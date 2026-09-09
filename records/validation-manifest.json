@@ -1,0 +1,22 @@
+{
+  "recorded_at_utc": "2026-09-09T23:17:21.325087+00:00",
+  "sha256": {
+    "pyproject.toml": "0293f016fbe391eebe55aa363571509beff7d432d26f80a8d846128e603554bf",
+    "uv.lock": "f3e998a5da7afee0157c18e37f46a012b96af4d7e490eaefcf609d6e2c3298fd",
+    ".python-version": "7b55f8e67b5623c4bef3fa691288da9437d79d3aba156de48d481db32ac7d16d",
+    "README.md": "75fe4b598d26ca873b66d3bdf83e6f832fd2a383bef49d4aee682630c9aa53bf",
+    "src/thorlabs_shutter_control/__init__.py": "137f17a3283046f0c4c3f42f25a51d615543217b60564eb124cc0711bb889eb2",
+    "src/thorlabs_shutter_control/__main__.py": "49b4796bc00ab647731e3f743e846dcff18c3b90031fa39567b133f66da351a0",
+    "src/thorlabs_shutter_control/controller.py": "acfc151988b7a1d01ef6c95d22df380b7d64e1243bae27c998e6dce686ead0bb",
+    "src/thorlabs_shutter_control/gui.py": "d8464c67c5d4ea12bb7393f118affdb915c21de612168f3e4871663b159c183d",
+    "src/thorlabs_shutter_control/assets/style.css": "af3886bd3f06947d45808c118b456e6794984224e8aaa4199efcce64c3c5d80b",
+    "tests/conftest.py": "1014f0d9dff36f9c8e76e4e59de59b78195b604c2729469c4da3aafa6c2d2683",
+    "tests/test_cli.py": "9921ece27dfa15952363087c2135c42cba8da4f876d0556539a83d4ad0f50d89",
+    "tests/test_controller.py": "8c4b539d8a902e574ba1545ccefc9a8de2837db190cbf892b2c623b5756898ea",
+    "tests/test_gui.py": "1008feb878530f6f1e9927ad1e70c8b14aeba3fbb7f739bcf2d2c0aa98e29004",
+    "tests/test_sdk.py": "348f9784eef822a1ec60b17b0bd15a43f08360cee2878e4f6cd52726c2a2bde5",
+    "dist/.gitignore": "684888c0ebb17f374298b65ee2807526c066094c701bcc7ebbe1c1095f494fc1",
+    "dist/thorlabs_shutter_control-0.1.0-py3-none-any.whl": "b2d1d5f88eff3585af4067ed2d6c93f36eaa4f5c0c867db00de0192bb6bb9de6",
+    "dist/thorlabs_shutter_control-0.1.0.tar.gz": "e62b8855231e4579f0f9330c48ca8b0e3e09f7bf6052f3318ccb9c1021d82e78"
+  }
+}

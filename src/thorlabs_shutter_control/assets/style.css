@@ -1,0 +1,22 @@
+:root { color-scheme: light; font-family: system-ui, sans-serif; color: #182a38; background: #f3f5f7; }
+body { margin: 0; }
+.app { max-width: 660px; margin: 28px auto; padding: 0 24px 24px; }
+h1 { font-size: 28px; margin: 6px 0; letter-spacing: -0.6px; }
+.eyebrow { color: #627584; font-size: 11px; font-weight: 700; letter-spacing: 2px; margin: 0; }
+.subtitle { color: #627584; margin: 0 0 16px; }
+.panel { background: white; border: 1px solid #dce3e8; border-radius: 12px; padding: 20px; margin: 14px 0; }
+label, .label { display: block; color: #526674; font-size: 13px; margin-bottom: 9px; }
+.status-panel > div { margin-bottom: 12px; }
+.status-panel .note { margin: 8px 0; }
+.connection-actions, .shutter-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 0; }
+button { border: 1px solid #b7c4ce; background: #fff; color: #233c4b; border-radius: 7px; padding: 11px 17px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+button:hover:enabled { background: #edf4f7; }
+button:focus-visible { outline: 3px solid #67a7bd; outline-offset: 3px; }
+button:disabled { opacity: .45; cursor: not-allowed; }
+button.primary { color: white; background: #176b80; border-color: #176b80; }
+button.primary:hover:enabled { background: #105a6c; }
+.shutter-actions button { flex: 1; font-size: 17px; padding: 12px; }
+.shutter-state { font-size: 24px; }
+.note { font-size: 12px; line-height: 1.6; color: #627584; }
+#message { white-space: pre-wrap; overflow-wrap: anywhere; background: #e7eef3; border-radius: 8px; padding: 15px 18px; font-size: 14px; line-height: 1.5; }
+@media (max-width: 480px) { .app { margin-top: 24px; padding: 0 14px 24px; } .panel { padding: 18px; } }

@@ -1,0 +1,167 @@
+====Prompt 1=============================================
+
+Initialize this repository as a new project based on the existing `agentic-engineering-template`.
+
+Project name: `thorlabs-shutter-control`
+
+Populate the human-authored project definition with the following requirements and constraints. Keep it concise. Do not begin implementation yet.
+
+## Objective
+
+Develop a reliable control program for a Thorlabs KSC101 K-Cube Solenoid Controller and connected optical shutter.
+
+The finished project should provide:
+
+* a simple reusable Python controller class;
+* reliable shutter open/close control;
+* device connection and status handling;
+* a lightweight Plotly Dash GUI for manual control;
+* a clean structure suitable for later integration into larger laboratory-control software.
+
+## Technical constraints
+
+* Use Python.
+* Use `uv` for environment and dependency management.
+* Use `pyproject.toml` and a `uv.lock` file.
+* Use Plotly Dash for the GUI.
+* Keep the hardware interface behind a simple controller class.
+* The GUI must call the controller class rather than contain Thorlabs-specific control logic.
+* Prefer official Thorlabs-supported APIs/libraries where practical.
+* Keep the implementation minimal and avoid unnecessary abstractions.
+
+## Desired controller capabilities
+
+The controller interface should support, where appropriate:
+
+* connect
+* disconnect
+* identify device
+* open shutter
+* close shutter
+* query state/status
+* safe shutdown
+* clear handling of communication errors
+
+The exact internal API may be refined after studying the KSC101 interface.
+
+## GUI requirements
+
+The Dash GUI should minimally show:
+
+* connection status
+* device identity / serial number
+* shutter state where available
+* Open button
+* Close button
+* status/error messages
+
+Keep the GUI simple and functional.
+
+## Validation
+
+The project should ultimately validate on the physical hardware:
+
+* device discovery/connection;
+* open;
+* close;
+* repeated open/close operation;
+* disconnect/reconnect;
+* error handling;
+* defined shutdown behavior;
+* GUI operation through the controller class.
+
+Do not treat successful software calls alone as proof of physical shutter operation.
+
+## Available system
+
+Known hardware:
+
+* Thorlabs KSC101
+* compatible Thorlabs optical shutter
+* USB-connected control computer
+
+Leave unknown details such as serial number, shutter model, power configuration, or installed Kinesis version explicitly unknown until discovered or supplied.
+
+## Engineering behavior
+
+* Research official Thorlabs documentation and supported software interfaces autonomously when implementation begins.
+* Make routine reversible engineering decisions autonomously.
+* Do not invent missing hardware details.
+* Do not bypass hardware interlocks or safety mechanisms.
+* Do not modify firmware without explicit approval.
+
+For now, only initialize the project definition and any template state required for a fresh project.
+
+Show me the resulting `PROJECT.md` and any initialization changes you made, then stop and wait for the autonomous engineering launch command.
+
+
+
+
+====Prompt 2=============================================
+Read `PROJECT.md`, `AGENTS.md`, and `STATE.md`. Take ownership of the engineering objective and begin the autonomous engineering loop.
+
+Continue inspect → gap → design → implement → test → diagnose → update state until the requirements are validated or a genuine external/hardware blocker requires my intervention.
+
+
+====Prompt 3=============================================
+Review the current `thorlabs-shutter-control` project as a hardware-ready engineering candidate.
+
+Do not begin physical KSC101 interaction and do not make unnecessary implementation changes.
+
+Inspect:
+
+* `PROJECT.md`
+* `AGENTS.md`
+* `STATE.md`
+* engineering records
+* controller implementation
+* Thorlabs backend
+* simulated/mock backend
+* Dash GUI
+* tests
+* packaging and `uv` configuration
+* documentation
+
+The previous run reports:
+
+* the Dash application correctly handles zero detected devices;
+* connection errors are surfaced correctly;
+* Open and Close remain disabled without a valid connection;
+* all 43 automated tests pass;
+* linting passes;
+* package builds pass;
+* remaining work requires physical KSC101 validation.
+
+Audit whether the project is genuinely ready for hardware integration.
+
+Specifically verify:
+
+1. the public controller API is small and coherent;
+2. GUI code is separated from device-specific control logic;
+3. the real KSC101 backend is implemented as far as possible from official documentation;
+4. hardware-dependent assumptions are explicitly identified;
+5. failure and shutdown behavior are well defined;
+6. simulated tests meaningfully cover expected application behavior;
+7. installation and execution through `uv` are reproducible;
+8. the hardware-validation procedure is complete and ordered from least consequential to more consequential interactions;
+9. the exact first commands/actions against the physical device are known;
+10. the project can be resumed cleanly for hardware validation.
+
+Do not add abstractions, features, or refactors merely to improve style.
+
+If a concrete issue prevents safe or meaningful hardware validation, fix it and rerun the relevant software tests.
+
+Otherwise, make no implementation changes.
+
+At completion:
+
+* update the canonical project state to `HARDWARE_READY` and then `AWAITING_HUMAN_REVIEW`;
+* summarize the architecture;
+* summarize automated validation results;
+* list all remaining hardware-dependent assumptions;
+* provide the exact ordered hardware-validation plan;
+* identify which steps physically actuate the shutter;
+* describe expected safe shutdown behavior;
+* provide the exact short prompt that should be used after human approval to begin hardware validation.
+
+Then stop. Do not communicate with or actuate the physical KSC101.

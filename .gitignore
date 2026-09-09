@@ -1,0 +1,22 @@
+# Local credentials and private inputs; review filenames before committing.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+inputs/private/
+
+# Common local caches and editor/OS artifacts.
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+.uv-cache/
+.tools/
+tmp/
+dist/
+*.egg-info/
+.ruff_cache/
+.DS_Store
+Thumbs.db
+~$*
