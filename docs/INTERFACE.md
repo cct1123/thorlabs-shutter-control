@@ -12,8 +12,9 @@ The vendor examples establish available methods, not a complete recovery or
 physical-validation policy. This project adds selection checks, serialization,
 fault handling, feedback waits, and cleanup around them.
 
-The [current download page](https://www.thorlabs.com/software-pages/Motion_Control)
-lists Kinesis 1.14.60 and notes a transition toward XA. Kinesis is used here because
+The [download page](https://www.thorlabs.com/software-pages/Motion_Control), inspected
+on 2026-09-09 during E001, listed Kinesis 1.14.60 and a transition toward XA.
+Kinesis is used here because
 the official KSC101 example and inspected KSC101 SDK directly establish support.
 No assertion is made about KSC101 support in XA. Revisit the choice if official
 device-specific support changes.
@@ -48,9 +49,17 @@ field or independent physical motion. Communication health is checked before and
 after sampling, and any observed fault invalidates displayed state. Hardware
 tests must establish actual status/USB-loss behavior for the installed version.
 
-The program does not persist settings, alter trigger wiring, bypass safeguards,
-or write firmware. Selecting Manual for explicit shutter operations is a runtime
-mode change; it is not restored on shutdown, so timed/triggered output stays disarmed.
+Open preparation requests Inactive then Manual and requires reported Closed,
+Inactive and Manual before EnableDevice/Active. A successful setter alone cannot
+satisfy that gate. Hardware must establish whether those reports are fresh and
+represent physical position for the connected shutter; the mock cannot do so.
+
+The program issues no explicit persist-settings or firmware calls, alters no
+trigger wiring, and does not bypass safeguards. Successful Close/shutdown leaves
+Manual/Inactive reported; the previous timed/triggered mode is not restored.
+The manufacturer manual says the last mode is remembered across power cycles;
+do not assume these runtime changes have no lasting effect or that a failed
+shutdown disarmed the controller. Record actual startup/persistence behavior.
 
 ## Manufacturer documentation and unresolved configuration
 

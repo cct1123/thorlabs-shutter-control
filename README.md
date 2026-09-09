@@ -3,8 +3,9 @@
 A reusable Python controller for the Thorlabs KSC101 and a local Plotly Dash GUI.
 Hardware commands live entirely in `KSC101Controller`; the GUI calls that class.
 
-**Hardware validation pending.** Software tests pass and the official Kinesis SDK
-loads, but discovery on the development computer returns no KSC101 devices.
+**AWAITING_HUMAN_REVIEW — hardware-ready candidate, physical validation pending.**
+The readiness audit passed after a focused Open-preparation fix. Earlier SDK
+checks loaded successfully and found zero devices; this audit did not access USB.
 See [STATE.md](STATE.md) and the [engineering report](outputs/REPORT.md).
 
 ## Setup
@@ -17,10 +18,13 @@ Development checks used Python 3.12.14 and the 64-bit Kinesis 1.14.60 SDK.
 
 ```powershell
 uv sync --locked
-uv run --locked shutter-control --list
-uv run --locked shutter-control
+uv run --locked shutter-control --help
 ```
 
+After human approval and the setup gates in the
+[hardware procedure](docs/HARDWARE_VALIDATION.md), run
+`uv run --locked shutter-control --list`, then `uv run --locked shutter-control`.
+The list command communicates with the vendor USB discovery interface.
 Open <http://127.0.0.1:8050>. Discover devices, select a serial number if needed,
 and Connect. Open and Close request manual operation. The GUI reports connection,
 identity, controller-reported shutter state, key/interlock status, and errors.
@@ -73,8 +77,9 @@ Methods: `discover`, `connect`, `identify_device`, `get_status`, `open_shutter`,
 state. Communication/operation faults block further Open commands until a
 disconnect/reconnect. Close and cleanup remain available while a handle exists.
 
-`connect()` issues no explicit output, enable, or mode commands. Open clears prior
-activity, selects Manual, enables the device, and requests Active. Close requests
+`connect()` issues no explicit output, enable, or mode commands. Open requests
+Inactive and Manual, waits for reported Closed/Inactive/Manual, then enables the
+device and requests Active. Failed preparation prevents Enable/Active. Close requests
 Inactive, then Manual. Commands wait for matching Kinesis feedback with a default
 5-second wait per stage; vendor calls have their own timeouts. Polling is 250 ms;
 GUI refresh is 1 second. These are not real-time guarantees or exposure controls.
@@ -101,15 +106,19 @@ and the Kinesis runtime dependencies. Restart Python after changing SDK versions
 ## Validation and project files
 
 ```powershell
-uv run --locked pytest -q -p no:cacheprovider
+uv run --locked pytest -q -p no:cacheprovider --ignore=tests/test_sdk.py
 uv run --locked ruff check src tests
 uv run --locked ruff format --check src tests
-uv build
+uv build --offline
 ```
 
-The ordinary suite uses a software test double. To additionally check the actual
-SDK signatures and USB enumeration, set `KINESIS_TEST_DIR` to the Kinesis folder
-before running pytest. That test never connects or actuates a device. No automatic
+The software-only command explicitly excludes USB enumeration regardless of the
+environment. Offline builds require cached build dependencies; on a fresh computer
+use `uv build` with network access. The ordinary suite uses a software test double.
+To additionally check SDK signatures and USB enumeration, set `KINESIS_TEST_DIR`
+to the Kinesis folder and run `uv run --locked pytest -q tests/test_sdk.py` only
+when hardware communication is authorized. That test never connects or actuates.
+No automatic
 test in this repository moves real hardware.
 
 - `src/thorlabs_shutter_control/`: controller, GUI, CLI, packaged CSS.
@@ -119,5 +128,6 @@ test in this repository moves real hardware.
 - [PROJECT.md](PROJECT.md): human intent; [AGENTS.md](AGENTS.md): operating rules.
 - [STATE.md](STATE.md): checkpoint; [records/RECORDS.md](records/RECORDS.md): evidence.
 
-To resume engineering, read PROJECT.md, AGENTS.md, and STATE.md, reconcile the
-hardware configuration, then continue from the recorded blocker and next action.
+Resume only after human approval: read PROJECT.md, AGENTS.md, STATE.md and the
+hardware procedure, reconcile the actual configuration, then follow its ordered
+gates. The exact launch prompt is in STATE.md. Hardware requirements remain pending.

@@ -84,6 +84,33 @@ def test_open_disarms_auto_mode_before_enabling(rig):
     ]
 
 
+@pytest.mark.parametrize("unchanged", ["operation", "position"])
+def test_open_does_not_enable_when_preparation_feedback_disagrees(rig, monkeypatch, unchanged):
+    rig.device.mode = "AutoToggle"
+    rig.device.state = "Open"
+    rig.device.operation = "Active"
+    rig.controller.connect()
+    set_state = rig.device.SetOperatingState
+
+    def incomplete_close(state):
+        if state == "Inactive":
+            rig.device.record("set_state", state)
+            if unchanged != "operation":
+                rig.device.operation = "Inactive"
+            if unchanged != "position":
+                rig.device.state = "Closed"
+        else:
+            set_state(state)
+
+    monkeypatch.setattr(rig.device, "SetOperatingState", incomplete_close)
+    with pytest.raises(ShutterError, match="reported Closed/Inactive in Manual mode"):
+        rig.controller.open_shutter()
+    assert ("enable",) not in rig.device.calls
+    assert ("set_state", "Active") not in rig.device.calls
+    assert rig.device.calls[-1] == ("set_state", "Inactive")
+    assert rig.controller.get_status().shutter_state == "unknown"
+
+
 @pytest.mark.parametrize("blocked", ["key", "interlock"])
 def test_open_respects_existing_safeguards(rig, blocked):
     rig.controller.connect()

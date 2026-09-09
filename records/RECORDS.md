@@ -142,3 +142,93 @@ Consequence: close on context exit/Ctrl+C is best-effort; default disconnect cha
 output. A deliberate communication-only disconnect is available. Browser closure,
 forced termination and USB loss do not guarantee closure. Physical acceptance
 must verify the documented policy before the project can be COMPLETE.
+
+## E005
+
+Kind / scope: hardware-readiness source audit and reproduced defect; 2026-09-09.
+Reviewed PROJECT, AGENTS, STATE, engineering records, controller/real SDK boundary,
+test double, GUI/CLI/assets, all tests, packaging/lock and documentation. Read local
+official Python example, KSC101 native header and manual text; no SDK load, USB
+inventory, discovery, connection or actuation was performed during this audit.
+
+Baseline: 42 software tests passed in 0.17 s with tests/test_sdk.py explicitly
+excluded. E003's 43 included one real-SDK enumeration test; that result is historical,
+not rerun evidence. E004's rendered-browser zero-device result is also historical.
+
+Finding: Open preparation required only Manual feedback before EnableDevice/Active,
+so it proceeded even when the preceding Inactive command still reported Active or
+Open. Two software regressions injected those independent disagreements: both
+FAILED before the fix (DID NOT RAISE), reproducing false successful preparation.
+The single production change requires Closed AND Inactive AND Manual before
+EnableDevice/Active. It retains the existing timeout/recovery-close/fault behavior.
+Both regressions and the full software suite now PASS. No API, GUI, dependency or
+backend abstraction was added. E003 alone no longer validates the changed code;
+E006 supplies current software evidence. Physical feedback freshness remains unknown.
+
+Procedure defect: TEST-003's initial disconnect used the default Close policy.
+Replaced it with explicit disconnect(close_shutter=False) for communication-only
+checks; documented exact first vendor calls, first Close before Open, normal
+shutdown before GUI/repeated cycles, and closed-state USB fault injection last.
+All potential actuation and observation gates are identified. Clarified that no
+explicit persistence call does not prove a mode change is nonpersistent: the
+manufacturer manual describes remembering the last mode across power cycles.
+The ordered procedure was reviewed against actual public methods and shutdown paths.
+
+## E006
+
+Kind / scope: current software/packaging acceptance; TEST-001..008 software scope.
+Configuration: Windows x64, CPython 3.12.14, uv 0.11.2; locked 39-package environment
+including Dash 4.4.1, Plotly 7.0.0, Python.NET 3.1.0, pytest 9.1.1, ruff 0.16.6.
+Application source/build/document fingerprints: [readiness manifest](hardware-readiness-manifest.json).
+Base Git revision: bdcb48fffd8a579edc83a2cadf91eed5256a385f plus the audited changes.
+
+Commands run from repository root with
+`C:\Users\ctcheung\.local\bin\uv.exe --cache-dir .uv-cache`:
+
+1. Unset KINESIS_TEST_DIR. `run --locked --offline pytest -q -p no:cacheprovider --ignore=tests/test_sdk.py`:
+   **44 passed** after fix (0.19 s).
+2. Set UV_PROJECT_ENVIRONMENT=tmp/audit-venv and run `sync --locked --offline --python
+   C:\Users\ctcheung\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe`:
+   created a fresh environment, installed all 39 locked packages. Repeat software
+   test command: **44 passed in 0.43 s**.
+3. `run --locked --offline ruff check src tests`: PASS;
+   `run --locked --offline ruff format --check src tests`: 9 files already formatted.
+   `run --locked --offline shutter-control --help`: PASS without SDK loading.
+4. `build --offline --out-dir tmp/audit-dist`: sdist and wheel built successfully.
+5. `pip install --offline --python tmp/audit-venv/Scripts/python.exe --no-deps
+   --reinstall tmp/audit-dist/thorlabs_shutter_control-0.1.0-py3-none-any.whl`:
+   replaced editable install with wheel. Using that environment's Python directly,
+   `-m pytest -q -p no:cacheprovider --ignore=tests/test_sdk.py`: **44 passed in 0.17 s**.
+   Installed CLI --help and `pip check --python tmp/audit-venv/Scripts/python.exe`: PASS.
+6. Verified import path is the audit environment's site-packages, wheel contains
+   CSS and no vendor DLL/executable, and passive Flask page/layout/CSS routes return
+   200. Asserted _loaded_sdk is None and clr/pythonnet/Thorlabs modules absent.
+
+Meaningful simulated coverage: discovery/selection and no-device handling, passive
+connection, partial-connect cleanup, 20 cycles, safeguard refusal, incomplete
+preparation, missing feedback, communication faults and unknown-state latching,
+shutdown failure/retry/interruption, original-exception preservation, CLI cleanup,
+real Dash HTTP callback lifecycle/error handling and no replay on refresh.
+The fake applies normal updates immediately; it does not model USB timing, vendor
+cache age, drivers, electrical interlocks or mechanics. No claim of real-time or
+physical acceptance is made. The real SDK opt-in test was excluded, not counted
+as a current PASS. Final documentation-only package rebuilds preserve tested code.
+
+Reproducibility boundary: runtime/dev dependencies are locked and a fresh cached
+install was demonstrated on Python 3.12 x64. Other allowed Python versions are
+not validated. Fresh uncached hosts require package/Python downloads and a separate
+supported vendor runtime/driver installation. Hatchling's allowed build dependency
+range is not a claim of byte-identical builds on every host; artifact hashes record
+the actual builds. Neither vendor binaries nor drivers are supplied by uv.lock.
+
+## D004
+
+Decision: user-requested review supersedes autonomous hardware continuation.
+After E005/E006, record HARDWARE_READY, then AWAITING_HUMAN_REVIEW; retain BLOCKED
+for physical REQ-003..008. These explicit user-requested readiness states refine
+the template workflow; neither means COMPLETE or grants physical authority.
+PROJECT.md's current scope records the same user instruction. No hardware
+communication, actuation, firmware changes or safeguard bypass occurred in this audit.
+Resume only after human approval using docs/HARDWARE_VALIDATION.md from stage 0.
+Unknown bench facts remain unknown until discovered or supplied. Preserve E001–E004
+as historical evidence; use the new manifest for the current reviewed candidate.

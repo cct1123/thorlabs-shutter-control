@@ -285,7 +285,14 @@ class KSC101Controller:
                 # Clear any existing timed/triggered activity before enabling Manual mode.
                 self._device.SetOperatingState(self._sdk.enums.OperatingStates.Inactive)
                 self._device.SetOperatingMode(self._sdk.enums.OperatingModes.Manual)
-                self._wait_for(lambda s: s.operating_mode == "manual", "Manual mode")
+                self._wait_for(
+                    lambda s: (
+                        s.shutter_state == "closed"
+                        and s.operating_state == "inactive"
+                        and s.operating_mode == "manual"
+                    ),
+                    "reported Closed/Inactive in Manual mode",
+                )
                 self._device.EnableDevice()
                 self._device.SetOperatingState(self._sdk.enums.OperatingStates.Active)
                 return self._wait_for(

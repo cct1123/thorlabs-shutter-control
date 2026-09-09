@@ -58,7 +58,8 @@ later integration into larger laboratory-control software.
 
 ## Current scope
 
-Autonomous engineering launched by the user on 2026-09-09. Continue inspection,
-design, implementation, testing, diagnosis, and state updates until requirements
-are validated or a genuine external/hardware blocker requires intervention.
-Retain the engineering constraints and physical-action boundaries in AGENTS.md.
+Autonomous implementation was followed by a user-requested hardware-readiness
+audit on 2026-09-09. Finish software review and preparation, then stop at
+AWAITING_HUMAN_REVIEW. Do not communicate with or actuate the physical KSC101
+until the user approves the staged hardware-validation launch. Requirements and
+the engineering constraints above remain unchanged.
