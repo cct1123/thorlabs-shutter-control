@@ -1,158 +1,101 @@
-# Hardware-readiness engineering review
+# Simplification report
 
-The documentation follow-up is complete; see [documentation pass](#documentation-pass)
-for its deliverables and validation. The physical readiness status below is unchanged.
+Software cleanup is complete; physical acceptance remains **AWAITING_HUMAN_REVIEW**
+with REQ-003–008 **BLOCKED**. This pass used software fixtures only, without loading
+Kinesis or communicating with hardware. Final evidence: [E009](../records/RECORDS.md#e009).
+The subsequent publication review is recorded in [E010](../records/RECORDS.md#e010).
 
-Status: **AWAITING_HUMAN_REVIEW**, following **HARDWARE_READY** on 2026-09-09.
-The candidate is ready for staged hardware integration after human approval and
-verification of the bench conditions. Physical acceptance remains BLOCKED.
-No physical KSC101 communication or actuation occurred during this review.
+## Simplified architecture
 
-## Architecture and audit conclusions
+Dash GUI / CLI → KSC101Controller → official Kinesis .NET via Python.NET → USB KSC101.
 
-Dash / CLI -> KSC101Controller -> official Kinesis .NET via Python.NET -> USB KSC101.
-The public class provides discover, connect, identify_device, get_status,
-open_shutter, close_shutter, disconnect and safe_shutdown, plus context cleanup.
-ShutterStatus is an immutable snapshot; ShutterError carries failures. Methods on
-one instance are serialized. Hardware-specific calls remain in controller.py;
-GUI callbacks only use the public controller interface. Import/GUI startup is passive.
-The test fake replaces the SDK boundary; there is no production simulator or
-additional driver abstraction to configure.
+Four small production Python modules remain: public package exports, controller,
+GUI and CLI. Hardware behavior stays in the controller; the GUI uses its public
+API. Open preparation now calls the same verified Close used by explicit Close
+and shutdown. One state wait checks position, Active/Inactive and Manual mode,
+plus key/interlock feedback for Open. No predicate callback or command registry
+is needed. See [architecture](../docs/architecture.md) and [API](../docs/python-api.md).
 
-| Requested audit | Conclusion |
-| --- | --- |
-| 1. Small coherent API | PASS: eight operations, status/error types, explicit passive release option. |
-| 2. GUI/device separation | PASS: Dash orchestration calls controller; no vendor enums or SDK calls in GUI. |
-| 3. Real backend implemented from official sources | PASS for software readiness: official KSC101 Python/C# examples, native header and previously reflected 1.14.60.27990 SDK contract; no stubbed hardware operations. Actual device behavior pending. |
-| 4. Assumptions explicit | PASS: unresolved bench, feedback, timing and shutdown facts below and in STATE.md. |
-| 5. Failure/shutdown policy | PASS in software; fault snapshots invalidate state, faults block Open, Close/cleanup remain possible. Physical guarantees not inferred. |
-| 6. Meaningful simulation tests | PASS: lifecycle, faults, feedback disagreement, cleanup and actual Dash HTTP callbacks. Mock timing/mechanics are not hardware evidence. |
-| 7. Reproducible uv setup | PASS on Windows/Python 3.12 x64: fresh locked environment and installed wheel tested. Vendor runtime/drivers remain external prerequisites. |
-| 8. Ordered physical procedure | PASS after correction: passive checks, first Close, singles, shutdown, GUI, repetition, closed-state faults. |
-| 9. Exact first actions | PASS: explicit commands and vendor sequence in stages 1–3 of the procedure. |
-| 10. Clean resumption | PASS: canonical checkpoint, artifact hashes, authority hold, stage gates, evidence fields and launch prompt recorded. |
+## Removed or collapsed
 
-Sources and interface details: [INTERFACE.md](../docs/INTERFACE.md).
-Audit/reproduction evidence: [E005/E006](../records/RECORDS.md#e005).
+- Removed root `ARCHITECTURE.md`, which repeated the engineering workflow already
+  specified in [AGENTS.md](../AGENTS.md).
+- Merged `docs/assets/README.md` into the [GUI guide](../docs/gui.md#screenshot-provenance),
+  alongside the screenshots it explains. All four images and reproduction details remain.
+- Collapsed three predicate callbacks and duplicated Close preparation into the
+  controller's existing closing path and one concrete feedback wait.
+- Removed redundant Dash asset-path construction/import and an explicit default
+  callback setting; package-local CSS and initial refresh are still checked.
+- Removed the fake's unused clock export and special stuck-position flag. Tests
+  inject disagreement at the affected device method instead.
+- Replaced a custom fake server class/factory with a patched Dash run method,
+  exercising the real app construction during the CLI shutdown test.
+- Shortened checkpoint/report duplication and removed the architecture diagram's
+  artificial split between the public controller and its implementation.
 
-## Concrete changes and automated validation
+No dependencies were removed: Dash, Python.NET, pytest, Ruff and Hatchling each
+serve a required purpose. Packaging, lockfile, CLI flags and public signatures are
+unchanged. Timeout errors now name the full expected state; failed Open preparation
+can include the underlying Close failure before the recovery result.
 
-Fixed one production defect: Open previously proceeded to Enable/Active when its
-preparatory Inactive request still reported Active or Open, provided Manual mode
-was reported. Two injected regression cases reproduced that failure. Preparation
-now requires **Closed AND Inactive AND Manual** before enabling/requesting Active.
-Both cases then passed. No public API, GUI, dependency, feature or abstraction changed.
+## Size and validation
 
-Corrected the procedure's first disconnect to `disconnect(close_shutter=False)`;
-default disconnect writes Close. Added first-close-before-open ordering, explicit
-actuation labels, observation/stop gates, and exact first calls. Clarified mode
-persistence and the difference between historical SDK evidence and current tests.
-PROJECT.md's scope now reflects the user's explicit human-review pause.
+Against baseline 1984b17, tracked files decreased **39 → 37**; production Python
+lines decreased **637 → 616** (21 lines, about 3.3%). Test code increased by 13 lines
+for the five added safety cases. Counts exclude ignored builds/caches and the
+user's prompt-log edits. The runtime was already compact; no production module
+merger met the stated preservation criteria.
 
-- **44 software-only tests PASS**, including the two regressions, repeated in a fresh
-  locked environment and against the installed wheel.
-- Ruff lint/format PASS; fresh offline uv sync installed 39 locked packages.
-- Source distribution and wheel build PASS; installed CLI --help, dependency
-  compatibility, GUI page/layout/CSS and packaged-asset checks PASS.
-- Verified wheel import from site-packages and no Python.NET/Kinesis modules loaded
-  during passive GUI smoke checks. Real USB enumeration test explicitly excluded.
-- Previous 43-test result included one opt-in SDK enumeration test. That and the
-  zero-device browser result remain historical E003/E004 evidence, not new hardware
-  validation. There are now 44 software cases plus one opt-in SDK case.
+Final checks in [E009](../records/RECORDS.md#e009):
 
-Readiness-audit source/document/build hashes: [readiness manifest](../records/hardware-readiness-manifest.json).
-The old manifest is preserved as historical evidence. Builds are usable artifacts;
-byte-identical builds across all toolchain versions are not claimed. uv.lock covers
-Python runtime/dev packages, not the separately installed vendor SDK or USB driver.
-The build-system requirement permits a Hatchling version range. Other declared
-Python versions have not been validated; the hardware candidate targets 3.12 x64.
+- 49 software tests PASS in a fresh locked environment and against the installed wheel.
+- Ruff lint/format PASS; all 39 installed dependencies compatible; CLI help PASS.
+- Source distribution and wheel build/install PASS; installed GUI/layout/CSS HTTP 200,
+  passive initial callback and package assets checked without vendor modules loading.
+- Four documented Python examples and normal/empty API demos PASS (empty exit 1 expected).
+- Markdown lint and internal references PASS; five Mermaid diagrams rendered without
+  browser errors and the revised architecture diagram passed visual review.
 
-## Remaining hardware-dependent assumptions
+The original 44 software cases passed immediately after the controller reduction.
+Five additional feedback cases cover ignored Manual mode during preparation and
+operating-state/mode/key/interlock disagreement after Active. All existing lifecycle,
+selection, passive startup, fault-latching, cleanup, interruption and GUI cases remain.
 
-All of these require discovery, supplied bench facts or physical observation:
+The real-SDK test enumerates USB and was excluded under the hardware hold. No
+physical movement, feedback freshness, timing or shutdown guarantee is established
+by these tests. No static type checker is configured; Ruff and Python/package
+execution are the project's configured checks.
 
-- Actual serial, shutter model/compatibility, firmware, initial mode/state and
-  availability. Last real enumeration found zero devices; it was not rerun here.
-- Actual supply model/rating/polarity, shutter/USB cabling and power sequence;
-  key/interlock/trigger configuration; independently blocked/disabled beam,
-  qualified observer/measurement arrangement and approved physical shutdown method.
-- Installed Kinesis version/path/bitness, .NET/vendor dependencies and USB driver;
-  settings initialization, passive connection/polling and channel-enable behavior.
-- Whether this shutter supplies meaningful position feedback; state/key/interlock
-  semantics and cache freshness; feedback availability before Enable; actual USB
-  fault detection latency and native-call blocking behavior.
-- Physical open/close mapping and settling, thermal/duty-cycle limits and approved
-  dwell, repeated-operation reliability, ownership release and reconnect behavior.
-- Key/interlock and external-trigger behavior, startup/mode persistence, closure
-  during normal shutdown/Ctrl+C, and residual state under USB/power/process failure.
-  Abrupt failures cannot be assumed to close the shutter and are not all injected
-  by this bounded plan; normal-mode and closed-state USB-loss checks are required.
+## Complexity intentionally retained
 
-The official SDK administrative image under tmp/ is local/ignored and not a USB
-installation. Its prior successful load cannot settle any of these unknowns.
-
-## Ordered hardware validation and shutdown
-
-The exact commands, vendor calls, expectations, evidence and stop rules are in
-[HARDWARE_VALIDATION.md](../docs/HARDWARE_VALIDATION.md). Execute only after approval:
-
-| Order | Action | Actuation classification |
-| --- | --- | --- |
-| 0 | Confirm hardware/configuration, supported software, independent protection/observation, shutdown method and dwell limits. | Operator setup/power changes may cause motion; manufacturer procedure required. |
-| 1 | Locked environment checks, then CLI --list; compare physical label/serial. | SDK discovery only; no explicit output commands. |
-| 2 | Connect, identify, sample status, passive disconnect; review and repeat twice. | No explicit output commands; observe any SDK/startup side effects. |
-| 3 | Connect and first Close; verify Closed/Inactive/Manual and independent position. | First intentional output-changing command. |
-| 4 | One Open, approved dwell, Close; correlate physical observations and status. | Actuates. |
-| 5 | Shutdown from closed, then from open; reconnect/identity/cleanup. | Actuates; proves normal closing path before further tests. |
-| 6 | Dash discovery/connect, Close/Open/Close, Close & disconnect; reconnect/Open/Ctrl+C. | Actuates; independently verify cleanup. |
-| 7 | Twenty numbered Open/Close pairs at approved dwell; observe every transition; shutdown. | Repeated actuation. |
-| 8 | Closed-state USB loss, Fault/Unknown timing, Open refusal only after fault, failed-shutdown reporting, reconnect/cleanup; repeat through GUI. | No intended opening; loss/restoration and cleanup may affect output. |
-
-Stop at any failed gate, ambiguous state or missing prerequisite. Do not interpret
-successful calls as proof of movement. Record TEST-003..008 against the exact
-configuration; repeat affected gates and final GUI open/close/shutdown after changes.
-
-Normal `safe_shutdown()`, default `disconnect()`, context exit, GUI Close &
-disconnect and server Ctrl+C request Inactive then Manual, wait for reported
-Closed/Inactive/Manual, stop polling and disconnect. Closure failure does not skip
-release; errors remain visible. Failed release retains the handle for retry.
-Successful shutdown does not restore auto/trigger mode. Failed Open attempts a
-recovery Inactive write and latches a fault, without claiming physical closure.
-Browser-tab closure does nothing to the controller. Force-kill, USB/power loss,
-stale feedback or a hung native call cannot guarantee closure; maintain independent
-protection and use the approved bench shutdown method when software cannot verify it.
-
-## Human handoff
-
-REQ-001/002 PASS within software scope; REQ-003..008 remain BLOCKED. Review is
-complete, project acceptance is not. [STATE.md](../STATE.md) is canonical and records
-HARDWARE_READY -> AWAITING_HUMAN_REVIEW. No hardware command or server is pending.
-User changes to prompt log.txt were preserved outside this audit. Consult Git
-history for commit/publication status. After approval, use exactly:
-
-> Human review approved. Read PROJECT.md, AGENTS.md, STATE.md and docs/HARDWARE_VALIDATION.md. Begin hardware validation in the documented order, verifying the bench conditions before device access and requiring independent observations for every actuation. Stop on any failed gate or missing prerequisite; record evidence and update state.
+- `KSC101Controller`, immutable `ShutterStatus`, and `ShutterError`: the required
+  reusable interface isolates vendor types and gives callers explicit fault snapshots.
+- SDK cache/DLL handles and locks: retain native dependencies, enforce one loaded
+  Kinesis installation and serialize calls on a controller instance.
+- Health checks around status reads, feedback timeouts, safeguard checks, latched
+  faults, recovery Close and retained handles after failed release: protect correctness.
+- Separate Close and disconnect operations, passive release, context cleanup and
+  the public `safe_shutdown()` wrapper: actively documented APIs with different
+  ownership/output consequences. Cleanup still runs after failure or interruption.
+- GUI/CLI modules, packaged CSS, and SDK/controller/GUI/CLI tests: each isolates a
+  real runtime or validation boundary. Merging them would couple unrelated concerns.
+- The shared fixture/demo and historical evidence manifests: avoid duplicate
+  simulators and preserve reproducible software examples and revision-specific evidence.
 
 ## Documentation pass
 
-The [README](../README.md) and five linked guides cover setup/troubleshooting,
-GUI use, Python API/integration, architecture and hardware. Four actual 820 × 850 px
-screenshots show simulated disconnected, Closed, Open and empty-discovery error
-states. Five editable Mermaid diagrams explain architecture and workflows.
+The prior documentation delivery remains available: README, setup, GUI, API,
+architecture and hardware guides, four simulated screenshots and five editable
+Mermaid diagrams. [E007/E008](../records/RECORDS.md#e007) and the
+[historical manifest](../records/documentation-manifest.json) identify that delivery.
+Old manifests do not identify the refactored candidate; E009 records its validation.
 
-The [demo](../docs/examples/simulated_demo.py) reuses the existing pytest fixture;
-it requires a source checkout and dev dependencies. The docs accurately describe
-this boundary and the `open_shutter()`/`close_shutter()` API. No production code,
-CSS, tests or dependencies changed, and no production defect was found.
+## Hardware handoff
 
-[E007](../records/RECORDS.md#e007) records the fresh environment, 44 software tests,
-API examples, browser captures, lint, links, diagram rendering and package checks.
-[E008](../records/RECORDS.md#e008) records pruning and publication review;
-the [manifest](../records/documentation-manifest.json) identifies the final files.
-The duplicated request archive was removed because the full request is already
-in the user-maintained prompt log, included in the same commit as requested.
-
-Documentation REQ-009–013 are complete. Physical REQ-003–008 remain BLOCKED under
-AWAITING_HUMAN_REVIEW. Installer/remote-clone and hardware command checks retain
-the limits stated in E007. No bench photos are available; the hardware guide links
-official references and lists useful future views. The existing approved-launch
-procedure remains the condition for future physical validation.
+The [ordered hardware procedure](../docs/HARDWARE_VALIDATION.md) is unchanged.
+[STATE.md](../STATE.md#human-action-required-for-future-hardware-validation--b001)
+records the missing bench facts, safeguards and exact resumption condition.
+Explicit approval and stage-0 verification are required before device access.
+Shutdown remains a best-effort Close and release; USB/power loss, hung native calls
+or forced termination cannot guarantee closure. No firmware or interlock changes
+are authorized. The user's pre-existing `prompt log.txt` edits are preserved.

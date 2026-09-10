@@ -94,12 +94,12 @@ uv run --locked ruff format --check src tests docs/examples
 uv build
 ```
 
-Expect **44 passed**, successful Ruff checks, and a wheel plus source distribution
+Expect **49 passed**, successful Ruff checks, and a wheel plus source distribution
 under `dist/`. The ignored SDK test can enumerate real USB when `KINESIS_TEST_DIR`
 is set, so the explicit exclusion matters even on a development computer.
 
 These checks cover software behavior, including faults and GUI callbacks, not
-physical operation. [E007](../records/RECORDS.md#e007) records the tested environment
+physical operation. [E009](../records/RECORDS.md#e009) records the tested environment
 and verification limits.
 
 For an already populated cache, `uv sync --locked --offline` and `uv build --offline`

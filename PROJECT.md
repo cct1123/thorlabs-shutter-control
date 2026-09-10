@@ -75,3 +75,14 @@ device access, physical validation, architectural redesign or unrelated features
 are in scope. Documentation examples and a source-checkout screenshot/demo harness
 may reuse the existing test fixture; production behavior remains unchanged.
 The earlier hardware-review hold remains in force after this documentation pass.
+
+### Code simplification follow-up
+
+The user's subsequent cleanup request authorizes incremental code and documentation
+simplification: remove redundant structure and configuration while preserving
+required behavior, used public APIs, hardware boundaries, safety/error handling,
+meaningful tests, packaging and reproducibility. Validate reductions with affected
+tests, then the full software suite, lint/format and package checks. Report the
+resulting architecture, removals, size changes and intentionally retained complexity.
+This supersedes the documentation-only restriction on local implementation changes;
+the hardware-review hold and physical acceptance criteria remain in force.

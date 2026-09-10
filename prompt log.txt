@@ -803,7 +803,140 @@ The final result should make `thorlabs-shutter-control` understandable to a new 
 
 
 
+
+
 ====Prompt 5=============================================
+Review the existing codebase and aggressively simplify it.
+
+The objective is to reduce unnecessary coding scaffolding, abstraction, boilerplate, indirection, dead structure, and maintenance burden while preserving the required behavior.
+
+Prioritize a smaller, clearer, more direct implementation.
+
+## Goals
+
+* reduce file count where sensible;
+* reduce unnecessary classes, wrappers, factories, registries, adapters, managers, services, and helper layers;
+* merge modules that exist only to preserve artificial separation;
+* remove dead code, unused configuration, stale experiments, redundant utilities, duplicate tests, and obsolete compatibility code;
+* remove abstractions that have only one implementation and no clear near-term need for extension;
+* eliminate pass-through functions and wrappers that add no meaningful behavior;
+* simplify dependency injection or plugin systems that are unnecessary for the project scale;
+* reduce configuration surfaces;
+* remove premature extensibility;
+* reduce comments and documentation that merely restate obvious code;
+* simplify test fixtures and mocking infrastructure where lighter tests provide equivalent confidence;
+* preserve important boundaries around hardware, external APIs, safety, persistence, or other genuinely unstable interfaces.
+
+## Decision Rule
+
+For every abstraction, file, module, configuration option, and dependency, ask:
+
+> Does this materially improve correctness, testability, safety, readability, reuse, or isolation of a genuinely unstable boundary?
+
+If not, remove or collapse it.
+
+Prefer:
+
+**direct code > framework machinery**
+**small module > layered hierarchy**
+**explicit call > generic dispatch**
+**plain function > manager/service object**
+**one clear implementation > extensibility scaffold**
+**local configuration > configuration framework**
+**simple test double > elaborate mocking framework**
+
+## Preserve
+
+Do not simplify away:
+
+* required functionality;
+* public APIs that are actively used;
+* meaningful hardware/device boundaries;
+* safety checks;
+* error handling that protects correctness;
+* tests covering important behavior or regressions;
+* reproducibility;
+* packaging required for actual use;
+* interfaces that isolate unstable vendor or external dependencies;
+* documentation needed by users.
+
+## Avoid
+
+Do not:
+
+* rewrite the whole project merely for stylistic consistency;
+* introduce a new framework during cleanup;
+* replace simple working code with clever abstractions;
+* create new generic infrastructure to remove old generic infrastructure;
+* optimize for hypothetical future requirements;
+* preserve scaffolding only because it might someday be useful.
+
+## Cleanup Process
+
+1. Inspect the full repository and identify the actual required behavior.
+2. Map the current architecture and dependency flow.
+3. Identify obvious dead code and redundant files.
+4. Identify unnecessary abstraction layers and indirection.
+5. Propose the simplest architecture that preserves current requirements.
+6. Simplify incrementally.
+7. After each meaningful reduction, run the relevant tests.
+8. Remove tests, fixtures, and configuration that became obsolete.
+9. Run the complete test suite, linting, type checks, and build/package checks that are relevant.
+10. Update documentation to match the simplified architecture.
+
+When multiple implementations are equivalent, choose the one with:
+
+* fewer concepts;
+* fewer files;
+* fewer dependencies;
+* fewer hidden control paths;
+* fewer configuration options;
+* less boilerplate;
+* easier debugging.
+
+## Final Review
+
+At the end, perform another pruning pass.
+
+Look specifically for:
+
+* one-line wrappers;
+* trivial base classes;
+* interfaces with one implementation;
+* unused extension points;
+* duplicate state representations;
+* unnecessary enums;
+* excessive dataclasses/models;
+* redundant exception types;
+* generic helpers used once;
+* test-only production abstractions;
+* repeated configuration;
+* obsolete feature flags;
+* stale comments;
+* dead imports and dependencies.
+
+Remove them unless they have a concrete current purpose.
+
+## Deliverables
+
+After cleanup, provide:
+
+1. the simplified architecture;
+2. files/modules removed or merged;
+3. abstractions eliminated;
+4. dependencies removed;
+5. approximate reduction in code/file count if practical;
+6. tests/build checks run and results;
+7. any complexity intentionally retained and why.
+
+The desired outcome is not merely “cleaner code.”
+
+The desired outcome is:
+
+> **the smallest maintainable implementation that clearly satisfies the current requirements.**
+
+====Prompt 6=============================================
+
 
 Resume the existing `thorlabs-shutter-control` project and begin the **physical hardware integration and validation phase**.
 

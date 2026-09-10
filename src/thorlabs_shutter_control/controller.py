@@ -254,17 +254,24 @@ class KSC101Controller:
                 error=self._fault,
             )
 
-    def _wait_for(self, predicate, description: str) -> ShutterStatus:
+    def _wait_for_state(self, shutter_state: str) -> ShutterStatus:
+        operating_state = "active" if shutter_state == "open" else "inactive"
         deadline = time.monotonic() + self.timeout
         while True:
             # Allow a poll after a write. Kinesis still owns cache freshness/USB timeout.
             time.sleep(self.polling_ms / 1000)
             status = self._read_status()
-            if predicate(status):
+            if (
+                status.shutter_state == shutter_state
+                and status.operating_state == operating_state
+                and status.operating_mode == "manual"
+                and (shutter_state != "open" or (status.key_enabled and status.interlock_enabled))
+            ):
                 return status
             if time.monotonic() >= deadline:
                 raise ShutterError(
-                    f"Timed out waiting for {description}; reported state: {status}."
+                    f"Timed out waiting for reported {shutter_state.title()}/"
+                    f"{operating_state.title()} in Manual mode; reported state: {status}."
                 )
 
     def open_shutter(self) -> ShutterStatus:
@@ -283,28 +290,10 @@ class KSC101Controller:
                 return status
             try:
                 # Clear any existing timed/triggered activity before enabling Manual mode.
-                self._device.SetOperatingState(self._sdk.enums.OperatingStates.Inactive)
-                self._device.SetOperatingMode(self._sdk.enums.OperatingModes.Manual)
-                self._wait_for(
-                    lambda s: (
-                        s.shutter_state == "closed"
-                        and s.operating_state == "inactive"
-                        and s.operating_mode == "manual"
-                    ),
-                    "reported Closed/Inactive in Manual mode",
-                )
+                self.close_shutter()
                 self._device.EnableDevice()
                 self._device.SetOperatingState(self._sdk.enums.OperatingStates.Active)
-                return self._wait_for(
-                    lambda s: (
-                        s.shutter_state == "open"
-                        and s.operating_state == "active"
-                        and s.operating_mode == "manual"
-                        and s.key_enabled
-                        and s.interlock_enabled
-                    ),
-                    "reported Open",
-                )
+                return self._wait_for_state("open")
             except BaseException as exc:
                 # A failed Open may have actuated; attempt Inactive and preserve the failure.
                 recovery = ""
@@ -326,14 +315,7 @@ class KSC101Controller:
             try:
                 self._device.SetOperatingState(self._sdk.enums.OperatingStates.Inactive)
                 self._device.SetOperatingMode(self._sdk.enums.OperatingModes.Manual)
-                return self._wait_for(
-                    lambda s: (
-                        s.shutter_state == "closed"
-                        and s.operating_state == "inactive"
-                        and s.operating_mode == "manual"
-                    ),
-                    "reported Closed",
-                )
+                return self._wait_for_state("closed")
             except Exception as exc:
                 self._fault = f"Close failed: {exc}. Physical closure is unverified."
                 raise ShutterError(self._fault) from exc

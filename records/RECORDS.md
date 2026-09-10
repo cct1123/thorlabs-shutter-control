@@ -315,7 +315,7 @@ Observed GUI/visual validation:
   states. Normal browser lifecycle ended with Close & disconnect; the error case
   remained disconnected with Open disabled. No browser JavaScript errors in the
   normal lifecycle. Screenshots were inspected visually without pixel editing.
-- [Asset provenance and reproduction steps](../docs/assets/README.md) identify
+- [Asset provenance and reproduction steps](../docs/gui.md#screenshot-provenance) identify
   every screenshot as simulation. Fictional identity and test-double description
   are visible in connected captures. No private desktop material, real device
   serials or vendor photographs were included. Missing bench photos are documented.
@@ -371,3 +371,115 @@ failure cleanup. Final builds/installed-wheel checks and file hashes are in
 E007's screenshots, example execution and 44-test results remain applicable to
 unchanged source/tests/demo. Publication is identified by Git history/origin/main;
 physical acceptance remains blocked under the existing review hold.
+
+## D006
+
+Kind / scope: active user-requested aggressive simplification, superseding only
+PROJECT.md's prior documentation-only implementation restriction. Hardware hold
+and all acceptance criteria remain. REQ-014–016 derive from that request.
+
+Retain four production modules: exports, hardware controller, Dash UI and CLI.
+Each has a current API/runtime boundary. Reuse Close during Open preparation and
+replace generic predicate waits with one concrete state wait. Preserve the vendor
+call order, full feedback/safeguard gates, fault latching, locks and cleanup.
+Exception type is unchanged; timeout messages now name the full expected state,
+and Open preparation errors can include the nested Close failure.
+
+Remove duplicate workflow documentation, merge screenshot provenance into its
+GUI guide, use Dash's package-local asset default, and prune unused fixture state
+and a custom server fake. Keep used public wrappers, vendor isolation, dependency
+lock/build configuration, all important tests and historical evidence. No new
+framework, production abstraction or dependency was introduced. The only adjusted
+historical record link points to the relocated screenshot provenance.
+
+## E009
+
+Kind / scope: software cleanup on 2026-09-10 UTC, base commit `1984b17`.
+REQ-001/002, REQ-009/010/012 and derived REQ-014–016; TEST-014–016, with affected
+TEST-001/002 and TEST-009/010/012 rechecked. Physical REQ-003–008 remain BLOCKED.
+No real SDK load, USB enumeration, device communication or actuation is authorized.
+
+Expected: preserve public signatures and command/safety/cleanup behavior, remove
+redundancy, pass all software tests and documented examples, and build/install the
+package with functional passive GUI/CSS. Real-SDK enumeration is explicitly excluded.
+
+Observed:
+
+- Baseline: 44 software cases PASS (0.23 s), Ruff lint/format PASS. After collapsing
+  Close and feedback waits, the same 44 cases PASS (0.18 s). Ruff identified one
+  line wrap, corrected with its formatter before subsequent checks.
+- Added five parameter cases for preparation-mode and post-Active operating-state,
+  mode, key and interlock disagreement. All 49 cases PASS after fixture/GUI pruning
+  (0.22 s), retaining every existing behavior/regression case.
+- Fresh `tmp/cleanup-venv`: `uv --cache-dir .uv-cache sync --locked --offline`, with
+  `UV_PROJECT_ENVIRONMENT=tmp/cleanup-venv` and `UV_PYTHON` pointing to the existing
+  bundled CPython 3.12.14 x64. uv 0.11.2 installed all 39 locked packages. This
+  validates a fresh environment from cache, not a fresh network/OS installation.
+- Fresh environment: `python -m pytest -q -p no:cacheprovider --ignore=tests/test_sdk.py`
+  PASS, 49 cases (1.02 s); `ruff check src tests docs/examples` and
+  `ruff format --check src tests docs/examples` PASS, 10 files. CLI `--help` PASS;
+  `uv pip check --python tmp/cleanup-venv/Scripts/python.exe` PASS, 39 packages.
+- All four README/API Python blocks PASS using the patched fixture, including
+  acquisition success/failure cleanup; no clr/pythonnet/Thorlabs module loaded.
+  Demo `--api` returned 0 with Closed → Open → Closed → Disconnected; `--api --empty`
+  returned the expected 1 with the missing-device diagnostic. One-off verification
+  source: `tmp/cleanup-examples.py`; it excludes obsolete unchanged-source assertions.
+
+- `uv --cache-dir .uv-cache build --offline --out-dir tmp/cleanup-dist`: sdist and
+  wheel PASS. Installed with `uv pip install --offline --python
+  tmp/cleanup-venv/Scripts/python.exe --no-deps --reinstall` plus the wheel path.
+  All 49 software cases PASS against site-packages (0.21 s). Passive GUI, layout
+  and CSS return HTTP 200; initial callback remains enabled; no vendor modules load.
+  Wheel includes CSS/current README and excludes tests/demo/vendor binaries; sdist
+  includes the demo/screenshots and excludes the two deleted documents. Check source:
+  `tmp/cleanup-package.py`. Builds use the configured Hatchling range, not a claim
+  of byte-identical artifacts across build-tool versions.
+- Markdownlint-cli2 0.23.2: 11 maintained Markdown files, zero issues using the
+  existing ignored `tmp/docs-lint.json` (long lines/tables and HTML images allowed).
+  A pre-existing bare URL in the hardware procedure was converted to a link; its
+  ordered steps/limits are unchanged. `tmp/cleanup-docs.cjs` checked internal links
+  and rendered six user pages/five Mermaid diagrams: zero missing references/images
+  or browser errors. The simplified architecture was visually reviewed. Headless
+  Edge initially hit sandbox EPERM; scoped automatic escalation permitted the
+  temporary local-only browser check. Browser closed normally; no server was needed.
+- Public method signatures checked with AST comparison against HEAD; package
+  exports, CLI, CSS, pyproject.toml, uv.lock and .python-version are byte-identical
+  to baseline. User-maintained prompt log.txt matches its pre-cleanup SHA256.
+  No static type checker is configured; none was added for this refactor.
+- Final pruning reviewed every remaining module, helper, configuration and dependency.
+  39 -> 37 tracked files; production Python 637 -> 616 lines (3.3% reduction).
+  Test Python 534 -> 547 lines for five additional safety cases. No public API or
+  dependency removed; no permanent verification framework/manifest introduced.
+
+Changed production SHA256 (other production/configuration files match base 1984b17):
+
+- `controller.py`: `7761daa9f3dc383384e58bc3f990b3a19f7eb78e101708e05b3cb944cd594baf`
+- `gui.py`: `a52e176194de1e7d17a445f9ade1942440633c886f73835a656843919c0bc775`
+
+TEST-014–016 PASS; affected software/documentation requirements revalidated.
+Cleanup is COMPLETE. Physical REQ-003–008 remain BLOCKED under the review hold.
+Historical manifests still identify their original candidates. No hardware operation,
+server or browser remains pending; no commit or push was requested/performed.
+
+## E010
+
+Kind / scope: user-requested review, fixes, commit and push of the cleanup,
+2026-09-10 UTC. TEST-017: prepublication review of REQ-014–016 and current software
+validation, followed by Git publication verification. Hardware hold unchanged.
+
+Reviewed the full pending diff, including the shared Close path, all feedback gates,
+fault/recovery behavior, Dash defaults, revised tests and documentation removals.
+No production defect found. Corrected stale checkpoint statements referring only
+to baseline tests and saying publication had not been requested. Production/test
+files remain the candidate validated in E009; its source fingerprints still apply.
+
+Current source suite: `python -m pytest -q -p no:cacheprovider --ignore=tests/test_sdk.py`
+PASS, 49 cases (0.20 s). Ruff lint/format PASS for all 10 Python files; `git diff
+--check` PASS. Internal references resolve; E009's package/example/diagram checks
+remain applicable. No real SDK load or device access occurred.
+
+Fetched origin and confirmed HEAD/origin/main had no divergence before publication.
+The reviewed commit includes the related user-maintained prompt-log additions;
+their content is preserved, with Git's configured LF normalization in the index.
+The active user request authorizes commit and push to the existing origin/main.
+Git history and the matching origin/main revision identify the publication result.

@@ -39,7 +39,7 @@ uv run --locked python docs/examples/simulated_demo.py --api
 uv run --locked python docs/examples/simulated_demo.py
 ```
 
-The test command runs **44 software tests** and explicitly excludes real USB
+The test command runs **49 software tests** and explicitly excludes real USB
 enumeration. The API demo prints `closed → open → closed → disconnected`.
 The final command starts the actual GUI at [localhost:8050](http://127.0.0.1:8050).
 Click **Discover → Connect**, verify **TEST DOUBLE, NOT HARDWARE**, then try
@@ -116,7 +116,7 @@ uv build
 
 Tests cover operation, selection, faults, feedback disagreement, cleanup, CLI and
 Dash callbacks. Simulation cannot validate wiring, motion, timing or interlocks.
-See [validation evidence](records/RECORDS.md#e007); hardware REQ-003–008 remain **BLOCKED**.
+See [validation evidence](records/RECORDS.md#e009); hardware REQ-003–008 remain **BLOCKED**.
 
 ## Documentation
 
@@ -128,7 +128,7 @@ See [validation evidence](records/RECORDS.md#e007); hardware REQ-003–008 remai
 | [Software architecture](docs/architecture.md) | Data/control flow, simulation boundary and source map |
 | [Hardware and validation](docs/hardware.md) | Target setup, vendor links, missing photos and physical limits |
 | [Interface notes](docs/INTERFACE.md) | Kinesis members and historical SDK evidence |
-| [Engineering report](outputs/REPORT.md) | Readiness review, documentation deliverables and limitations |
+| [Engineering report](outputs/REPORT.md) | Simplification, validation results and retained boundaries |
 
 Maintainers: [PROJECT.md](PROJECT.md) holds intent, [STATE.md](STATE.md) holds the
 checkpoint, and [records](records/RECORDS.md) hold evidence. Follow

@@ -103,4 +103,23 @@ power or USB is lost, or a vendor call hangs, software cannot guarantee closure.
 A shutdown error must be resolved using the approved bench recovery method;
 retrying a button is not independent evidence that the shutter is closed.
 See [shutdown details](python-api.md#shutdown-and-faults) and
-[screenshot provenance](assets/README.md).
+[screenshot provenance](#screenshot-provenance).
+
+## Screenshot provenance
+
+These unedited screenshots show the actual Dash page and CSS with the software
+fixture, captured on 2026-09-09 in Edge 152.0.4191.66 through Playwright. Each is
+an 820 × 850 px browser viewport at scale 1. Kinesis was replaced before any
+controller operation; `68000001` is fictional. They are simulation evidence only.
+
+To reproduce, launch [the demo](examples/simulated_demo.py), set that viewport/scale,
+wait for callbacks to finish and move the pointer clear of controls:
+
+| Image | Steps |
+| --- | --- |
+| `gui-disconnected.png` | Fresh normal demo, before Discover |
+| `gui-connected-simulated.png` | Discover → Connect → Close |
+| `gui-shutter-open.png` | From connected state, Open |
+| `gui-error-state.png` | Fresh `--empty` demo, Discover → Connect |
+
+Finish with Close & disconnect where connected, then Ctrl+C in the terminal.

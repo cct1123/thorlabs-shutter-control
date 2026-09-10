@@ -27,15 +27,15 @@ def test_server_exception_still_attempts_shutdown(rig, monkeypatch):
 
     rig.controller.connect()
 
-    class Server:
-        def run(self, **kwargs):
-            assert kwargs["debug"] is False
-            assert kwargs["use_reloader"] is False
-            assert kwargs["host"] == "127.0.0.1"
-            raise RuntimeError("server failure")
+    def fail_server(self, **kwargs):
+        assert kwargs["debug"] is False
+        assert kwargs["use_reloader"] is False
+        assert kwargs["host"] == "127.0.0.1"
+        assert kwargs["threaded"] is False
+        raise RuntimeError("server failure")
 
     monkeypatch.setattr(cli, "KSC101Controller", lambda *a, **k: rig.controller)
-    monkeypatch.setattr(gui, "create_app", lambda controller: Server())
+    monkeypatch.setattr(gui.Dash, "run", fail_server)
     monkeypatch.setattr(sys, "argv", ["shutter-control"])
     with pytest.raises(RuntimeError, match="server failure"):
         cli.main()

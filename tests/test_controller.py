@@ -84,25 +84,21 @@ def test_open_disarms_auto_mode_before_enabling(rig):
     ]
 
 
-@pytest.mark.parametrize("unchanged", ["operation", "position"])
-def test_open_does_not_enable_when_preparation_feedback_disagrees(rig, monkeypatch, unchanged):
+@pytest.mark.parametrize(
+    "getter, value",
+    [
+        ("GetOperatingState", "Active"),
+        ("GetSolenoidState", "Open"),
+        ("GetOperatingMode", "AutoToggle"),
+    ],
+    ids=["operation", "position", "mode"],
+)
+def test_open_does_not_enable_when_preparation_feedback_disagrees(rig, monkeypatch, getter, value):
     rig.device.mode = "AutoToggle"
     rig.device.state = "Open"
     rig.device.operation = "Active"
     rig.controller.connect()
-    set_state = rig.device.SetOperatingState
-
-    def incomplete_close(state):
-        if state == "Inactive":
-            rig.device.record("set_state", state)
-            if unchanged != "operation":
-                rig.device.operation = "Inactive"
-            if unchanged != "position":
-                rig.device.state = "Closed"
-        else:
-            set_state(state)
-
-    monkeypatch.setattr(rig.device, "SetOperatingState", incomplete_close)
+    monkeypatch.setattr(rig.device, getter, lambda: value)
     with pytest.raises(ShutterError, match="reported Closed/Inactive in Manual mode"):
         rig.controller.open_shutter()
     assert ("enable",) not in rig.device.calls
@@ -124,9 +120,29 @@ def test_open_respects_existing_safeguards(rig, blocked):
     assert rig.controller.close_shutter().shutter_state == "closed"
 
 
-def test_missing_feedback_does_not_turn_successful_write_into_success(rig):
+@pytest.mark.parametrize(
+    "attribute, value",
+    [
+        ("state", "Closed"),
+        ("operation", "Inactive"),
+        ("mode", "AutoToggle"),
+        ("KeyEnabled", False),
+        ("interlock", False),
+    ],
+)
+def test_missing_feedback_does_not_turn_successful_write_into_success(
+    rig, monkeypatch, attribute, value
+):
     rig.controller.connect()
-    rig.device.stuck = True
+    set_state = rig.device.SetOperatingState
+
+    def disagree_after_open(state):
+        set_state(state)
+        if state == "Active":
+            target = rig.device.Status if attribute == "KeyEnabled" else rig.device
+            setattr(target, attribute, value)
+
+    monkeypatch.setattr(rig.device, "SetOperatingState", disagree_after_open)
     with pytest.raises(ShutterError, match="Timed out waiting for reported Open"):
         rig.controller.open_shutter()
     assert rig.device.calls[-1] == ("set_state", "Inactive")

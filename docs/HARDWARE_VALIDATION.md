@@ -146,7 +146,7 @@ Exit the REPL with `exit()` only after successful cleanup.
 & $uv --cache-dir .uv-cache run --locked shutter-control --serial $env:KSC101_SERIAL
 ```
 
-Open http://127.0.0.1:8050. Check passive initial UI with Open/Close disabled;
+Open [localhost:8050](http://127.0.0.1:8050). Check passive initial UI with Open/Close disabled;
 Discover, verify/select serial, Connect, verify identity/status/safeguards. Click
 Close, then Open, observe over several refreshes with no replay, then Close.
 Click Close & disconnect; verify closure/release. Reconnect, Open, then press

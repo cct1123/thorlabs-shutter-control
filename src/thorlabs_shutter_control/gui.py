@@ -1,14 +1,12 @@
 """Local single-operator Dash UI; every device action goes through the controller."""
 
-from pathlib import Path
-
 from dash import Dash, Input, Output, State, ctx, dcc, html, no_update
 
 from .controller import KSC101Controller, ShutterError
 
 
 def create_app(controller: KSC101Controller) -> Dash:
-    app = Dash(__name__, assets_folder=str(Path(__file__).with_name("assets")))
+    app = Dash(__name__)
     app.title = "Shutter control"
     initial_serial = controller.serial_number
     app.layout = html.Main(
@@ -116,7 +114,6 @@ def create_app(controller: KSC101Controller) -> Dash:
         Input("close", "n_clicks"),
         Input("refresh", "n_intervals"),
         State("serial", "value"),
-        prevent_initial_call=False,
         running=[(Output("refresh", "disabled"), True, False)],
     )
     def update(_discover, _connect, _disconnect, _open, _close, _refresh, serial):

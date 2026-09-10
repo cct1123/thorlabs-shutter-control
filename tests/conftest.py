@@ -23,7 +23,6 @@ class FakeDevice:
         self.polling = 0
         self.serial = "68000001"  # Explicitly fictional test identity.
         self.fail = set()
-        self.stuck = False
 
     def record(self, name, *args):
         self.calls.append((name, *args))
@@ -73,8 +72,7 @@ class FakeDevice:
     def SetOperatingState(self, state):
         self.record("set_state", state)
         self.operation = state
-        if not self.stuck:
-            self.state = "Open" if state == "Active" else "Closed"
+        self.state = "Open" if state == "Active" else "Closed"
 
     def SetOperatingMode(self, mode):
         self.record("set_mode", mode)
@@ -121,5 +119,4 @@ def rig(monkeypatch):
         controller=KSC101Controller(timeout=0.5),
         serials=serials,
         manager_calls=manager_calls,
-        clock=clock,
     )

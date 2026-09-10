@@ -11,19 +11,14 @@ flowchart TD
     H[Human operator] --> G[Plotly Dash GUI]
     E[Experiment software] --> C[KSC101Controller public API]
     G --> C
-    subgraph M[controller.py]
-        C --> B[KSC101-specific implementation]
-    end
-    B --> K[Official Kinesis .NET through Python.NET]
+    C --> K[Official Kinesis .NET through Python.NET]
     K --> U[USB: Thorlabs KSC101]
     U --> S[Compatible optical shutter]
-    B -. SDK replaced by tests or docs demo .-> F[Software test double]
+    C -. SDK replaced by tests or docs demo .-> F[Software test double]
     F --> N[In-memory state and virtual clock: no hardware]
 ```
 
-The hardware and fake paths are alternatives. The boxes inside `controller.py`
-describe responsibilities within one module; there is no separate backend class.
-The Mermaid source above is the editable architecture figure.
+The hardware and fake paths are alternatives. The Mermaid source above is editable.
 
 ## What each part owns
 
@@ -48,6 +43,11 @@ Commands check reported state; faults invalidate `ShutterStatus` and block Open
 until disconnect/reconnect. Close and cleanup remain available while a handle
 exists. See [the API reference](python-api.md#shutdown-and-faults) for recovery
 semantics and [INTERFACE.md](INTERFACE.md) for the exact vendor command sequence.
+
+Open preparation calls `close_shutter()` before enabling the output. Both commands
+use one state wait that checks position, matching Active/Inactive state and Manual
+mode; Open also requires enabled key/interlock feedback. There is no configurable
+predicate or command-dispatch layer.
 
 ## Timing and ownership
 
@@ -89,5 +89,4 @@ thermal limits, USB-loss latency or physical shutdown.
 | [docs](.) | User guides, example harness and screenshots |
 | [STATE.md](../STATE.md), [records](../records/RECORDS.md) | Checkpoint and traceable evidence |
 
-The root [ARCHITECTURE.md](../ARCHITECTURE.md) describes the autonomous engineering
-workflow. This page describes the shutter-control software.
+Engineering operating instructions live in [AGENTS.md](../AGENTS.md).
