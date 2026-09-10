@@ -1,8 +1,9 @@
 # Engineering records
 
 Durable evidence and decisions. Software doubles, SDK enumeration, and physical
-observations have distinct scopes. Records below were finalized 2026-09-09,
-23:20 UTC. No physical shutter operation has been observed or claimed.
+observations have distinct scopes. Each record identifies its scope; subsequent
+documentation evidence is appended below. No physical shutter operation has
+been observed or claimed.
 
 ## E001
 
@@ -232,3 +233,141 @@ communication, actuation, firmware changes or safeguard bypass occurred in this 
 Resume only after human approval using docs/HARDWARE_VALIDATION.md from stage 0.
 Unknown bench facts remain unknown until discovered or supplied. Preserve E001–E004
 as historical evidence; use the new manifest for the current reviewed candidate.
+
+## D005
+
+Decision / scope: documentation-only follow-up to the user's
+[request in prompt log.txt](../prompt%20log.txt), REQ-009–013. Preserve the production controller,
+GUI, CSS, tests, dependency configuration and hardware-review hold. No device access,
+hardware validation or architectural change is authorized by this request.
+
+Inspection found no production simulator or separate backend class: the real
+Kinesis implementation is inside controller.py, and simulation is the pytest rig
+in tests/conftest.py. Document this existing structure rather than inventing
+`--simulate`, `open()`/`close()` aliases or a pluggable backend interface.
+Add only a source-checkout documentation helper under docs/examples that reuses
+the existing fixture for the API walkthrough and actual GUI screenshots. It
+replaces the SDK loader before use and restores it after cleanup; it is not an
+installed command or public backend. This is documentation-enabling support,
+not production feature work. No concrete production defect was found in the
+documented workflows.
+
+Keep the detailed hardware procedure's sequence/gates and historical readiness
+evidence intact. Replace its machine-specific working-directory/uv path with a
+repository-root instruction and PATH lookup; this changes no device operation.
+The readiness manifest still identifies the unchanged code/test/configuration
+candidate; its older document/build hashes are historical after this pass.
+Do not interpret documentation completion as physical project completion.
+
+## E007
+
+Kind / scope: documentation, software-only examples, GUI browser captures,
+Markdown/diagram checks and packaging on 2026-09-09/10 UTC. TEST-009–013,
+REQ-009–013; software evidence also supports unchanged REQ-001/002.
+No real SDK loading, USB enumeration, device communication or actuation occurred.
+
+Expected results: current commands/examples match implementation, the actual GUI
+renders the documented simulated states, internal links/assets resolve, Mermaid
+renders, packaging succeeds, and production/test/configuration fingerprints remain
+unchanged. Physical REQ-003–008 are excluded, not counted as PASS.
+
+Observed software validation:
+
+- Fresh `tmp/docs-venv` environment: `uv sync --locked --offline` installed all
+  39 locked packages with CPython 3.12.14 x64 and uv 0.11.2. In this sandbox, set
+  `UV_CACHE_DIR` to `.uv-cache`, `UV_PROJECT_ENVIRONMENT` to `tmp/docs-venv`, and
+  `UV_PYTHON` to the existing bundled Python 3.12 executable. The initial offline
+  attempt without that interpreter reference could not discover Python 3.12;
+  explicitly selecting the installed interpreter resolved it. This is a fresh
+  environment equivalent, not a new system Python/uv installation.
+- `uv run --locked pytest -q -p no:cacheprovider --ignore=tests/test_sdk.py`:
+  **44 passed in 0.46 s**. The SDK test was explicitly excluded regardless of
+  environment. `ruff check src tests docs/examples` and
+  `ruff format --check src tests docs/examples`: PASS, 10 Python files.
+- `uv run --locked shutter-control --help`: PASS. Documented hardware CLI flags
+  match argparse; actual `--list`/Connect/actuation were not run on hardware.
+  Git HTTPS clone URL matches the configured origin; remote cloning and the
+  documented uv installer command were not executed. Fresh-clone network/access
+  conditions and vendor-driver installation are not established by this pass.
+- `uv run --locked python docs/examples/simulated_demo.py --api`: PASS; fictional
+  identity `68000001`, Closed → Open → Closed → Disconnected. All four Python
+  example blocks in README.md / docs/python-api.md executed against the existing
+  fixture. Integration callback return and exception paths both closed the fake.
+  `_loaded_sdk` remained None; no clr/pythonnet/Thorlabs modules were loaded.
+  Detailed temporary result: `tmp/docs-example-results.json`.
+- All 13 source/test/configuration fingerprints covered by this review match
+  the prior readiness manifest, including source CSS, tests, pyproject.toml,
+  uv.lock and .python-version. User-maintained prompt log.txt was not edited.
+- `uv build --offline --out-dir tmp/docs-dist`: wheel and source distribution
+  PASS. Installed the wheel with `uv pip install --offline --python
+  tmp/docs-venv/Scripts/python.exe --no-deps --reinstall` and its wheel path;
+  `uv pip check --python tmp/docs-venv/Scripts/python.exe` and installed CLI help
+  PASS. Verified import from site-packages, passive GUI page/layout/CSS HTTP 200,
+  current README in package metadata, CSS in wheel, no demo/test/vendor binaries
+  in wheel, and demo plus all four screenshots in sdist. No vendor modules loaded.
+  Detailed temporary result: `tmp/docs-package-results.json`.
+
+Observed GUI/visual validation:
+
+- Ran the actual `create_app`/callbacks/CSS with the documentation fixture helper.
+  Microsoft Edge 152.0.4191.66, Playwright, viewport 820 × 850 px, scale 1.
+  Captured fresh disconnected, connected/Closed, Open, and empty-discovery error
+  states. Normal browser lifecycle ended with Close & disconnect; the error case
+  remained disconnected with Open disabled. No browser JavaScript errors in the
+  normal lifecycle. Screenshots were inspected visually without pixel editing.
+- [Asset provenance and reproduction steps](../docs/assets/README.md) identify
+  every screenshot as simulation. Fictional identity and test-double description
+  are visible in connected captures. No private desktop material, real device
+  serials or vendor photographs were included. Missing bench photos are documented.
+- Browser/server sandbox restrictions initially prevented localhost binding and
+  headless process launch. Scoped automatic escalation allowed the fixture-only
+  server and temporary-profile browser; no hardware fallback was used.
+- Markdown/diagram tools were installed only in ignored `tmp/docs-tools` with
+  scripts disabled, without changing project dependencies. Markdownlint-cli2
+  0.23.2 uses an ignored config permitting HTML img elements and long lines/tables
+  (MD013/MD060 disabled). Seven user-facing Markdown pages checked. An underscore
+  in a CLI link label was corrected. Mermaid blocks rendered in an isolated
+  local-content browser; diagram labels were shortened after visual inspection.
+  Final link/render result: `tmp/docs-render-results.json`.
+- Final user-page render: seven pages, 77 internal references, five Mermaid
+  diagrams, zero missing references/images and zero browser JavaScript errors.
+  Broader checkpoint/report/reference-document links are checked again with the
+  final manifest present. Both screenshot servers were stopped after verifying
+  their process command lines; the normal simulated device had already been
+  closed/disconnected. No pending device/process operation remains.
+
+Command verification distinguishes executed software commands from source-checked
+hardware/installer/remote-clone commands. Official uv instructions and Python.NET
+runtime guidance were checked online. The vendor download page was reachable but
+provided no readable text; the linked manual could not be refetched by the web
+reader, so its existing local extraction and E001 were used to verify the quoted
+hardware context. No new vendor version/compatibility claim is made.
+
+Final outcomes, artifact hashes and check counts are captured in the
+[documentation manifest](documentation-manifest.json). New documentation status
+and limitations are summarized in [the report](../outputs/REPORT.md#documentation-pass).
+These results do not change the blocked physical acceptance criteria.
+
+## E008
+
+Kind / scope: user-requested review, pruning and publication of the documentation
+with `prompt log.txt`. TEST-009–013, REQ-009–013; no device access. Expected result:
+concise, accurate guides with valid links/builds and unchanged production behavior.
+
+Review found repeated simulation, status and shutdown explanations, plus a full
+request archive already present verbatim in the prompt log. Removed that duplicate
+and linked the original log; shortened README, architecture/hardware/setup text,
+asset notes and the report: 2,730 words removed, including the 2,137-word duplicate
+request. Kept all examples, screenshots, diagrams, public API
+details and hardware-validation gates. No production defect was identified.
+
+The user explicitly authorized committing the prompt log with these changes and
+pushing. Its content was preserved; Git applies the repository's LF normalization.
+Fetched origin and confirmed main had no divergence before preparing the commit.
+Markdownlint reports zero issues; all 110 internal references resolve, and four
+Python documentation blocks pass against the fixture, including acquisition
+failure cleanup. Final builds/installed-wheel checks and file hashes are in
+[the manifest](documentation-manifest.json).
+E007's screenshots, example execution and 44-test results remain applicable to
+unchanged source/tests/demo. Publication is identified by Git history/origin/main;
+physical acceptance remains blocked under the existing review hold.

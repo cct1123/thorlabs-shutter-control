@@ -63,3 +63,15 @@ audit on 2026-09-09. Finish software review and preparation, then stop at
 AWAITING_HUMAN_REVIEW. Do not communicate with or actuate the physical KSC101
 until the user approves the staged hardware-validation launch. Requirements and
 the engineering constraints above remain unchanged.
+
+### Documentation follow-up
+
+The user's subsequent documentation-only request in [prompt log.txt](prompt%20log.txt)
+authorizes a polished README, supporting user guides, actual simulated GUI
+screenshots, editable architecture/workflow diagrams, verified examples and
+troubleshooting. Base every claim on implementation and recorded evidence. Keep
+simulation prominent and physical validation pending. No hardware development,
+device access, physical validation, architectural redesign or unrelated features
+are in scope. Documentation examples and a source-checkout screenshot/demo harness
+may reuse the existing test fixture; production behavior remains unchanged.
+The earlier hardware-review hold remains in force after this documentation pass.

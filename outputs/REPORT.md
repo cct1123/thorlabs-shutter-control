@@ -1,5 +1,8 @@
 # Hardware-readiness engineering review
 
+The documentation follow-up is complete; see [documentation pass](#documentation-pass)
+for its deliverables and validation. The physical readiness status below is unchanged.
+
 Status: **AWAITING_HUMAN_REVIEW**, following **HARDWARE_READY** on 2026-09-09.
 The candidate is ready for staged hardware integration after human approval and
 verification of the bench conditions. Physical acceptance remains BLOCKED.
@@ -57,7 +60,7 @@ PROJECT.md's scope now reflects the user's explicit human-review pause.
   zero-device browser result remain historical E003/E004 evidence, not new hardware
   validation. There are now 44 software cases plus one opt-in SDK case.
 
-Current source/document/build hashes: [readiness manifest](../records/hardware-readiness-manifest.json).
+Readiness-audit source/document/build hashes: [readiness manifest](../records/hardware-readiness-manifest.json).
 The old manifest is preserved as historical evidence. Builds are usable artifacts;
 byte-identical builds across all toolchain versions are not claimed. uv.lock covers
 Python runtime/dev packages, not the separately installed vendor SDK or USB driver.
@@ -128,3 +131,28 @@ User changes to prompt log.txt were preserved outside this audit. Consult Git
 history for commit/publication status. After approval, use exactly:
 
 > Human review approved. Read PROJECT.md, AGENTS.md, STATE.md and docs/HARDWARE_VALIDATION.md. Begin hardware validation in the documented order, verifying the bench conditions before device access and requiring independent observations for every actuation. Stop on any failed gate or missing prerequisite; record evidence and update state.
+
+## Documentation pass
+
+The [README](../README.md) and five linked guides cover setup/troubleshooting,
+GUI use, Python API/integration, architecture and hardware. Four actual 820 × 850 px
+screenshots show simulated disconnected, Closed, Open and empty-discovery error
+states. Five editable Mermaid diagrams explain architecture and workflows.
+
+The [demo](../docs/examples/simulated_demo.py) reuses the existing pytest fixture;
+it requires a source checkout and dev dependencies. The docs accurately describe
+this boundary and the `open_shutter()`/`close_shutter()` API. No production code,
+CSS, tests or dependencies changed, and no production defect was found.
+
+[E007](../records/RECORDS.md#e007) records the fresh environment, 44 software tests,
+API examples, browser captures, lint, links, diagram rendering and package checks.
+[E008](../records/RECORDS.md#e008) records pruning and publication review;
+the [manifest](../records/documentation-manifest.json) identifies the final files.
+The duplicated request archive was removed because the full request is already
+in the user-maintained prompt log, included in the same commit as requested.
+
+Documentation REQ-009–013 are complete. Physical REQ-003–008 remain BLOCKED under
+AWAITING_HUMAN_REVIEW. Installer/remote-clone and hardware command checks retain
+the limits stated in E007. No bench photos are available; the hardware guide links
+official references and lists useful future views. The existing approved-launch
+procedure remains the condition for future physical validation.

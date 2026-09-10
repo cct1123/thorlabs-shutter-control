@@ -165,3 +165,1170 @@ At completion:
 * provide the exact short prompt that should be used after human approval to begin hardware validation.
 
 Then stop. Do not communicate with or actuate the physical KSC101.
+
+
+
+====Prompt 4=============================================
+
+Improve the existing `thorlabs-shutter-control` repository by creating polished, human-oriented documentation and visual material.
+
+This is a **documentation-only engineering pass**.
+
+Do not perform hardware development, hardware validation, architectural redesign, or unrelated feature work. Do not change working device-control behavior unless a documentation example reveals a concrete defect that prevents the documented workflow from working; if that occurs, record the issue rather than expanding this task into a new development phase.
+
+The goal is to make the repository immediately understandable and approachable to a new human user.
+
+## Primary Objective
+
+Create a clear, professional README and supporting documentation that explain:
+
+* what the project does;
+* what hardware/software it targets;
+* how the architecture works;
+* how to install it;
+* how to run it;
+* how to use the Python controller;
+* how to launch and use the Plotly Dash GUI;
+* how the project behaves with and without hardware;
+* how to integrate the controller into larger experiment-control software;
+* what has and has not been physically validated.
+
+Use visual material wherever it materially improves understanding.
+
+The documentation should be useful to:
+
+* laboratory researchers;
+* research hardware engineers;
+* scientific software developers;
+* future maintainers;
+* AI agents inspecting the repository.
+
+---
+
+# 1. Inspect Before Writing
+
+First inspect the current repository, including:
+
+* `PROJECT.md`
+* `STATE.md`
+* `AGENTS.md`
+* existing README
+* package structure
+* controller API
+* real KSC101 backend
+* simulated/mock backend
+* Dash GUI
+* tests
+* configuration
+* validation records
+* existing images/assets
+* current installation and run commands
+
+Base the documentation on the actual implementation.
+
+Do not document hypothetical APIs, files, commands, or behavior that do not exist.
+
+If documentation and implementation disagree, treat the implementation and recorded engineering evidence as the current source of truth, while clearly noting unresolved hardware-dependent behavior.
+
+---
+
+# 2. README
+
+Rewrite or create the root `README.md` as the primary entry point.
+
+Keep it concise enough to scan quickly, while linking to deeper documentation where useful.
+
+Recommended structure:
+
+## Project title
+
+`thorlabs-shutter-control`
+
+One concise sentence explaining the project.
+
+Example concept:
+
+> Python control interface and Plotly Dash GUI for the Thorlabs KSC101 K-Cube Solenoid Controller and optical shutter.
+
+## Overview
+
+Briefly explain:
+
+* the problem being solved;
+* why the controller abstraction exists;
+* intended laboratory use;
+* relationship between Python API, KSC101 backend, and Dash GUI.
+
+## Visual Overview
+
+Place a useful hero visual near the top of the README.
+
+Prefer one of:
+
+* a clean screenshot of the running Dash GUI;
+* a compact system architecture figure combining GUI, controller, backend, and shutter;
+* or a tasteful combination if readability remains good.
+
+Do not overload the README with large numbers of images.
+
+## Features
+
+Summarize actual implemented functionality.
+
+Examples may include:
+
+* Python controller class;
+* device discovery/connection;
+* shutter open/close;
+* state handling;
+* safe shutdown;
+* simulated backend;
+* Plotly Dash GUI;
+* automated tests;
+* `uv`-based environment management.
+
+Only list features that actually exist.
+
+## Architecture
+
+Explain the intended separation:
+
+**Dash GUI / user code
+→ controller API
+→ device backend
+→ Thorlabs KSC101
+→ optical shutter**
+
+Include a small Mermaid or generated architecture figure.
+
+Explain why the separation matters:
+
+* reusable controller API;
+* hardware-independent application logic;
+* simulated testing;
+* easier integration into larger experimental software.
+
+## Quick Start
+
+Make this section exceptionally clear.
+
+Include:
+
+1. prerequisites;
+2. clone;
+3. `uv` setup;
+4. dependency installation;
+5. running tests;
+6. starting simulated mode;
+7. starting the Dash GUI;
+8. using real hardware when applicable.
+
+Commands must be copied from and tested against the actual repository.
+
+Prefer copy-paste-ready code blocks.
+
+## Python API Example
+
+Provide the smallest realistic example for using the controller.
+
+Keep it focused on normal laboratory use.
+
+Where supported, show a safe context-manager or cleanup pattern.
+
+## GUI
+
+Explain:
+
+* how to launch it;
+* what each important control does;
+* connection/status indicators;
+* Open/Close controls;
+* behavior when no device is present;
+* error/status feedback.
+
+Include annotated or well-captioned screenshots.
+
+## Hardware
+
+Document the intended hardware stack, such as:
+
+* Thorlabs KSC101;
+* compatible optical shutter;
+* power arrangement;
+* USB/control computer;
+* Kinesis/vendor software requirements where applicable.
+
+Clearly distinguish:
+
+**known supported configuration**
+
+from
+
+**configuration awaiting physical validation**.
+
+Do not invent model numbers or serial numbers.
+
+## Testing
+
+Briefly describe:
+
+* automated test coverage;
+* mock/simulated backend;
+* lint/static checks if present;
+* package/build validation;
+* physical validation status.
+
+Avoid presenting software-only tests as physical-device validation.
+
+## Project Status
+
+Provide a short, explicit statement such as:
+
+* software-tested;
+* hardware-ready;
+* awaiting physical validation;
+* physically validated;
+
+based strictly on `STATE.md`.
+
+## Documentation
+
+Link to deeper guides.
+
+## License / contributing information
+
+Include only if applicable.
+
+---
+
+# 3. Supporting Documentation
+
+Create a small `docs/` section only if it improves readability.
+
+Prefer a compact structure such as:
+
+```text
+docs/
+├── getting-started.md
+├── architecture.md
+├── gui.md
+├── python-api.md
+└── hardware.md
+```
+
+Do not create documentation files merely to fill a directory.
+
+Merge topics when a shorter structure would be clearer.
+
+---
+
+# 4. Getting Started Guide
+
+Create a beginner-friendly guide that takes a user from a fresh clone to a working application.
+
+Cover:
+
+* required OS/software assumptions;
+* installation of `uv`;
+* cloning;
+* dependency setup;
+* simulated mode;
+* test execution;
+* GUI launch;
+* expected screen/result;
+* transition from simulation to real device;
+* common first-run problems.
+
+Aim for a user who understands Python but has never seen this repository.
+
+Include expected outputs or screenshots where useful.
+
+---
+
+# 5. GUI Documentation
+
+Create a dedicated GUI explanation if the GUI has enough functionality to justify it.
+
+Include:
+
+* overall screenshot;
+* labeled controls;
+* connection indicator;
+* device identity;
+* shutter-state display;
+* Open button;
+* Close button;
+* error/status area;
+* simulated vs hardware operation where relevant.
+
+Explain normal workflow visually:
+
+**Launch → Connect → Verify Device → Open/Close → Disconnect/Exit**
+
+If the GUI can be run in simulated mode, use that mode to generate clean screenshots without requiring physical hardware.
+
+Prefer screenshots that show several useful states, for example:
+
+1. disconnected/no-device state;
+2. connected/simulated state;
+3. shutter-open state;
+4. shutter-closed state;
+5. representative error state.
+
+Do not manufacture screenshots that imply physical hardware validation when they were produced from simulation.
+
+Caption them accurately.
+
+---
+
+# 6. Screenshots
+
+Generate current screenshots from the actual software where possible.
+
+Use a consistent window size and clean presentation.
+
+Before capturing:
+
+* remove temporary debug clutter;
+* use realistic but non-sensitive example values;
+* make sure labels are readable;
+* avoid exposing usernames, local filesystem paths, secrets, serial numbers that should remain private, or unrelated desktop content.
+
+Crop screenshots to the relevant application area.
+
+Store them in a predictable location such as:
+
+```text
+docs/assets/
+```
+
+Use descriptive filenames, for example:
+
+```text
+gui-overview.png
+gui-disconnected.png
+gui-connected-simulated.png
+gui-shutter-open.png
+gui-error-state.png
+```
+
+Do not add redundant screenshots.
+
+---
+
+# 7. Architecture Figures
+
+Create at least one clear architecture illustration.
+
+Use Mermaid in Markdown as the canonical editable representation when appropriate.
+
+The figure should show:
+
+**Human / experiment software**
+→ **Python controller**
+→ **KSC101 backend**
+→ **Thorlabs Kinesis/API**
+→ **KSC101**
+→ **Optical shutter**
+
+and separately:
+
+**Plotly Dash GUI**
+→ **same controller API**
+
+Also show the simulated backend branching below the same controller interface.
+
+The visual should immediately communicate that GUI and higher-level software do not directly depend on vendor-specific implementation details.
+
+Keep it minimal.
+
+---
+
+# 8. Workflow Figure
+
+Create a second small diagram only if useful, showing the user's normal workflow:
+
+**Install
+→ Run in simulation
+→ Run tests
+→ Connect hardware
+→ Verify controller identity
+→ Operate shutter**
+
+Clearly mark any hardware-validation steps that are not yet completed in the current project state.
+
+---
+
+# 9. Hardware Photos and Illustrative Material
+
+Use hardware photographs only when they genuinely help a new user identify or assemble the system.
+
+Good candidates include:
+
+* KSC101 controller;
+* compatible shutter;
+* power connection;
+* USB connection;
+* overall controller/shutter setup;
+* relevant connector or interlock orientation.
+
+Prefer, in order:
+
+1. project-owned photographs;
+2. user-provided photographs;
+3. properly reusable vendor/manufacturer material with appropriate attribution/linking.
+
+Do not copy copyrighted vendor imagery into the repository without confirming that reuse is appropriate.
+
+When redistribution rights are unclear, link to the official product/documentation page instead of embedding the image.
+
+If project-owned photographs are not available, create clear placeholders or a documentation note describing which photographs would be useful rather than inventing hardware photos.
+
+For each hardware photo, include a short caption explaining what the reader should notice.
+
+---
+
+# 10. Illustrative Graphics
+
+Create simple explanatory graphics where they improve comprehension.
+
+Useful examples:
+
+* software stack;
+* controller/backend separation;
+* simulation vs real-hardware path;
+* device connection topology;
+* shutter-control sequence.
+
+Prefer simple technical diagrams over decorative graphics.
+
+Do not use generic robot/AI imagery.
+
+The documentation should look like an engineering repository, not a marketing website.
+
+---
+
+# 11. Python API Documentation
+
+Document the public controller API based on the actual code.
+
+For each public method/property, describe:
+
+* purpose;
+* important arguments;
+* return value;
+* important exceptions;
+* state requirements;
+* example usage where useful.
+
+Do not expose internal vendor/backend implementation details unless required for debugging or extension.
+
+Show a minimal example first.
+
+Then, if useful, show:
+
+* explicit connect/disconnect;
+* context-managed usage;
+* state query;
+* exception handling.
+
+---
+
+# 12. Integration Guide
+
+Add a short section showing how another laboratory-control program should use this project.
+
+Explain the intended dependency boundary:
+
+```python
+controller.open()
+controller.close()
+```
+
+rather than calling vendor libraries directly.
+
+Mention thread/process considerations, lifetime management, or state ownership only if they materially matter in the current implementation.
+
+Do not design a generalized laboratory framework during this documentation task.
+
+---
+
+# 13. Simulation Mode
+
+Make simulation/mock operation prominent because it allows users and developers to understand the application without owning the physical KSC101.
+
+Explain:
+
+* why simulation exists;
+* how to launch it;
+* what it validates;
+* what it cannot validate;
+* how its behavior differs from physical hardware.
+
+Use simulation screenshots where appropriate.
+
+Clearly label simulated results.
+
+---
+
+# 14. Troubleshooting
+
+Create a concise troubleshooting section based on actual project behavior.
+
+Possible categories:
+
+* no KSC101 detected;
+* Kinesis/vendor dependency missing;
+* connection failure;
+* incorrect device/serial;
+* GUI starts but controls are disabled;
+* shutter commands unavailable;
+* Dash port already in use;
+* Python/`uv` environment issue.
+
+Do not speculate extensively.
+
+Only include known or strongly justified diagnostic steps.
+
+Where physical testing has not occurred, distinguish expected troubleshooting from validated troubleshooting.
+
+---
+
+# 15. Documentation Accuracy
+
+Before completing:
+
+* verify every command in the README;
+* verify internal links;
+* verify image paths;
+* run Markdown/format checks if available;
+* confirm screenshots match the current GUI;
+* confirm API examples match the current public interface;
+* confirm architecture diagrams match the implementation;
+* confirm documented project status matches `STATE.md`;
+* confirm no secrets or private information appear in screenshots or documentation.
+
+If practical, follow the Quick Start instructions from a clean environment or equivalent reproducible setup.
+
+---
+
+# 16. Human Readability
+
+Write for scanning first and depth second.
+
+Use:
+
+* short sections;
+* meaningful headings;
+* concise explanations;
+* diagrams;
+* screenshots;
+* copy-paste commands;
+* small examples;
+* clear captions.
+
+Avoid:
+
+* giant walls of text;
+* repeated architecture explanations;
+* excessive implementation detail in the README;
+* vague AI-generated prose;
+* inflated claims.
+
+A new user should understand the project within approximately a few minutes of opening the README.
+
+---
+
+# 17. Agent Readability
+
+Keep important technical information explicit enough that future AI agents can also understand:
+
+* repository purpose;
+* architecture;
+* public API;
+* device boundary;
+* simulation mechanism;
+* current validation status;
+* where deeper documentation lives.
+
+Do not encode essential information only inside images.
+
+Every important diagram should have nearby text explaining its meaning.
+
+---
+
+# 18. Scope Boundary
+
+This task is documentation-focused.
+
+Do not:
+
+* redesign the controller;
+* redesign the backend;
+* add new hardware support;
+* perform physical hardware validation;
+* add unrelated GUI features;
+* generalize the codebase into a multi-device framework;
+* alter engineering requirements without evidence.
+
+If documentation reveals an implementation issue, record it as an engineering issue for a future development pass unless it is a trivial documentation-enabling fix.
+
+---
+
+# 19. Final Deliverables
+
+At completion, provide:
+
+1. polished root `README.md`;
+2. any necessary supporting `docs/` pages;
+3. clean GUI screenshots;
+4. architecture diagram(s);
+5. relevant workflow/connection illustrations;
+6. appropriate hardware photos or clearly identified photo placeholders/links;
+7. accurate Python usage examples;
+8. quick-start instructions;
+9. troubleshooting guidance;
+10. clear current validation/status statement.
+
+Also provide a concise summary of:
+
+* documentation files created or changed;
+* visual assets added;
+* screenshots generated;
+* diagrams generated;
+* missing photographs or visual material that would benefit from future user-supplied images;
+* any implementation/documentation inconsistencies discovered.
+
+The final result should make `thorlabs-shutter-control` understandable to a new human user without requiring them to inspect the source code first.
+
+
+
+====Prompt 5=============================================
+
+Resume the existing `thorlabs-shutter-control` project and begin the **physical hardware integration and validation phase**.
+
+The software has already completed its hardware-free development phase and has been reviewed as a hardware-ready candidate.
+
+Do not restart the project, redesign the architecture without evidence, or repeat software-only work that has already been validated.
+
+Read and use the existing project state, including:
+
+* `PROJECT.md`
+* `AGENTS.md`
+* `STATE.md`
+* engineering records
+* controller implementation
+* Thorlabs/KSC101 backend
+* simulated or mock backend
+* Dash GUI
+* automated tests
+* hardware-validation plan
+* relevant documentation
+
+Treat the existing implementation as the baseline.
+
+## Phase Objective
+
+Validate the complete control system against the real Thorlabs KSC101 and connected optical shutter.
+
+The purpose of this phase is to determine whether the software assumptions made during hardware-free development match actual device behavior, correct any discrepancies, and reach a physically validated engineering state.
+
+The final system should demonstrate reliable operation through both:
+
+* the reusable Python controller interface;
+* the Plotly Dash GUI.
+
+Use the autonomous engineering loop throughout:
+
+**Inspect → Identify Gap → Test → Observe → Diagnose → Implement/Fix → Regression Test → Hardware Retest → Update State → Repeat**
+
+Let actual hardware evidence drive changes.
+
+---
+
+# 1. Begin with Hardware Identification
+
+Before issuing physical shutter commands, determine and record the actual hardware/software environment.
+
+Identify where possible:
+
+* KSC101 serial number;
+* connected shutter model;
+* controller firmware version;
+* Kinesis/software version;
+* USB/device enumeration;
+* power configuration;
+* relevant interlock state;
+* operating system;
+* actual supported API/backend behavior.
+
+Compare these against assumptions recorded during the hardware-free phase.
+
+Do not silently overwrite incorrect assumptions.
+
+Record important discrepancies as engineering evidence.
+
+---
+
+# 2. Start with the Least Consequential Interaction
+
+Begin hardware validation incrementally.
+
+Prefer the following progression where supported:
+
+**device discovery
+→ identity
+→ read-only/status query
+→ connection/initialization
+→ known safe state
+→ single controlled actuation
+→ repeated operation
+→ failure/recovery tests
+→ GUI validation**
+
+Do not begin with rapid cycling or complex automation.
+
+Validate each layer before moving to the next.
+
+---
+
+# 3. Device Discovery and Connection
+
+Validate:
+
+* discovery of the KSC101;
+* correct serial/device selection;
+* connection;
+* initialization;
+* repeated connect/disconnect;
+* meaningful behavior when the device is absent;
+* behavior when the wrong serial number is requested;
+* reconnect after USB/device interruption where practical.
+
+Compare observed behavior with the existing controller abstraction and automated tests.
+
+If the real API behaves differently than expected, update the implementation based on evidence rather than adding ad hoc special cases.
+
+---
+
+# 4. Read-Only / State Validation
+
+Where supported by the KSC101 API, validate:
+
+* controller identity;
+* connection state;
+* device status;
+* shutter state;
+* configuration/status information relevant to operation.
+
+Determine which reported states are authoritative and which must be inferred.
+
+Do not claim that physical shutter state is known merely because a command returned successfully unless the device actually provides reliable state feedback.
+
+Document any limitation between:
+
+**commanded state**
+
+and
+
+**physically verified state**.
+
+---
+
+# 5. Establish a Known Safe State
+
+Before the first intentional open command, establish the expected initial shutter state.
+
+Prefer closing the shutter or otherwise placing it into the defined safe state first, if supported and appropriate.
+
+Verify the resulting physical state.
+
+Record:
+
+* command issued;
+* software response;
+* controller-reported state;
+* physical observation;
+* pass/fail result.
+
+---
+
+# 6. First Physical Actuation
+
+Perform the first physical actuation conservatively.
+
+Recommended sequence:
+
+**known closed state
+→ single open command
+→ observe physical shutter
+→ query/report state if supported
+→ single close command
+→ observe physical shutter**
+
+Do not immediately automate repeated cycling.
+
+For each operation, compare:
+
+* requested state;
+* returned API result;
+* reported state;
+* actual physical motion;
+* timing or delay if relevant.
+
+Any mismatch becomes a diagnostic task.
+
+---
+
+# 7. Repeated Operation
+
+After single open/close behavior is validated, test repeated operation.
+
+Determine an appropriate conservative repetition count and rate based on the device documentation and project requirements.
+
+Validate:
+
+* repeated open;
+* repeated close;
+* alternating open/close;
+* command/state consistency;
+* absence of accumulating communication failures;
+* absence of invalid state transitions;
+* acceptable latency;
+* stable application behavior.
+
+Do not exceed documented device operating limits.
+
+The purpose is reliability validation, not stress testing unless stress testing is explicitly required.
+
+---
+
+# 8. Controller API Validation
+
+Validate the public Python controller interface against the physical hardware.
+
+Confirm that the intended user-facing API behaves consistently for:
+
+* connect;
+* disconnect;
+* identify;
+* open;
+* close;
+* state/status;
+* repeated use;
+* shutdown;
+* error conditions.
+
+Keep vendor-specific API behavior encapsulated behind the controller interface.
+
+Do not expose additional Kinesis-specific details to higher-level application code unless genuinely necessary.
+
+Preserve the simple public interface.
+
+---
+
+# 9. Error and Recovery Validation
+
+Test realistic failure conditions when safe and practical.
+
+Examples may include:
+
+* device unavailable at startup;
+* incorrect serial number;
+* disconnect before command;
+* USB disconnect/reconnect;
+* command after disconnect;
+* reconnect after communication loss;
+* application shutdown while connected;
+* backend exception;
+* device returning unexpected status.
+
+Do not create physically risky faults merely to exercise software errors.
+
+Use simulated tests for failure modes that would be unsafe or unnecessarily disruptive to reproduce physically.
+
+Validate that errors:
+
+* produce useful diagnostics;
+* do not leave the application in a misleading state;
+* do not enable inappropriate GUI controls;
+* allow recovery where practical.
+
+---
+
+# 10. Shutdown Behavior
+
+Explicitly validate shutdown semantics.
+
+Determine what occurs when:
+
+* controller object is closed normally;
+* context manager exits, if supported;
+* Dash application is stopped;
+* disconnect is requested;
+* an exception occurs;
+* Python process exits normally.
+
+Confirm whether the shutter is actually placed in the intended safe state.
+
+Do not assume destructor/finalizer behavior is sufficient for safety-critical cleanup.
+
+Document what is guaranteed by software and what depends on controller/device behavior.
+
+---
+
+# 11. Dash GUI Hardware Validation
+
+Once the controller layer has passed direct hardware validation, test the Plotly Dash GUI against the real controller.
+
+Validate:
+
+* initial disconnected state;
+* device discovery/connection;
+* displayed identity;
+* displayed connection state;
+* displayed shutter state where supported;
+* Open button;
+* Close button;
+* button enable/disable behavior;
+* communication error reporting;
+* reconnect behavior;
+* GUI shutdown behavior.
+
+The GUI must continue to use the controller abstraction.
+
+Do not add direct KSC101/Kinesis calls to GUI callbacks as a shortcut.
+
+---
+
+# 12. Diagnose Discrepancies Systematically
+
+If physical behavior differs from the expected behavior, do not patch blindly.
+
+Use:
+
+**Observed failure
+→ smallest failing subsystem
+→ competing causes
+→ discriminating test
+→ new evidence
+→ diagnosis
+→ focused fix
+→ software regression tests
+→ hardware retest**
+
+Possible failure domains include:
+
+* Kinesis/API semantics;
+* device discovery;
+* USB;
+* initialization ordering;
+* polling/state refresh;
+* timing;
+* shutter configuration;
+* interlock state;
+* controller configuration;
+* backend implementation;
+* controller abstraction;
+* GUI state management.
+
+Prefer root-cause correction over special-case workarounds.
+
+---
+
+# 13. Preserve Software Regression Coverage
+
+After every implementation change caused by hardware findings:
+
+1. rerun relevant automated tests;
+2. add or modify tests to capture the newly discovered behavior where appropriate;
+3. ensure simulated behavior still represents the application contract;
+4. rerun the full software test suite before declaring the change complete.
+
+Hardware fixes must not silently regress previously working software behavior.
+
+---
+
+# 14. Update Persistent Engineering State
+
+Maintain `STATE.md` throughout the hardware phase.
+
+Record concise current engineering state, including:
+
+* actual hardware configuration;
+* validated functionality;
+* hardware tests passed;
+* hardware tests failed;
+* observed discrepancies;
+* current diagnoses;
+* implementation changes;
+* remaining requirements;
+* next engineering priority.
+
+Use durable engineering records for important physical observations, test results, and design decisions.
+
+Do not turn `STATE.md` into a chronological log.
+
+---
+
+# 15. Engineering Evidence
+
+Create durable evidence records for important hardware findings.
+
+For example:
+
+* physical open/close verified;
+* device reports state X after command Y;
+* reconnect succeeds after USB restoration;
+* safe shutdown closes shutter;
+* physical state cannot be independently queried;
+* actual API behavior differs from documentation.
+
+Record enough information to reproduce or understand the test:
+
+* hardware configuration;
+* command/action;
+* software result;
+* physical result;
+* pass/fail;
+* implication.
+
+---
+
+# 16. Human Interaction During This Phase
+
+Minimize human intervention.
+
+If the agent can directly interact with authorized hardware, proceed within the approved validation plan and project constraints.
+
+If human physical observation or intervention is required, ask for the **smallest specific action or observation needed**.
+
+Examples:
+
+Good:
+
+> Confirm whether the shutter physically opened after the command and report only `open`, `closed`, or `no motion`.
+
+> Disconnect the KSC101 USB cable, wait five seconds, reconnect it, and tell me when Windows detects the controller again.
+
+Avoid:
+
+> Check the hardware.
+
+Do not ask the human to choose routine software/debugging actions.
+
+---
+
+# 17. Scope Discipline
+
+The goal of this phase is physical validation and correction of the existing system.
+
+Do not expand scope by adding unrelated features such as:
+
+* experiment scheduling;
+* remote control infrastructure;
+* databases;
+* authentication;
+* complex GUI redesign;
+* generalized device frameworks;
+* support for unrelated Thorlabs products;
+
+unless required to satisfy an existing project requirement.
+
+Keep the KSC101 controller simple and reliable.
+
+---
+
+# 18. Acceptance Criteria
+
+The physical validation phase is complete when the project demonstrates, on the actual hardware:
+
+1. reliable discovery/connection;
+2. correct controller identification;
+3. controlled physical shutter opening;
+4. controlled physical shutter closing;
+5. repeatable open/close operation;
+6. correct state/status behavior to the extent supported by the device;
+7. clean disconnect/reconnect behavior;
+8. useful error handling;
+9. validated shutdown behavior;
+10. correct operation through the Python controller API;
+11. correct operation through the Plotly Dash GUI;
+12. successful software regression tests after hardware integration;
+13. documented actual hardware configuration and remaining limitations.
+
+A command returning successfully is not sufficient evidence of physical actuation.
+
+Physical behavior must be observed or otherwise independently validated.
+
+---
+
+# 19. Completion State
+
+When all required physical acceptance criteria pass:
+
+transition the project state to:
+
+`HARDWARE_VALIDATION → VALIDATED`
+
+Then:
+
+* update `STATE.md`;
+* record final hardware evidence;
+* update documentation with the actual supported configuration;
+* ensure installation/run instructions are correct;
+* rerun the full automated test suite;
+* perform final controller and GUI smoke tests;
+* update the final engineering report.
+
+The final report should clearly distinguish:
+
+* software-tested behavior;
+* physically validated behavior;
+* inferred behavior;
+* known device/API limitations.
+
+---
+
+# 20. If Validation Cannot Be Completed
+
+If a real external blocker prevents completion, do not keep searching or modifying software without evidence.
+
+Record:
+
+* exact blocker;
+* completed hardware validation;
+* remaining unvalidated requirements;
+* why further autonomous progress is not useful;
+* exact action needed to resume.
+
+Then stop in a clearly documented blocked hardware-validation state.
+
+---
+
+# Final Engineering Loop
+
+During this phase, operate autonomously according to:
+
+**Inspect actual hardware
+→ Validate assumption
+→ Observe behavior
+→ Identify discrepancy/gap
+→ Diagnose
+→ Implement focused correction
+→ Run software regression tests
+→ Retest physical hardware
+→ Update persistent state
+→ Check requirements
+→ Repeat**
+
+Continue until the system reaches either:
+
+**VALIDATED**
+
+or
+
+a genuine external blocker that prevents further useful engineering progress.
+
+Do not stop merely because the physical device behaves differently from the software assumptions. Treat discrepancies as engineering evidence and continue the diagnose–fix–retest loop.
+

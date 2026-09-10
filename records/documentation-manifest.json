@@ -1,0 +1,160 @@
+{
+  "recorded_at_utc": "2026-09-10T00:13:13.983450+00:00",
+  "base_commit": "7948f528b5384b85590afa225b310639a52b42fe",
+  "documentation_status": "COMPLETE",
+  "engineering_status": "AWAITING_HUMAN_REVIEW",
+  "physical_requirements": "REQ-003 through REQ-008 BLOCKED; unchanged",
+  "evidence_records": [
+    "E007",
+    "E008"
+  ],
+  "review": {
+    "pruned_words": 2730,
+    "duplicate_request_words": 2137,
+    "prompt_log_included": true,
+    "prompt_log_content_preserved": true,
+    "diagram_and_screenshot_evidence": "E007; diagrams, GUI and demo unchanged"
+  },
+  "device_access": false,
+  "production_behavior_changed": false,
+  "screenshots": {
+    "gui-connected-simulated.png": {
+      "width_px": 820,
+      "height_px": 850,
+      "simulation_only": true
+    },
+    "gui-disconnected.png": {
+      "width_px": 820,
+      "height_px": 850,
+      "simulation_only": true
+    },
+    "gui-error-state.png": {
+      "width_px": 820,
+      "height_px": 850,
+      "simulation_only": true
+    },
+    "gui-shutter-open.png": {
+      "width_px": 820,
+      "height_px": 850,
+      "simulation_only": true
+    }
+  },
+  "software_tests": {
+    "passed": 44,
+    "seconds": 0.46,
+    "excluded": "tests/test_sdk.py"
+  },
+  "checks": {
+    "TEST-009": {
+      "status": "PASS",
+      "method": "Source-grounded documentation and command review; internal links",
+      "internalReferences": 110,
+      "failures": []
+    },
+    "TEST-010": {
+      "status": "PASS",
+      "method": "API examples executed with software fixture",
+      "python_example_blocks_executed": [
+        "README.md:block0",
+        "docs/python-api.md:block0",
+        "docs/python-api.md:block1",
+        "docs/python-api.md:block2"
+      ],
+      "vendor_modules_loaded": false,
+      "unchanged_production_test_config_files": [
+        ".python-version",
+        "pyproject.toml",
+        "uv.lock",
+        "src/thorlabs_shutter_control/__init__.py",
+        "src/thorlabs_shutter_control/__main__.py",
+        "src/thorlabs_shutter_control/controller.py",
+        "src/thorlabs_shutter_control/gui.py",
+        "src/thorlabs_shutter_control/assets/style.css",
+        "tests/conftest.py",
+        "tests/test_cli.py",
+        "tests/test_controller.py",
+        "tests/test_gui.py",
+        "tests/test_sdk.py"
+      ]
+    },
+    "TEST-011": {
+      "status": "PASS",
+      "method": "Actual simulated GUI captures; visual inspection; Mermaid render",
+      "files": 7,
+      "internalReferences": 77,
+      "diagramsRendered": 5,
+      "failures": [],
+      "browserErrors": []
+    },
+    "TEST-012": {
+      "status": "PASS",
+      "method": "Fresh locked 39-package environment; Ruff; markdownlint; builds and installed-wheel smoke",
+      "installed_wheel_import": true,
+      "passive_gui_routes": 3,
+      "packaged_css": true,
+      "current_readme_in_metadata": true,
+      "vendor_modules_loaded": false,
+      "sdist_has_demo_and_four_screenshots": true,
+      "wheel_excludes_test_demo_and_vendor_binaries": true
+    },
+    "TEST-013": {
+      "status": "PASS",
+      "method": "13 unchanged source/test/configuration fingerprints; honest pending physical status"
+    }
+  },
+  "versions": {
+    "python": "3.12.14 x64",
+    "uv": "0.11.2",
+    "dash": "4.4.1",
+    "plotly": "7.0.0",
+    "edge": "152.0.4191.66",
+    "markdownlint_cli2": "0.23.2",
+    "mermaid": "11.17.2"
+  },
+  "limitations": [
+    "No physical validation or new real SDK check.",
+    "Installer and remote clone commands source-checked, not executed; fresh cached environment used instead.",
+    "Hardware commands verified against source/test fixture only.",
+    "No hardware photos available; official references and missing-photo notes supplied.",
+    "Generated manifest excludes itself; prompt log.txt hash uses repository LF normalization, matching Git content. Other file hashes use exact bytes.",
+    "Ignored build artifacts identify this build and may be regenerated.",
+    "Source archive built before this generated manifest; wheel metadata uses final README.",
+    "Historical readiness document/build hashes are superseded by this documentation pass; source/test/configuration hashes still match."
+  ],
+  "sha256": {
+    ".python-version": "7b55f8e67b5623c4bef3fa691288da9437d79d3aba156de48d481db32ac7d16d",
+    "docs/architecture.md": "78f0d0e0ec6f3b6cdef8a1f77fefeddfd5456f0cac16b002af6ce4003b38e854",
+    "docs/assets/gui-connected-simulated.png": "8cf07fd8aca351117f4d39d267de8dbb567ab7c7ca1b46051012218b34bdaebf",
+    "docs/assets/gui-disconnected.png": "b35c7d6e8c975b6c0007415f76c63cffca73a1a65fdb730f80bf1750c47e9d27",
+    "docs/assets/gui-error-state.png": "abea35ba46a6dc44c07858f801d358e4c6b12ba9378ba1d63d17979ae15f7fc0",
+    "docs/assets/gui-shutter-open.png": "4cf8edd148a1020424e70c529a0ccfd931ea119d152ab984d9abcb68ab2793fd",
+    "docs/assets/README.md": "2b852e2c7f922b3621adee1caa36c71c955dfd9af94bc9e5daac989974d04b97",
+    "docs/examples/simulated_demo.py": "55e942a0a6f40b389dfe5112a5d139c0107f07730a2cc31a675336047ff930ca",
+    "docs/getting-started.md": "fd5fd03e36bf1a635a6da18d2ab8f8cfb79016e70274b1aeff5617854de917e0",
+    "docs/gui.md": "72d05441a34ed25e9377e5a6f84e464ee67e02585a81a89a59d5812f2ca614c6",
+    "docs/hardware.md": "6d97097e1a97e3d2e57c0896a419c3cd4f37537017952827b547285a835a859a",
+    "docs/HARDWARE_VALIDATION.md": "147c3ecefc71871b0dbca9147279c0e57f5c23b455574334b39807b5cb9c3929",
+    "docs/INTERFACE.md": "108a82e18fe20cb4a63f008fed719dc27c796ddd233038f0da6f700b788a4506",
+    "docs/python-api.md": "638552f7c4c3285041cb05071c805bce10c84e46ed91a18e9738386944bd4df2",
+    "outputs/REPORT.md": "4766c62428ea8e29ff7718a78e94fa66b91a62b9cb7e5bfd39713bca86eb464f",
+    "PROJECT.md": "f24618fd4b6700c7678f001e58d980c0559ba8b8d4e4c9e7b10213be48f5390f",
+    "prompt log.txt": "71465a4af1d5a3b370988ca4690357c0080ecf112d8e8fe1b98d734984af7cff",
+    "pyproject.toml": "0293f016fbe391eebe55aa363571509beff7d432d26f80a8d846128e603554bf",
+    "README.md": "86a64ea3a06e8b5d81a608c46d42b82c1db032a75a5be9551c8f22f78cd47f56",
+    "records/RECORDS.md": "c9846d4f4a11be546ce8c62a2e3d46fd109bbc9271a001a4bb302c87ae4ca2e8",
+    "src/thorlabs_shutter_control/__init__.py": "137f17a3283046f0c4c3f42f25a51d615543217b60564eb124cc0711bb889eb2",
+    "src/thorlabs_shutter_control/__main__.py": "49b4796bc00ab647731e3f743e846dcff18c3b90031fa39567b133f66da351a0",
+    "src/thorlabs_shutter_control/assets/style.css": "af3886bd3f06947d45808c118b456e6794984224e8aaa4199efcce64c3c5d80b",
+    "src/thorlabs_shutter_control/controller.py": "bf8a5533d6a622f82734a650c05b5c9777621c685c384a5e71d18f6554cc3f5d",
+    "src/thorlabs_shutter_control/gui.py": "d8464c67c5d4ea12bb7393f118affdb915c21de612168f3e4871663b159c183d",
+    "STATE.md": "d09a79e0d90389dc4e5241b4f1e336c7c64ee08fc2a57da043e47d6bb154deba",
+    "tests/conftest.py": "1014f0d9dff36f9c8e76e4e59de59b78195b604c2729469c4da3aafa6c2d2683",
+    "tests/test_cli.py": "9921ece27dfa15952363087c2135c42cba8da4f876d0556539a83d4ad0f50d89",
+    "tests/test_controller.py": "58e961b1dbff6bdf42c566011b42b07b7ed1ab0538dfd2553786a58ae2008e08",
+    "tests/test_gui.py": "1008feb878530f6f1e9927ad1e70c8b14aeba3fbb7f739bcf2d2c0aa98e29004",
+    "tests/test_sdk.py": "348f9784eef822a1ec60b17b0bd15a43f08360cee2878e4f6cd52726c2a2bde5",
+    "tmp/docs-dist/thorlabs_shutter_control-0.1.0-py3-none-any.whl": "0c29f3ecfb96370895e794736a0e0275a5f3216cc0da3f6423e2c887b52315e9",
+    "tmp/docs-dist/thorlabs_shutter_control-0.1.0.tar.gz": "5eb0178ffffa3f952a9bf1c103cc32a20dc0eaa14844d2a16c1412465b0da79a",
+    "uv.lock": "f3e998a5da7afee0157c18e37f46a012b96af4d7e490eaefcf609d6e2c3298fd"
+  }
+}

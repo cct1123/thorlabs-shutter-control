@@ -1,10 +1,30 @@
 # Engineering state
 
-Project: `thorlabs-shutter-control`. Checkpoint: 2026-09-09, 23:38 UTC.
-Intent: [PROJECT.md](PROJECT.md). Evidence: [E005/E006](records/RECORDS.md#e005).
-Current fingerprints: [readiness manifest](records/hardware-readiness-manifest.json).
+Project: `thorlabs-shutter-control`. Checkpoint: documentation publication review.
+Intent: [PROJECT.md](PROJECT.md). Evidence: [E007](records/RECORDS.md#e007), [E008](records/RECORDS.md#e008).
+Current documentation/build fingerprints: [documentation manifest](records/documentation-manifest.json).
+Unchanged software candidate: [readiness manifest](records/hardware-readiness-manifest.json).
 
 ## Status
+
+Documentation follow-up: **COMPLETE** within the
+[documentation-only request](prompt%20log.txt). README, five user
+guides, four actual simulated screenshots, five Mermaid diagrams and a fixture
+demo are delivered. Commands/examples, links/assets, Markdown, diagrams and
+packaging are checked; E007 records execution limits. Hardware status is unchanged.
+
+The user requested review/pruning, a single commit including `prompt log.txt`,
+and push to origin/main. The full documentation request already exists verbatim
+in that log, so its duplicate archive was removed. E008 records final checks;
+Git history and origin/main identify publication. No hardware action is authorized.
+
+| ID | Documentation criterion / source | Validation method | Status |
+| --- | --- | --- | --- |
+| REQ-009 | Readable README, setup and troubleshooting; request §§2–4, 14, 16–19 | TEST-009: source/command/link review, E007 | PASS |
+| REQ-010 | Accurate public API, architecture, integration and simulation; §§7, 11–13 | TEST-010: four example blocks against fixture and source, E007 | PASS |
+| REQ-011 | Actual GUI screenshots, editable diagrams, hardware visual notes; §§5–10 | TEST-011: browser capture/render and visual review, E007 | PASS |
+| REQ-012 | Reproducible documentation workflow; §15 | TEST-012: fresh locked setup, 44 software tests, lint/build, E007 | PASS |
+| REQ-013 | Honest status and documentation-only scope; §§1, 15, 18–19 | TEST-013: 13 unchanged production/test/config fingerprints, E007 | PASS |
 
 **AWAITING_HUMAN_REVIEW** — software candidate and staged procedure passed readiness
 review. This is not physical acceptance or permission to communicate with hardware.
@@ -40,16 +60,27 @@ close_shutter, disconnect, safe_shutdown; immutable ShutterStatus and ShutterErr
 One owner per device; per-instance locking. Test fake lives in tests/conftest.py;
 there is no separate production simulation backend or extra driver framework.
 
-Only production change: Open now requires reported Closed/Inactive/Manual before
+The prior readiness audit's only production change: Open requires Closed/Inactive/Manual before
 Enable/Active. Two regression cases demonstrated the prior false preparation
 success. GUI/CLI, dependencies and public API are unchanged. The procedure now
 uses explicit passive disconnect before the first output-changing Close.
+
+This documentation pass changed no production/test/configuration file. Its demo
+under docs/examples reuses the existing pytest fixture, including virtual time;
+it is not an installed backend or a public simulation API. The hardware procedure
+retains its ordered operations/gates; only machine-specific shell paths were made
+portable. [D005](records/RECORDS.md#d005) records these documentation decisions.
 
 ## Current validation and configuration
 
 - E006: 44 software tests PASS, including two new regressions. Fresh locked offline
   environment, lint, format, sdist/wheel build, installed-wheel suite, CLI help,
   dependency compatibility, and passive GUI/packaged CSS checks PASS.
+- E007: fresh 39-package environment, 44 software tests, lint/format, four executed
+  Python documentation blocks, installed-wheel CLI/GUI/CSS smoke and build PASS.
+  Four fixture GUI screenshots and five rendered diagrams visually reviewed;
+  Markdown/internal references checked. Real SDK was excluded. The demo servers
+  and capture browsers were stopped after screenshot work.
 - E003's 43 tests included a real SDK enumeration check; that test was explicitly
   excluded here. E004's zero-device browser observations are historical.
 - Windows x64, CPython 3.12.14, uv 0.11.2; Dash 4.4.1, Plotly 7.0.0,
@@ -57,9 +88,10 @@ uses explicit passive disconnect before the first output-changing Close.
 - Prior verified SDK: Kinesis 1.14.60.27990 x64, administratively extracted to
   tmp/kinesis-sdk/Program Files 64/Thorlabs/Kinesis. Not a USB-driver installation;
   it is ignored/local and absent from a fresh clone. No SDK was loaded this audit.
-- Reproduction commands and environment/build limits: E006 and README.md.
-- No device communication/actuation during this audit, no hardware handles opened,
-  and no GUI server started. No physical operation is pending in this task.
+- Reproduction commands and environment/build limits: E006/E007 and README.md.
+- No device communication/actuation or hardware handles in either follow-up.
+  E006 started no GUI server; E007 ran only fixture-backed GUI servers, now stopped.
+  No command or physical operation is pending.
 
 ## Hardware-dependent assumptions / B001
 
@@ -84,6 +116,11 @@ Physical REQ-003..008 require the actual bench and independent observation:
 
 ## Human review and next action
 
+No human action is needed to complete the documentation task. Future bench photos
+would improve hardware identification; [hardware.md](docs/hardware.md#hardware-photographs)
+lists useful views. The request below belongs to future physical validation and
+does not authorize it during this documentation-only pass.
+
 Review [report](outputs/REPORT.md), audited changes, and the exact
 [ordered hardware procedure](docs/HARDWARE_VALIDATION.md). Supply/confirm the bench
 facts and safeguards above; unknowns block dependent stages. After explicit launch
@@ -98,7 +135,7 @@ Exact postapproval launch prompt:
 
 ## Completion
 
-Hardware readiness review is complete; physical project acceptance is not.
+Documentation and hardware readiness review are complete; physical acceptance is not.
 The current user instruction prohibits device communication/actuation until approval.
 No firmware changes or interlock bypass are authorized. [D004](records/RECORDS.md#d004)
 records the readiness-state override of the template; do not auto-resume from a

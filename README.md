@@ -1,133 +1,135 @@
 # thorlabs-shutter-control
 
-A reusable Python controller for the Thorlabs KSC101 and a local Plotly Dash GUI.
-Hardware commands live entirely in `KSC101Controller`; the GUI calls that class.
+Python controller and local Plotly Dash GUI for a Thorlabs KSC101 K-Cube Solenoid Controller and optical shutter.
 
-**AWAITING_HUMAN_REVIEW — hardware-ready candidate, physical validation pending.**
-The readiness audit passed after a focused Open-preparation fix. Earlier SDK
-checks loaded successfully and found zero devices; this audit did not access USB.
-See [STATE.md](STATE.md) and the [engineering report](outputs/REPORT.md).
+Operate a shutter from the browser or integrate the same small Python API into
+experiment software. The controller handles vendor calls, feedback and cleanup.
 
-## Setup
+**Software-tested; awaiting physical validation.** The engineering checkpoint is
+**AWAITING_HUMAN_REVIEW**; physical discovery, motion, feedback and shutdown
+acceptance remain blocked. See [current state](STATE.md).
 
-Use 64-bit Windows, Python 3.12, [uv](https://docs.astral.sh/uv/getting-started/installation/),
-and the official [Thorlabs Kinesis package](https://www.thorlabs.com/software-pages/Motion_Control)
-matching Python's bitness. Kinesis provides vendor DLLs and USB drivers; those
-are not distributed in this repository. Python.NET also requires .NET Framework.
-Development checks used Python 3.12.14 and the 64-bit Kinesis 1.14.60 SDK.
+<img src="docs/assets/gui-connected-simulated.png" alt="Actual Dash GUI connected to the software test double, reporting Closed" width="660">
+
+*Actual GUI in simulation. `68000001` is a fictional test identity; no physical
+controller or shutter was used. [GUI controls and more states](docs/gui.md).*
+
+## Features
+
+- Python API for discovery, device selection, connection, identity and status.
+- Manual Open/Close with reported-state checks and key/interlock checks before Open.
+- Close attempts during normal disconnect, context-manager exit and GUI server shutdown.
+- Local Dash controls and a [simulated demo](docs/getting-started.md#try-simulation) for use without hardware.
+- Locked `uv` environment, pytest tests, Ruff checks, and package builds.
+
+## Quick start — no hardware needed
+
+Use Git, [uv](https://docs.astral.sh/uv/getting-started/installation/), and a modern
+browser. The verified environment is Windows x64 with Python 3.12; `uv` uses the
+repository's Python version file. Kinesis is unnecessary for the simulation demo.
+
+Run in PowerShell:
 
 ```powershell
+git clone https://github.com/cct1123/thorlabs-shutter-control.git
+cd thorlabs-shutter-control
 uv sync --locked
-uv run --locked shutter-control --help
+uv run --locked pytest -q -p no:cacheprovider --ignore=tests/test_sdk.py
+uv run --locked python docs/examples/simulated_demo.py --api
+uv run --locked python docs/examples/simulated_demo.py
 ```
 
-After human approval and the setup gates in the
-[hardware procedure](docs/HARDWARE_VALIDATION.md), run
-`uv run --locked shutter-control --list`, then `uv run --locked shutter-control`.
-The list command communicates with the vendor USB discovery interface.
-Open <http://127.0.0.1:8050>. Discover devices, select a serial number if needed,
-and Connect. Open and Close request manual operation. The GUI reports connection,
-identity, controller-reported shutter state, key/interlock status, and errors.
+The test command runs **44 software tests** and explicitly excludes real USB
+enumeration. The API demo prints `closed → open → closed → disconnected`.
+The final command starts the actual GUI at [localhost:8050](http://127.0.0.1:8050).
+Click **Discover → Connect**, verify **TEST DOUBLE, NOT HARDWARE**, then try
+**Open**, **Close**, and **Close & disconnect**. Stop the server with **Ctrl+C**.
 
-For a nonstandard SDK location:
+The demo reuses `tests/conftest.py`; it needs a source checkout and dev dependencies.
+There is no production `--simulate` flag or installed simulation backend.
+[Fresh-install walkthrough and troubleshooting](docs/getting-started.md).
 
-```powershell
-$env:KINESIS_DIR = 'C:\path\to\Kinesis'
-uv run --locked shutter-control --list
+## Architecture
+
+```mermaid
+flowchart TD
+    G[Plotly Dash GUI] --> C[KSC101Controller]
+    X[Experiment software] --> C
+    C --> K[Kinesis .NET via Python.NET]
+    K --> H[KSC101 over USB + optical shutter]
+    C -. test fixture replaces SDK .-> F[Software fake: no USB]
 ```
 
-Alternatively pass `--kinesis-dir` directly. `--serial` selects a known device;
-without a selection, connection requires exactly one discovered KSC101.
-`--port` changes the default 8050 port. The server binds only to `127.0.0.1` and
-runs as a single process without debug/reloading. Use one operator and one owner
-per device; do not run Kinesis GUI or another control process on the same device.
+The API and KSC101 implementation share `controller.py`. Tests and the demo
+replace its SDK boundary with a software fake. See the
+[software architecture and repository map](docs/architecture.md).
 
-On this development computer, `uv` is at
-`C:\Users\ctcheung\.local\bin\uv.exe`. If it is not on PATH, invoke that path with
-PowerShell's `&`. This sandbox requires `--cache-dir .uv-cache` before the command:
+## Python API
 
-```powershell
-& "$env:USERPROFILE\.local\bin\uv.exe" --cache-dir .uv-cache run --locked shutter-control
-```
-
-An ignored SDK administrative image is available locally at
-`tmp\kinesis-sdk\Program Files 64\Thorlabs\Kinesis`; select it with `--kinesis-dir`
-for SDK checks. It is not a system installation or evidence of USB driver readiness.
-
-## Python use
-
-Run only on the agreed safe hardware setup described in the
-[hardware validation procedure](docs/HARDWARE_VALIDATION.md).
+For an **approved, verified hardware setup**, with exactly one KSC101 attached:
 
 ```python
 from thorlabs_shutter_control import KSC101Controller
 
-controller = KSC101Controller()  # Or supply the actual discovered serial_number.
-print(controller.discover())
-with controller:  # Connects; exits with close attempt and disconnect.
+with KSC101Controller() as controller:
     print(controller.identify_device())
-    print(controller.get_status())
-    print(controller.open_shutter())
-    print(controller.close_shutter())
+    print(controller.get_status().shutter_state)
+    controller.open_shutter()
+    controller.close_shutter()
+# Context exit attempts Close, stops polling, and disconnects.
 ```
 
-Methods: `discover`, `connect`, `identify_device`, `get_status`, `open_shutter`,
-`close_shutter`, `disconnect`, and `safe_shutdown`. Failures raise `ShutterError`;
-`get_status()` instead returns an explicit fault snapshot with unknown shutter
-state. Communication/operation faults block further Open commands until a
-disconnect/reconnect. Close and cleanup remain available while a handle exists.
+This example can actuate real hardware. Start with the simulated API command above.
+See [arguments, returns, errors, cleanup and integration](docs/python-api.md).
 
-`connect()` issues no explicit output, enable, or mode commands. Open requests
-Inactive and Manual, waits for reported Closed/Inactive/Manual, then enables the
-device and requests Active. Failed preparation prevents Enable/Active. Close requests
-Inactive, then Manual. Commands wait for matching Kinesis feedback with a default
-5-second wait per stage; vendor calls have their own timeouts. Polling is 250 ms;
-GUI refresh is 1 second. These are not real-time guarantees or exposure controls.
+## Hardware operation
 
-## Shutdown and recovery
+The target is a **KSC101 + compatible Thorlabs shutter + supported power supply +
+USB-connected Windows computer**. The exact shutter, supply, serial and firmware
+have not been established; there is no physically validated bench configuration.
 
-- **Close & disconnect**, `disconnect()`, and `safe_shutdown()` attempt closure,
-  then stop polling and release the device, including when closure fails.
-- Ctrl+C in the server terminal runs the same shutdown attempt. Closing a browser
-  tab does not stop the server or close the shutter. Forced termination, lost
-  USB, power failure, or a hung vendor call cannot guarantee closure.
-- A shutdown error must be investigated physically. A repeated cleanup call does
-  not erase a failed-close message. If release fails, the handle is retained so
-  cleanup can be retried.
-- `disconnect(close_shutter=False)` is an explicit communication-only release:
-  it leaves the output unchanged and is not safe shutdown.
-- Preserve existing interlocks and key safeguards. Do not bypass them or modify
-  firmware. Software feedback is not independent proof of physical closure.
-
-If discovery is empty, check device availability, supported power/cabling, and
-the vendor USB driver. If SDK loading fails, check path, bitness, .NET Framework,
-and the Kinesis runtime dependencies. Restart Python after changing SDK versions.
-
-## Validation and project files
+Real control requires 64-bit Kinesis, its runtime/USB drivers and .NET Framework,
+installed separately from `uv`. After bench checks and launch approval in the
+[ordered hardware procedure](docs/HARDWARE_VALIDATION.md):
 
 ```powershell
-uv run --locked pytest -q -p no:cacheprovider --ignore=tests/test_sdk.py
-uv run --locked ruff check src tests
-uv run --locked ruff format --check src tests
-uv build --offline
+uv run --locked shutter-control --list
+uv run --locked shutter-control
 ```
 
-The software-only command explicitly excludes USB enumeration regardless of the
-environment. Offline builds require cached build dependencies; on a fresh computer
-use `uv build` with network access. The ordinary suite uses a software test double.
-To additionally check SDK signatures and USB enumeration, set `KINESIS_TEST_DIR`
-to the Kinesis folder and run `uv run --locked pytest -q tests/test_sdk.py` only
-when hardware communication is authorized. That test never connects or actuates.
-No automatic
-test in this repository moves real hardware.
+`--list` enumerates real USB devices. GUI startup alone is passive; **Discover**
+and **Connect** access hardware. The [hardware guide](docs/hardware.md) explains
+configuration, official references and the pending validation.
 
-- `src/thorlabs_shutter_control/`: controller, GUI, CLI, packaged CSS.
-- `tests/`: failure, lifecycle, GUI callback, CLI, and optional real-SDK checks.
-- [docs/INTERFACE.md](docs/INTERFACE.md): official sources and API semantics.
-- [docs/HARDWARE_VALIDATION.md](docs/HARDWARE_VALIDATION.md): pending physical tests.
-- [PROJECT.md](PROJECT.md): human intent; [AGENTS.md](AGENTS.md): operating rules.
-- [STATE.md](STATE.md): checkpoint; [records/RECORDS.md](records/RECORDS.md): evidence.
+**Shutdown is a best-effort Close and release.** Closing the browser tab does not
+shut down the controller. USB loss, power loss, a hung vendor call or forced process
+termination cannot guarantee closure. Displayed state is controller feedback,
+not independent optical verification.
 
-Resume only after human approval: read PROJECT.md, AGENTS.md, STATE.md and the
-hardware procedure, reconcile the actual configuration, then follow its ordered
-gates. The exact launch prompt is in STATE.md. Hardware requirements remain pending.
+## Testing
+
+```powershell
+uv run --locked ruff check src tests docs/examples
+uv run --locked ruff format --check src tests docs/examples
+uv build
+```
+
+Tests cover operation, selection, faults, feedback disagreement, cleanup, CLI and
+Dash callbacks. Simulation cannot validate wiring, motion, timing or interlocks.
+See [validation evidence](records/RECORDS.md#e007); hardware REQ-003–008 remain **BLOCKED**.
+
+## Documentation
+
+| Start here | What you will find |
+| --- | --- |
+| [Getting started](docs/getting-started.md) | Installation, simulation, run commands and first-run problems |
+| [GUI guide](docs/gui.md) | Controls, screenshots, status and shutdown workflow |
+| [Python API and integration](docs/python-api.md) | Public interface, examples, state and ownership |
+| [Software architecture](docs/architecture.md) | Data/control flow, simulation boundary and source map |
+| [Hardware and validation](docs/hardware.md) | Target setup, vendor links, missing photos and physical limits |
+| [Interface notes](docs/INTERFACE.md) | Kinesis members and historical SDK evidence |
+| [Engineering report](outputs/REPORT.md) | Readiness review, documentation deliverables and limitations |
+
+Maintainers: [PROJECT.md](PROJECT.md) holds intent, [STATE.md](STATE.md) holds the
+checkpoint, and [records](records/RECORDS.md) hold evidence. Follow
+[AGENTS.md](AGENTS.md) for engineering work. No license file is currently provided.

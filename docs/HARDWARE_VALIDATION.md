@@ -44,8 +44,8 @@ dwell; an unknown limit does not authorize a 20-cycle run.
 Prepared PowerShell commands, to execute AFTER approval:
 
 ```powershell
-Set-Location C:\projects\thorlabs-shutter-control
-$uv = 'C:\Users\ctcheung\.local\bin\uv.exe'
+# Run from the repository root after approval.
+$uv = (Get-Command uv -ErrorAction Stop).Source
 $env:KINESIS_TEST_DIR = $null
 & $uv --cache-dir .uv-cache sync --locked
 & $uv --cache-dir .uv-cache run --locked pytest -q -p no:cacheprovider --ignore=tests/test_sdk.py
