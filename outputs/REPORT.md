@@ -5,6 +5,28 @@ with REQ-003–008 **BLOCKED**. This pass used software fixtures only, without l
 Kinesis or communicating with hardware. Final evidence: [E009](../records/RECORDS.md#e009).
 The subsequent publication review is recorded in [E010](../records/RECORDS.md#e010).
 
+## First-time-user guide refresh
+
+The 2026-09-15 README rewrite and hardware-focused follow-up are complete
+([E011](../records/RECORDS.md#e011), [E012](../records/RECORDS.md#e012)). It leads with
+status, installation, bench setup, discovery, actual serial selection and a GUI
+operating/shutdown checklist. Hardware troubleshooting precedes the optional
+simulator. The existing simulated screenshot stays explicitly labeled; a
+connection diagram and small tables support the hardware workflow. Python usage
+and developer notes are last.
+
+49 software tests, API examples, demo HTTP lifecycle, Ruff, Markdown/reference
+checks and README rendering PASS. Locked setup and cached build PASS; online
+build was blocked by PyPI connectivity. Commands and hardware claims were checked
+against the repository; no SDK/USB access or physical validation occurred.
+Production code, configuration and the ordered hardware procedure are unchanged.
+The follow-up's interactive Python example also passes software-fixture checks
+for normal operation and interruption after Open; its hardware dwell limits are
+explicitly operator-managed. Final Markdown, links and rendering checks PASS.
+The [publication review](../records/RECORDS.md#e013) clarified Python bitness,
+serial format, the software-test gate and releasing GUI ownership before a script.
+All 49 software tests, example checks, lint/format and cached build pass.
+
 ## Simplified architecture
 
 Dash GUI / CLI → KSC101Controller → official Kinesis .NET via Python.NET → USB KSC101.

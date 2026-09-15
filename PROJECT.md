@@ -76,6 +76,12 @@ are in scope. Documentation examples and a source-checkout screenshot/demo harne
 may reuse the existing test fixture; production behavior remains unchanged.
 The earlier hardware-review hold remains in force after this documentation pass.
 
+On 2026-09-15, the user requested a simple first-time-user README, then asked for
+more focus on real-hardware use. For the README, prioritize installation, bench
+setup, discovery, connection, operation and shutdown; keep simulation as an
+optional workflow and label its evidence clearly. This changes documentation
+emphasis only; the hardware-review hold and physical criteria remain unchanged.
+
 ### Code simplification follow-up
 
 The user's subsequent cleanup request authorizes incremental code and documentation

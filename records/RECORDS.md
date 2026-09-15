@@ -69,6 +69,7 @@ SDK check. [validation-manifest.json](validation-manifest.json) fingerprints the
 tested source/configuration and final build outputs.
 
 Method / expected:
+
 - `uv lock --check`, `uv sync --locked --offline`: lock consistent; environment reproducible.
 - `uv run --locked ruff check src tests`, `ruff format --check src tests`: no findings.
 - Set KINESIS_TEST_DIR to the extracted SDK and run
@@ -483,3 +484,114 @@ The reviewed commit includes the related user-maintained prompt-log additions;
 their content is preserved, with Git's configured LF normalization in the index.
 The active user request authorizes commit and push to the existing origin/main.
 Git history and the matching origin/main revision identify the publication result.
+
+## E011
+
+Kind / scope: first-time-user README rewrite, 2026-09-15; base `b40ec49`.
+Derived REQ-017 from the current user request; TEST-018 rechecks affected
+REQ-009–012. Documentation only; the hardware-review hold is unchanged.
+
+Expected: a concise Install → Test → Demo → Hardware → Safe use guide, with
+repository-backed commands, interfaces and validation claims; usable existing
+screenshot, valid diagram/links, and no SDK/USB access.
+
+Observed:
+
+- Inspected controller, GUI, CLI, packaging/lock, fixture/demo, hardware procedure,
+  current checkpoint and E009/E010. Reused the existing simulated GUI screenshot
+  after visual inspection; its provenance remains in docs/gui.md.
+- `uv sync --locked` PASS: 39 packages checked. This shell lacked uv on PATH;
+  prepended the existing `C:\Users\ctcheung\.local\bin` for verification and used
+  project-local `UV_CACHE_DIR=.uv-cache`. uv 0.11.2, CPython 3.12.14 x64.
+- Documented software pytest command PASS: 49 cases in 0.23 s. Real-SDK test
+  explicitly excluded. Normal API demo PASS with documented states; empty API
+  demo returned the expected missing-device message and exit 1. CLI help PASS.
+- README Python block executed against the patched fixture and cleanup verified;
+  three additional API-guide blocks also PASS using `tmp/cleanup-examples.py`.
+  No clr, pythonnet or Thorlabs module loaded.
+- Documented Ruff lint/format commands PASS (10 files). `uv build` could not reach
+  PyPI for Hatchling in this environment; `uv build --offline` PASS from the existing
+  cache, producing wheel and sdist. A fresh network install was not demonstrated.
+- Clone URL matches the configured GitHub repository; cloning was not repeated.
+  Real-hardware commands were checked against source and tests, not run on devices.
+
+- Markdownlint-cli2 0.23.2 PASS for README; local Markdown/image/anchor checks
+  PASS. The README rendered with its screenshot and one Mermaid diagram without
+  broken images or browser errors; rendered top section and diagram visually
+  reviewed. Sandbox browser launch initially returned EPERM; scoped automatic
+  escalation permitted the local-only render. Browser closed normally.
+- Exact Quick Start demo launch started the server at 127.0.0.1:8050. HTTP layout
+  and CSS returned 200; real Dash callback requests exercised initial state,
+  Discover, Connect, Open, Close and Close & disconnect with the documented identity
+  and states, all PASS (`tmp/readme-demo-check.py`). After verified Disconnected,
+  Ctrl+C stopped the terminal session (wrapper exit 1); this is not a physical
+  shutdown validation. Existing screenshot assets were preserved.
+
+TEST-018 PASS; REQ-017 and affected documentation REQ-009–012 revalidated.
+The README task is COMPLETE. Physical REQ-003–008 remain BLOCKED. No hardware
+operation is authorized or performed. No server or browser remains pending.
+
+## E012
+
+Kind / scope: same-day user follow-up, "more focus on using with real hardware".
+TEST-018 revalidates revised REQ-017 and affected documentation REQ-009–012.
+Expected: hardware setup/operation is the main README path, simulation optional;
+retain accurate validation limits and the existing hardware hold.
+
+Observed:
+
+- README now leads with Windows/Kinesis installation and software checks, bench
+  topology/checklist, discovery, actual serial selection, GUI connection,
+  Close/Open/Close observations and shutdown. Troubleshooting prioritizes hardware.
+  The simulated screenshot is explicitly labeled; no hardware imagery or bench
+  configuration was invented. The simulator is an optional later section.
+- Reviewed CLI flags, environment-variable use, serial selection and GUI workflow
+  against source, hardware notes and the ordered procedure. Discovery remains
+  gated by approval; the GUI follows first-use stages 2–5. No procedure stages,
+  physical limits or acceptance criteria changed; no device access occurred.
+- Revised Python example uses the selected serial and prompts for Closed/Open
+  observations. It makes no timing guarantee and explicitly leaves approved
+  dwell/thermal limits to the operator. `tmp/readme-hardware-example-check.py`
+  executed the actual README block against the fixture: normal completion and
+  KeyboardInterrupt at the second prompt both leave the fake Closed/released.
+  No clr/pythonnet/Thorlabs modules loaded. This is software-only evidence.
+- Markdownlint and internal Markdown/image/anchor checks PASS. Local browser render
+  PASS: one Mermaid diagram, no missing images or browser errors; top section
+  visually reviewed. Existing screenshot/diagram assets retained. Browser closed.
+- E011's source tests, software demo, dependency and Ruff checks remain applicable;
+  production code/configuration is unchanged. Hardware commands are documented and
+  source-checked, not physically executed. No redundant full-suite run or build.
+
+TEST-018 PASS for the revised guide. Documentation COMPLETE; physical REQ-003–008
+remain BLOCKED under AWAITING_HUMAN_REVIEW. No hardware/server operation pending.
+
+## E013
+
+Kind / scope: user-requested review, fixes, commit and push, 2026-09-15.
+TEST-019: prepublication review of the README change and REQ-009–012/017;
+TEST-018 example/reference checks rerun. Hardware-review hold unchanged.
+
+Reviewed all five changed documentation files against controller/CLI/GUI source,
+packaging, existing guides and E011/E012. Corrected four first-use gaps: specify
+Python 3.12 x64, show the eight-digit serial format beginning with 68, stop on
+failed software checks, and explicitly Close & disconnect/stop the GUI before
+running the Python example. Updated the stale publication checkpoint. No
+production, test, configuration, dependency or hardware-procedure changes.
+
+Validation:
+
+- `uv run --locked pytest -q -p no:cacheprovider --ignore=tests/test_sdk.py`:
+  49 PASS (0.18 s). No real-SDK test or device operation executed.
+- Actual README Python block: normal completion and interruption after Open PASS
+  against the fixture, ending Closed/released; no vendor modules loaded.
+- Ruff lint/format PASS, all 10 Python files. Cached wheel/sdist build PASS.
+- Fixed a pre-existing missing blank line before the E003 list. PowerShell
+  command blocks parse; Markdown lint, internal references and
+  `git diff --check` PASS. E012's diagram/screenshot rendering remains applicable;
+  only small text clarifications were made during this review.
+- Fetched origin; HEAD and origin/main both at b40ec49 with zero divergence before
+  publication. Only the five reviewed documentation files are in scope.
+
+TEST-019 PASS. The current user request explicitly authorizes commit/push to the
+existing origin/main. Git history and remote refs identify publication; no force
+push or hardware access is part of this action. Physical REQ-003–008 remain BLOCKED.
