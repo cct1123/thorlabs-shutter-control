@@ -595,3 +595,32 @@ Validation:
 TEST-019 PASS. The current user request explicitly authorizes commit/push to the
 existing origin/main. Git history and remote refs identify publication; no force
 push or hardware access is part of this action. Physical REQ-003–008 remain BLOCKED.
+
+## E014
+
+Kind / scope: user-reported GitHub diagram failure, 2026-09-15. TEST-020;
+REQ-011/017. User observed "Unable to render rich display" and an undefined
+`render` property. This invalidated the README's viewer-compatibility conclusion
+from local Mermaid rendering; the exact GitHub/client runtime cause is unconfirmed.
+
+Expected: the README diagram displays without a viewer-side Mermaid dependency,
+with the same hardware topology and accessible editable source.
+
+Changed README to embed `docs/assets/hardware-connections.png` and link
+`hardware-connections.mmd`. The source matches the prior README Mermaid block
+exactly. Exported with local Mermaid 11.17.2 and headless Edge at scale 2:
+2080 x 692 px, 44,400 bytes, white background. Reviewed the labels and connections;
+used opaque label backgrounds to avoid lines crossing text. Export helper is
+`tmp/export-hardware-diagram.cjs`; the committed .mmd is the source of truth.
+
+Validation: source equality and absence of a README Mermaid fence PASS; local
+README render with JavaScript disabled PASS, both images load, no broken images
+or browser errors. Markdown lint, local links and whitespace checks PASS. Test
+helper: `tmp/readme-static-review.cjs`. No source/configuration change, SDK load,
+USB access or hardware actuation; prior software tests remain applicable.
+
+TEST-020 PASS for the static display path. The reported GitHub renderer was not
+repaired or diagnosed; the README no longer invokes it. Other guides' Mermaid
+blocks are outside this reported README issue. Existing authorization to fix,
+commit and push this documentation covers publication to origin/main. Physical
+acceptance remains BLOCKED under AWAITING_HUMAN_REVIEW.

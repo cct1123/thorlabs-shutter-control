@@ -49,16 +49,11 @@ $env:KINESIS_DIR = Read-Host 'Full path to your installed Kinesis folder'
 
 ## 2. Prepare the bench
 
-```mermaid
-flowchart LR
-    PC[Windows computer + Kinesis] <-->|USB| K[KSC101]
-    P[Verified power supply] --> K
-    K -->|Shutter cable| S[Compatible optical shutter]
-    I[Existing key / interlock] -. safeguards .-> K
-```
+![Windows computer with Kinesis connected by USB to the KSC101, with a verified power supply, compatible optical shutter, and existing key/interlock arrangement](docs/assets/hardware-connections.png)
 
 *Connection overview, not a pinout. Follow the actual equipment manuals and
-[hardware setup notes](docs/hardware.md) for cabling and power-up.*
+[hardware setup notes](docs/hardware.md) for cabling and power-up.
+[Editable diagram source](docs/assets/hardware-connections.mmd).*
 
 | Check | What to establish |
 | --- | --- |

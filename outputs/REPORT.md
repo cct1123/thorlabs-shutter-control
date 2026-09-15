@@ -27,6 +27,11 @@ The [publication review](../records/RECORDS.md#e013) clarified Python bitness,
 serial format, the software-test gate and releasing GUI ownership before a script.
 All 49 software tests, example checks, lint/format and cached build pass.
 
+The subsequent GitHub display fix ([E014](../records/RECORDS.md#e014)) replaces the
+README's live Mermaid block with a pre-rendered PNG and a link to the original
+editable source. The README images load with JavaScript disabled. Earlier local
+Mermaid rendering did not establish compatibility with the user's GitHub viewer.
+
 ## Simplified architecture
 
 Dash GUI / CLI → KSC101Controller → official Kinesis .NET via Python.NET → USB KSC101.
