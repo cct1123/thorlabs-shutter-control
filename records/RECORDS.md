@@ -624,3 +624,9 @@ repaired or diagnosed; the README no longer invokes it. Other guides' Mermaid
 blocks are outside this reported README issue. Existing authorization to fix,
 commit and push this documentation covers publication to origin/main. Physical
 acceptance remains BLOCKED under AWAITING_HUMAN_REVIEW.
+
+Post-publication check: commit `5ef79a1` was pushed to origin/main. A fresh headless
+browser opened that commit's GitHub README (HTTP 200); the visible diagram decoded
+successfully at 2080 x 692 px. Screenshot: `tmp/github-readme-diagram.png`;
+check: `tmp/check-published-readme.cjs`. GitHub display PASS for the static image.
+The browser closed normally. This supplements the local script-free rendering check.
