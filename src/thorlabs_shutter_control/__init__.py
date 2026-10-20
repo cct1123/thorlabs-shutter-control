@@ -1,5 +1,5 @@
 """Manual KSC101 shutter control. Importing this package never connects hardware."""
 
-from .controller import KSC101Controller, ShutterError, ShutterStatus
+from .controller import KCubeShutter, ShutterError, ShutterHub, ShutterStatus, TriggerConfig
 
-__all__ = ["KSC101Controller", "ShutterError", "ShutterStatus"]
+__all__ = ["KCubeShutter", "ShutterHub", "ShutterError", "ShutterStatus", "TriggerConfig"]

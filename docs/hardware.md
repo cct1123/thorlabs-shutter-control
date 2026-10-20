@@ -2,18 +2,30 @@
 
 [README](../README.md) · [Setup](getting-started.md) · [Interface notes](INTERFACE.md)
 
-The intended system is a Thorlabs KSC101 K-Cube Solenoid Controller, a compatible
-Thorlabs optical shutter, a supported power supply and a USB-connected control
-computer. **No physical configuration has yet passed acceptance.** The current
+The intended system is up to three Thorlabs KSC101 K-Cube Solenoid Controllers
+through a KEH3 USB hub, each driving a compatible Thorlabs optical shutter, with
+manufacturer-approved power/cabling and a USB-connected control computer.
+**No physical configuration has yet passed acceptance.** The current
 state is **AWAITING_HUMAN_REVIEW**, with REQ-003–008 blocked.
+Three-panel software support does not establish KEH3 USB compatibility at the
+bench. KEH3 Ethernet control is outside the implementation; hardware access
+remains on hold.
+
+Thorlabs' [current KSC101 product page](https://www.thorlabs.com/k-cube-r-solenoid-controller?tabName=Overview),
+verified on 2026-10-20, explicitly lists KEH3 as a compatible hub for up to three
+controllers. It provides power and USB 2.0 communications through one host USB
+connection; the stated combined cube-load limit is 4.6 A. This is manufacturer
+compatibility evidence ([E018](../records/RECORDS.md#e018)), not a measurement of
+the installed bench. Supply/load ratings and every physical acceptance gate
+still require verification under the existing hold.
 
 ## What is established
 
 | Item | Established evidence | Still required |
 | --- | --- | --- |
-| Controller | Human-supplied target: KSC101 | Actual identity/serial, firmware and availability |
-| Optical shutter | Human-supplied compatible Thorlabs shutter | Exact model, compatibility, feedback capability and operating limits |
-| Power and cables | A supply, shutter connection and USB link are required | Actual supply model/rating/polarity, cabling and approved power-up arrangement |
+| Controllers | Human-supplied targets: three KSC101s through KEH3 USB | Each actual identity/serial, firmware, availability and shutter/panel mapping |
+| Optical shutters | Human-supplied compatible Thorlabs shutters | Each exact model, compatibility, feedback capability and operating limits |
+| Hub, power and cables | KEH3 USB is the requested topology | Actual hub variant/identity, approved supply/docking/USB arrangement, each shutter cable and power-up procedure |
 | Software | Windows x64 / Python 3.12 software tests; historical Kinesis 1.14.60.27990 SDK load and contract inspection | Installed vendor runtime/USB driver readiness on the bench computer |
 | GUI and API | Software tests and actual browser operation against the test fixture | Physical motion, feedback, reconnect, faults and shutdown through the GUI/API |
 
@@ -25,15 +37,18 @@ was accessed during the readiness audit or this documentation pass.
 
 ```mermaid
 flowchart LR
-    P[Windows computer with Kinesis] <-->|USB| C[KSC101]
-    V[Verified supported supply] -->|Power| C
-    C -->|Compatible shutter cable| S[Optical shutter]
-    I[Existing key / interlock arrangement] -. safeguards .-> C
+    P[Windows computer with Kinesis] <-->|USB| H[KEH3: intended, unverified]
+    V[Manufacturer-approved hub supply] -->|Power| H
+    H --> C[Up to three KSC101 cubes]
+    C -->|One compatible shutter per cube| S[Optical shutters]
+    I[Existing key / interlock arrangements] -. safeguards .-> C
 ```
 
 This is a functional topology, **not a wiring diagram or pinout**. Supply, shutter,
 trigger and interlock details must be checked against the actual equipment and
 manufacturer instructions. The physical configuration is still unknown.
+The hub arrangement needs its own KEH3 manual and supply/docking checks; a single
+cube's supply specification below does not establish the hub supply requirements.
 
 The [KSC101 manual, HA0368T Rev D](https://media.thorlabs.com/contentassets/e92d618c92c94cea9096b3f231859611/etn017648-d02.pdf)
 is the project's recorded hardware reference: setup/interlocks in §§3.3–3.4,
@@ -78,7 +93,9 @@ the diagram is an overview, not authorization or a substitute for the
 [ordered validation procedure](HARDWARE_VALIDATION.md). That procedure starts
 with bench facts and safeguards, then discovery and passive connection/identity/
 release, first Close, individual Open/Close, shutdown/reconnect, GUI/Ctrl+C,
-approved-dwell repetition, and closed-state USB-loss/recovery.
+approved-dwell repetition, and closed-state USB-loss/recovery. The multi-controller
+stage additionally verifies three serial/shutter/panel mappings, unaffected
+neighbors during individual operations/reconnect, and all-controller shutdown.
 
 Acceptance needs independent observation, comparison with reported state, approved
 operating/dwell limits and observed shutdown. No physical timing, optical transmission
@@ -91,8 +108,11 @@ not restore the prior mode. The manual describes mode persistence across power
 cycles. Initialization, polling and preparation feedback before Enable still need
 bench validation. See [interface notes](INTERFACE.md) for the command sequence.
 
-Normal cleanup attempts Close then release. Abrupt power/USB/process failure and
-hung vendor calls cannot guarantee closure. Keep the independent beam block/source
+Normal per-controller cleanup attempts Close then release. Hub/GUI/CLI shutdown
+attempts every slot sequentially and continues after reported failures, identifying
+each failed slot/serial. There is no total latency guarantee: a hung vendor call
+can prevent later attempts. Abrupt power/USB/process failure also prevents a
+closure guarantee. Keep the independent beam block/source
 disable, approved observation method and physical shutdown method required by
 the hardware procedure. No firmware change or safeguard bypass is authorized.
 

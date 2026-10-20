@@ -12,24 +12,26 @@ from pathlib import Path
 
 import pytest
 
-from thorlabs_shutter_control import ShutterError
+from thorlabs_shutter_control import ShutterError, ShutterHub, TriggerConfig
 from thorlabs_shutter_control.gui import create_app
 
 
 @contextmanager
-def simulated_controller(*, empty=False):
-    """Reuse the test fixture, including its virtual clock and fictional identity."""
+def simulated_hub(*, empty=False):
+    """Reuse distinct test devices and a virtual clock; no real SDK is reachable."""
     fixture_file = Path(__file__).resolve().parents[2] / "tests" / "conftest.py"
     fixture = runpy.run_path(str(fixture_file))["rig"]
     with pytest.MonkeyPatch.context() as patch:
         # This source-checkout helper deliberately depends on the test fixture.
         rig = fixture.__wrapped__(patch)
+        rig.serials[:] = list(rig.devices)
         if empty:
             rig.serials.clear()
+        hub = ShutterHub(list(rig.devices))
         try:
-            yield rig.controller
+            yield hub
         finally:
-            rig.controller.safe_shutdown()
+            hub.safe_shutdown()
 
 
 def main():
@@ -42,17 +44,23 @@ def main():
         parser.error("port must be between 1 and 65535")
     print("SIMULATION ONLY — test fixture; no hardware access.", flush=True)
     try:
-        with simulated_controller(empty=args.empty) as controller:
+        with simulated_hub(empty=args.empty) as hub:
             if args.api:
-                print("Discovered:", controller.discover())
-                with controller:
+                print("Discovered:", hub.discover())
+                for slot, controller in enumerate(hub.controllers):
+                    hub.connect(slot, controller.serial_number)
                     print("Identity:", controller.identify_device())
                     print("Initial:", controller.get_status().shutter_state)
                     print("Open:", controller.open_shutter().shutter_state)
                     print("Close:", controller.close_shutter().shutter_state)
-                print("After cleanup:", controller.get_status().connection)
+                    print("TTL:", controller.configure_triggers(TriggerConfig()))
+                    armed = controller.arm_triggers()
+                    print("TTL armed / shutter:", armed.ttl_armed, armed.shutter_state)
+                    print("Disarmed:", controller.disarm_triggers().ttl_armed)
+                hub.safe_shutdown()
+                print("After cleanup:", [c.get_status().connection for c in hub.controllers])
             else:
-                app = create_app(controller)
+                app = create_app(hub)
                 app.run(
                     host="127.0.0.1",
                     port=args.port,

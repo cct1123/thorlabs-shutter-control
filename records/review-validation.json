@@ -1,0 +1,67 @@
+{
+  "date": "2026-10-20",
+  "test": "TEST-035",
+  "scope": "software-only review; hardware and real SDK access held",
+  "requirements": [
+    "REQ-032",
+    "REQ-028",
+    "REQ-029",
+    "REQ-030"
+  ],
+  "environment": {
+    "python": "3.12.7",
+    "platform": "Windows x64",
+    "dash": "4.4.1",
+    "pythonnet": "3.1.0",
+    "dependencies": "unchanged uv.lock; 39 compatible packages"
+  },
+  "regression_reproduction": {
+    "baseline": "E023 wheel extracted at tmp/wheel-ttl-final",
+    "failed": 14,
+    "deselected": 197,
+    "selection": "connect_rejects_mismatched_identity or status_samples_operating or disarm_operating_feedback or release_interrupt_still or open_recovery_interrupt"
+  },
+  "source_tests": {
+    "passed": 211,
+    "seconds": 0.6
+  },
+  "wheel_tests": {
+    "passed": 211,
+    "seconds": 0.5,
+    "import_root": "tmp/wheel-review-validation"
+  },
+  "excluded_hardware_test": "tests/test_sdk.py",
+  "checks": {
+    "lint": "PASS",
+    "format": "PASS",
+    "sdist_wheel_build": "PASS",
+    "source_package_bytes": "MATCH",
+    "assets": "PRESENT",
+    "excluded_local_cache_sdk_files": "PASS",
+    "simulated_api": "three independent manual/TTL lifecycles; all disconnected",
+    "prior_gui_css_normalized_bytes": "MATCH"
+  },
+  "source_line_endings": "LF; matches .gitattributes policy",
+  "source_sha256": {
+    "docs/examples/simulated_demo.py": "e1509116f1191c72372eb3cf0b43e067413d525cbf18a1d3d2ab11c6c70431d1",
+    "src/thorlabs_shutter_control/__init__.py": "8f3f2b6322eb188a53e9483781c161da05ad835d5e8489f69fde9388293f1d97",
+    "src/thorlabs_shutter_control/__main__.py": "64992f7a84a3044181cd81cc3618da65d95cf858ca3242aa6d54936159aedab4",
+    "src/thorlabs_shutter_control/controller.py": "f9970adbf203622ac3cf3ff1b1c93b84bea965ba39d48adbc7778c6406b54aff",
+    "src/thorlabs_shutter_control/gui.py": "4c20c1fa90ce0bc51c1cc9889fd1fb0a4e8a0bea808c8f53dc53fdcd0829e374",
+    "tests/conftest.py": "8b0a103c22ed3800a36705f090ac20e154e15b9c304a6e5b2a1fdb3e3e88cb5a",
+    "tests/test_cli.py": "98b1bca93f684ecea45db89b8d2c04892af8bafc14aa5c906ac8bcc492961750",
+    "tests/test_controller.py": "342921638344221054fcdfdf97943006a2cce1d524de4e8973b9499ae90a84e9",
+    "tests/test_gui.py": "20e0c648bda83e390c94f72f1b6706c8114f8d20b19bcbca3fa24c94e18d8ade",
+    "tests/test_hub.py": "28d3eb9e08cded5e9545e778579affae76d2cabd96ef219472e9e6f8aa80d38c",
+    "tests/test_sdk.py": "6cd2b5d072cfb340859863111d160474200b2d619d29a58873dfcd1aacffad67",
+    "tests/test_triggers.py": "f5cd2b6c465a1ca9a7b2c6167e6100cc90e0b847f918b24a1d110c15cf11ceaa"
+  },
+  "wheel_sha256": "9d152e4c50074f6cde54e42c89d22211fc7db4d035f64ccddabdb4f3bd15eccd",
+  "historical_manifests": [
+    "records/three-shutter-validation.json",
+    "records/controller-cleanup-validation.json",
+    "records/ttl-validation.json"
+  ],
+  "pending_physical": "TEST-003 through TEST-008, TEST-026 and TEST-034 remain BLOCKED",
+  "publication": "User authorized normal commit/push; recorded separately as TEST-036"
+}

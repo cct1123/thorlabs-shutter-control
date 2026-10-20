@@ -7,7 +7,7 @@ test fixture, so no Kinesis installation, USB device or optical setup is needed.
 
 ## Install the tools
 
-The verified setup is **Windows x64, Python 3.12.14 and uv 0.11.2**, with a modern
+The software-tested setup is **Windows x64, Python 3.12 and uv**, with a modern
 browser. The package declares Python `>=3.11,<3.14`; other Python versions and
 non-Windows simulation are not validated here. The real backend requires Windows.
 
@@ -66,9 +66,11 @@ uv run --locked python docs/examples/simulated_demo.py
 
 Keep the terminal open and visit [http://127.0.0.1:8050](http://127.0.0.1:8050).
 Initially the screen says **Disconnected** and **Unknown**, and Open/Close are
-disabled. Click **Discover**, then **Connect**. Identity should read
-**TEST DOUBLE, NOT HARDWARE / 68000001** and the shutter should report **Closed**.
-Try Open, Close and Close & disconnect. See the [illustrated GUI guide](gui.md).
+disabled in all three panels. The demo preselects fictional serials `68000001`
+through `68000003`. Click **Discover**, then each panel's **Connect**. Each identity
+should read **TEST DOUBLE, NOT HARDWARE** with its own serial and report **Closed**.
+Try each panel's Open and Close; observe that other simulated shutters retain
+their state. Finish with **Close & disconnect all**. See the [GUI guide](gui.md).
 
 Stop the demo with **Ctrl+C** in the terminal. Closing a browser tab leaves the
 server running. A new demo process starts with a new fixture; it does not preserve
@@ -80,7 +82,8 @@ To explore the no-device case after stopping the first demo:
 uv run --locked python docs/examples/simulated_demo.py --empty
 ```
 
-Discover reports `Found 0 device(s).`; Connect reports `Expected one KSC101; found 0.`
+Discover reports `Found 0 device(s).`; after selection is cleared, Connect asks
+for a serial. A still-preselected absent serial produces a not-discovered error.
 No hardware is queried. There is no `shutter-control --simulate` option.
 
 ## Run software checks
@@ -94,7 +97,7 @@ uv run --locked ruff format --check src tests docs/examples
 uv build
 ```
 
-Expect **49 passed**, successful Ruff checks, and a wheel plus source distribution
+Expect all software tests to pass, successful Ruff checks, and a wheel plus source distribution
 under `dist/`. The ignored SDK test can enumerate real USB when `KINESIS_TEST_DIR`
 is set, so the explicit exclusion matters even on a development computer.
 
@@ -127,8 +130,8 @@ uv run --locked shutter-control
 ```
 
 The GUI does not auto-connect. Discover accesses the real SDK/USB interface;
-Connect discovers again and requires either a selected serial or exactly one
-discovered device. Open and Close request physical operation.
+Connect discovers again and requires an explicit serial in the selected panel.
+Open and Close request physical operation.
 
 Inspect available options without hardware access:
 
@@ -138,13 +141,14 @@ uv run --locked shutter-control --help
 
 | Option | Meaning |
 | --- | --- |
-| `--serial` | Actual eight-digit KSC101 serial beginning with `68`; preselects the identity, does not auto-connect |
+| `--serial` | Actual eight-digit KSC101 serial beginning with `68`; repeat up to three times with distinct serials in panel order. Preselection does not connect. |
 | `--kinesis-dir` | SDK folder; overrides `KINESIS_DIR`, then the default `C:\Program Files\Thorlabs\Kinesis` |
 | `--list` | Load SDK and enumerate USB identities; no connection or output command |
 | `--port` | Local GUI port, default `8050`, accepted range `1..65535` |
 
 The hardware application always binds to `127.0.0.1`, runs one process without
-debug/reloading, and attempts shutdown on normal server exit or Ctrl+C.
+debug/reloading, and attempts shutdown of all slots on normal server exit or Ctrl+C.
+KEH3 USB operation remains physically unvalidated; Ethernet is outside this interface.
 
 ## Troubleshooting
 

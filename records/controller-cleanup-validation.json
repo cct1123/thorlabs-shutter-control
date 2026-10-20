@@ -1,0 +1,42 @@
+{
+  "date": "2026-10-20",
+  "scope": "KCubeShutter consolidation; software only; hardware held",
+  "python": "3.12.7 | packaged by Anaconda, Inc. | (main, Oct  4 2024, 13:17:27) [MSC v.1929 64 bit (AMD64)]",
+  "software_tests_source": 99,
+  "software_tests_packaged": 99,
+  "production_python_modules": {
+    "before": 5,
+    "after": 4
+  },
+  "production_python_lines": {
+    "before": 839,
+    "after": 802
+  },
+  "sha256": {
+    "PROJECT.md": "91ea7445e4a6b0a4d6dc883ff434d28a461d719d6c9dce614e7d0b6c1adeeee7",
+    "README.md": "d0e6bf3ccaa52cbdadbe6d2bf584581379eacf4ecd263b69f401fceb5ce1d38c",
+    "pyproject.toml": "0293f016fbe391eebe55aa363571509beff7d432d26f80a8d846128e603554bf",
+    "uv.lock": "f3e998a5da7afee0157c18e37f46a012b96af4d7e490eaefcf609d6e2c3298fd",
+    "src/thorlabs_shutter_control/controller.py": "bf39a5b4a6330f2a2d59955e029820ab9c681ad2e98f350c79f2b5f41a57fba1",
+    "src/thorlabs_shutter_control/gui.py": "46846c7866817c1d078d27c24f3243b06fef4974d6e862d8aca421e9c00486b7",
+    "src/thorlabs_shutter_control/__init__.py": "b2b3e9fa18f009e561e8a269bdf9f2335d437e67efb284158b73a653165a4f19",
+    "src/thorlabs_shutter_control/__main__.py": "239c904e02f7a23daede73ee2982614cd05605d9184ab56b2281ac9521257a91",
+    "src/thorlabs_shutter_control/assets/style.css": "14b76f1cd748beb0933eab87a9273ac8bae0c1aae5954f766cdd28bd09eddd74",
+    "tests/conftest.py": "2139e7ab61bd6390a5b0bff0d630d94db4e5d869b918ddb3010ddaf66890b88b",
+    "tests/test_bank.py": "441680212b9fc93d70b99da7bae780cc350ddaa6a7b9c85adeac9ad1a90d01fb",
+    "tests/test_cli.py": "3b0d0c98226d828d3731bb1721bfd1d8cf75f80751ad2634f3104eda04030f6b",
+    "tests/test_controller.py": "134c4456e9b5d7c165cdd7ef19b266a8735d0970f15c1109452177952d689091",
+    "tests/test_gui.py": "482639390cefa383695725a084fd944d403d6416e37ec0d418f01a4b4df7eece",
+    "tests/test_sdk.py": "be0c795d35b42a777fbcdde31e606d6137fbbb28df6cefb3cb4c2772f0e16aee",
+    "docs/architecture.md": "df30b9f5f67eb6d3b3d85767c30105bd8eef4d017188af0607f78b0d4470f8eb",
+    "docs/getting-started.md": "8ced9c1ce0bd4d81f59d91dfb72b73de6e00837d4a1bcf91bf462204191740be",
+    "docs/gui.md": "aaf1b6cf1a49ff8e5098d480c40f45b5892c35fa8b244a7dca3fe4349fb7dd0a",
+    "docs/hardware.md": "c01bb55682b9a2638384a540ff3d578fe8576eb06e8dc10a48de1100fc5dab23",
+    "docs/HARDWARE_VALIDATION.md": "5e7668dd98670a6ab816e788520102bee9e432f517a6ea761c63cfa5dcedb541",
+    "docs/INTERFACE.md": "108a82e18fe20cb4a63f008fed719dc27c796ddd233038f0da6f700b788a4506",
+    "docs/python-api.md": "4441ff0d1511fc4974453e7ec05eb94b38f2cc54c6f0e90c10c85f981693a1b3",
+    "docs/examples/simulated_demo.py": "501b0e17cb782679667f43f91d1e652c316df32ed56f6742f0639660a374664f",
+    "dist/thorlabs_shutter_control-0.1.0-py3-none-any.whl": "d3d982c16e1cf2287833d7f1ea91c50892094140fe6e59ba308bf450fd0660f5",
+    "dist/thorlabs_shutter_control-0.1.0.tar.gz": "988630fc64bc6b625119a11d09ad7c91c139a19ff20c757642c6b1badd67ad04"
+  }
+}

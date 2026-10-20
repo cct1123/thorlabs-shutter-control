@@ -1,0 +1,57 @@
+{
+  "date": "2026-10-20",
+  "scope": "software only; no real SDK import or device access",
+  "requirements": [
+    "REQ-028",
+    "REQ-029",
+    "REQ-030"
+  ],
+  "test": "TEST-033",
+  "python": "3.12.7",
+  "source_tests": {
+    "passed": 187,
+    "seconds": 0.5
+  },
+  "wheel_tests": {
+    "passed": 187,
+    "seconds": 0.49,
+    "import_root": "tmp/wheel-ttl-final"
+  },
+  "excluded_real_sdk_test": "tests/test_sdk.py",
+  "checks": {
+    "ruff_check": "PASS",
+    "ruff_format_check": "PASS",
+    "uv_build": "PASS",
+    "dependency_check": "39 packages compatible",
+    "source_wheel_python_bytes": "MATCH",
+    "simulated_api": "three manual and TTL lifecycles; all disconnected",
+    "browser": "three fake identities; second Armed/Closed; disarm and shutdown all"
+  },
+  "screenshot": {
+    "path": "docs/assets/gui-ttl-simulated.jpg",
+    "format": "JPEG",
+    "width": 1265,
+    "height": 712,
+    "sha256": "fe3d1a93fea4d15c4963ab1ce7358deb0eee9c04370326cf975ed035a6c02b48"
+  },
+  "wheel_sha256": "ae296ea4d82b42097160f61b8bccadbc069c349460b8e017b0112745affe35c3",
+  "sdist_sha256": "70331e746a62fa8e95e536ec967f4048dec016a5e80a6e60ffdf1944313158ff",
+  "official_api_chm_sha256": "dfa52c72df9c0c9859bd29a9cfb9efe7a29e33787f9b4ddec0e720704de29b7d",
+  "source_sha256": {
+    "src/thorlabs_shutter_control/controller.py": "556e6c471fcfc2076b8f56657caff068d3a7d138e0089902cbb75b19bd075985",
+    "src/thorlabs_shutter_control/gui.py": "b2a759122de231aeecb396835f61e2827c60faee31683572614d6cec2b2b774f",
+    "src/thorlabs_shutter_control/__init__.py": "f80599c986353864a3aa2d2a31b5754a9cb865319cc7c1ecde11548bb0f351ce",
+    "src/thorlabs_shutter_control/__main__.py": "ff2df80b56c1ed49cb32860e73ae235abba0b2f9d3f237826e3cc5872eb10379",
+    "tests/conftest.py": "d3a1aeaa0803e2a8c47db7eb2622825771993365304cd7a789029303d11b0a2a",
+    "tests/test_cli.py": "5d120c4c143015528054fc0a0bfc01ec12e553e2f5c90634a0edf693c6a84373",
+    "tests/test_controller.py": "e5262076418b41d219399924df0e576188cbe51b8f23955b0244e6ac5395d8e2",
+    "tests/test_gui.py": "4986c8734c379e9a75a25c536110583553a06fd6288f97a19a870336f1ede0cf",
+    "tests/test_hub.py": "3173969d7ba8be8915c49b031bd69296407a93158610384183fadb78aff1a5e8",
+    "tests/test_sdk.py": "4dc83ec5283687cfa4a1943e1f565283e808930f685601ae9c99b0de728774d2",
+    "tests/test_triggers.py": "7750fb82bf317d3e0782bc88d4ad78cc6ecbd68be0c08fd9bb51990d75296c75",
+    "docs/examples/simulated_demo.py": "a1a48885312c6480690ff0e15d1c6b7a5d6ea0e82cac017169832ae25cded068",
+    "docs/assets/gui-ttl-simulated.jpg": "fe3d1a93fea4d15c4963ab1ce7358deb0eee9c04370326cf975ed035a6c02b48"
+  },
+  "pending_physical": "TEST-034; hardware hold; no installed-SDK or electrical proof",
+  "background_work": "none; simulator port 8058 and browser tab closed"
+}

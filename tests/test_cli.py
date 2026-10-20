@@ -2,15 +2,112 @@ import sys
 
 import pytest
 
+from thorlabs_shutter_control import KCubeShutter, gui
 from thorlabs_shutter_control import __main__ as cli
 from thorlabs_shutter_control import controller as module
 
 
-def test_list_does_not_connect_or_actuate(rig, monkeypatch, capsys):
+def layout_components(app):
+    """Inspect the served Dash layout without starting a network listener."""
+    components = {}
+
+    def visit(item):
+        if isinstance(item, list):
+            for child in item:
+                visit(child)
+        elif isinstance(item, dict):
+            props = item.get("props", {})
+            if "id" in props:
+                components[props["id"]] = props
+            visit(props.get("children"))
+
+    response = app.server.test_client().get("/_dash-layout")
+    assert response.status_code == 200
+    visit(response.get_json())
+    return components
+
+
+@pytest.mark.parametrize("serials", [[], ["68000001"], ["68000003", "68000001", "68000002"]])
+def test_gui_launch_has_three_passive_panels_with_requested_preselection(rig, monkeypatch, serials):
+    inspected = []
+
+    def forbidden_sdk_load(directory):
+        pytest.fail("GUI launch and unconnected shutdown must not load the SDK.")
+
+    def inspect_server(self, **kwargs):
+        assert kwargs == {
+            "host": "127.0.0.1",
+            "port": 8050,
+            "debug": False,
+            "use_reloader": False,
+            "threaded": False,
+        }
+        components = layout_components(self)
+        for slot in range(3):
+            assert components[f"serial-{slot + 1}"]["value"] == (
+                serials[slot] if slot < len(serials) else None
+            )
+            assert components[f"connection-{slot + 1}"]["children"] == "Disconnected"
+            assert components[f"open-{slot + 1}"]["disabled"] is True
+        inspected.append(True)
+
+    monkeypatch.setattr(module, "_load_sdk", forbidden_sdk_load)
+    monkeypatch.setattr(gui.Dash, "run", inspect_server)
+    argv = ["shutter-control"]
+    for serial in serials:
+        argv.extend(["--serial", serial])
+    monkeypatch.setattr(sys, "argv", argv)
+    assert cli.main() == 0
+    assert inspected == [True]
+    assert rig.manager_calls == []
+    assert all(device.calls == [] for device in rig.devices.values())
+
+
+@pytest.mark.parametrize(
+    "arguments",
+    [
+        ["--serial", "68000001", "--serial", "68000001"],
+        [
+            "--serial",
+            "68000001",
+            "--serial",
+            "68000002",
+            "--serial",
+            "68000003",
+            "--serial",
+            "68000004",
+        ],
+        ["--serial", "invalid"],
+        ["--port", "0"],
+        ["--port", "65536"],
+    ],
+    ids=["duplicate", "fourth", "invalid-serial", "low-port", "high-port"],
+)
+def test_invalid_arguments_are_rejected_before_sdk_or_server_access(rig, monkeypatch, arguments):
+    def forbidden(*args, **kwargs):
+        pytest.fail("Invalid CLI arguments must not access SDK or start the server.")
+
+    monkeypatch.setattr(module, "_load_sdk", forbidden)
+    monkeypatch.setattr(gui.Dash, "run", forbidden)
+    monkeypatch.setattr(sys, "argv", ["shutter-control", *arguments])
+    with pytest.raises(SystemExit) as caught:
+        cli.main()
+    assert caught.value.code == 2
+    assert rig.manager_calls == []
+    assert all(device.calls == [] for device in rig.devices.values())
+
+
+@pytest.mark.parametrize("serials", [[], ["68000001", "68000002", "68000003"]])
+def test_list_uses_one_fake_discovery_without_connecting_or_actuating(
+    rig, monkeypatch, capsys, serials
+):
+    rig.serials[:] = serials
     monkeypatch.setattr(sys, "argv", ["shutter-control", "--list"])
     assert cli.main() == 0
-    assert capsys.readouterr().out.strip() == "68000001"
-    assert rig.device.calls == []
+    expected = "\n".join(serials) if serials else "No KSC101 devices discovered."
+    assert capsys.readouterr().out.strip() == expected
+    assert rig.manager_calls == ["discover"]
+    assert all(device.calls == [] for device in rig.devices.values())
 
 
 def test_missing_sdk_is_an_actionable_nonzero_exit(monkeypatch, capsys):
@@ -22,21 +119,48 @@ def test_missing_sdk_is_an_actionable_nonzero_exit(monkeypatch, capsys):
     assert "Kinesis SDK not found" in capsys.readouterr().err
 
 
-def test_server_exception_still_attempts_shutdown(rig, monkeypatch):
-    from thorlabs_shutter_control import gui
+@pytest.mark.parametrize("interruption", [RuntimeError, KeyboardInterrupt])
+@pytest.mark.parametrize("shutdown_failure", [False, True])
+def test_server_exit_attempts_every_shutter_and_reports_shutdown_failures(
+    rig, monkeypatch, capsys, interruption, shutdown_failure
+):
+    rig.serials[:] = list(rig.devices)
+    controllers = [KCubeShutter(timeout=0.5) for _ in range(3)]
+    supplied = iter(controllers)
+    monkeypatch.setattr(module, "KCubeShutter", lambda *args, **kwargs: next(supplied))
 
-    rig.controller.connect()
-
-    def fail_server(self, **kwargs):
+    def interrupt_server(self, **kwargs):
         assert kwargs["debug"] is False
         assert kwargs["use_reloader"] is False
         assert kwargs["host"] == "127.0.0.1"
         assert kwargs["threaded"] is False
-        raise RuntimeError("server failure")
+        for controller, serial in zip(controllers, rig.serials, strict=True):
+            controller.connect(serial)
+            controller.open_shutter()
+        if shutdown_failure:
+            rig.devices["68000001"].fail.add("set_state")
+            rig.devices["68000002"].fail.add("disconnect")
+        raise interruption("server failure")
 
-    monkeypatch.setattr(cli, "KSC101Controller", lambda *a, **k: rig.controller)
-    monkeypatch.setattr(gui.Dash, "run", fail_server)
+    monkeypatch.setattr(gui.Dash, "run", interrupt_server)
     monkeypatch.setattr(sys, "argv", ["shutter-control"])
-    with pytest.raises(RuntimeError, match="server failure"):
-        cli.main()
-    assert rig.device.calls[-2:] == [("stop_poll",), ("disconnect",)]
+    if interruption is RuntimeError:
+        # Preserving the server exception also preserves its nonzero process exit.
+        with pytest.raises(RuntimeError, match="server failure"):
+            cli.main()
+    else:
+        assert cli.main() == (1 if shutdown_failure else 0)
+
+    error_output = capsys.readouterr().err
+    if shutdown_failure:
+        assert "Shutter 1 (68000001)" in error_output and "set_state" in error_output
+        assert "Shutter 2 (68000002)" in error_output and "disconnect" in error_output
+    else:
+        assert error_output == ""
+    for device in rig.devices.values():
+        assert device.calls[-2:] == [("stop_poll",), ("disconnect",)]
+    assert rig.devices["68000003"].state == "Closed"
+    assert not rig.devices["68000003"].IsConnected
+    if not shutdown_failure:
+        assert all(device.state == "Closed" for device in rig.devices.values())
+        assert all(not device.IsConnected for device in rig.devices.values())
