@@ -1278,3 +1278,23 @@ loaded, USB/network device scan, device connection/actuation, calibration,
 electrical measurement or firmware change. No simulator/device handle pending.
 Source/package/doc review is complete; normal commit/push and remote verification
 are the remaining authorized publication steps.
+
+## E025
+
+2026-10-20; REQ-033 / TEST-036, authorized commit/push from the latest user request.
+Expected: commit the explicitly reviewed files, push normally to origin/main,
+verify remote identity and retain the hardware hold.
+
+Observed: staged an explicit 33-file allowlist; cached diff/check reviewed, no
+unstaged changes, no local cache/SDK artifacts. Staged Python blob SHA-256 values
+match the final source manifest. Commit 2bce513baeef36a38f365c1e78c3702e30bf821e,
+"Add three-shutter hub and independent KSC101 TTL controls", created successfully.
+`git push origin main` succeeded as ca47dd2..2bce513, no force/history rewrite.
+`git ls-remote origin refs/heads/main` returned the same full commit ID. Local
+HEAD/origin/main matched, ahead/behind 0/0, working tree clean after that push.
+
+TEST-036 PASS for implementation publication. The subsequent record-only
+checkpoint preserves this evidence without changing the validated software;
+its publication uses the same normal push and remote-verification procedure.
+Software checks remain E024 / 211 source and wheel tests. No hardware or SDK
+access occurred; AWAITING_HUMAN_REVIEW / B001 and physical blockers remain.

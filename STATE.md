@@ -1,6 +1,6 @@
 # Engineering state
 
-Checkpoint: consistency review **VALIDATED (SOFTWARE ONLY), READY TO PUBLISH**, 2026-10-20.
+Checkpoint: consistency review **VALIDATED AND PUBLISHED (SOFTWARE ONLY)**, 2026-10-20.
 Intent: [PROJECT.md](PROJECT.md), review/fix/commit/push request.
 Current evidence: E024 / TEST-035; prior TTL evidence E023 is historical after
 these changes. **AWAITING_HUMAN_REVIEW** remains the hardware status. No SDK load,
@@ -49,7 +49,7 @@ unchanged behavior; physical criteria remain blocked under B001.
 | REQ-030 | TTL shutdown and package regression (derived) | TEST-033; failure/interrupt/all-slot tests and wheel, E024 | PASS (software) |
 | REQ-031 | Physical TTL configuration/priming/disarm across three shutters (derived) | TEST-034; stage 10, no SDK/physical execution | BLOCKED |
 | REQ-032 | Consistency review, focused fixes and pruning (derived) | TEST-035; 211 source/wheel tests, E024 | PASS (software) |
-| REQ-033 | Commit and push reviewed changes | TEST-036; verified commit and remote reference required | PENDING |
+| REQ-033 | Commit and push reviewed changes | TEST-036; implementation 2bce513 pushed and remote verified, E025 | PASS |
 
 ## Current architecture and configuration
 
@@ -91,12 +91,14 @@ implemented. See [assessment](docs/ethernet-assessment.md). Actual installed SDK
 physical topology, feedback/cache age, electrical behavior, persistence and
 closure/latency remain unvalidated. No simulator or hardware handle is pending.
 
-## Next action
+## Publication and next action
 
-Commit/push the validated reviewed tree to
-origin/main (explicitly authorized by the latest request). Use a normal push;
-no history rewrite is authorized. Keep physical work on hold. Forced termination,
-power/USB loss or a hung SDK call can prevent closure and later cleanup attempts.
+Implementation commit 2bce513baeef36a38f365c1e78c3702e30bf821e was pushed normally to
+origin/main and verified with git ls-remote (E025 / TEST-036). The record-only
+publication checkpoint does not change validated software. Review and publication
+are complete; the next engineering dependency is B001 below. Keep physical work
+on hold. Forced termination, power/USB loss or a hung SDK call can prevent closure
+and later cleanup attempts.
 
 ## Human action required for future hardware validation / B001
 

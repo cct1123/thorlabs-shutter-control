@@ -29,7 +29,9 @@ against the prior E023 wheel, demonstrating the defects reproduced by the new te
 Ruff lint/format, uv build, dependency check and three-device simulated API pass.
 Packaged Python matches source; assets are present and local caches/SDK artifacts
 are excluded. Current hashes: [review manifest](../records/review-validation.json).
-Earlier manifests remain historical. Publication is tracked by TEST-036.
+Earlier manifests remain historical. [E025](../records/RECORDS.md#e025) / TEST-036
+verifies implementation commit [2bce513](https://github.com/cct1123/thorlabs-shutter-control/commit/2bce513baeef36a38f365c1e78c3702e30bf821e)
+was pushed to origin/main and the remote reference matched.
 No real SDK import, USB/network device scan, connection, actuation, electrical test,
 calibration or firmware write occurred. All behavior tests use distinct fake devices.
 The rendered GUI and its earlier simulated screenshot remain visually unchanged.
@@ -43,5 +45,5 @@ remains unexecuted. See [STATE.md](../STATE.md), [API](../docs/python-api.md),
 [GUI](../docs/gui.md) and [bench procedure](../docs/HARDWARE_VALIDATION.md).
 
 The [Ethernet assessment](../docs/ethernet-assessment.md), E022, remains research
-only; production transport remains USB. Publication is authorized by the latest
-user request; no hardware authority is added.
+only; production transport remains USB. Review and publication are complete;
+no hardware authority is added.
