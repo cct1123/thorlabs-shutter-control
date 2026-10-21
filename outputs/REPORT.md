@@ -38,7 +38,8 @@ matches settings initialization only; test instructions avoid bytecode caches.
 Current source and wheel: **188 passed, 1 skipped** each; lint/format, simulation,
 package parity and documentation checks PASS. Details:
 [follow-up-review-validation.json](../records/follow-up-review-validation.json).
-Hardware behavior of the revised sequence remains untested.
+Implementation **fd70b46** pushed to origin/main and exact remote hash verified
+(E117 / TEST-125). Hardware behavior of the revised sequence remains untested.
 
 ## Prior integrated validation and pruning
 

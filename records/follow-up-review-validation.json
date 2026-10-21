@@ -29,6 +29,13 @@
   "privacy_issues": [],
   "wheel_source_parity": "PASS",
   "wheel_sha256": "1b2516a35efcda3a0ea26e6560a729eda5ad01f57aa071065e88a29c85e202b6",
-  "publication": "PENDING",
+  "publication": {
+    "status": "PASS",
+    "implementation_commit": "fd70b46620919c91fabe8f95098ad501948509ed",
+    "remote": "origin/main",
+    "remote_hash_verified": "fd70b46620919c91fabe8f95098ad501948509ed",
+    "evidence": "E117",
+    "test": "TEST-125"
+  },
   "cleanup": "PASS: generated wheel/extraction directories removed; no temp/cache paths outside protected .git/.venv"
 }

@@ -1,6 +1,6 @@
 # Engineering state
 
-## Follow-up review validated; publication pending - REQ-083
+## Follow-up review and publication complete - REQ-083
 
 TEST-124 / E116: source and extracted-wheel suites each188 passed,1 skipped.
 Fixed manual tutorials/notebook to Disarm, read Inactive/Manual, then Enable.
@@ -11,8 +11,9 @@ repeat-loop and setup descriptions. Guides use bytecode-free test commands.
 Ruff check/format, simulation, snippets/links/JSON and package parity PASS.
 No hardware operation or GUI launch. Human action required: none.
 
-Next: stage the reviewed paths, commit/push to origin/main and verify its hash.
-Current evidence: records/follow-up-review-validation.json and E116.
+Implementation fd70b46 pushed normally to origin/main and exact remote hash
+verified (E117 / TEST-125). No further implementation work for this request.
+Current evidence: records/follow-up-review-validation.json and E116/E117.
 
 ## Previous integrated review - REQ-082
 
@@ -69,7 +70,7 @@ archive retention: records/archive/README.md. The illustrated supervisor noteboo
 summarizes historical bench results; its launch examples now match current config.
 
 Implementation f2934c8 pushed normally to origin/main and exact remote hash
-verified (E115 / TEST-123). Publication checkpoint follows in a separate commit.
+verified (E115 / TEST-123); prior publication checkpoint is b5278de.
 No further implementation action. Preserve .venv, .git, private inputs and raw data.
 
 ## Requirements
@@ -161,4 +162,4 @@ acceptance. No broader electrical/physical completion is inferred from no-cable 
 | REQ-081 | No software interlock gating anywhere | E114 / TEST-122; GUI None/False/True cases; tutorial/diagnostic metadata trap; source audit | PASS (software) |
 | REQ-082 | Review, fix, prune, commit and push | E114/E115 / TEST-122/123; source/wheel PASS; f2934c8 pushed and remote verified | PASS (software publication) |
 
-| REQ-083 | Follow-up review, consistency fixes and publication | TEST-124 / E116; source/wheel each188 passed,1 skipped; publication pending | IN PROGRESS |
+| REQ-083 | Follow-up review, consistency fixes and publication | TEST-124/125 / E116/E117; source/wheel each188 passed,1 skipped; fd70b46 pushed/verified | PASS (software publication) |

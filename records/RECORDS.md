@@ -1137,3 +1137,16 @@ matched all source/asset bytes and ran the same suite. Python/JSON/snippet/link,
 notebook compilation/output defaults, HTML anchor/SVG and shareable-file scans
 PASS. Evidence/hash/counts: records/follow-up-review-validation.json.
 No hardware access, server launch, wiring/firmware change or physical test.
+
+## E117 / TEST-125 - Follow-up fix published
+
+REQ-083: reviewed16 explicit staged paths and cached diff whitespace check PASS.
+Committed fd70b46620919c91fabe8f95098ad501948509ed and pushed normally to
+origin/main; independent ls-remote returned that exact hash. Initial pre-commit
+read-only remote query timed out on SSH port22; bounded retry/push and verification
+succeeded without remote/config changes. Checkout clean after implementation push.
+Source/wheel each188 passed,1 skipped; current limits remain software-only.
+Generated wheel/extraction directories were inventoried and removed; zero generated
+cache/temp paths remained outside protected .git/.venv. Private inputs/environment
+preserved. This documentation/evidence checkpoint records verified publication;
+no runtime source change or physical operation follows from it.
