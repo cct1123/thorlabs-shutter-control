@@ -51,6 +51,8 @@ Default getter wait/polling is250ms. GUI Manual Open requests prerequisite and
 result reads (0.50s programmed waits); Close requests a result read (0.25s).
 Connect requests one combined operating/TTL snapshot (0.25s programmed wait) and
 uses it for the display instead of requesting the result a second time.
+Apply TTL keeps the prerequisite operating read, then shares one full snapshot
+between actual TTL readback comparison and display (0.50s total programmed waits).
 Trigger Start adds an actual input-settings read. Refresh is requested every1s
 and serial reads scale with connected count. Native calls may block; timeout
 limits settings initialization/asynchronous discovery polling, not total native
@@ -132,6 +134,9 @@ of changes per panel, handles the action, reads feedback, then calls `_panel_vie
 An action can return its completed feedback snapshot so `update()` can reuse that
 event's result. None requests the usual result read; previous events' snapshots
 are never reused as new action feedback.
+Apply TTL still checks Closed/Inactive/Manual before writing. Its returned snapshot
+is used only after checking for read errors and comparing actual TTL settings with
+the requested draft. A failed read or mismatch cannot report successful Apply.
 It keeps the existing hub lock throughout that sequence so commands cannot overlap.
 
 ### Develop without hardware

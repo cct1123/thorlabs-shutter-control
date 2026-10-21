@@ -146,6 +146,79 @@ def test_gui_connect_keeps_fault_and_cleanup_after_combined_read_failure(bench):
     assert not bench.usb.IsConnected
 
 
+@pytest.mark.parametrize("transport", ["usb", "lan"])
+def test_gui_apply_ttl_batches_readback_with_operating_feedback(bench, transport):
+    device = bench.usb if transport == "usb" else bench.lan
+    endpoints = [None] if transport == "usb" else [bench.endpoint]
+    # The draft must change an actual setting, rather than confirm its old value.
+    device.settings.Trigger1Mode = "Disabled"
+    app = gui.create_app(ShutterHub(slots=1, ethernet_endpoints=endpoints))
+    selections = {"serial": device.serial}
+    click(app, "connect", selections)
+    device.calls.clear()
+
+    start = controller.time.monotonic()
+    result = click(app, "apply-ttl", selections)
+    assert controller.time.monotonic() - start == pytest.approx(0.5)
+    assert [call[0] for call in device.calls] == [
+        "status",
+        "mode_read",
+        "operation",  # Prerequisites before writing.
+        "ttl_write",
+        "status",
+        "mode_read",
+        "operation",
+        "ttl_read",  # One result batch.
+    ]
+    assert result["message"]["children"] == "TTL settings applied and read back; disarmed."
+    assert "TRIG1 input/high" in result["ttl-status"]["children"]
+    assert device.mode == "Manual" and device.operation == "Inactive"
+    click(app, "disconnect", selections)
+
+
+def test_gui_apply_ttl_refuses_to_write_while_active(bench):
+    app = gui.create_app(ShutterHub(slots=1))
+    selections = {"serial": bench.usb.serial}
+    click(app, "connect", selections)
+    bench.usb.operation, bench.usb.position = "Active", "Open"
+    bench.usb.calls.clear()
+    result = click(app, "apply-ttl", selections)
+    assert "Disarm/Close before configuring TTL" in result["message"]["children"]
+    assert [call[0] for call in bench.usb.calls] == ["status", "mode_read", "operation"]
+    click(app, "disconnect", selections)
+
+
+def test_gui_apply_ttl_reports_actual_readback_mismatch(bench, monkeypatch):
+    bench.usb.settings.Trigger1Mode = "Disabled"
+    app = gui.create_app(ShutterHub(slots=1))
+    selections = {"serial": bench.usb.serial}
+    click(app, "connect", selections)
+
+    def ignore_write(settings):
+        bench.usb.record("ttl_write")  # Device accepts the call but keeps its settings.
+
+    monkeypatch.setattr(bench.usb, "SetTriggerConfigParams", ignore_write)
+    result = click(app, "apply-ttl", selections)
+    assert "TTL readback mismatch" in result["message"]["children"]
+    assert "TRIG1 disabled/high" in result["ttl-status"]["children"]
+    assert result["arm-ttl"]["disabled"]  # Neither actual port is an input.
+    click(app, "disconnect", selections)
+
+
+def test_gui_apply_ttl_keeps_fault_and_cleanup_after_readback_failure(bench):
+    app = gui.create_app(ShutterHub(slots=1))
+    selections = {"serial": bench.usb.serial}
+    click(app, "connect", selections)
+    bench.usb.fail = "ttl_read"
+    result = click(app, "apply-ttl", selections)
+    assert result["connection"]["children"] == "Fault"
+    assert "ttl_read failed" in result["message"]["children"]
+    assert result["open"]["disabled"] and result["arm-ttl"]["disabled"]
+    assert result["serial"]["disabled"] and not result["close"]["disabled"]
+    click(app, "disconnect", selections)
+    assert not bench.usb.IsConnected
+
+
 def test_launcher_builds_passive_panels_and_exits_normally(bench, monkeypatch):
     stop = []
     create = gui.create_app

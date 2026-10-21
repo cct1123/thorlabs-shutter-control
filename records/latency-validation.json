@@ -6,19 +6,112 @@
   "connect_stage": {
     "evidence": "E148 / TEST-158",
     "source_passed": 21,
-    "transports": ["USB", "LAN"],
+    "transports": [
+      "USB",
+      "LAN"
+    ],
     "before_wait_s": 0.5,
     "after_wait_s": 0.25,
     "polling_ms": 250,
-    "feedback_requests": ["status", "mode_read", "operation", "ttl_read"],
+    "feedback_requests": [
+      "status",
+      "mode_read",
+      "operation",
+      "ttl_read"
+    ],
     "no_output_or_configuration_write": true,
     "combined_read_failure_retains_fault_and_cleanup": true,
-    "lint_format_whitespace": "PASS"
+    "lint_format_whitespace": "PASS",
+    "commit": "448b6b4"
   },
-  "apply_ttl_stage": "UNTESTED - next implementation stage",
+  "apply_ttl_stage": {
+    "evidence": "E149 / TEST-159",
+    "transports": [
+      "USB",
+      "LAN"
+    ],
+    "before_wait_s": 0.75,
+    "after_wait_s": 0.5,
+    "polling_ms": 250,
+    "prerequisite": "Closed/Inactive/Manual feedback before write",
+    "result": "one full snapshot for actual TTL comparison and display",
+    "active_state_refuses_write": "PASS",
+    "actual_readback_mismatch": "PASS",
+    "readback_failure_retains_fault_and_cleanup": "PASS"
+  },
   "limits": [
     "Virtual-clock waits exclude native calls and transport overhead",
     "No response-age or optical timing guarantee",
     "No physical qualification"
-  ]
+  ],
+  "evidence": "E149 / TEST-159",
+  "source_tests": {
+    "passed": 26,
+    "skipped": 0,
+    "seconds": 0.61
+  },
+  "wheel_tests": {
+    "passed": 26,
+    "skipped": 0,
+    "seconds": 0.57
+  },
+  "behavior_comparison": {
+    "callbacks": 59,
+    "browser_responses": "identical",
+    "non_target_device_call_sequences": "identical",
+    "discovery_calls": "identical",
+    "target_request_sets": "identical; batched order intentional",
+    "target_events": 5,
+    "per_target_wait_reduction_s": 0.25,
+    "baseline": "Saved pre-readability probe; TEST-156 had already established equivalence to 9d4491c"
+  },
+  "package": {
+    "wheel_sha256": "31efc9e96b3b7bcff68ab885ab788066c1cbcdbcf815daa86e137dd41ecf791a",
+    "package_files": [
+      "thorlabs_shutter_control/__init__.py",
+      "thorlabs_shutter_control/__main__.py",
+      "thorlabs_shutter_control/config.py",
+      "thorlabs_shutter_control/controller.py",
+      "thorlabs_shutter_control/gui.py",
+      "thorlabs_shutter_control/assets/style.css"
+    ],
+    "package_source_parity": "PASS",
+    "readme_parity": "PASS",
+    "import_origin": "tmp\\latency\\wheel\\thorlabs_shutter_control\\__init__.py",
+    "pytest_summary": "26 passed in 0.57s"
+  },
+  "quality": {
+    "ruff_lint": "PASS",
+    "ruff_format": "PASS",
+    "unchanged_gui_functions": [
+      "_panel",
+      "_panel_view",
+      "_panel_outputs",
+      "_control_hint",
+      "_open_ready",
+      "_mode_ready",
+      "_action_ready",
+      "_arm_ready"
+    ],
+    "app_layout": "unchanged",
+    "driver_config_launch_css": "unchanged byte hashes",
+    "dependencies_fixture_notebooks": "unchanged",
+    "local_links_and_anchors": 85,
+    "compiled_python_snippets": 5,
+    "cleared_notebooks": 2
+  },
+  "production_sha256": {
+    "src/thorlabs_shutter_control/config.py": "62ca4da608f956123f0b3ae9161f65e3ba8dc82bf8a43ebdc9e50648a8fa3e47",
+    "src/thorlabs_shutter_control/controller.py": "dd1be28375a5d218dcc0d3bf30495a1220ef386c253a4b91e9fddd6380f7c040",
+    "src/thorlabs_shutter_control/gui.py": "2c02455b4b663cea30c63fd7505ef03e6f46b2a7a9e9262667bf3e955d3b9f7a",
+    "src/thorlabs_shutter_control/__init__.py": "9968bd00d5520f9de214c78c05892965134b9d8f5ff99c7f5d27bd28ab79e281",
+    "src/thorlabs_shutter_control/__main__.py": "6e6475b2913ee076784c8eb6b4ac73a119f745c3478ee0a8c5e9ac0201a218b5",
+    "src/thorlabs_shutter_control/assets/style.css": "54fbe35bc43bfad34f8bfbfa6026ef731a6b72a12ea2e96eb056b8c7482b0f47"
+  },
+  "test_sha256": {
+    "tests/conftest.py": "8b92a89f5640615c803ba6e6d39b0c987270f5388f36771bc70f100003585d3e",
+    "tests/test_application.py": "9a43351f2ec83ac41ca41e478995a5a8cf2fc393f11d40b558380c776f57dfd4",
+    "tests/test_core.py": "76014b4fa3409f50c36d79f60787f4044ffa0f2dab5d94893c79e341487333ba",
+    "tests/test_notebooks.py": "d358e35ea86135213f22657b6a0dfd60f448550b337273dd1fed89cdd75e4241"
+  }
 }

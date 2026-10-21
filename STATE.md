@@ -1,6 +1,6 @@
 # Engineering state
 
-## REQ-105 IN PROGRESS - simple Connect / Apply TTL latency
+## REQ-105 COMPLETE - simple Connect / Apply TTL latency
 
 Source: PROJECT.md current user request. Derived criteria: Connect uses one full
 snapshot (250 ms default wait); Apply retains its prerequisite and compares one
@@ -10,17 +10,21 @@ Connect, TTL comparison, faults and cleanup. No changes to polling/discovery or
 other actions. Baseline is clean 9d4491c; earlier TEST-156 hashes remain historical
 once GUI changes. Physical qualification remains outside scope.
 
-Plan: (1) validate/commit Connect batching and result reuse; (2) validate/commit
-Apply batching, safety regressions and final package/docs. TEST-158/159 will record
-virtual waits and actual callback HTTP with fictional USB/LAN devices. No push is
-included in the current request.
+E148 / TEST-158 validates Connect (448b6b4): USB/LAN waits 500 -> 250 ms, no output
+or configuration write, combined read fault retains cleanup. E149 / TEST-159
+validates Apply: USB/LAN waits 750 -> 500 ms; Closed/Inactive/Manual precondition,
+actual readback comparison, faults and cleanup are retained. Each action returns
+its completed full snapshot; the callback reuses it only for that current event.
 
-E148 / TEST-158 PASS Connect: existing 18 tests pass before changes; two new timing
-checks first observed 500 ms (expected 250 ms). After batching, 21 tests pass; USB
-and LAN Connect each wait 250 ms and issue no output/enable/mode/TTL write. Combined
-read failure retains its fault/handle, blocks activation and allows cleanup. Full
-result is reused only during the current callback. Ruff and whitespace checks pass.
-Apply remains UNTESTED for its new target (implementation follows this commit).
+Final source and extracted wheel each pass 26 tests. The 59-callback comparison
+preserves browser responses, discovery and non-target SDK call sequences; the five
+target events each save 250 ms with unchanged request sets. Lint/format, package
+parity and documentation checks pass. Driver, layout, polling/discovery, dependencies
+and other actions are unchanged. Current evidence: records/latency-validation.json;
+delivery: outputs/REPORT.md. Earlier strict TEST-156 equivalence is historical for
+these intentionally changed target waits/request order. Physical acceptance and
+calibrated timing remain untested. Focused stages are committed locally; no new
+push is part of this request. No further software action or human input is needed.
 
 ## REQ-104 COMPLETE - beginner readability implementation
 
@@ -116,6 +120,7 @@ Kinesis folder defaults to C:/Program Files/Thorlabs/Kinesis. Native calls may b
 
 | ID | Current criterion | Method | Status |
 | --- | --- | --- | --- |
+| REQ-105 | Simple Connect/Apply batching with safety checks | TEST-158/159; 26 source/wheel cases; virtual waits and 59 callback comparison | PASS software; physical latency unmeasured |
 | REQ-104 | Beginner readability, less positional scaffolding, unchanged behavior | TEST-154/155 stages; TEST-156 source/wheel and 59 behavior comparisons | PASS software; novice study untested |
 | REQ-102 | Rewrite all tests as a small essential suite | TEST-151 source/wheel,15 cases,405 lines | PASS software |
 | REQ-101 | Slim current baseline, no compatibility paths | TEST-148 source/wheel; TEST-149 tree/docs; TEST-150 publication | PASS software baseline/publication |
@@ -137,6 +142,6 @@ No hardware/network discovery or actuation is performed during baseline cleanup.
 ## Next action and human action required
 
 No human action needed for software delivery. Baseline provenance marker:
-baseline-2026-10-21; current readability delivery is REQ-104. Physical acceptance
+baseline-2026-10-21; current latency delivery is REQ-105. Physical acceptance
 requires a separately authorized bench session with the intended topology,
 independent source protection and observations recorded under the current revision.

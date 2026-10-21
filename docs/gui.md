@@ -65,7 +65,8 @@ Expanding/collapsing and draft changes issue no hardware commands.
 
 - Read replaces drafts with fresh settings. Routine refresh keeps drafts and the
   explicitly labelled last-read settings summary.
-- Apply requires Closed/Inactive/Manual, writes settings and checks readback.
+- Apply requires Closed/Inactive/Manual, writes settings and checks actual readback.
+  The same result snapshot supplies the display; it is not requested again.
 - Arm requires that baseline, key enabled and an actual configured input, then
   explicitly enables, selects Triggered and requests Active.
 - Main Trigger Start instead preserves mode/enable state and rereads actual input

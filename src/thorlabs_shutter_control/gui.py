@@ -647,10 +647,15 @@ def create_app(
                 raise ShutterError("Disarm/Close before configuring TTL.")
             requested = TriggerConfig(*ttl_draft)
             hub.configure_triggers(slot, requested)
-            last_ttl_settings[slot] = hub.get_trigger_config(slot)
-            if last_ttl_settings[slot] != requested:
+            # Compare actual TTL readback and display operating feedback from one read.
+            status = hub.get_status(slot)
+            if status.error:
+                raise ShutterError(status.error)
+            last_ttl_settings[slot] = status.trigger_config
+            if status.trigger_config != requested:
                 raise ShutterError("TTL readback mismatch; settings not confirmed.")
             updates["message"] = "TTL settings applied and read back; disarmed."
+            return status
         elif command == "read-ttl":
             config = hub.get_trigger_config(slot)
             last_ttl_settings[slot] = config

@@ -88,7 +88,7 @@ uv run --locked ruff check --no-cache src tests
 uv build --wheel
 ```
 
-The 21 essential tests use one fake SDK, virtual waits and real Dash callback HTTP.
+The 26 essential tests use one fake SDK, virtual waits and real Dash callback HTTP.
 They cover USB/LAN operation, TTL settings, identity/ownership/cleanup, the main
 GUI/launcher workflows for one and three panels, GUI TTL actions, and one cycle in
 each notebook. Selected operational

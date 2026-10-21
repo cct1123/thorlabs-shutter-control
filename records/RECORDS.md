@@ -1,5 +1,44 @@
 # Baseline evidence and decisions
 
+## E149 / TEST-159 - Combined Apply TTL result and final validation, REQ-105 stage 2
+
+Expected: default Apply waits 750 -> 500 ms while keeping the pre-write
+Closed/Inactive/Manual check, actual settings comparison and fault cleanup. Before
+changing Apply, two new USB/LAN timing tests observe 0.75 s versus expected 0.5 s;
+active refusal, ignored-write mismatch and readback-failure checks already pass.
+After batching, all 26 source cases pass in 0.61 s; the extracted wheel passes
+26 in 0.57 s. Normal Apply retains the prerequisite requests, issues one TTL write,
+then requests operating and TTL feedback in one batch and reuses that snapshot.
+Active state prevents the write; actual mismatches report failure and preserve
+actual settings; read failures disable activation while retaining cleanup.
+
+59 callback steps preserve complete browser responses, discovery calls and
+non-target device-call sequences versus the prior saved baseline (TEST-156 already
+proved its equivalence to the readability delivery). The five successful target
+events retain their request sets and each save 0.25 s; only batching order changes.
+Connect's read error and Apply's readback errors use the existing full-status
+fault diagnostic. Driver/readiness/layout, polling, discovery, dependency and
+notebook sources remain unchanged. Six packaged Python/CSS files and README match
+source; extracted import origin verified. Ruff lint/format, local documentation
+links/snippets and whitespace checks pass. [Machine evidence](latency-validation.json)
+records final source/test/package hashes and scope. PASS software only.
+
+Commands: source pytest and Ruff as TEST-158; uv build --wheel --offline --out-dir
+tmp/latency/package using the existing cache; extract, compare bytes/import origin,
+run pytest with extracted PYTHONPATH. Functional checks use the existing fictional
+SDK and virtual clock, never a live device/network. Native/optical latency and
+physical qualification remain unmeasured. No new push is part of this request.
+
+## D042 - Reuse only the completed current-action snapshot, REQ-105
+
+Use existing get_status() batching and an explicit ShutterStatus-or-None return
+from the action helper. The callback consumes that snapshot only for the selected
+panel in the same locked event; no persistent freshness policy or worker is added.
+Reject snapshot errors explicitly, keep Apply prerequisites before its write, and
+compare actual trigger_config before success. Leave direct driver setters/getters,
+intervals, endpoint discovery and all other action paths unchanged. Prior exact
+wait/order equivalence is superseded only for Connect/Apply by TEST-158/159.
+
 ## E148 / TEST-158 - Combined GUI Connect feedback, REQ-105 stage 1
 
 Expected: default GUI Connect programmed waits 500 -> 250 ms for USB and LAN,
