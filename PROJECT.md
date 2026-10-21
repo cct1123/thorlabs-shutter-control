@@ -16,6 +16,12 @@ contracts, polling intervals and discovery policy unchanged. Validate software
 only and commit Connect and Apply separately. These waits exclude native calls
 and do not establish physical response time. No hardware action is authorized.
 
+Publication follow-up: user requested "update doc, readme. commit push". Refresh
+the operator/developer guidance for the implemented batching, validate documents,
+commit the documentation and publish the completed latency delivery to origin/main.
+The follow-up also requests a beginner-friendly README and refreshed screenshots;
+capture only fictional software devices and document their provenance.
+
 ## Beginner readability - REQ-104
 
 User: "implement the readability and scaffolding reduction. prioritize beginner

@@ -151,3 +151,14 @@ app = create_app(hub)  # A ShutterHub is required, including for one panel.
 
 The host owns its server and cleanup. An optional on_shutdown callback enables
 cooperative server shutdown after successful hub cleanup; it must not block.
+
+GUI Connect calls the driver's `connect()` and then `hub.get_status(slot)` for a
+full operating/TTL snapshot. GUI Apply TTL reads the operating prerequisite,
+writes settings, then checks one full snapshot for read errors and actual TTL
+agreement. Each action returns that snapshot to the GUI callback for display,
+avoiding a second result read. See [GUI feedback timing](gui.md#feedback-timing).
+
+Direct Python `connect()` still returns connection metadata only; it does not
+automatically request operating or TTL feedback. Setters still return None and
+perform no implicit readback. Use explicit getters and application checks as in
+the examples above. The GUI optimization does not change those driver contracts.

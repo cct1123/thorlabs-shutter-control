@@ -1,5 +1,34 @@
 # Baseline evidence and decisions
 
+## E150 / TEST-160 - Beginner documentation, screenshots and publication
+
+2026-10-21; user requested documentation/README updates, commit/push, beginner
+readability and refreshed screenshots. Expected: current guidance, truthful timing
+and image scope, unchanged runtime, normal publication to existing origin/main.
+Observed: README starts with prerequisites, installation and first use; explains
+configuration, feedback, timing and common problems. GUI, setup, API and architecture
+guides clarify current-event combined reads, retained checks and direct API contracts.
+No claim of total/physical response time or measured novice independence.
+
+Two direct full-page browser JPEG captures show current d7a37f9: overview 1264x828
+and expanded-trigger 1264x1180. Whole-session SDK fixture is fictional, with USB/LAN
+serials 68000001/68000002 and documentation address 192.0.2.10. Launcher shutdown
+control is present; UI expansion and cooperative shutdown verified. Preview reports
+fictional handles released and exits 0. No vendor SDK, real device or LAN discovery;
+only loopback HTTP. Old PNG replaced; provenance is in docs/assets/README.md.
+
+89 local links/anchors and 4 Python snippets pass; rebuilt wheel's README and all 6
+Python/CSS package files match source. All production/CSS/test hashes match TEST-159;
+its 26 source/26 wheel functional results remain applicable. Functional tests were
+not repeated for documentation-only edits. Machine evidence and capture hashes are
+in records/latency-validation.json documentation_refresh. Whitespace checks pass.
+PASS documentation/software scope. No physical qualification or novice study.
+
+git push origin main published 448b6b4 and d7a37f9 normally. Independent git ls-remote
+origin refs/heads/main returned d7a37f9e96f4a1475296755632e0d461919c1229, matching the
+implementation HEAD. This documentation checkpoint is committed and published
+after that verified implementation. Final remote equality is checked at session end.
+
 ## E149 / TEST-159 - Combined Apply TTL result and final validation, REQ-105 stage 2
 
 Expected: default Apply waits 750 -> 500 ms while keeping the pre-write

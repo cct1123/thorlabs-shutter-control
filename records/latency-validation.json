@@ -113,5 +113,34 @@
     "tests/test_application.py": "9a43351f2ec83ac41ca41e478995a5a8cf2fc393f11d40b558380c776f57dfd4",
     "tests/test_core.py": "76014b4fa3409f50c36d79f60787f4044ffa0f2dab5d94893c79e341487333ba",
     "tests/test_notebooks.py": "d358e35ea86135213f22657b6a0dfd60f448550b337273dd1fed89cdd75e4241"
+  },
+  "documentation_refresh": {
+    "date": "2026-10-21",
+    "evidence": "E150 / TEST-160",
+    "runtime_revision": "d7a37f9",
+    "scope": "beginner README, operating/API/developer guidance, screenshots and publication",
+    "runtime_and_tests": "all source/CSS/test hashes unchanged from TEST-159; previous 26/26 functional results retained",
+    "local_links_and_anchors": 89,
+    "compiled_python_snippets": 4,
+    "wheel_sha256": "9923f2db8daa0afd58b67b7bb1674fb486bf74c48c44c80c7dbffa42554ef5a6",
+    "six_package_files_match_source": true,
+    "packaged_readme_matches": true,
+    "screenshot_provenance": "Direct in-app-browser JPEG captures of the unchanged GUI, fake SDK for whole session; fictional USB/LAN devices and 192.0.2.10; no real device/network discovery",
+    "preview_cleanup": "GUI shutdown and fictional handles released; process exited 0",
+    "screenshots": {
+      "docs/assets/gui-overview.jpg": {
+        "width": 1264,
+        "height": 828,
+        "bytes": 90895,
+        "sha256": "7e8bf7f0ab4910f1885b0d8fc3e9b6915f490ee0346485f75c012eaaf6ff0e9d"
+      },
+      "docs/assets/gui-trigger-settings.jpg": {
+        "width": 1264,
+        "height": 1180,
+        "bytes": 118417,
+        "sha256": "c2f1300ab63511b0a7a9d770a2b25b2d18bf574f144d320d3885ac9ae4c9bcf9"
+      }
+    },
+    "novice_handoff_study": "not performed"
   }
 }

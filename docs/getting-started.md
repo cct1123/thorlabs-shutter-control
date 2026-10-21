@@ -32,6 +32,10 @@ and Connect; the detected route is applied automatically. Startup never discover
 connects or writes outputs. Release process handles for a fresh broad scan and
 close competing GUI/notebook/Kinesis owners.
 
+GUI Connect and Apply TTL use combined feedback to avoid a duplicate result wait.
+See [feedback timing](gui.md#feedback-timing) for the default software waits and
+their scope. Long discovery or native SDK calls are separate from those waits.
+
 ## Troubleshooting
 
 | Symptom | Action |

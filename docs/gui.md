@@ -6,7 +6,7 @@ Run `uv run shutter-control`, then open [localhost:8050](http://127.0.0.1:8050/)
 Startup is passive. Exclude competing owners and establish physical source
 protection/interlock before operating a shutter.
 
-![Unified USB/LAN discovery using software devices](assets/gui-unified-discovery.png)
+![Main controls with fictional USB and LAN devices](assets/gui-overview.jpg)
 
 The screenshot uses fictional identities and software feedback, not hardware.
 Panels wrap to a single column on narrow displays. SLOTS controls panel count;
@@ -37,7 +37,7 @@ See [KEH3 setup](ethernet-assessment.md).
 | Control | Behavior |
 | --- | --- |
 | Device serial/transport | Selected detected route before Connect; retained route while owned; selector locks with a handle |
-| Connect | Validate identity/route, initialize communication/polling, then read feedback; no output/mode write |
+| Connect | Validate identity/route, initialize communication/polling, then read one combined operating/TTL snapshot; no output/mode write |
 | Mode | Manual, Single, Auto, Trigger; requires fresh Inactive/Closed before changing mode |
 | Open / Start | Manual requests Active as Open; other modes request Active as Start after fresh readiness reads |
 | Close / Stop | Request Inactive while preserving mode; remains available with a retained faulted handle |
@@ -58,10 +58,41 @@ their previous observation until refresh. Unknown mode/state/position prevents
 activation. Refresh is requested every1s; serialized reads may delay clicks.
 Close is not an independent emergency stop and native calls may block.
 
+## Feedback timing
+
+The GUI uses one combined operating/TTL snapshot after Connect. Apply first reads
+Closed/Inactive/Manual prerequisites, writes the draft, then reads one combined
+snapshot for both actual TTL comparison and display. The callback reuses only
+feedback completed during that same action; it does not substitute an older
+display snapshot for a new result.
+
+| Action | Programmed waits with the default 250 ms poll interval |
+| --- | ---: |
+| Connect | 250 ms |
+| Apply TTL | 500 ms |
+| Manual Open | 500 ms |
+| Close / Stop | 250 ms after the command |
+| Trigger Start | 750 ms |
+| Refresh | 250 ms per connected panel, read sequentially |
+
+These are software waits validated with fictional devices and a virtual clock.
+Discovery, native SDK calls, other queued actions, network/USB communication and
+blade motion add time. A request and fixed wait do not establish feedback age.
+The polling interval and discovery policy have not been shortened. A failed
+combined read remains a fault, blocks activation and leaves the retained handle
+available for Close/disconnect. Apply readback mismatch reports failure instead
+of successful application. See [validation evidence](../records/latency-validation.json).
+
 ## Trigger settings
 
 Expand **Trigger settings** to edit TRIG1/TRIG2 directions and polarity.
 Expanding/collapsing and draft changes issue no hardware commands.
+
+![Trigger settings expanded on a fictional USB controller](assets/gui-trigger-settings.jpg)
+
+This capture shows a disarmed Manual controller with one input and one output.
+It uses the same fictional devices as the overview and is not electrical or
+physical validation.
 
 - Read replaces drafts with fresh settings. Routine refresh keeps drafts and the
   explicitly labelled last-read settings summary.

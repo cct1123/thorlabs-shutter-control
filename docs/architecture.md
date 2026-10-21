@@ -47,16 +47,18 @@ before listener closure. Cleanup failures keep it running. No reloader is used.
 
 ## Timing and validation
 
-Default getter wait/polling is250ms. GUI Manual Open requests prerequisite and
-result reads (0.50s programmed waits); Close requests a result read (0.25s).
+Default getter wait/polling is 250 ms. GUI Manual Open requests prerequisite and
+result reads (0.50 s programmed waits); Close requests a result read (0.25 s).
 Connect requests one combined operating/TTL snapshot (0.25s programmed wait) and
 uses it for the display instead of requesting the result a second time.
 Apply TTL keeps the prerequisite operating read, then shares one full snapshot
 between actual TTL readback comparison and display (0.50s total programmed waits).
-Trigger Start adds an actual input-settings read. Refresh is requested every1s
+Trigger Start adds an actual input-settings read. Refresh is requested every 1 s
 and serial reads scale with connected count. Native calls may block; timeout
 limits settings initialization/asynchronous discovery polling, not total native
-duration. These are software waits, not calibrated optical timing.
+duration. These are software waits, not calibrated optical timing. The operator
+table is in [GUI feedback timing](gui.md#feedback-timing); direct Python getter
+contracts remain documented in the [API guide](python-api.md).
 
 Tests replace the SDK and use virtual waits, independent fake devices and real
 Dash callback HTTP. Notebooks run only against those doubles during validation.

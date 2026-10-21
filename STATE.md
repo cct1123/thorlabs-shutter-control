@@ -23,8 +23,21 @@ parity and documentation checks pass. Driver, layout, polling/discovery, depende
 and other actions are unchanged. Current evidence: records/latency-validation.json;
 delivery: outputs/REPORT.md. Earlier strict TEST-156 equivalence is historical for
 these intentionally changed target waits/request order. Physical acceptance and
-calibrated timing remain untested. Focused stages are committed locally; no new
-push is part of this request. No further software action or human input is needed.
+calibrated timing remain untested. User subsequently requested documentation/README
+updates, commit and push. Publication is authorized to existing origin/main;
+documentation validation and publication evidence follow in E150 / TEST-160.
+
+E150 / TEST-160: beginner README now follows setup/first use, configuration, timing
+and troubleshooting; GUI/API/developer docs agree with batching. Refreshed overview
+and expanded-trigger JPEG captures use the existing fake SDK throughout, fictional
+serials/address, and the unchanged launcher layout. Preview GUI shutdown confirmed
+fictional handles released and process exit 0. Old PNG is replaced, with provenance
+in docs/assets/README.md. 89 local links/anchors and four Python snippets pass;
+rebuilt README metadata and six package files match source. Runtime/CSS/test hashes
+remain unchanged, so TEST-159's 26/26 results retain their scope. No new novice study
+or physical qualification. Implementation d7a37f9 was pushed normally; independent
+origin/main readback equals d7a37f9e96f4a1475296755632e0d461919c1229. This documentation
+checkpoint completes the requested refresh; final publication uses the same main.
 
 ## REQ-104 COMPLETE - beginner readability implementation
 

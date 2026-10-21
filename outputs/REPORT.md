@@ -51,4 +51,9 @@ No real SDK, network discovery, hardware operation or physical qualification was
 performed. Prior physical limits, including the active-low TTL issue, remain open.
 No beginner handoff study was performed. The earlier readability delivery and its
 publication are historical in [readability evidence](../records/readability-validation.json).
-The current request asks for local commits, with no new push.
+The user subsequently requested updated documentation and publication. README,
+operator timing, setup, API and developer guidance now explain the combined reads,
+retained safety checks and software-only timing scope. Documentation/publication
+validation is recorded as E150 / TEST-160. The README now starts with installation
+and first use; overview and trigger screenshots were refreshed from a fake-only
+browser preview. No production source or styling changed in this documentation step.
