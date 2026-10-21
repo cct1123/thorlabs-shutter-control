@@ -442,7 +442,12 @@ def create_app(
     *,
     on_shutdown: Callable[[], None] | None = None,
 ) -> Dash:
-    """Build passive panels; an owning server may supply its stop notification."""
+    """Build passive panels and keep one hub's GUI state in this closure.
+
+    discover_panels() owns discovery choices; run_panel_action() owns commands;
+    update() coordinates feedback and _panel_view() renders values without I/O.
+    An owning server may supply a nonblocking shutdown notification.
+    """
     if not isinstance(hub, ShutterHub):
         raise TypeError("create_app requires a ShutterHub.")
     count = len(hub.controllers)
@@ -547,6 +552,125 @@ def create_app(
         )
     }
 
+    def discover_panels(selections, panel_updates):
+        """Remember the latest routes and populate choices without replacing held handles."""
+        nonlocal discovered_routes, discovery_attempted
+        hub_error = False
+        discovery_attempted = True
+        discovered_routes = {}
+        discovered_routes, warnings = hub.discover_available()
+        for index, shutter in enumerate(hub.controllers):
+            routes = dict(discovered_routes)
+            if hub.get_operating_status(index).has_device:
+                routes[shutter.serial_number] = hub.ethernet_endpoints[index]
+                panel_updates[index]["selected"] = shutter.serial_number
+            elif selections[index] in routes:
+                panel_updates[index]["selected"] = selections[index]
+            elif single and len(routes) == 1:
+                panel_updates[index]["selected"] = next(iter(routes))
+            else:
+                panel_updates[index]["selected"] = None
+            panel_updates[index]["options"] = _device_options(routes)
+        noun = "controller" if len(discovered_routes) == 1 else "controllers"
+        hub_message = (
+            f"Found {len(discovered_routes)} USB / Ethernet {noun}. Select a device, then Connect."
+        )
+        if warnings:
+            hub_message += " " + " ".join(warnings)
+            hub_error = True
+        return hub_message, hub_error
+
+    def run_panel_action(slot, command, serial, ttl_draft, updates):
+        """Check prerequisites and issue one panel action under the caller's hub lock.
+
+        Change only this action's browser values and last-read TTL display cache.
+        Errors propagate to update(), which preserves partial updates and chooses
+        whether to request result feedback. Keep commands and reads in this order.
+        """
+        if command == "connect":
+            if discovery_attempted and serial not in discovered_routes:
+                raise ShutterError("Discover and select a currently available device.")
+            if serial in discovered_routes:
+                endpoint = discovered_routes[serial]
+                if endpoint != hub.ethernet_endpoints[slot]:
+                    hub.configure_slot(slot, ethernet_endpoint=endpoint)
+                    last_ttl_settings[slot] = None
+                    updates["draft"] = ["input", "high", "output", "high"]
+            status = hub.connect(slot, serial)
+            updates["selected"] = status.serial_number
+            last_ttl_settings[slot] = hub.get_trigger_config(slot)
+            updates["message"] = "Connected."
+        elif command == "disconnect":
+            hub.disconnect(slot)
+            updates["message"] = "Close command sent; disconnected. Verify physical closure."
+        elif command.startswith("mode-"):
+            status = hub.get_operating_status(slot)
+            if not _mode_ready(status):
+                raise ShutterError("Stop/Close and verify Inactive/Closed before changing mode.")
+            mode = command.removeprefix("mode-")
+            hub.set_operating_mode(slot, mode)
+            updates["message"] = f"{dict(MODES)[mode]} mode command sent."
+        elif command in ("open", "close"):
+            shutter = hub.controllers[slot]
+            if command == "open":
+                status = hub.get_operating_status(slot)
+                config = None
+                if status.operating_mode == "triggered":
+                    config = hub.get_trigger_config(slot)
+                    last_ttl_settings[slot] = config
+                if not _action_ready(status, config):
+                    raise ShutterError(
+                        "Open refused: verify feedback, key and input settings; "
+                        "timed modes require Inactive/Closed."
+                    )
+            timed_action = shutter.get_cached_status().operating_mode in (
+                "single",
+                "auto",
+                "triggered",
+            )
+            if command == "open":
+                hub.open_shutter(slot)
+            else:
+                hub.close_shutter(slot)
+            label = command.title()
+            if timed_action:
+                label = "Start" if command == "open" else "Stop"
+            updates["message"] = f"{label} command sent."
+        elif command == "apply-ttl":
+            if not hub.get_operating_status(slot).is_closed_manual:
+                raise ShutterError("Disarm/Close before configuring TTL.")
+            requested = TriggerConfig(*ttl_draft)
+            hub.configure_triggers(slot, requested)
+            last_ttl_settings[slot] = hub.get_trigger_config(slot)
+            if last_ttl_settings[slot] != requested:
+                raise ShutterError("TTL readback mismatch; settings not confirmed.")
+            updates["message"] = "TTL settings applied and read back; disarmed."
+        elif command == "read-ttl":
+            config = hub.get_trigger_config(slot)
+            last_ttl_settings[slot] = config
+            updates["draft"] = [
+                config.trig1_mode,
+                config.trig1_polarity,
+                config.trig2_mode,
+                config.trig2_polarity,
+            ]
+            updates["message"] = "TTL settings read; draft selections replaced."
+        elif command == "arm-ttl":
+            status = hub.get_status(slot)
+            config = status.trigger_config
+            if config is not None and "input" not in (
+                config.trig1_mode,
+                config.trig2_mode,
+            ):
+                raise ShutterError("Arm refused: configure at least one trigger input.")
+            if not _arm_ready(status, config):
+                raise ShutterError("Arm refused: verify Closed/Manual, key and input.")
+            hub.arm_triggers(slot)
+            updates["message"] = "TTL arm command sent. Input controls shutter."
+        elif command == "disarm-ttl":
+            hub.disarm_triggers(slot)
+            updates["message"] = "Disarm / Close command sent."
+
     @app.callback(
         output={
             "hub_message": Output("hub-message", "children"),
@@ -579,12 +703,22 @@ def create_app(
         ],
     )
     def update(_events, selections, ttl_drafts):
-        nonlocal discovered_routes, discovery_attempted
+        """Handle one event, read its feedback, then return named browser properties.
+
+        Periodic refresh reads all panels. Other actions read only the affected
+        panel after success; unrelated or failed actions keep display snapshots.
+        """
         with hub.lock:
-            messages = [no_update] * count
-            options = [no_update] * count
-            selected = [no_update] * count
-            drafts = [[no_update] * 4 for _ in range(count)]
+            # Each panel keeps its own action updates; no parallel positional lists.
+            panel_updates = [
+                {
+                    "message": no_update,
+                    "options": no_update,
+                    "selected": no_update,
+                    "draft": [no_update] * 4,
+                }
+                for _ in range(count)
+            ]
             hub_message = no_update
             action = ctx.triggered_id
             slot = None
@@ -592,29 +726,7 @@ def create_app(
             hub_error = False
             try:
                 if action == "discover":
-                    discovery_attempted = True
-                    discovered_routes = {}
-                    discovered_routes, warnings = hub.discover_available()
-                    for index, shutter in enumerate(hub.controllers):
-                        routes = dict(discovered_routes)
-                        if hub.get_operating_status(index).has_device:
-                            routes[shutter.serial_number] = hub.ethernet_endpoints[index]
-                            selected[index] = shutter.serial_number
-                        else:
-                            selected[index] = (
-                                selections[index]
-                                if selections[index] in routes
-                                else (next(iter(routes)) if single and len(routes) == 1 else None)
-                            )
-                        options[index] = _device_options(routes)
-                    noun = "controller" if len(discovered_routes) == 1 else "controllers"
-                    hub_message = (
-                        f"Found {len(discovered_routes)} USB / Ethernet {noun}. "
-                        "Select a device, then Connect."
-                    )
-                    if warnings:
-                        hub_message += " " + " ".join(warnings)
-                        hub_error = True
+                    hub_message, hub_error = discover_panels(selections, panel_updates)
                 elif action == "stop-server" and on_shutdown is not None:
                     hub.safe_shutdown()
                     on_shutdown()
@@ -625,136 +737,57 @@ def create_app(
                     had_devices = [c.get_cached_status().has_device for c in hub.controllers]
                     hub.safe_shutdown()
                     hub_message = "Shutdown attempts completed. Check each shutter's status."
-                    messages = [
-                        "Close command sent; disconnected. Verify physical closure."
-                        if had_device
-                        else no_update
-                        for had_device in had_devices
-                    ]
+                    for index, had_device in enumerate(had_devices):
+                        if had_device:
+                            panel_updates[index]["message"] = (
+                                "Close command sent; disconnected. Verify physical closure."
+                            )
                 elif action in actions:
                     slot, command = actions[action]
-                    shutter = hub.controllers[slot]
-                    if command == "connect":
-                        serial = selections[slot]
-                        if discovery_attempted and serial not in discovered_routes:
-                            raise ShutterError("Discover and select a currently available device.")
-                        if serial in discovered_routes:
-                            endpoint = discovered_routes[serial]
-                            if endpoint != hub.ethernet_endpoints[slot]:
-                                hub.configure_slot(slot, ethernet_endpoint=endpoint)
-                                shutter = hub.controllers[slot]
-                                last_ttl_settings[slot] = None
-                                drafts[slot] = ["input", "high", "output", "high"]
-                        status = hub.connect(slot, serial)
-                        selected[slot] = status.serial_number
-                        last_ttl_settings[slot] = hub.get_trigger_config(slot)
-                        messages[slot] = "Connected."
-                    elif command == "disconnect":
-                        hub.disconnect(slot)
-                        messages[slot] = (
-                            "Close command sent; disconnected. Verify physical closure."
-                        )
-                    elif command.startswith("mode-"):
-                        status = hub.get_operating_status(slot)
-                        if not _mode_ready(status):
-                            raise ShutterError(
-                                "Stop/Close and verify Inactive/Closed before changing mode."
-                            )
-                        mode = command.removeprefix("mode-")
-                        hub.set_operating_mode(slot, mode)
-                        messages[slot] = f"{dict(MODES)[mode]} mode command sent."
-                    elif command in ("open", "close"):
-                        if command == "open":
-                            status = hub.get_operating_status(slot)
-                            config = None
-                            if status.operating_mode == "triggered":
-                                config = hub.get_trigger_config(slot)
-                                last_ttl_settings[slot] = config
-                            if not _action_ready(status, config):
-                                raise ShutterError(
-                                    "Open refused: verify feedback, key and input settings; "
-                                    "timed modes require Inactive/Closed."
-                                )
-                        timed_action = shutter.get_cached_status().operating_mode in (
-                            "single",
-                            "auto",
-                            "triggered",
-                        )
-                        getattr(hub, f"{command}_shutter")(slot)
-                        label = command.title()
-                        if timed_action:
-                            label = "Start" if command == "open" else "Stop"
-                        messages[slot] = f"{label} command sent."
-                    elif command == "apply-ttl":
-                        if not hub.get_operating_status(slot).is_closed_manual:
-                            raise ShutterError("Disarm/Close before configuring TTL.")
-                        requested = TriggerConfig(*ttl_drafts[slot])
-                        hub.configure_triggers(slot, requested)
-                        last_ttl_settings[slot] = hub.get_trigger_config(slot)
-                        if last_ttl_settings[slot] != requested:
-                            raise ShutterError("TTL readback mismatch; settings not confirmed.")
-                        messages[slot] = "TTL settings applied and read back; disarmed."
-                    elif command == "read-ttl":
-                        config = hub.get_trigger_config(slot)
-                        last_ttl_settings[slot] = config
-                        drafts[slot] = [
-                            config.trig1_mode,
-                            config.trig1_polarity,
-                            config.trig2_mode,
-                            config.trig2_polarity,
-                        ]
-                        messages[slot] = "TTL settings read; draft selections replaced."
-                    elif command == "arm-ttl":
-                        status = hub.get_status(slot)
-                        config = status.trigger_config
-                        if config is not None and "input" not in (
-                            config.trig1_mode,
-                            config.trig2_mode,
-                        ):
-                            raise ShutterError("Arm refused: configure at least one trigger input.")
-                        if not _arm_ready(status, config):
-                            raise ShutterError("Arm refused: verify Closed/Manual, key and input.")
-                        hub.arm_triggers(slot)
-                        messages[slot] = "TTL arm command sent. Input controls shutter."
-                    elif command == "disarm-ttl":
-                        hub.disarm_triggers(slot)
-                        messages[slot] = "Disarm / Close command sent."
+                    run_panel_action(
+                        slot, command, selections[slot], ttl_drafts[slot], panel_updates[slot]
+                    )
             except (ShutterError, ValueError) as exc:
                 if slot is None:
                     hub_message = str(exc)
                     hub_error = True
                 else:
-                    messages[slot] = str(exc)
+                    panel_updates[slot]["message"] = str(exc)
                     error_slots.add(slot)
 
             # Setters send commands only. Explicitly read the selected panel's
             # feedback here; unrelated panels keep their previous observations.
-            statuses = [
-                shutter.get_operating_status()
-                if action == "refresh"
-                or action is None
-                or (index == slot and index not in error_slots)
-                else shutter.get_cached_status()
-                for index, shutter in enumerate(hub.controllers)
-            ]
+            statuses = []
+            for index, shutter in enumerate(hub.controllers):
+                read_feedback = action in (None, "refresh") or (
+                    index == slot and index not in error_slots
+                )
+                if read_feedback:
+                    statuses.append(shutter.get_operating_status())
+                else:
+                    statuses.append(shutter.get_cached_status())
+            if hub_error:
+                hub_message_class = "message message-error"
+            elif hub_message is no_update:
+                hub_message_class = no_update
+            else:
+                hub_message_class = "message"
             connected_count = sum(s.connection == "connected" for s in statuses)
             result = {
                 "hub_message": hub_message,
                 "connection_summary": f"{connected_count} of {count} connected",
-                "hub_message_class": "message message-error"
-                if hub_error
-                else ("message" if hub_message is not no_update else no_update),
+                "hub_message_class": hub_message_class,
                 "panels": [],
             }
             for index, status in enumerate(statuses):
                 if status.error:
-                    messages[index] = status.error
+                    panel_updates[index]["message"] = status.error
                     error_slots.add(index)
                 if status.connection != "connected":
                     last_ttl_settings[index] = None
                 elif status.trigger_config is not None:
                     last_ttl_settings[index] = status.trigger_config
-                serial = selected[index]
+                serial = panel_updates[index]["selected"]
                 if serial is no_update:
                     serial = selections[index]
                 endpoint = hub.ethernet_endpoints[index]
@@ -764,12 +797,9 @@ def create_app(
                     _panel_view(
                         status,
                         last_ttl_settings[index],
-                        message=messages[index],
-                        options=options[index],
-                        selected=selected[index],
-                        draft=drafts[index],
                         error=index in error_slots,
                         endpoint=endpoint,
+                        **panel_updates[index],
                     )
                 )
             return result

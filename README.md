@@ -3,7 +3,8 @@
 A local Dash GUI and Python API for KSC101 controllers and SH05R shutters.
 Connect directly by USB, through KEH3/KEH6 USB hubs, or through documented
 KEH3 Ethernet routes. Startup is passive; connection and output actions are explicit.
-Runtime baseline marker: `baseline-2026-10-21`.
+Baseline provenance: `baseline-2026-10-21`. Current software validation is recorded
+in [readability validation](records/readability-validation.json).
 
 ![KSC101 and SH05R](docs/assets/ksc101-sh05r.webp)
 
@@ -87,9 +88,10 @@ uv run --locked ruff check --no-cache src tests
 uv build --wheel
 ```
 
-The15 essential tests use one fake SDK, virtual waits and real Dash callback HTTP.
+The 18 essential tests use one fake SDK, virtual waits and real Dash callback HTTP.
 They cover USB/LAN operation, TTL settings, identity/ownership/cleanup, the main
-GUI/launcher workflows and one cycle in each notebook. Selected operational
+GUI/launcher workflows for one and three panels, GUI TTL actions, and one cycle in
+each notebook. Selected operational
 failures are covered; this is a small functional suite, not exhaustive validation.
 Tests perform no real SDK, device or network operations.
 

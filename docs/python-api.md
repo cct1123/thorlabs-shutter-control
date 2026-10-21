@@ -61,8 +61,8 @@ Close or mode changes. Do not replace it with safe_shutdown.
 | discover() | Return matching KSC101 serials; no Connect/output |
 | connect(serial_number=None) | Use explicit/preselected serial or the sole discovered USB device; validate identity and retain ownership |
 | identify_device() | Read serial/description; does not flash the device display |
-| get_status() | Fresh full operating/TTL snapshot |
-| get_operating_status() | Fresh operating/key/interlock snapshot without TTL settings |
+| get_status() | Request operating/TTL feedback; return a fault snapshot on read failure |
+| get_operating_status() | Request operating/key/interlock feedback without TTL; return a fault snapshot on read failure |
 | get_cached_status() | Last observation without I/O; current fault/disconnection takes precedence |
 | get_shutter_state(), get_operating_state(), get_operating_mode(), get_status_bits() | Request the named feedback only |
 | open_shutter(), close_shutter() | Request Active/Inactive only; preserve mode/enable state |
@@ -77,6 +77,13 @@ reads, sleeps, retries, readback or automatic recovery. SDK errors latch faults.
 Callers own readiness, sequencing and verification; the GUI performs explicit
 application checks. Close/release remain available after faults. Native calls can
 block. A returned command does not establish physical state.
+
+Snapshot getters report failed reads in `connection` and `error`; inspect those
+fields before using the values. Narrow getters such as `get_trigger_config()`
+raise `ShutterError` on read failure. Requested feedback uses a fixed wait followed
+by SDK getters; it does not guarantee a known response age. `has_device` means a
+driver handle is retained, including after failed disconnect, rather than healthy
+communication or demonstrated shutter motion.
 
 The context manager connects on entry and attempts safe_shutdown on exit. Failed
 entry performs passive connection cleanup; failed release retains the object/claim.

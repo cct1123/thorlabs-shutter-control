@@ -1,7 +1,7 @@
 """Small protocol double: no DLL loading, sockets, physical timing or TTL model."""
 
 from copy import copy
-from types import SimpleNamespace as NS
+from types import SimpleNamespace
 
 import pytest
 
@@ -9,8 +9,10 @@ from thorlabs_shutter_control import config, controller
 
 
 class TriggerSettings:
-    TriggerPortMode = NS(Disabled="Disabled", TrigIN_GPI="TrigIN_GPI", TrigOUT_GPO="TrigOUT_GPO")
-    TriggerPolarity = NS(TriggerHigh="TriggerHigh", TriggerLow="TriggerLow")
+    TriggerPortMode = SimpleNamespace(
+        Disabled="Disabled", TrigIN_GPI="TrigIN_GPI", TrigOUT_GPO="TrigOUT_GPO"
+    )
+    TriggerPolarity = SimpleNamespace(TriggerHigh="TriggerHigh", TriggerLow="TriggerLow")
 
     def __init__(self):
         self.Trigger1Mode, self.Trigger1Polarity = "TrigIN_GPI", "TriggerHigh"
@@ -18,10 +20,12 @@ class TriggerSettings:
 
 
 class Device:
+    """Fictional SDK handle: calls records operations; fail names one operation to reject."""
+
     def __init__(self, serial):
         self.serial = self.identity = serial
         self.IsConnected, self.USBConnected = False, "Disconnected"
-        self.CommsStatus, self.Status = "OK", NS(KeyEnabled=True)
+        self.CommsStatus, self.Status = "OK", SimpleNamespace(KeyEnabled=True)
         self.position, self.operation, self.mode = "Closed", "Inactive", "Manual"
         self.calls, self.fail, self.polling = [], None, 0
         self.settings = TriggerSettings()
@@ -47,7 +51,9 @@ class Device:
 
     def GetDeviceInfo(self):
         self.record("identity")
-        return NS(SerialNumberText=self.identity, Description="FICTIONAL SOFTWARE DEVICE")
+        return SimpleNamespace(
+            SerialNumberText=self.identity, Description="FICTIONAL SOFTWARE DEVICE"
+        )
 
     def RequestStatus(self):
         self.record("status")
@@ -102,6 +108,8 @@ class Device:
 
 
 class Manager:
+    """Fictional enumeration: registered LAN routes appear after ready_after refreshes."""
+
     def __init__(self, routes):
         self.routes, self.entries, self.calls = routes, [], []
         self.refreshes, self.ready_after, self.scan_error = 0, 1, False
@@ -125,7 +133,7 @@ class Manager:
 
     def GetTransportInfo(self, serial):
         endpoint = self.routes[serial]
-        return NS(
+        return SimpleNamespace(
             GetProvider=lambda: "TCPIP" if endpoint else "FTDI",
             GetComSpec=lambda: endpoint or "USB",
         )
@@ -149,13 +157,13 @@ def bench(monkeypatch):
     devices = {d.serial: d for d in (usb, lan)}
     endpoint = "192.0.2.10:40304"
     manager = Manager({usb.serial: None, lan.serial: endpoint})
-    sdk = NS(
+    sdk = SimpleNamespace(
         manager=manager,
-        device_type=NS(CreateKCubeSolenoid=devices.__getitem__),
+        device_type=SimpleNamespace(CreateKCubeSolenoid=devices.__getitem__),
         trigger_settings=TriggerSettings,
-        enums=NS(
-            OperatingStates=NS(Active="Active", Inactive="Inactive"),
-            OperatingModes=NS(
+        enums=SimpleNamespace(
+            OperatingStates=SimpleNamespace(Active="Active", Inactive="Inactive"),
+            OperatingModes=SimpleNamespace(
                 Manual="Manual",
                 SingleToggle="SingleToggle",
                 AutoToggle="AutoToggle",
@@ -174,7 +182,11 @@ def bench(monkeypatch):
 
     monkeypatch.setattr(controller, "_load_sdk", load)
     monkeypatch.setattr(controller, "_device_owners", {})
-    monkeypatch.setattr(controller, "time", NS(sleep=sleep, monotonic=lambda: clock[0]))
+    monkeypatch.setattr(
+        controller, "time", SimpleNamespace(sleep=sleep, monotonic=lambda: clock[0])
+    )
     monkeypatch.setattr(config, "LAN_SCAN_START_IP", "192.0.2.0")
     monkeypatch.setattr(config, "LAN_SCAN_END_IP", "192.0.2.255")
-    return NS(usb=usb, lan=lan, devices=devices, manager=manager, endpoint=endpoint, loads=loads)
+    return SimpleNamespace(
+        usb=usb, lan=lan, devices=devices, manager=manager, endpoint=endpoint, loads=loads
+    )

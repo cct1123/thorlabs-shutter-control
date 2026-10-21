@@ -1,30 +1,25 @@
 # Engineering state
 
-## REQ-104 IN PROGRESS - beginner readability implementation
+## REQ-104 COMPLETE - beginner readability implementation
 
 Source: PROJECT.md user request to implement readability/scaffolding reduction,
 preserve behavior and validate/commit step by step. Derived criteria: approachable
 source walkthrough and state/error explanations; named GUI output wiring; clear
 action/render separation; readable one/multiple-panel software checks; unchanged
 public APIs, DOM IDs/messages, command/read order, waits, discovery and cleanup.
-Review checkpoint committed as 2498ee8. Before changes, all 15 tests passed and
-59 single/three-panel callback responses, SDK-call histories and virtual waits were
-captured in ignored tmp/readability for comparison (TEST-154 baseline).
+Review checkpoint 2498ee8; contracts/guide 117ff78; named outputs/rendering 568a408.
+E144 / TEST-154 and E145 / TEST-155 validate those stages. E146 / TEST-156 validates
+the final named discovery/action/render paths and per-panel update dictionaries:
+18 tests pass from source and extracted wheel; 59 full callback/call-history/wait
+observations match the pre-refactor tree in both. Driver executable AST and GUI
+layouts are unchanged; lint/format, package/source parity and doc checks pass.
+GUI coordinator shrinks 300 -> 101 lines. Total Python grows 1,952 -> 2,037 lines
+with explicit maps and explanations; no net line-reduction claim. Current evidence:
+records/readability-validation.json; operation/handoff: outputs/REPORT.md.
 
-E144 / TEST-154 PASS stage 1: driver/fixture executable AST unchanged after excluding
-docstrings; 15 tests pass; all 59 baseline callback/call-history/wait observations
-match. Ruff lint/format and whitespace checks pass. Driver contracts, fixture
-explanation and existing-guide walkthrough are ready for their focused commit.
-
-Contracts/guide committed as 117ff78. E145 / TEST-155 PASS stage 2: GUI uses named
-component/property maps and pure presentation helpers; the positional field list
-is removed. Existing DOM IDs, messages and I/O are preserved. All 18 essential
-tests pass (one/three-panel GUI cases plus TTL actions); all 59 baseline observations
-match. GUI callback reduced from 300 to 195 lines. Ruff/whitespace checks pass.
-
-Plan: (1) commit validated named outputs/rendering; (2) clarify action coordination,
-validate final source/wheel and commit delivery. Hardware remains outside
-scope. Actual uncoached beginner handoff is untested and is not software acceptance.
+Software implementation and staged validation are complete. This checkpoint is
+part of the final delivery commit. No push requested. Hardware remains outside scope. An actual
+uncoached beginner handoff remains untested; no claim of measured novice independence.
 
 ## REQ-103 COMPLETE - holistic efficiency review
 
@@ -51,6 +46,9 @@ Readability now governs recommendations; the earlier line-reduction estimate is
 secondary. Source/comments/docstrings/tests remain unchanged by this review.
 
 ## REQ-102 COMPLETE - essential tests
+
+Historical delivery below; REQ-104 / TEST-156 extends the current suite to 18 cases
+and supersedes the old production/test hashes with readability-validation.json.
 
 Source: PROJECT.md latest test-rewrite request. E141 / TEST-151: source and
 extracted wheel each15 passed,0 skipped. All tests and doubles rewritten:
@@ -95,6 +93,7 @@ Kinesis folder defaults to C:/Program Files/Thorlabs/Kinesis. Native calls may b
 
 | ID | Current criterion | Method | Status |
 | --- | --- | --- | --- |
+| REQ-104 | Beginner readability, less positional scaffolding, unchanged behavior | TEST-154/155 stages; TEST-156 source/wheel and 59 behavior comparisons | PASS software; novice study untested |
 | REQ-102 | Rewrite all tests as a small essential suite | TEST-151 source/wheel,15 cases,405 lines | PASS software |
 | REQ-101 | Slim current baseline, no compatibility paths | TEST-148 source/wheel; TEST-149 tree/docs; TEST-150 publication | PASS software baseline/publication |
 | REQ-099 | Unified USB/LAN Discover and detected-route Connect | TEST-148 fake SDK and actual Dash callback HTTP | PASS software |
@@ -114,7 +113,7 @@ No hardware/network discovery or actuation is performed during baseline cleanup.
 
 ## Next action and human action required
 
-No remaining software action, generated scratch or pending process. Current baseline
-marker: baseline-2026-10-21. No human action needed for software delivery. Physical acceptance
+No human action needed for software delivery. Baseline provenance marker:
+baseline-2026-10-21; current readability delivery is REQ-104. Physical acceptance
 requires a separately authorized bench session with the intended topology,
 independent source protection and observations recorded under the current revision.

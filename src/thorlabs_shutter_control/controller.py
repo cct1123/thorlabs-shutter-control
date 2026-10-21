@@ -75,7 +75,7 @@ class LanDiscovery:
 class ShutterStatus:
     """An immutable observation for display and application readiness checks.
 
-    has_device means this object still holds an SDK device handle, even if
+    has_device records whether the driver still holds an SDK device handle, even if
     communication or disconnect failed. connection describes communication health.
     Active/Inactive is operating_state; it is distinct from blade Open/Closed.
     Unknown fields are not evidence of a safe physical state. Cached observations

@@ -1,5 +1,46 @@
 # Baseline evidence and decisions
 
+## E146 / TEST-156 - Behavior-preserving readability delivery, REQ-104 stage 3
+
+Expected: readable named action/discovery/render boundaries, same application
+behavior and integrated source/package validation. Observed: `discover_panels`
+owns choices, `run_panel_action` handles explicit commands, and `update` coordinates
+feedback/presentation under the same hub lock. One dictionary per panel replaces
+parallel update lists. Coordinator 300 -> 101 lines; GUI 780 -> 807; production
+Python 1,952 -> 2,037. Added explanations and named maps are deliberate; there is
+no net source-line reduction claim. No new runtime dependency/module/framework.
+
+18 source tests and 18 extracted-wheel tests pass in 0.29 s each. Both source and
+wheel match all 59 pre-refactor callback responses, cumulative fake SDK calls and
+programmed waits. Layout ASTs and driver executable AST (excluding docstrings)
+match revision 3835d2c. Six package Python/CSS files and README match source;
+extracted import origin verified. Ruff lint/format, documentation link/anchor and
+whitespace checks pass. [Machine evidence](readability-validation.json) captures
+the tested file hashes, package and comparison method. PASS software scope.
+
+The default sandbox could not write uv's external cache; an offline build using
+the existing cache with scoped execution approval succeeded. An empty local cache
+did not contain Hatchling. A layout comparison initially used Windows' default
+text decoding; repeating with explicit UTF-8 matched both layout ASTs. Neither
+issue required a production/config/dependency change. No real SDK/network/device
+operation or new physical qualification. No novice handoff study was performed.
+
+Commands: source pytest and Ruff as TEST-154; uv build --wheel --offline --out-dir
+tmp/readability/package; extract wheel, assert import origin and six-file parity,
+run the same pytest and behavior probe with extracted PYTHONPATH. Comparison
+fixture/method is described in machine evidence and the pre-implementation review.
+
+## D041 - Preserve behavior while simplifying the learning path, REQ-104
+
+The active request requires unchanged behavior. Retain one/multiple-panel DOM IDs,
+whole-hub LAN discovery, native timeouts/waits, command/read sequence, route/identity
+checks and retained-handle cleanup. Earlier proposed batching, selected-endpoint
+discovery, ID unification and workers would change behavior and are deferred.
+Keep explicit public hub methods and the small shared driver/adapter classes.
+Use named panel values, ordinary functions and short contract explanations instead
+of generated APIs or another application framework. Final source/package checks
+supersede affected baseline hashes; retained physical evidence remains historical.
+
 ## E145 / TEST-155 - Named GUI outputs and pure rendering, REQ-104 stage 2
 
 Expected: remove positional output coupling and separate presentation without

@@ -3,6 +3,10 @@
 REQ-103; 2026-10-21; inspected revision `3835d2c`. Review only: no production
 source, dependencies, configuration, tests or hardware changed.
 
+This is the pre-implementation assessment. REQ-104 implements the readability
+work with unchanged behavior; see [delivery report](REPORT.md). Proposed latency
+optimizations and changes to element IDs remain outside that refactor.
+
 ## Conclusion
 
 The runtime is already small: 38 tracked files and 1,952 physical Python source

@@ -1,0 +1,109 @@
+{
+  "date": "2026-10-21",
+  "requirement": "REQ-104",
+  "evidence": "E146 / TEST-156",
+  "scope": "software-only behavior-preserving readability refactor; no real SDK/network/device operation",
+  "baseline_revision": "3835d2c",
+  "source_tests": {
+    "passed": 18,
+    "skipped": 0,
+    "seconds": 0.29
+  },
+  "wheel_tests": {
+    "passed": 18,
+    "skipped": 0,
+    "seconds": 0.29
+  },
+  "behavior_comparison": {
+    "source": "59 callback responses, cumulative fake SDK-call histories and virtual waits match",
+    "extracted_wheel": "59 match",
+    "panel_counts": [
+      1,
+      3
+    ],
+    "scenarios": [
+      "initial display",
+      "unified discovery",
+      "USB and LAN Connect",
+      "all four modes",
+      "Open/Start/Close/Stop",
+      "TTL Apply/Read/Arm/Disarm",
+      "periodic refresh",
+      "discovery with retained handles",
+      "unknown operation",
+      "status read fault",
+      "Close after fault",
+      "failed disconnect retention and retry",
+      "global cleanup",
+      "cooperative server shutdown"
+    ],
+    "method": "Before production changes, run the existing bench fixture through actual Dash callback HTTP; record full responses, cumulative device/manager calls and virtual-clock readings after each step. Replay the same 59 steps against final source and the extracted wheel.",
+    "probe": "tmp/readability/compare_behavior.py (ignored local evidence, not a maintained test API)",
+    "probe_sha256": "30d78c5383a7246010c727a02a6f5efd95d9ffb7897904e7856b39d56e7344dc",
+    "baseline_sha256": "bebd08f4bbb58c9867b64f45a75bdff304985c8f07eb5e3dbf234efd3f18d2ad"
+  },
+  "structure": {
+    "callback_lines_before": 300,
+    "callback_lines_after": 101,
+    "gui_lines_before": 780,
+    "gui_lines_after": 807,
+    "production_python_lines_before": 1952,
+    "production_python_lines_after": 2037,
+    "test_files": 4,
+    "test_lines": 456,
+    "new_runtime_modules": 0,
+    "new_runtime_dependencies": 0,
+    "net_line_reduction_claim": false
+  },
+  "quality": {
+    "ruff_lint": "PASS",
+    "ruff_format": "PASS",
+    "driver_executable_ast": "unchanged excluding docstrings",
+    "panel_and_app_layout_ast": "unchanged",
+    "unchanged_byte_hashes": [
+      "src/thorlabs_shutter_control/config.py",
+      "src/thorlabs_shutter_control/__init__.py",
+      "src/thorlabs_shutter_control/__main__.py",
+      "src/thorlabs_shutter_control/assets/style.css"
+    ],
+    "local_links_and_anchors": 85,
+    "compiled_python_doc_snippets": 5,
+    "cleared_unchanged_notebooks": 2
+  },
+  "package": {
+    "wheel_sha256": "77ce762a674462a4daa8072db478b5da363fb8a48834b7964c4528d99844839b",
+    "package_files": [
+      "thorlabs_shutter_control/__init__.py",
+      "thorlabs_shutter_control/__main__.py",
+      "thorlabs_shutter_control/config.py",
+      "thorlabs_shutter_control/controller.py",
+      "thorlabs_shutter_control/gui.py",
+      "thorlabs_shutter_control/assets/style.css"
+    ],
+    "package_source_parity": "PASS",
+    "readme_parity": "PASS",
+    "import_origin": "tmp\\readability\\wheel\\thorlabs_shutter_control\\__init__.py",
+    "pytest_summary": "18 passed in 0.29s",
+    "baseline_comparison": "59 matched"
+  },
+  "production_sha256": {
+    "src/thorlabs_shutter_control/config.py": "62ca4da608f956123f0b3ae9161f65e3ba8dc82bf8a43ebdc9e50648a8fa3e47",
+    "src/thorlabs_shutter_control/controller.py": "dd1be28375a5d218dcc0d3bf30495a1220ef386c253a4b91e9fddd6380f7c040",
+    "src/thorlabs_shutter_control/gui.py": "eb72cb6240a12f265f408690cc99e6ba1bc84e972c7a608fac344e635174705c",
+    "src/thorlabs_shutter_control/__init__.py": "9968bd00d5520f9de214c78c05892965134b9d8f5ff99c7f5d27bd28ab79e281",
+    "src/thorlabs_shutter_control/__main__.py": "6e6475b2913ee076784c8eb6b4ac73a119f745c3478ee0a8c5e9ac0201a218b5",
+    "src/thorlabs_shutter_control/assets/style.css": "54fbe35bc43bfad34f8bfbfa6026ef731a6b72a12ea2e96eb056b8c7482b0f47"
+  },
+  "test_sha256": {
+    "tests/conftest.py": "8b92a89f5640615c803ba6e6d39b0c987270f5388f36771bc70f100003585d3e",
+    "tests/test_application.py": "0697aa1a920435c8d8bdd23c8ab43a577d0e574edc136ff8aee44d2f14654888",
+    "tests/test_core.py": "76014b4fa3409f50c36d79f60787f4044ffa0f2dab5d94893c79e341487333ba",
+    "tests/test_notebooks.py": "d358e35ea86135213f22657b6a0dfd60f448550b337273dd1fed89cdd75e4241"
+  },
+  "limits": [
+    "No real SDK or physical qualification",
+    "No exhaustive behavior equivalence proof",
+    "No actual novice handoff exercise",
+    "Timing/discovery policy unchanged; prior latency findings remain applicable"
+  ]
+}

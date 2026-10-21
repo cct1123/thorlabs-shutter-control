@@ -16,7 +16,8 @@ def click(app, action, selections=None):
     fields use the panel's default TTL draft. Dash expects flattened output IDs
     and State values even though our callback uses named groups internally.
     """
-    ((key, callback),) = app.callback_map.items()
+    callback_key = next(iter(app.callback_map))
+    callback = app.callback_map[callback_key]
     selections = selections or {}
     states = []
     for item in callback["state"]:
@@ -33,7 +34,7 @@ def click(app, action, selections=None):
     response = app.server.test_client().post(
         "/_dash-update-component",
         json={
-            "output": key,
+            "output": callback_key,
             "outputs": [
                 {"id": o.component_id, "property": o.component_property} for o in callback["output"]
             ],

@@ -70,13 +70,14 @@ Ethernet provider names. TTL means the controller's electrical trigger interface
 
 | Read | Responsibility |
 | --- | --- |
-| config.py | Defaults, including panel count, SDK folder and LAN scan range |
-| __main__.py:main | Construct the hub/app, serve localhost requests, clean up on exit |
-| gui.py:create_app | Build passive panels and connect button events to application logic |
-| controller.py:ShutterStatus, TriggerConfig | Values passed between driver and GUI |
-| controller.py:ShutterHub | Own slots/routes and dispatch commands to their drivers |
-| controller.py:_KinesisShutter | Shared connection, feedback, commands and release |
-| tests/test_core.py, tests/test_application.py | Executable examples using fictional devices |
+| [config.py](../src/thorlabs_shutter_control/config.py) | Defaults, including panel count, SDK folder and LAN scan range |
+| [__main__.py](../src/thorlabs_shutter_control/__main__.py): main | Construct the hub/app, serve localhost requests, clean up on exit |
+| [gui.py](../src/thorlabs_shutter_control/gui.py): create_app, update, run_panel_action | Build panels, coordinate events, check prerequisites and send commands |
+| [gui.py](../src/thorlabs_shutter_control/gui.py): _panel, _panel_view, _panel_outputs | Define layout, named presentation values and matching output wiring |
+| [controller.py](../src/thorlabs_shutter_control/controller.py): ShutterStatus, TriggerConfig | Values passed between driver and GUI |
+| [controller.py](../src/thorlabs_shutter_control/controller.py): ShutterHub | Own slots/routes and dispatch commands to their drivers |
+| [controller.py](../src/thorlabs_shutter_control/controller.py): _KinesisShutter | Shared connection, feedback, commands and release |
+| [test_core.py](../tests/test_core.py), [test_application.py](../tests/test_application.py) | Executable examples using fictional devices |
 
 Read the normal command path before SDK loading or error cleanup. A slot is a
 zero-based panel index. An Ethernet endpoint is one exact IPv4:port route. Polling
@@ -85,8 +86,9 @@ feedback and waits. Neither a successful setter nor a sleep proves blade motion.
 
 ### Trace one Open and one LAN Connect
 
-GUI Open enters the callback in create_app. It requests operating feedback through
-hub.get_operating_status(slot), checks readiness, and additionally reads actual TTL
+GUI Open enters `update()` in create_app, which calls `run_panel_action()`. That
+helper requests operating feedback through hub.get_operating_status(slot), checks
+readiness, and additionally reads actual TTL
 settings in Trigger mode. It calls hub.open_shutter(slot), which dispatches to the
 channel's open_shutter(). That sends SDK SetOperatingState(Active). The callback
 then reads the selected panel's operating feedback and updates its display. The
@@ -118,6 +120,13 @@ operating feedback. Connection alone never enables the channel or writes outputs
 - Dash `no_update` leaves a browser property unchanged. Returning `None` sets a
   value; these are different choices. All tabs share one hub and its locks.
 
+In Dash, `Input` properties trigger the callback; `State` properties supply values
+without triggering it. Named `Output` groups describe where returned values go.
+`create_app()` keeps discovery choices and last-read TTL settings in local variables
+shared by its nested functions. Each call to `update()` creates one small dictionary
+of changes per panel, handles the action, reads feedback, then calls `_panel_view()`.
+It keeps the existing hub lock throughout that sequence so commands cannot overlap.
+
 ### Develop without hardware
 
 Use the install/test commands in [Setup](getting-started.md). Tests request the
@@ -131,8 +140,8 @@ For a first change, add a readout of the existing `ShutterStatus.status_bits`.
 Add its element to `_panel()` and its named component/property value to
 `_panel_view()` in gui.py. `_panel_outputs()` derives Dash output wiring from that
 same view; no separate field list or matching return position is needed. Rendering
-and control hints perform no device I/O. Add a GUI assertion using `bench`, exercising one
-and multiple panels. No new driver request is needed: operating snapshots already
+and control hints perform no device I/O. Add a GUI assertion using `bench`, exercising
+one and multiple panels. No new driver request is needed: operating snapshots already
 contain the bits. Reuse the small HTTP helper in tests/test_application.py; it posts
 the same Dash callback request as the browser without opening a server socket.
 
