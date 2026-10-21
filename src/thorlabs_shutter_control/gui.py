@@ -22,77 +22,134 @@ def _enabled(value):
 def _panel(slot, serial_number, serials, suffix):
     return html.Section(
         [
-            html.H2(f"Shutter {slot + 1}"),
+            html.Div(
+                [
+                    html.H2(f"Shutter {slot + 1}"),
+                    html.Span("Disconnected", id=f"connection{suffix}", className="badge offline"),
+                ],
+                className="panel-heading",
+            ),
             html.Label("Device serial number", htmlFor=f"serial{suffix}"),
             dcc.Dropdown(
                 id=f"serial{suffix}",
                 options=serials,
                 value=serial_number,
-                placeholder="Discover and select this shutter's serial",
+                placeholder="Discover, then select a controller",
             ),
             html.Div(
                 [
-                    html.Button("Connect", id=f"connect{suffix}"),
-                    html.Button("Close & disconnect", id=f"disconnect{suffix}", disabled=True),
+                    html.Button("Connect", id=f"connect{suffix}", className="connect-button"),
+                    html.Button(
+                        "Close & disconnect",
+                        id=f"disconnect{suffix}",
+                        disabled=True,
+                        title="Close this shutter and release its USB connection",
+                    ),
                 ],
                 className="connection-actions",
             ),
-            _readout("Connection", html.Strong("Disconnected", id=f"connection{suffix}")),
-            _readout("Device identity", html.Span("Unknown", id=f"identity{suffix}")),
-            _readout(
-                "Shutter state · controller reported",
-                html.Strong("Unknown", id=f"shutter-state{suffix}", className="shutter-state"),
-            ),
-            html.P("Key / interlock: unknown", id=f"safeguards{suffix}", className="note"),
+            html.P("No controller connected", id=f"identity{suffix}", className="device-identity"),
             html.Div(
                 [
-                    html.Button("Open", id=f"open{suffix}", disabled=True, className="primary"),
-                    html.Button("Close", id=f"close{suffix}", disabled=True),
+                    html.Span("Shutter · controller reported", className="state-label"),
+                    html.Strong(
+                        "Unknown", id=f"shutter-state{suffix}", className="shutter-state is-unknown"
+                    ),
+                    html.P("Key / interlock: unknown", id=f"safeguards{suffix}", className="note"),
+                ],
+                className="state-display",
+            ),
+            html.Div(
+                [
+                    html.Button(
+                        "Open",
+                        id=f"open{suffix}",
+                        disabled=True,
+                        **{"aria-describedby": f"control-hint{suffix}"},
+                    ),
+                    html.Button("Close", id=f"close{suffix}", disabled=True, className="primary"),
                 ],
                 className="shutter-actions",
             ),
-            html.H3("TTL · TRIG1 / TRIG2"),
-            _readout("Controller readback", html.Span("Unknown", id=f"ttl-status{suffix}")),
-            *[
-                html.Div(
-                    [
-                        html.Label(f"TRIG{port} direction", htmlFor=f"trig{port}-mode{suffix}"),
-                        dcc.Dropdown(
-                            id=f"trig{port}-mode{suffix}",
-                            options=["disabled", "input", "output"],
-                            value="input" if port == 1 else "output",
-                            clearable=False,
-                        ),
-                        html.Label(
-                            f"TRIG{port} active polarity", htmlFor=f"trig{port}-polarity{suffix}"
-                        ),
-                        dcc.Dropdown(
-                            id=f"trig{port}-polarity{suffix}",
-                            options=["high", "low"],
-                            value="high",
-                            clearable=False,
-                        ),
-                    ],
-                    className="ttl-port",
-                )
-                for port in (1, 2)
-            ],
-            html.Div(
-                [
-                    html.Button("Apply TTL settings", id=f"apply-ttl{suffix}", disabled=True),
-                    html.Button("Read TTL settings", id=f"read-ttl{suffix}", disabled=True),
-                    html.Button("Arm TTL", id=f"arm-ttl{suffix}", disabled=True),
-                    html.Button("Disarm / Close", id=f"disarm-ttl{suffix}", disabled=True),
-                ],
-                className="connection-actions",
-            ),
             html.P(
-                "Selections are drafts until Apply. Apply requires Disarm/Close. "
-                "Arm uses device readback and may open immediately. An open input is LOW; "
-                "active-low can open with no cable. Read replaces drafts. Close disarms TTL.",
-                className="note",
+                "Connect this shutter to enable manual controls.",
+                id=f"control-hint{suffix}",
+                className="control-hint",
             ),
-            _message("Select a device to begin.", f"message{suffix}"),
+            _message("No action yet in this view.", f"message{suffix}"),
+            html.Details(
+                [
+                    html.Summary(
+                        ["Trigger settings ", html.Span("TRIG1 / TRIG2", className="note")]
+                    ),
+                    html.Div(
+                        [
+                            _readout(
+                                "Controller readback",
+                                html.Span("Unknown", id=f"ttl-status{suffix}"),
+                            ),
+                            html.Div(
+                                [
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                f"TRIG{port} direction",
+                                                htmlFor=f"trig{port}-mode{suffix}",
+                                            ),
+                                            dcc.Dropdown(
+                                                id=f"trig{port}-mode{suffix}",
+                                                options=["disabled", "input", "output"],
+                                                value="input" if port == 1 else "output",
+                                                clearable=False,
+                                            ),
+                                            html.Label(
+                                                f"TRIG{port} active polarity",
+                                                htmlFor=f"trig{port}-polarity{suffix}",
+                                            ),
+                                            dcc.Dropdown(
+                                                id=f"trig{port}-polarity{suffix}",
+                                                options=["high", "low"],
+                                                value="high",
+                                                clearable=False,
+                                            ),
+                                        ],
+                                        className="ttl-port",
+                                    )
+                                    for port in (1, 2)
+                                ],
+                                className="ttl-grid",
+                            ),
+                            html.Div(
+                                [
+                                    html.Button(
+                                        "Read TTL settings", id=f"read-ttl{suffix}", disabled=True
+                                    ),
+                                    html.Button(
+                                        "Apply TTL settings", id=f"apply-ttl{suffix}", disabled=True
+                                    ),
+                                    html.Button("Arm TTL", id=f"arm-ttl{suffix}", disabled=True),
+                                    html.Button(
+                                        "Disarm / Close", id=f"disarm-ttl{suffix}", disabled=True
+                                    ),
+                                ],
+                                className="connection-actions",
+                            ),
+                            html.P(
+                                "Selections are drafts until Apply. Read replaces drafts. "
+                                "Apply requires Disarm/Close. Arm uses device readback "
+                                "and may open immediately. An open input is LOW; "
+                                "active-low can open with no cable. "
+                                "Close disarms TTL.",
+                                className="note",
+                            ),
+                        ],
+                        className="ttl-content",
+                    ),
+                ],
+                id=f"trigger-settings{suffix}",
+                className="trigger-settings",
+                open=False,
+            ),
         ],
         className="panel status-panel",
     )
@@ -111,21 +168,44 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
     serials = [c.serial_number for c in hub.controllers if c.serial_number]
     app = Dash(__name__)
     app.title = "Shutter control"
+    app_class = "app" if single else "app multi-app"
     app.layout = html.Main(
         [
             html.Header(
                 [
-                    html.P("LAB CONTROL", className="eyebrow"),
-                    html.H1("Shutter control"),
-                    html.P("KSC101 · up to three shutters through KEH3 USB", className="subtitle"),
+                    html.Div(
+                        [
+                            html.P("OPTICS / LAB CONTROL", className="eyebrow"),
+                            html.H1("Shutter control"),
+                            html.P("KSC101 controllers · KEH3 USB", className="subtitle"),
+                        ]
+                    ),
+                    html.Div(
+                        [
+                            html.Button(
+                                "Discover", id="discover", title="Find connected USB controllers"
+                            ),
+                            html.Button(
+                                "Close & disconnect all",
+                                id="shutdown-all",
+                                className="shutdown-button",
+                            ),
+                        ],
+                        className="hub-actions",
+                    ),
                 ]
             ),
             html.Div(
                 [
-                    html.Button("Discover", id="discover"),
-                    html.Button("Close & disconnect all", id="shutdown-all"),
+                    html.Span(f"0 of {count} connected", id="connection-summary"),
+                    html.Span("Status auto-refreshes", className="note"),
+                    html.Span(
+                        "Communicating with controller…",
+                        className="activity",
+                        **{"aria-hidden": "true"},
+                    ),
                 ],
-                className="connection-actions",
+                className="session-bar",
             ),
             _message("Discovery and connection start only when requested.", "hub-message"),
             html.Div(
@@ -140,11 +220,13 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
                 "Closing this browser tab does not shut down any controller. "
                 "Close & disconnect all attempts cleanup for every connected shutter; "
                 "verify physical closure independently.",
-                className="note",
+                className="note footer-note",
             ),
             dcc.Interval(id="refresh", interval=1000),
         ],
-        className="app" if single else "app multi-app",
+        id="shutter-app",
+        className=app_class,
+        **{"aria-busy": "false"},
     )
 
     fields = [
@@ -169,6 +251,10 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
         ("trig1-polarity", "value"),
         ("trig2-mode", "value"),
         ("trig2-polarity", "value"),
+        ("connection", "className"),
+        ("shutter-state", "className"),
+        ("control-hint", "children"),
+        ("message", "className"),
     ]
     actions = {
         f"{action}{suffix}": (slot, action)
@@ -186,7 +272,11 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
     }
 
     @app.callback(
-        [Output("hub-message", "children")]
+        [
+            Output("hub-message", "children"),
+            Output("connection-summary", "children"),
+            Output("hub-message", "className"),
+        ]
         + [Output(f"{name}{suffix}", prop) for suffix in suffixes for name, prop in fields],
         inputs={
             "_events": [
@@ -205,7 +295,11 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
                 for suffix in suffixes
             ],
         },
-        running=[(Output("refresh", "disabled"), True, False)],
+        running=[
+            (Output("refresh", "disabled"), True, False),
+            (Output("shutter-app", "className"), app_class + " is-busy", app_class),
+            (Output("shutter-app", "aria-busy"), "true", "false"),
+        ],
     )
     def update(_events, selections, ttl_drafts):
         with hub.lock:
@@ -216,6 +310,8 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
             hub_message = no_update
             action = ctx.triggered_id
             slot = None
+            error_slots = set()
+            hub_error = False
             try:
                 if action == "discover":
                     serials = hub.discover()
@@ -233,9 +329,8 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
                             if selections[index] in serials
                             else (serials[0] if single and len(serials) == 1 else None)
                         )
-                    hub_message = (
-                        f"Found {len(serials)} device(s). Select a distinct serial per shutter."
-                    )
+                    noun = "controller" if len(serials) == 1 else "controllers"
+                    hub_message = f"Found {len(serials)} USB {noun}. Select a serial, then Connect."
                 elif action == "shutdown-all":
                     had_devices = [c.get_status().has_device for c in hub.controllers]
                     hub.safe_shutdown()
@@ -289,14 +384,24 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
             except (ShutterError, ValueError) as exc:
                 if slot is None:
                     hub_message = str(exc)
+                    hub_error = True
                 else:
                     messages[slot] = str(exc)
+                    error_slots.add(slot)
 
-            result = [hub_message]
-            for index, shutter in enumerate(hub.controllers):
-                status = shutter.get_status()
+            statuses = [shutter.get_status() for shutter in hub.controllers]
+            connected_count = sum(s.connection == "connected" for s in statuses)
+            result = [
+                hub_message,
+                f"{connected_count} of {count} connected",
+                "message message-error"
+                if hub_error
+                else ("message" if hub_message is not no_update else no_update),
+            ]
+            for index, status in enumerate(statuses):
                 if status.error:
                     messages[index] = status.error
+                    error_slots.add(index)
                 connected, active = status.connection == "connected", status.has_device
                 identity = (
                     " / ".join(v for v in (status.description, status.serial_number) if v)
@@ -304,6 +409,20 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
                 )
                 config = status.trigger_config
                 ttl = "Unknown"
+                if not connected:
+                    hint = (
+                        "Resolve the connection fault before Open."
+                        if status.error
+                        else ("Select a controller, then Connect to enable manual controls.")
+                    )
+                elif status.operating_mode == "triggered":
+                    hint = "Use Disarm / Close before manual Open."
+                elif not status.key_enabled:
+                    hint = "Unlock the controller key to enable Open."
+                elif not status.interlock_ready:
+                    hint = "Normal interlock readiness has not been verified for this session."
+                else:
+                    hint = "Manual control ready. Close also disarms triggers."
                 if config is not None:
                     armed = {True: "Armed", False: "Disarmed", None: "Unknown"}[status.ttl_armed]
                     ttl = (
@@ -318,7 +437,8 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
                         identity,
                         status.shutter_state.title(),
                         f"Key: {_enabled(status.key_enabled)} · "
-                        f"Interlock: {_enabled(status.interlock_enabled)}",
+                        f"Interlock: {_enabled(status.interlock_enabled)}"
+                        + (" (operator verified)" if status.operator_interlock_confirmed else ""),
                         messages[index],
                         options[index],
                         selected[index],
@@ -328,7 +448,7 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
                         not (
                             connected
                             and status.key_enabled
-                            and status.interlock_enabled
+                            and status.interlock_ready
                             and status.operating_mode != "triggered"
                         ),
                         not active,
@@ -345,11 +465,26 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
                             and config is not None
                             and status.ttl_armed is False
                             and status.key_enabled
-                            and status.interlock_enabled
+                            and status.interlock_ready
                             and "input" in (config.trig1_mode, config.trig2_mode)
                         ),
                         not active,
                         *drafts[index],
+                        "badge "
+                        + (
+                            "online"
+                            if connected
+                            else ("fault" if status.connection == "fault" else "offline")
+                        ),
+                        "shutter-state is-" + status.shutter_state,
+                        hint,
+                        (
+                            "message message-error"
+                            if index in error_slots
+                            else "message message-success"
+                        )
+                        if messages[index] is not no_update
+                        else no_update,
                     ]
                 )
             return result

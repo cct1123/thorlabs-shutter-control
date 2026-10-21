@@ -76,6 +76,20 @@ def test_gui_reports_fault_and_allows_cleanup_and_reconnect(rig):
     assert invoke(app, "connect")["connection"]["children"] == "Connected"
 
 
+def test_unverified_interlock_displays_unknown_and_blocks_open_arm(rig, monkeypatch):
+    monkeypatch.setattr(rig.device, "GetStatusBits", lambda: 0x2000)
+    app = create_app(rig.controller)
+    result = invoke(app, "connect")
+    assert result["connection"]["children"] == "Connected"
+    assert "Interlock: unknown" in result["safeguards"]["children"]
+    assert result["open"]["disabled"] is True
+    assert result["arm-ttl"]["disabled"] is True
+    assert not any(
+        c[0] in {"enable", "set_state", "set_mode", "set_triggers"} for c in rig.device.calls
+    )
+    rig.controller.disconnect(close_shutter=False)
+
+
 def test_no_device_error_is_visible(rig):
     rig.serials.clear()
     result = invoke(create_app(rig.controller), "connect")
@@ -280,3 +294,53 @@ def test_ttl_invalid_browser_values_are_errors_without_output_writes(rig):
     result = invoke(app, "apply-ttl", ttl={"trig1-mode": "bogus"})
     assert "Trigger mode must" in result["message"]["children"]
     assert not any(c[0] == "set_triggers" for c in rig.device.calls)
+
+
+def test_connection_summary_and_state_styling_follow_feedback(rig):
+    app = create_app(rig.controller)
+    assert invoke(app, "refresh")["connection-summary"]["children"] == "0 of 1 connected"
+    connected = invoke(app, "connect")
+    assert connected["connection-summary"]["children"] == "1 of 1 connected"
+    assert connected["connection"]["className"] == "badge online"
+    assert "Manual control ready" in connected["control-hint"]["children"]
+    opened = invoke(app, "open")
+    assert opened["shutter-state"]["className"] == "shutter-state is-open"
+    closed = invoke(app, "close")
+    assert closed["shutter-state"]["className"] == "shutter-state is-closed"
+    disconnected = invoke(app, "disconnect")
+    assert disconnected["connection-summary"]["children"] == "0 of 1 connected"
+    assert "Connect" in disconnected["control-hint"]["children"]
+
+
+def test_open_disabled_reason_distinguishes_key_interlock_and_trigger_mode(rig):
+    app = create_app(rig.controller)
+    invoke(app, "connect")
+    rig.device.Status.KeyEnabled = False
+    keyed = invoke(app, "refresh")
+    assert keyed["open"]["disabled"] and "key" in keyed["control-hint"]["children"]
+    rig.device.Status.KeyEnabled = True
+    rig.device.interlock = False
+    interlock = invoke(app, "refresh")
+    assert interlock["open"]["disabled"]
+    assert "interlock readiness" in interlock["control-hint"]["children"]
+    rig.device.mode = "Triggered"
+    triggered = invoke(app, "refresh")
+    assert triggered["open"]["disabled"]
+    assert "Disarm / Close" in triggered["control-hint"]["children"]
+    rig.controller.safe_shutdown()
+
+
+def test_fault_remains_visible_across_refresh_and_connected_count_drops(rig):
+    app = create_app(rig.controller)
+    invoke(app, "connect")
+    rig.device.CommsStatus = "Timeout"
+    fault = invoke(app, "refresh")
+    assert fault["connection"]["className"] == "badge fault"
+    assert fault["connection-summary"]["children"] == "0 of 1 connected"
+    assert fault["message"]["className"] == "message message-error"
+    assert "fault" in fault["control-hint"]["children"]
+    refreshed = invoke(app, "refresh")
+    assert "Timeout" in refreshed["message"]["children"]
+    assert refreshed["message"]["className"] == "message message-error"
+    rig.device.CommsStatus = "OK"
+    rig.controller.safe_shutdown()

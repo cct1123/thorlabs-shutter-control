@@ -1,4 +1,4 @@
-"""Documentation demo using the existing software-only pytest rig.
+"""Developer-only simulation using the existing software-only pytest rig.
 
 Run from a source checkout after `uv sync --locked`. This is not a production
 backend or an installed console command. The real SDK loader is replaced for
@@ -19,7 +19,7 @@ from thorlabs_shutter_control.gui import create_app
 @contextmanager
 def simulated_hub(*, empty=False):
     """Reuse distinct test devices and a virtual clock; no real SDK is reachable."""
-    fixture_file = Path(__file__).resolve().parents[2] / "tests" / "conftest.py"
+    fixture_file = Path(__file__).with_name("conftest.py")
     fixture = runpy.run_path(str(fixture_file))["rig"]
     with pytest.MonkeyPatch.context() as patch:
         # This source-checkout helper deliberately depends on the test fixture.

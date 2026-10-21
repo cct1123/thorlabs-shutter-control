@@ -1,0 +1,32 @@
+{
+  "evidence": "hardware-validation.json",
+  "stage_3": "SDK_BASELINE_PASS",
+  "stage_4": "FIVE_CYCLE_SDK_AND_USER_CONFIRMED_PASS",
+  "stage_5": "PRODUCTION_READBACK_PASS",
+  "stage_6": "BROWSER_AND_PRODUCTION_READBACK_PASS",
+  "stage_7": "REMOVED_BY_USER",
+  "stages_8_9_10": "UNTESTED_ON_HARDWARE",
+  "independent_shutdown_timing": "UNMEASURED",
+  "formal_bench_record": "INCOMPLETE; missing facts are not inferred",
+  "last_observed_gui_handoff": {
+    "status": "RUNNING_CONNECTED_READY",
+    "url": "http://127.0.0.1:8050/",
+    "session_id": 8424,
+    "serial": "68800777",
+    "shutter_state": "closed",
+    "operating_state": "inactive",
+    "operating_mode": "manual",
+    "key_enabled": true,
+    "sdk_interlock": "unknown",
+    "operator_interlock_confirmed": true,
+    "open_button_enabled": true,
+    "other_slots": "disconnected",
+    "automatic_sequence": false,
+    "controller_owner": "intentional running final production GUI",
+    "retained_handle": true,
+    "proof": "gui-ux-final-2026-10-20.png",
+    "checked_utc": "2026-10-21T01:35:31.433959+00:00"
+  },
+  "transient_state_note": "Timestamped historical observation, not a fresh hardware read. Cleanup preserves the intentional GUI owner.",
+  "pending_hardware_operation": null
+}

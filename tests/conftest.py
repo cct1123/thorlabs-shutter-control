@@ -97,6 +97,12 @@ class FakeDevice:
     def GetOperatingState(self):
         return self.operation
 
+    def RequestOperatingState(self):
+        self.record("request_operation")
+
+    def RequestOperatingMode(self):
+        self.record("request_mode")
+
     def GetOperatingMode(self):
         return self.mode
 

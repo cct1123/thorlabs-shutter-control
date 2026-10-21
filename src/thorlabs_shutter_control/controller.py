@@ -13,6 +13,7 @@ import sys
 import time
 from collections.abc import Sequence
 from dataclasses import dataclass
+from ipaddress import IPv4Address
 from pathlib import Path
 from threading import RLock
 from types import SimpleNamespace
@@ -52,6 +53,20 @@ class ShutterStatus:
     interlock_enabled: bool | None = None
     trigger_config: TriggerConfig | None = None
     error: str | None = None
+    status_bits: int | None = None
+    operator_interlock_confirmed: bool = False
+
+    @property
+    def interlock_ready(self) -> bool:
+        """Reported enabled, or explicitly operator-verified when SDK is unknown.
+
+        A known negative report is never overridden. This is readiness evidence,
+        not a command to alter the hardware interlock.
+        """
+        return self.connection == "connected" and (
+            self.interlock_enabled is True
+            or (self.interlock_enabled is None and self.operator_interlock_confirmed)
+        )
 
     @property
     def ttl_armed(self) -> bool | None:
@@ -154,40 +169,103 @@ class KCubeShutter:
         kinesis_dir: str | Path | None = None,
         timeout: float = 5.0,
         polling_ms: int = 250,
+        ethernet_endpoint: str | None = None,
     ):
-        if serial_number is not None and (
-            not isinstance(serial_number, str) or not re.fullmatch(r"68[0-9]{6}", serial_number)
-        ):
-            raise ValueError("KSC101 serial number must be eight digits beginning with 68.")
+        self._lock = RLock()
+        self._device = None
+        self.serial_number = serial_number
+        if ethernet_endpoint is not None:
+            try:
+                address, port = ethernet_endpoint.rsplit(":", 1)
+                if str(IPv4Address(address)) != address or port not in (
+                    "40304",
+                    "40305",
+                    "40306",
+                    "40307",
+                ):
+                    raise ValueError
+            except (AttributeError, TypeError, ValueError) as exc:
+                raise ValueError(
+                    "ethernet_endpoint must be an IPv4 KEH3 cube endpoint, "
+                    "for example 192.168.1.19:40304 (ports 40304..40307)."
+                ) from exc
+        self._ethernet_endpoint = ethernet_endpoint
         if not math.isfinite(timeout) or not 0.5 <= timeout <= 60:
             raise ValueError("timeout must be finite and between 0.5 and 60 seconds.")
         if isinstance(polling_ms, bool) or not isinstance(polling_ms, int):
             raise ValueError("polling_ms must be an integer.")
         if not 100 <= polling_ms <= 1000 or timeout < 2 * polling_ms / 1000:
             raise ValueError("polling_ms must be 100..1000 and timeout at least two polls.")
-        self.serial_number = serial_number
         self.kinesis_dir = kinesis_dir
         self.timeout = timeout
         self.polling_ms = polling_ms
-        self._lock = RLock()
         self._sdk = None
-        self._device = None
         self._description = None
         self._fault = None
         self._claimed_serial = None
 
+    @property
+    def ethernet_endpoint(self) -> str | None:
+        """Explicit KEH3 bay/USB OUT endpoint; immutable for this controller."""
+        return self._ethernet_endpoint
+
+    @property
+    def serial_number(self) -> str | None:
+        return self._serial_number
+
+    @serial_number.setter
+    def serial_number(self, serial: str | None) -> None:
+        with self._lock:
+            if serial is not None and (
+                not isinstance(serial, str) or not re.fullmatch(r"68[0-9]{6}", serial)
+            ):
+                raise ValueError("KSC101 serial number must be eight digits beginning with 68.")
+            if self._device is not None and serial != self._serial_number:
+                raise ShutterError("Disconnect before selecting another device.")
+            if serial != getattr(self, "_serial_number", None):
+                self._operator_verified_serial = None
+            self._serial_number = serial
+
+    def confirm_interlock(self, serial: str) -> None:
+        """Record explicit physical interlock verification for this selected serial.
+
+        Call before connection only after the operator confirms the normal circuit
+        and independent protection. No device command or persistent setting; the
+        confirmation belongs to this object/serial and clears on retargeting.
+        """
+        with self._lock:
+            if serial is None or serial != self.serial_number:
+                raise ValueError("Interlock confirmation requires the selected explicit serial.")
+            if self._device is not None:
+                raise ShutterError("Disconnect before changing interlock confirmation.")
+            self._operator_verified_serial = serial
+
     def discover(self) -> list[str]:
-        """Enumerate KSC101 USB identities without connecting or actuating."""
+        """Enumerate KSC101 identities; explicit Ethernet selection never falls back."""
         with self._lock:
             try:
                 self._sdk = self._sdk or _load_sdk(self.kinesis_dir)
                 with _sdk_lock:
+                    if self.ethernet_endpoint is not None:
+                        # Activates this local Kinesis transport entry; no hub IP write.
+                        self._sdk.manager.CreateManualDeviceEntry(self.ethernet_endpoint)
                     self._sdk.manager.BuildDeviceList()
-                    return sorted(str(s) for s in self._sdk.manager.GetDeviceList(68))
+                    serials = sorted(str(s) for s in self._sdk.manager.GetDeviceList(68))
+                    if self.ethernet_endpoint is not None:
+                        serials = [s for s in serials if self._matches_ethernet(s)]
+                    return serials
             except ShutterError:
                 raise
             except Exception as exc:
                 raise ShutterError(f"Device discovery failed: {exc}") from exc
+
+    def _matches_ethernet(self, serial: str) -> bool:
+        info = self._sdk.manager.GetTransportInfo(serial)
+        return (
+            info is not None
+            and str(info.GetProvider()) == "TCPIP"
+            and str(info.GetComSpec()) == self.ethernet_endpoint
+        )
 
     def connect(self, serial_number: str | None = None) -> ShutterStatus:
         """Connect the selected device, or the only discovered KSC101. No output write."""
@@ -229,6 +307,12 @@ class KCubeShutter:
             self._fault = None
             try:
                 with _sdk_lock:
+                    if self.ethernet_endpoint is not None and not self._matches_ethernet(
+                        self.serial_number
+                    ):
+                        raise ShutterError(
+                            "Selected Ethernet transport changed; refusing connection."
+                        )
                     self._device = self._sdk.device_type.CreateKCubeSolenoid(self.serial_number)
                 if self._device is None:
                     raise ShutterError("Kinesis could not create the selected device.")
@@ -279,7 +363,18 @@ class KCubeShutter:
     def _check_connection(self):
         if self._device is None:
             raise ShutterError("No device connected.")
-        if not self._device.IsConnected or str(self._device.USBConnected) != "Connected":
+        if self.ethernet_endpoint is not None:
+            with _sdk_lock:
+                matches = self._matches_ethernet(self.serial_number)
+            if not matches or not self._device.IsConnected:
+                raise ShutterError("Ethernet connection lost/changed; disconnect and reconnect.")
+        # Headless Kinesis can retain Connecting while IsConnected (documented
+        # ready-for-commands flag) and CommsStatus confirm working communication.
+        # Never force its internal state; retain disconnected/unknown rejection.
+        elif not self._device.IsConnected or str(self._device.USBConnected) not in (
+            "Connected",
+            "Connecting",
+        ):
             raise ShutterError("USB connection lost; disconnect and reconnect.")
         if str(self._device.CommsStatus) != "OK":
             raise ShutterError(f"Kinesis communication status: {self._device.CommsStatus}.")
@@ -287,23 +382,44 @@ class KCubeShutter:
     def _read_status(self, *, include_triggers: bool = True) -> ShutterStatus:
         self._check_connection()
         self._device.RequestStatus()
+        self._device.RequestOperatingMode()
+        self._device.RequestOperatingState()
         # Read operating feedback after the settings wait, rather than holding
         # key/interlock/state values sampled before that delay. Closure waits
         # need only operating feedback and must survive a TTL-settings fault.
         config = self._read_trigger_config() if include_triggers else None
+        if not include_triggers:
+            time.sleep(self.polling_ms / 1000)
         bits = int(self._device.GetStatusBits())
         state = str(self._device.GetSolenoidState()).lower()
+        operation = str(self._device.GetOperatingState()).lower()
+        mode = str(self._device.GetOperatingMode()).lower()
+        mode = {"singletoggle": "single", "autotoggle": "auto"}.get(mode, mode)
+        if operation not in ("active", "inactive") or mode not in (
+            "manual",
+            "single",
+            "auto",
+            "triggered",
+        ):
+            raise ShutterError(f"Unknown operating feedback: state={operation!r}, mode={mode!r}.")
         status = ShutterStatus(
             connection="connected",
             has_device=True,
             serial_number=self.serial_number,
             description=self._description,
             shutter_state=state if state in ("open", "closed") else "unknown",
-            operating_state=str(self._device.GetOperatingState()).lower(),
-            operating_mode=str(self._device.GetOperatingMode()).lower(),
+            operating_state=operation,
+            operating_mode=mode,
             key_enabled=bool(self._device.Status.KeyEnabled),
-            interlock_enabled=bool(bits & 0x1000),
+            # Vendor docs name bit 12 as interlock, but a clear bit did not
+            # distinguish jack installed/removed on the bench. Do not claim a
+            # measured disabled circuit from that value; keep readiness unknown.
+            interlock_enabled=True if bits & 0x1000 else None,
             trigger_config=config,
+            status_bits=bits,
+            operator_interlock_confirmed=(
+                getattr(self, "_operator_verified_serial", None) == self.serial_number
+            ),
         )
         self._check_connection()
         return status
@@ -394,8 +510,8 @@ class KCubeShutter:
             status = self.get_status()
             if status.connection != "connected":
                 raise ShutterError(status.error or "Connect before arming TTL.")
-            if not status.key_enabled or not status.interlock_enabled:
-                raise ShutterError("Arm refused: controller key or interlock is not enabled.")
+            if not status.key_enabled or not status.interlock_ready:
+                raise ShutterError("Arm refused: controller key/interlock not confirmed enabled.")
             config = status.trigger_config
             if "input" not in (config.trig1_mode, config.trig2_mode):
                 raise ShutterError("Arm refused: configure at least one trigger input.")
@@ -413,7 +529,7 @@ class KCubeShutter:
                     if (
                         reported.ttl_armed
                         and reported.key_enabled
-                        and reported.interlock_enabled
+                        and reported.interlock_ready
                         and reported.trigger_config == config
                     ):
                         return reported
@@ -467,14 +583,13 @@ class KCubeShutter:
         operating_state = "active" if shutter_state == "open" else "inactive"
         deadline = time.monotonic() + self.timeout
         while True:
-            # Allow a poll after a write. Kinesis still owns cache freshness/USB timeout.
-            time.sleep(self.polling_ms / 1000)
+            # _read_status allows a poll after its requests; cache age remains unknown.
             status = self._read_status(include_triggers=False)
             if (
                 status.shutter_state == shutter_state
                 and status.operating_state == operating_state
                 and (not manual or status.operating_mode == "manual")
-                and (shutter_state != "open" or (status.key_enabled and status.interlock_enabled))
+                and (shutter_state != "open" or (status.key_enabled and status.interlock_ready))
             ):
                 return status
             if time.monotonic() >= deadline:
@@ -492,8 +607,8 @@ class KCubeShutter:
                 raise ShutterError(status.error or "Connect before opening the shutter.")
             if status.operating_mode == "triggered":
                 raise ShutterError("Disarm TTL before requesting manual Open.")
-            if not status.key_enabled or not status.interlock_enabled:
-                raise ShutterError("Open refused: controller key or interlock is not enabled.")
+            if not status.key_enabled or not status.interlock_ready:
+                raise ShutterError("Open refused: controller key/interlock not confirmed enabled.")
             if (
                 status.shutter_state == "open"
                 and status.operating_state == "active"

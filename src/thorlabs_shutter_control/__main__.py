@@ -16,6 +16,13 @@ def main() -> int:
     )
     parser.add_argument("--kinesis-dir", help="Kinesis SDK folder (or set KINESIS_DIR)")
     parser.add_argument(
+        "--verified-interlock",
+        action="append",
+        default=[],
+        metavar="SERIAL",
+        help="Confirm normal interlock/protection for this preselected serial, this session only",
+    )
+    parser.add_argument(
         "--list", action="store_true", help="List USB devices; no connection/actuation"
     )
     parser.add_argument("--port", type=int, default=8050, help="Local GUI port (default: 8050)")
@@ -24,6 +31,10 @@ def main() -> int:
         parser.error("port must be between 1 and 65535")
     try:
         hub = ShutterHub(args.serial, kinesis_dir=args.kinesis_dir)
+        for serial in args.verified_interlock:
+            if serial not in args.serial:
+                raise ValueError("--verified-interlock requires the same explicit --serial.")
+            next(c for c in hub.controllers if c.serial_number == serial).confirm_interlock(serial)
     except ValueError as exc:
         parser.error(str(exc))
     if args.list:

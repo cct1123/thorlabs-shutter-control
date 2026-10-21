@@ -1,178 +1,74 @@
-# Getting started
+# Setup and troubleshooting
 
-[README](../README.md) · [GUI](gui.md) · [Python API](python-api.md) · [Hardware](hardware.md)
+[README](../README.md) | [GUI](gui.md) | [API](python-api.md)
 
-Start with simulation. It runs the real controller and GUI against the repository's
-test fixture, so no Kinesis installation, USB device or optical setup is needed.
+## Environment
 
-## Install the tools
-
-The software-tested setup is **Windows x64, Python 3.12 and uv**, with a modern
-browser. The package declares Python `>=3.11,<3.14`; other Python versions and
-non-Windows simulation are not validated here. The real backend requires Windows.
-
-1. Install [Git](https://git-scm.com/downloads).
-2. Install [uv using the official instructions](https://docs.astral.sh/uv/getting-started/installation/).
-   One documented Windows option is `winget install --id=astral-sh.uv -e`.
-3. Open a new PowerShell window so the tools are on `PATH`.
+Use Windows x64 and Python 3.12 x64 for the qualified configuration. Install the
+official Thorlabs Kinesis x64 distribution, its vendor dependencies and USB driver.
+Python.NET loads the .NET Framework assemblies; installing Python dependencies
+alone does not install Kinesis or a USB driver.
 
 ```powershell
-git --version
-uv --version
-git clone https://github.com/cct1123/thorlabs-shutter-control.git
-cd thorlabs-shutter-control
 uv sync --locked
-```
-
-`uv sync` creates `.venv`, installs the package and default dev dependencies
-(including pytest and Ruff), and uses Python 3.12 from `.python-version`.
-The first run may download Python and packages. You do not need to activate
-`.venv`: `uv run` selects it for each command. Keep `uv.lock` unchanged when
-reproducing the documented setup.
-
-If you already have this checkout, start with `uv sync --locked` in its root.
-
-## Try simulation
-
-Run the command-line API walkthrough:
-
-```powershell
-uv run --locked python docs/examples/simulated_demo.py --api
-```
-
-Expected output:
-
-```text
-SIMULATION ONLY — test fixture; no hardware access.
-Discovered: ['68000001']
-Identity: {'serial_number': '68000001', 'description': 'TEST DOUBLE, NOT HARDWARE'}
-Initial: closed
-Open: open
-Close: closed
-After cleanup: disconnected
-```
-
-`68000001` is deliberately fictional. The demo uses the existing pytest rig and
-its virtual clock; it does not load Kinesis or fall back to hardware. The
-[helper source](examples/simulated_demo.py) is documentation support, not a
-production backend or installed console command. It requires this source checkout,
-including `tests/`, and the default dev dependencies.
-
-Start the actual Dash GUI with that same fixture:
-
-```powershell
-uv run --locked python docs/examples/simulated_demo.py
-```
-
-Keep the terminal open and visit [http://127.0.0.1:8050](http://127.0.0.1:8050).
-Initially the screen says **Disconnected** and **Unknown**, and Open/Close are
-disabled in all three panels. The demo preselects fictional serials `68000001`
-through `68000003`. Click **Discover**, then each panel's **Connect**. Each identity
-should read **TEST DOUBLE, NOT HARDWARE** with its own serial and report **Closed**.
-Try each panel's Open and Close; observe that other simulated shutters retain
-their state. Finish with **Close & disconnect all**. See the [GUI guide](gui.md).
-
-Stop the demo with **Ctrl+C** in the terminal. Closing a browser tab leaves the
-server running. A new demo process starts with a new fixture; it does not preserve
-simulated device state.
-
-To explore the no-device case after stopping the first demo:
-
-```powershell
-uv run --locked python docs/examples/simulated_demo.py --empty
-```
-
-Discover reports `Found 0 device(s).`; after selection is cleared, Connect asks
-for a serial. A still-preselected absent serial produces a not-discovered error.
-No hardware is queried. There is no `shutter-control --simulate` option.
-
-## Run software checks
-
-In a second terminal at the repository root:
-
-```powershell
 uv run --locked pytest -q -p no:cacheprovider --ignore=tests/test_sdk.py
-uv run --locked ruff check src tests docs/examples
-uv run --locked ruff format --check src tests docs/examples
-uv build
-```
-
-Expect all software tests to pass, successful Ruff checks, and a wheel plus source distribution
-under `dist/`. The ignored SDK test can enumerate real USB when `KINESIS_TEST_DIR`
-is set, so the explicit exclusion matters even on a development computer.
-
-These checks cover software behavior, including faults and GUI callbacks, not
-physical operation. [E009](../records/RECORDS.md#e009) records the tested environment
-and verification limits.
-
-For an already populated cache, `uv sync --locked --offline` and `uv build --offline`
-work without downloads. A fresh machine needs network access. The lock covers
-runtime/dev packages; the build tool has a version range and the vendor SDK is
-installed separately.
-
-## Move to real hardware
-
-**Physical validation is pending.** Follow [the hardware guide](hardware.md) and
-the [approved validation procedure](HARDWARE_VALIDATION.md) before device access.
-
-After approval, stop the demo, select the verified Kinesis folder, then enumerate:
-
-```powershell
-$env:KINESIS_DIR = Read-Host 'Verified Kinesis installation folder'
-uv run --locked shutter-control --list
-```
-
-Compare the returned identity with the physical controller label. Do not use the
-fictional test serial. Then launch the hardware GUI:
-
-```powershell
-uv run --locked shutter-control
-```
-
-The GUI does not auto-connect. Discover accesses the real SDK/USB interface;
-Connect discovers again and requires an explicit serial in the selected panel.
-Open and Close request physical operation.
-
-Inspect available options without hardware access:
-
-```powershell
 uv run --locked shutter-control --help
 ```
 
-| Option | Meaning |
-| --- | --- |
-| `--serial` | Actual eight-digit KSC101 serial beginning with `68`; repeat up to three times with distinct serials in panel order. Preselection does not connect. |
-| `--kinesis-dir` | SDK folder; overrides `KINESIS_DIR`, then the default `C:\Program Files\Thorlabs\Kinesis` |
-| `--list` | Load SDK and enumerate USB identities; no connection or output command |
-| `--port` | Local GUI port, default `8050`, accepted range `1..65535` |
+These commands do not contact hardware. Default SDK location:
+`C:\Program Files\Thorlabs\Kinesis`. If different:
 
-The hardware application always binds to `127.0.0.1`, runs one process without
-debug/reloading, and attempts shutdown of all slots on normal server exit or Ctrl+C.
-KEH3 USB operation remains physically unvalidated; Ethernet is outside this interface.
+```powershell
+$env:KINESIS_DIR = Read-Host 'Kinesis installation folder'
+```
+
+## Hardware launch
+
+Preserve the manufacturer-approved power, docking and shutter wiring. Keep the
+source independently blocked and only one application owning each controller.
+Match discovery to the physical serial before connecting.
+
+```powershell
+uv run --locked shutter-control --list
+uv run --locked shutter-control --serial 68800777 --verified-interlock 68800777
+```
+
+The flag records verified normal physical interlock/protection for that exact
+preselected serial in this process. It is needed for Open on this bench while
+the SDK reading is unknown; it performs no interlock write. GUI startup remains
+passive. See [current hardware evidence](../records/hardware-validation.json).
+
+| CLI option | Meaning |
+| --- | --- |
+| `--serial SERIAL` | Preselect a panel; repeat up to three times with distinct identities |
+| `--verified-interlock SERIAL` | Confirm normal interlock/protection for the same preselected serial; repeat per device |
+| `--kinesis-dir PATH` | Override `KINESIS_DIR` and the default SDK location |
+| `--list` | Load the SDK and enumerate USB identities only |
+| `--port PORT` | Localhost port, default8050, accepted1..65535 |
 
 ## Troubleshooting
 
-Software messages and conditions below come from the implementation/tests.
-Hardware checks are expected diagnostics, not physically validated remedies.
-
-| Symptom | Next step |
+| Symptom | Action |
 | --- | --- |
-| `uv` or `git` is not recognized | Reopen PowerShell after installation; confirm the installation directory is on `PATH`. Follow the official installer instructions. |
-| Cannot write the uv cache | In this checkout, try `uv --cache-dir .uv-cache sync --locked` and use the same prefix for subsequent commands. |
-| `No module named pytest`, or demo fixture file missing | Use a source checkout with `tests/` and run `uv sync --locked` without `--no-dev`. A wheel alone does not include this demo. |
-| Lockfile or download failure | Use the repository's matching `pyproject.toml` and `uv.lock`; allow network access for uncached packages. `--offline` needs an existing cache. |
-| Address/port already in use | Stop the earlier server, or launch the demo with `--port 8051` and visit port 8051. The hardware CLI also accepts `--port`. |
-| GUI is disconnected; Open/Close disabled | Expected before connection. In the demo, Discover then Connect. In hardware mode, complete the approval/setup gates before either button. |
-| GUI loads without Kinesis, but Discover fails | Expected: SDK loading is lazy. Use the simulation helper to explore without Kinesis. |
-| `Kinesis SDK not found` / `Cannot load Kinesis` | Check the installed folder, matching Python/SDK bitness, .NET Framework and vendor runtime dependencies. Restart Python after correcting the installation or changing SDK versions. |
-| `The Kinesis hardware backend requires Windows` | Use Windows for real hardware. A GUI page can render elsewhere without making the backend supported. |
-| `Expected one KSC101; found 0` | In the empty demo this is intentional. On hardware, confirm device availability, the documented power/cabling arrangement and vendor USB-driver installation. |
-| More than one device, or selected serial not discovered | Compare actual discovery with the controller label; explicitly select the intended identity. Do not substitute a sample serial. |
-| Settings initialization/polling/connect failure | Read the full message and any cleanup error. Check the verified SDK/driver setup and competing controller processes before retrying under the hardware procedure. |
-| Open disabled while connected | The GUI requires both key and interlock reports to be enabled. Preserve the bench safeguards; do not bypass them to enable a button. |
-| Connection says Fault, shutter Unknown | Open is blocked. Read the error; Close/cleanup remain available while a device handle exists. Physically establish a safe state and resolve the cause before disconnect/reconnect. |
-| Close or shutdown reports an error | Release is still attempted. Physical closure is unverified; follow the approved physical shutdown/recovery method. A repeated cleanup call cannot prove closure. |
+| SDK missing/load failure | Check x64 alignment, SDK folder, .NET Framework and vendor dependencies; restart Python after fixing installation |
+| No controllers discovered | Inspect the approved USB/power arrangement and driver installation; this FTDI device need not have a COM port |
+| Identity mismatch | Stop; preserve both selected and reported serials. Firmware1.0.7 repaired the historical mismatch on68800777; never alias serials in code |
+| Already owned | Release the existing panel/process. A failed SDK disconnect retains its ownership claim |
+| Open disabled | Read the readiness hint: connection fault, key, unverified interlock or Triggered mode. Disarm/Close before manual Open |
+| Unknown operating state0 | Do not interpret it as Inactive. Preserve the report and diagnose; Close/Manual commands require separate output authority |
+| Close/shutdown fails | Use independent bench recovery. Release alone does not establish closure |
+| Port occupied | Use the existing GUI, stop its owning terminal normally, or choose another `--port` |
+| Ethernet hub only | Follow the [separate Ethernet assessment](ethernet-assessment.md); hub discovery is not cube communication |
 
-For a useful issue report, include the command, full non-sensitive error, software
-versions, simulation vs hardware mode, and the last successful step. Do not infer
-physical motion from a successful Python return value.
+Do not run two GUIs against the same serial. Browser closure is not hardware
+shutdown; use Close & disconnect all and normal terminal Ctrl+C.
+
+## Optional developer simulation
+
+```powershell
+uv run --locked python tests/simulated_demo.py --port 8051
+uv run --locked python tests/simulated_demo.py --api
+```
+
+The source-checkout helper reuses the fake SDK fixture. Its identities and states
+are fictional. It establishes software behavior, not physical performance.

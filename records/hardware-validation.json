@@ -1,0 +1,92 @@
+{
+  "record": "E079 / TEST-088 consolidation of E050, E068, E075, E077, E078",
+  "bench_date_local": "2026-10-20",
+  "archive": {
+    "path": "archive/hardware-2026-10-20.zip",
+    "sha256": "64df382ac5c946bec666f3cdf6a69aa5ad4799acd672536dee9b87354ca30f27",
+    "manifest": "manifest.json"
+  },
+  "configuration": {
+    "topology": "computer USB -> KEH3 left bay -> KSC101 -> SH05R",
+    "serial": "68800777",
+    "cube_firmware": "1.0.7",
+    "cube_hardware": 3,
+    "sdk": "Kinesis1.14.60.27990",
+    "python": "3.12.7 x64",
+    "pythonnet": "3.1",
+    "transport": "FTDI USB; no COM port assigned"
+  },
+  "results": {
+    "usb_identity_status_reconnect": "READBACK_PASS",
+    "five_cycle_sdk_sequence": {
+      "readback": "PASS",
+      "physical_observation": "USER_CONFIRMED_PASS",
+      "cycles": 5,
+      "added_open_hold_s": 2,
+      "added_closed_hold_s": 2
+    },
+    "production_shutdown": {
+      "status": "READBACK_PASS",
+      "cases": [
+        "Closed",
+        "reconnect",
+        "Open -> added hold -> safe_shutdown"
+      ],
+      "shutdown_call_s": [
+        1.1400000000139698,
+        1.140999999945052,
+        1.1400000000139698
+      ],
+      "physical_timing": "UNMEASURED"
+    },
+    "production_gui": {
+      "status": "BROWSER_AND_READBACK_PASS",
+      "open_close": "Closed",
+      "added_visible_open_hold_s": 2.015,
+      "normal_ctrl_c_cleanup": "COMPLETED; post-exit passive Closed/Inactive/Manual confirmed",
+      "application_main_result": 0,
+      "outer_pty_exit_code": 1,
+      "outer_status_cause": "not established; do not equate with application main result",
+      "new_independent_physical_observation": "UNTESTED"
+    },
+    "interlock": {
+      "sdk_clear_bit": "UNKNOWN, not proven physical disabled",
+      "operator_confirmation": "selected-serial/object session evidence",
+      "four_state_matrix": "0x2000 tracks key enabled; no jack-related difference established",
+      "physical_circuit": "not altered"
+    },
+    "ethernet": {
+      "historical_result": "hub only with cube firmware1.0.6",
+      "post_update_cube_result": "UNTESTED"
+    },
+    "remaining": [
+      "independent shutdown observation/calibrated physical timing",
+      "physical communication-loss/recovery",
+      "three actual controller/shutter pairs",
+      "electrical TTL behavior"
+    ],
+    "stage7": "REMOVED_BY_USER; not a PASS"
+  },
+  "evidence_members": {
+    "firmware": "records/firmware-post-usb-2026-10-20.json",
+    "interlock_matrix": "records/interlock-four-state-comparison-2026-10-20.json",
+    "sdk_cycles": "records/sdk-five-cycles-2s-2026-10-20.json",
+    "physical_sequence_observation": "records/sdk-five-cycles-observation-2026-10-20.json",
+    "stage5": "records/stage5-confirmed-hardware-2026-10-20.json",
+    "ctrl_c": "records/stage6-confirmed-server-2026-10-20.json",
+    "post_exit": "records/stage6-post-shutdown-2026-10-20.json",
+    "browser_actions": "records/gui-ux-hardware-2026-10-20.json",
+    "browser_motion": "records/gui-ux-browser-motion-2026-10-20.json",
+    "source_hashes": "records/gui-ux-summary-2026-10-20.json"
+  },
+  "screenshot": "gui-ux-final-2026-10-20.png",
+  "layout_verified": {
+    "viewport_px": [
+      912,
+      956
+    ],
+    "horizontal_overflow": false,
+    "manual_buttons_visible": true
+  },
+  "scope": "Historical measured/readback evidence; recheck transient state before operations. Cleanup changes tutorials/docs, not driver/GUI."
+}
