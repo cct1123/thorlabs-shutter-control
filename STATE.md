@@ -1,5 +1,29 @@
 # Engineering state
 
+## REQ-103 COMPLETE - holistic efficiency review
+
+Source: user request, 2026-10-21: holistic review of communication, latency,
+simplicity and codebase reduction possibilities. Derived acceptance: inspect
+current architecture; quantify programmed waits with software-only probes;
+prioritize reductions while preserving current contracts; report physical limits.
+E142 / TEST-152 PASS review: current15 tests pass; fake callback probes confirm
+250ms per connected-panel refresh,500ms Manual Open,750ms Trigger Start and5s
+LAN identity collection/absent-other-route delay. See outputs/REVIEW.md for
+findings, methods and proposed order. These are programmed waits, not calibrated
+USB/LAN/optical latency. Production code/config/tests remain unchanged.
+No implementation or hardware action is pending; review recommendations require
+a subsequent implementation objective. Existing physical qualification gaps remain.
+
+User refinement: beginner developers must be able to understand and take over
+development. E143 / TEST-153 completes the scaffolding/readability/docstring/comment
+assessment in outputs/REVIEW.md. Static assessment: public API is approachable;
+GUI/discovery handoff remains incomplete. Main gaps are positional GUI outputs,
+mixed callback responsibilities, indirect LAN discovery and undocumented state/error
+contracts. Passive schema inspection confirms 48 outputs per panel. Proposed novice
+handoff exercise is UNTESTED; no claim of demonstrated beginner independence.
+Readability now governs recommendations; the earlier line-reduction estimate is
+secondary. Source/comments/docstrings/tests remain unchanged by this review.
+
 ## REQ-102 COMPLETE - essential tests
 
 Source: PROJECT.md latest test-rewrite request. E141 / TEST-151: source and

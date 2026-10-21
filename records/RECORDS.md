@@ -1,5 +1,60 @@
 # Baseline evidence and decisions
 
+## E143 / TEST-153 - Beginner handoff and scaffolding review, REQ-103
+
+2026-10-21; user refinement makes beginner understanding and development takeover
+the essential criterion. Expected: identify unnecessary indirection, readability
+barriers, missing explanations and a concrete handoff validation method. Observed:
+static trace of GUI actions, driver guard/cleanup, LAN discovery, tests and guides
+identifies positional output coupling, a 300-line mixed callback, indirect selected
+LAN discovery, ambiguous GUI `active` naming and missing state/error explanations.
+Passive app construction with one/three panels confirms 51/147 callback outputs:
+3 shared and 48 per panel; no SDK or device handle loaded. Existing useful comments
+and thin public wrappers support understanding and should remain. See the
+[review addendum](../outputs/REVIEW.md#beginner-development-handoff-governing-criterion).
+PASS review scope only. No novice developer exercise was performed; independent
+beginner takeover remains unvalidated. No production, test, config or hardware
+change; no additional functional test run was needed for this documentation review.
+
+## D040 - Readability governs reduction, REQ-103
+
+User's essential criterion supersedes line count as the optimization target.
+Recommend an existing-guide developer walkthrough, explicit state/error contracts,
+named GUI outputs and a few ordinary action/render helpers. Preserve shared SDK
+guards, thin public method signatures and physically motivated comments. Avoid
+generated APIs, a new transport framework and worker scheduling without a measured
+need. Proposed acceptance is an uncoached software-only newcomer exercise: setup,
+trace Open, add a status-bits readout for one/multiple panels, explain discovery
+configuration and explain retained ownership/fault behavior. This is review guidance,
+not authorization to operate hardware or a claim that the exercise has passed.
+
+## E142 / TEST-152 - Holistic efficiency review, REQ-103
+
+2026-10-21, revision3835d2c. Expected: review communication/latency/simplicity and
+reduction possibilities with current source and software-only evidence. Observed:
+15 tests pass in0.17s. Existing fake SDK/virtual clock plus Dash callback HTTP
+confirm500ms Manual Open,250ms Close,750ms Trigger Start,750ms Apply TTL and
+250/750/1500ms refresh waits for1/3/6 connected panels. Selected LAN Connect waits
+5s when another configured LAN route is absent; immediate identities alone add
+no sleep to configured Connect. Unified discovery with a found host adds5s;
+its SDK-list builds number2 without configured routes or3 with one route.
+38 tracked files;1952 physical production Python lines. See
+[review](../outputs/REVIEW.md) for source locations, method, qualifications and
+prioritized recommendations. PASS review only; fake timing cannot establish
+real SDK/native/network/optical latency. No production/test/config change or
+hardware/network operation. No new physical qualification claim.
+
+## D039 - Prefer fewer waits and focused simplification, REQ-103
+
+Review recommends batching existing full feedback for Connect/Apply, target-route
+Connect discovery, shared discovery enumeration and named GUI output/rendering.
+Estimated150-300 Python lines may be removable without feature cuts; this is an
+unimplemented planning estimate. Preserve identity, ownership, retained-release
+handles, all-slot cleanup and explicit read/write semantics. Do not infer timing
+guarantees from polling intervals, simply enable HTTP threads under the same hub
+lock, or stop broad scanning after the first identity. Review authorizes no new
+actuation, discovery or implementation. Baseline source validation stays applicable.
+
 Current test delivery: E141 / TEST-151 below. E138/139 describe the original
 baseline before its tests were replaced; their old totals/hashes are historical.
 
