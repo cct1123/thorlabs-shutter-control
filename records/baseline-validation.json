@@ -1,0 +1,129 @@
+{
+  "requirement": "REQ-101",
+  "date": "2026-10-21",
+  "evidence": [
+    "E138 / TEST-148",
+    "E139 / TEST-149"
+  ],
+  "scope": "software-only current baseline; no real SDK, network discovery or device operation",
+  "source_suite": {
+    "passed": 217,
+    "skipped": 1,
+    "failed": 0
+  },
+  "extracted_wheel_suite": {
+    "passed": 217,
+    "skipped": 1,
+    "failed": 0
+  },
+  "quality": {
+    "ruff_lint": "PASS",
+    "ruff_format": "PASS",
+    "diff_check": "PASS",
+    "three_device_api_simulation": "PASS; every fake handle released"
+  },
+  "checks": {
+    "markdown_files": 16,
+    "notebooks": 2,
+    "local_links_and_anchors": 72,
+    "python_doc_snippets": 5,
+    "notebook_code_cells": 15,
+    "archived_files_hash_verified": 46,
+    "private_executed_notebook_intact": true,
+    "environment_preserved": true,
+    "obsolete_files_absent": 68,
+    "obsolete_symbols_and_references": "absent",
+    "public_identity_scan": "PASS",
+    "maintained_files_so_far": 43,
+    "maintained_bytes_so_far": 539469
+  },
+  "package": {
+    "command": "uv build --wheel --offline --out-dir tmp/baseline-package",
+    "sha256": "fbcfc18c6449f8d1f710b2296010e326c79a6937f99152867fded9cd7caa3d7d",
+    "source_css_parity": "PASS (6 files)",
+    "import_origin": "tmp/baseline-package/extracted/thorlabs_shutter_control/__init__.py",
+    "private_docs_records_tests_excluded": true
+  },
+  "pruning": {
+    "before_files": 109,
+    "before_working_tree_bytes": 2323179,
+    "removed_files": 68,
+    "removed_original_bytes": 1553612,
+    "new_evidence_files": 2,
+    "after_files": 43,
+    "inventory_private": "inputs/private/baseline-5ab1f91/pruning-manifest.json",
+    "inventory_sha256": "8bc448638999edea798080ce3290d2d2945fc99a2af1bd410a438af808a2a786",
+    "recovery_commit": "5ab1f910593ac062e60ea043037ddf2af8ec3c13"
+  },
+  "api_boundary": {
+    "gui": "create_app(hub: ShutterHub) requires hub and selected serial",
+    "direct_usb": "KCubeShutter",
+    "network": "ShutterHub owns explicit KEH3 routes",
+    "obsolete_adapters_and_confirmation_metadata": "removed; no aliases or migration wrappers",
+    "sdk_scan_hosts": "IPv4 address strings only"
+  },
+  "notebooks": {
+    "maintained": 2,
+    "code_cells": 15,
+    "shared_outputs_cleared": true,
+    "superseded_repeat_experiment": "removed",
+    "private_executed_lan_sha256": "fc609ca6e6fcd9017f87abd4b62b978db7bae157eab90d2a49909d671159b1a9",
+    "archive_manifest": "inputs/private/baseline-5ab1f91/manifest.json",
+    "archive_files_verified": 46
+  },
+  "source_sha256": {
+    "src/thorlabs_shutter_control/config.py": "62ca4da608f956123f0b3ae9161f65e3ba8dc82bf8a43ebdc9e50648a8fa3e47",
+    "src/thorlabs_shutter_control/controller.py": "1a9b97c6e83ff2148ec0d49a8efbdbcd2e13c1843f9e00d5d42dc32b0237482d",
+    "src/thorlabs_shutter_control/gui.py": "5b42329531e0d9dd9b681604851449b2a30e3c8585ca82f9b110b0413513f998",
+    "src/thorlabs_shutter_control/__init__.py": "9968bd00d5520f9de214c78c05892965134b9d8f5ff99c7f5d27bd28ab79e281",
+    "src/thorlabs_shutter_control/__main__.py": "6e6475b2913ee076784c8eb6b4ac73a119f745c3478ee0a8c5e9ac0201a218b5",
+    "src/thorlabs_shutter_control/assets/style.css": "54fbe35bc43bfad34f8bfbfa6026ef731a6b72a12ea2e96eb056b8c7482b0f47",
+    "tests/conftest.py": "7032ae5eac5326255d49f7b1c92fbc00291e6500ecb048f08c96918e6ed550a2",
+    "tests/simulated_demo.py": "96f82fe7e0af35bfffede0617bfd799050fdada780593602ab60e28c2fdec13c",
+    "tests/test_cli.py": "c9a923d766da9197f824e5410fc84e71a8080bfc5ae0d54abd93da08ea9e30bb",
+    "tests/test_controller.py": "5f575502f9a60119f2e825e56aee7fd905d49e9291ff33794c75224b0b794908",
+    "tests/test_examples.py": "c80c8d28f444534ed1b75f0274a48907f88bfb06818a92bce14488f0fdf00530",
+    "tests/test_gui.py": "ccbeeee07c9fdbcf78c3c347083293fd5a3679aef58e1666c931266057fe54ec",
+    "tests/test_hub.py": "60b7f5ad85c68015552326395e96d4cd7e0a14fea911d3fde69d0d642162a3ee",
+    "tests/test_lan_discovery.py": "0581d384b7d8438febf935f917fb78568680b4fd2efb64c38dded08ef510639f",
+    "tests/test_sdk.py": "6cd2b5d072cfb340859863111d160474200b2d619d29a58873dfcd1aacffad67",
+    "tests/test_triggers.py": "e1144258003d3fbd420b937b19cf1c7d84936cd8032949df85bda1e5f4f6d89a"
+  },
+  "limits": [
+    "Current physical baseline qualification is incomplete",
+    "Optional real SDK enumeration skipped",
+    "Retained physical observations have previous revision/configuration scope",
+    "No new browser capture; maintained layout capture visually unchanged; actual callback HTTP tests cover changed construction/dispatch"
+  ],
+  "publication": {
+    "status": "pending focused commits and push",
+    "baseline_marker": "baseline-2026-10-21"
+  },
+  "generated_cleanup": [
+    {
+      "path": "tmp/baseline-package",
+      "files": 12,
+      "bytes": 128497.0
+    },
+    {
+      "path": "tmp/baseline-prune.json",
+      "files": 1,
+      "bytes": 11218.0
+    },
+    {
+      "path": "tmp/write_baseline_docs.py",
+      "files": 1,
+      "bytes": 46958.0
+    },
+    {
+      "path": "tmp/check_baseline.py",
+      "files": 1,
+      "bytes": 4153.0
+    },
+    {
+      "path": "tmp/baseline-checks.json",
+      "files": 1,
+      "bytes": 447.0
+    }
+  ]
+}

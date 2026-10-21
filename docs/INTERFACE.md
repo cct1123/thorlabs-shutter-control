@@ -2,112 +2,63 @@
 
 [API](python-api.md) | [Hardware](hardware.md) | [Ethernet](ethernet-assessment.md)
 
-## Device and transport
+Use Windows x64, Kinesis .NET Framework assemblies and Python.NET. The retained
+bench configuration used Python3.12.7, Python.NET3.1 and Kinesis1.14.60.27990 with
+KSC101 firmware1.0.7. The current software baseline still needs bench qualification.
 
-The qualified USB branch is computer -> KEH3 left bay -> KSC101 (alias CONTROLLER_A) -> SH05R.
-Kinesis identifies the cube by its eight-digit serial beginning68 through FTDI;
-there is no COM-port dependency. Kinesis1.14.60.27990 .NET Framework assemblies
-are loaded lazily using Python.NET3.1 on Python3.12.7 x64. Cube firmware1.0.7
-repaired the old hardware-info serialMISMATCHED_ID versus descriptorCONTROLLER_A mismatch.
-No software serial alias was added. Installed supply/wiring details not observed
-remain incomplete in the bench record.
-
-The SDK namespace is `Thorlabs.MotionControl.KCube.SolenoidCLI`; exact members
-come from the installed KSC101-specific .NET API/help, not a different motion
-controller's trigger example. Official references:
-[Kinesis distribution](https://www.thorlabs.com/software-pages/Motion_Control),
-[Thorlabs Python examples](https://github.com/Thorlabs/Motion_Control_Examples/tree/main/Python),
-[KSC101 manual HA0368T RevD, sections3-4](https://media.thorlabs.com/contentassets/e92d618c92c94cea9096b3f231859611/etn017648-d02.pdf),
+Official references: [Kinesis](https://www.thorlabs.com/software-pages/Motion_Control),
+[vendor examples](https://github.com/Thorlabs/Motion_Control_Examples/tree/main/Python),
+[KSC101 manual sections3-4](https://media.thorlabs.com/contentassets/e92d618c92c94cea9096b3f231859611/etn017648-d02.pdf),
 [KEH3 manual section4.3](https://media.thorlabscms.cn/globalassets/items/k/ke/keh/keh3/doc-103012.pdf?v=0129060351).
-Static excerpts/checksums and bench investigations are preserved in the archive.
 
-KCubeShutter has no Ethernet argument/property/path. A private shared Kinesis
-implementation supplies lifecycle/getters/setters to USB cubes and hub-owned
-channels; ShutterHub owns all network endpoint selection and command dispatch.
-Only explicit documented KEH3 cube endpoints are accepted; no KEH6 network map
-or hub IP/firmware configuration is introduced.
+## Transport and feedback
 
-## Communication and feedback
-
-| Operation | SDK contract |
+| Operation | Contract |
 | --- | --- |
-| Discovery | KCubeShutter filters FTDI USB entries; ShutterHub registers LAN entries, builds once, polls CheckForConnectionChanges for asynchronous identities, and filters TCPIP/comspec per slot |
-| LAN range discovery | ScanEthernetRange(start, end, 40303, open_timeout_ms) finds host addresses; register their KEH3 ports40304–40307 and poll matching type68 TCPIP identities. Default inclusive range192.168.1.0–255, maximum256 addresses; no retained process handles |
-| Connect | CreateKCubeSolenoid, Connect, settings initialization, StartPolling, identity check; no operating-feedback request |
-| USB health | IsConnected true, USBConnected Connected or Connecting, CommsStatus OK |
-| Ethernet health | ShutterHub owns endpoint/provider checks; its network channel requires IsConnected and CommsStatus OK |
-| Status | RequestStatus, RequestOperatingMode, RequestOperatingState, optional trigger request, then cached getters |
-| Identity | GetDeviceInfo; identify_device does not invoke the SDK's flashing IdentifyDevice operation |
-| Release | Attempt StopPolling then Disconnect even when stopping polling fails |
+| USB | KSC101 eight-digit68 serial, FTDI transport; no COM port |
+| KEH3 Ethernet | Hub40303; left/middle/right40304/40305/40306; USB OUT40307; exact TCPIP endpoint/provider required |
+| Discovery | Register LAN entries, BuildDeviceList once, refresh CheckForConnectionChanges, enumerate type68 identities |
+| Range scan | ScanEthernetRange(start,end,40303,open_timeout_ms) returns host-address strings; bounded inclusive range; no owned handles |
+| Connect | CreateKCubeSolenoid, Connect, settings initialization, StartPolling, GetDeviceInfo identity validation; no output/mode writes |
+| USB health | IsConnected plus USBConnected Connected/Connecting and CommsStatus OK |
+| LAN health | IsConnected, CommsStatus OK and exact TCPIP endpoint/provider |
+| Feedback | RequestStatus/OperatingMode/OperatingState, optional trigger request/wait, then named getters |
+| Identity | GetDeviceInfo; no display-flashing IdentifyDevice call |
+| Release | Attempt StopPolling and Disconnect even if stopping polling fails |
 
-Headless USB can remain Connecting while IsConnected/CommsStatus and actual reads
-work; Connecting alone is never accepted as readiness. Disconnected/unknown or
-communication errors fault the wrapper. Operating modes normalize Manual/SingleToggle/
-AutoToggle/Triggered to manual/single/auto/triggered. Operating state0 is undefined and reported as unknown; it is never treated as Inactive. A request/wait does not establish cache age.
-get_status() includes operating/TTL readback; get_operating_status() requests
-only operating feedback, and get_trigger_config() requests only TTL settings.
-get_cached_status() performs no I/O and is for display only, never output
-authorization. GUI actions explicitly read selected-panel feedback after commands;
-periodic refresh updates operating feedback while TTL settings are labelled last read.
+Connecting alone is insufficient readiness. Undefined operation0 is unknown.
+Operating modes normalize Manual/SingleToggle/AutoToggle/Triggered to
+manual/single/auto/triggered. A request/wait does not establish cache age.
+Cached snapshots are for display, not output authorization.
 
-## Key and physical interlock
+## Commands and physical interlock
 
-The manual describes a current-carrying physical interlock separately from the
-key enable switch. SDK header bit0x1000 is treated as a positive interlock
-indication; a clear bit is **unknown**, not a proven disabled physical circuit.
-Four human-labelled Auto-mode tests showed0x2000 when key enabled and0 when key
-disabled, with no jack-related difference. No replacement mask or independent
-software jack-continuity report was established.
+Open/Close request Active/Inactive only; enable and mode are preserved. Explicit
+EnableDevice enables the channel. Disarm requests Inactive then Manual. Setters
+return None without readiness reads, sleeps or verification; SDK exceptions latch
+faults. Close/release remain available after faults. Shutdown requests Close and
+releases without independently proving closure.
 
-`confirm_interlock(serial)` records verified normal physical circuit/protection
-for the explicitly selected object/serial before connection. It performs no SDK
-or hardware write, clears on retargeting, and does not transfer to another object
-or process. It contributes only to informational interlock_ready metadata; it
-does not authorize output or override key/identity/communication checks. Raw bits and
-interlock_enabled remain separate from operator_interlock_confirmed/interlock_ready.
-These values remain available to Python callers. GUI Open/Arm do not gate on
-interlock feedback or confirmation; users manage the physical interlock externally.
-
-## Outputs and timing
-
-Close: SetOperatingState(Inactive) only; operating mode is preserved.
-Open: SetOperatingState(Active) only; operating mode and enable state are preserved.
-Enable: explicit enable_device() -> EnableDevice. Disarm: Inactive -> Manual.
-Setters return None and perform no prerequisite/status requests, feedback waits,
-readback or automatic recovery. SDK write errors latch a fault. The caller owns
-readiness and verification; the GUI performs explicit reads outside the setter.
-A returned setter call cannot prove Inactive was applied before the next write.
-Shutdown sends Close then releases; it does not verify physical closure.
-
-Default polling/getter wait250ms; GUI refresh request1s. Native calls may block.
-Setters have no programmed wait or feedback timeout. Settings initialization uses
-the configured timeout. Host waits and snapshots are not optical measurements.
+Key feedback is separate from the physical interlock. Status bit0x1000 is a positive
+interlock indication; a clear bit stays unknown. The recorded jack/key matrix did
+not establish a software continuity signal. Users manage the physical circuit;
+GUI Open/Arm do not use interlock feedback as a gate.
 
 ## TRIG1/TRIG2
 
-| Contract | Exact members |
+| Item | Vendor members |
 | --- | --- |
-| Settings | RequestTriggerConfigParams/GetTriggerConfigParams/SetTriggerConfigParams |
+| Read/write | RequestTriggerConfigParams/GetTriggerConfigParams/SetTriggerConfigParams |
 | Properties | Trigger1Mode/Trigger1Polarity/Trigger2Mode/Trigger2Polarity |
-| Direction enums | Disabled=0, TrigIN_GPI=1, TrigOUT_GPO=10 |
-| Polarity enums | TriggerHigh=1, TriggerLow=2 |
-| Arm | EnableDevice, Triggered, Active; no implicit readback |
-| Disarm | Inactive then Manual commands; Close alone preserves mode; no implicit readback |
+| Directions | Disabled=0, TrigIN_GPI=1, TrigOUT_GPO=10 |
+| Polarity | TriggerHigh=1, TriggerLow=2 |
+| Arm | EnableDevice, Triggered, Active |
+| Disarm | Inactive, Manual |
 
-The GUI checks Closed/Inactive/Manual before Apply and Arm and reads back Apply
-settings. Arm enables the channel, selects Triggered and sends Active. The main
-Trigger Start instead preserves enable state/mode and sends only Active, after
-Inactive/Closed feedback and an actual input-settings read. Both require a key
-enabled indication. Direct API setters do not
-perform those application checks. The hardware manual describes5V
-TTL and a disconnected input as LOW; active-low priming can open with no cable.
-The driver reports configuration/priming, not measured pin voltage or raw edges.
-No explicit PersistSettings/EEPROM call is made; power-cycle persistence has not
-been measured. E082 tested configuration/priming/Disarm on actual USB hardware
-with both ports disconnected. Each input/high stayed Closed, but input/low also
-stayed reported Closed despite Triggered/Active and matching settings after a
-bounded read window. This fails the manual-based Open expectation; cause remains
-unknown. A separate Manual Open/Close control passed. Settings were restored and
-handles released. [Raw-result index](../records/ttl-summary.json). External edges,
-output voltage and independent physical/timing behavior remain unqualified;
-the active-low safety warning still applies.
+GUI Apply/Arm require Closed/Inactive/Manual; Apply checks readback and Arm reads
+actual input settings. Main Trigger Start preserves mode/enable state and requires
+Inactive/Closed plus key/input feedback. Driver methods perform no such reads.
+The manual describes5V TTL and disconnected input LOW; active-low can open without
+a cable. Electronic no-cable low-position expectations failed on both ports; no
+workaround is applied. No explicit EEPROM persistence call is made, and power-cycle
+persistence, pin voltage/edges and optical timing remain unmeasured.

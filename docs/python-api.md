@@ -3,314 +3,144 @@
 [README](../README.md) | [Architecture](architecture.md) | [Interface](INTERFACE.md)
 
 Exports: KCubeShutter, ShutterHub, ShutterStatus, TriggerConfig, ShutterError,
-LanDevice and LanDiscovery.
-Import/construction is passive. SDK loading occurs on explicit discovery/connection.
-`KCubeShutter` accepts USB devices only. Ethernet endpoints belong to `ShutterHub`.
+LanDevice and LanDiscovery. Imports/construction are passive. KCubeShutter is USB
+only; ShutterHub owns slots and Ethernet. Use hub methods for owned network channels.
 
 ## Construction
 
-`hub.discover_available()` returns `(routes, warnings)` for unified discovery:
-`routes` maps serials to LAN endpoints, or None for USB. It combines USB discovery,
-configured routes and one config-based LAN scan without changing any slot route
-or connecting a device. A failed/skipped transport returns a warning while other
-results remain available. GUI Discover uses this method; Connect configures the
-selected detected route. The separate scan and explicit-route APIs below remain
-available to Python callers.
-
-For unknown LAN addresses, use `ShutterHub.scan_lan(start_address, end_address)`.
-Defaults are `192.168.1.0` and `192.168.1.255`, inclusive, limited to 256 addresses.
-The optional `open_timeout_ms` is an integer 50–1000 (default 100). Kinesis scans
-hub port 40303, registers discovered hosts' documented cube ports 40304–40307,
-builds once and polls asynchronous TCPIP identities for the controller timeout.
-Native calls may exceed that deadline. All process-owned handles must be released.
-It returns `LanDiscovery(hub_addresses, controllers)`; each `LanDevice` has
-`serial_number` and `endpoint`. Only type-68 serials with matching TCPIP routes
-are returned. It sends discovery probes without calling a cube's Connect or
-writing output/operating settings; existing slot routes stay unchanged. SDK manual
-registrations remain in the process device manager.
-
-Omitted/None start, end and timeout arguments read `config.LAN_SCAN_START_IP`,
-`LAN_SCAN_END_IP` and `LAN_SCAN_OPEN_TIMEOUT_MS` when called; explicit arguments
-override them. `LAN_SCAN_MAX_ADDRESSES` sets the limit for every scan (integer
-1..256, default 256). Invalid configured values fail before SDK loading or scans.
-
 ```python
-from thorlabs_shutter_control import ShutterHub
+from thorlabs_shutter_control import KCubeShutter, ShutterHub, config
 
-hub = ShutterHub(slots=1)
-result = hub.scan_lan()  # Explicit network discovery; no output command.
-print(result.hub_addresses)
-for device in result.controllers:
-    print(device.serial_number, device.endpoint)
-# Choose a result explicitly before configuring a slot or connecting.
-```
-
-```python
-from thorlabs_shutter_control import KCubeShutter, config
-
-# Set SERIAL_NUMBERS in config.py first.
 c = KCubeShutter(config.SERIAL_NUMBERS[0], timeout=5.0, polling_ms=250)
+hub = ShutterHub(slots=3)  # Empty, unselected panels; no discovery or connection.
 ```
 
-| Argument | Contract |
-| --- | --- |
-| serial_number | Optional eight-digit KSC101 serial starting68, as str or int; normalized to str internally; changing an owned target is refused |
-| kinesis_dir | Optional SDK path; otherwise `config.KINESIS_DIR` (no environment lookup) |
-| timeout | Finite0.5..60s, at least two polling intervals; settings initialization and ShutterHub asynchronous LAN identity polling; native calls are not bounded |
-| polling_ms | Integer100..1000ms; default250 |
+Serials are eight digits beginning68, as strings or integers; internally they are
+strings. None means unselected. timeout is finite0.5..60s and at least two polling
+intervals; polling_ms is an integer100..1000. kinesis_dir defaults to config.KINESIS_DIR.
+timeout applies to settings initialization and asynchronous LAN identity polling,
+not to a blocking native call or total address-range scan.
 
-Optional `confirm_interlock(serial)` requires the same explicitly selected serial
-and no retained handle.
-It is object/serial scoped, survives ordinary reconnect within that session,
-clears on retargeting and does not transfer to another object/process. It changes
-no hardware interlock setting. Positive SDK indication or this explicit evidence
-is informational metadata. No project command or example gates on interlock
-feedback or confirmation. Users manage the physical interlock externally; the GUI
-checks identity/communication, key and operating feedback.
+ShutterHub accepts serial_numbers, slots, kinesis_dir and ethernet_endpoints.
+Default slots: max(3, serial count) for USB, or max(serial count, endpoint count)
+when routes are supplied. An explicit positive count must fit both lists.
+None endpoints select USB; LAN endpoints must be IPv4:40304..40307 for KEH3.
+Distinct USB controllers may be injected with controllers= for embedded/test use,
+without other hub options. Network channels belong to their creating hub.
 
 ## Connection and manual control
 
-`connect()` initializes communication/polling and verifies the selected identity.
-Its returned snapshot contains connection metadata, not newly requested operating
-feedback. Use a getter when you need that feedback. Undefined operating state `0`
-is reported as `unknown`; it does not prevent connection or imply Inactive.
+Connect discovers and verifies identity without enabling or changing outputs.
+Its returned snapshot is connection metadata; explicitly request operating feedback.
+Hub connect(slot, serial) requires a selected serial; slots are zero-based.
 
 ```python
 verified = False
 try:
-    status = c.connect()
+    c.connect()
     verified = True
     print(c.identify_device())
+    c.disarm_triggers()  # Explicit Inactive, then Manual commands.
+    if not c.get_operating_status().is_closed_manual:
+        raise RuntimeError("Expected Closed/Inactive/Manual before Enable.")
+    c.enable_device()
+    c.open_shutter()
+    print(c.get_shutter_state())
     c.close_shutter()
     print(c.get_shutter_state())
 finally:
     c.disconnect(close_shutter=verified)
 ```
 
-The example authorizes normal output cleanup for the selected bench. For a purely
-passive diagnostic use disconnect(close_shutter=False), which leaves output/mode
-unchanged. Do not substitute safe_shutdown for communication-only release.
+This example operates hardware and assumes approved conditions/source protection.
+For communication-only checks, disconnect(close_shutter=False) releases without
+Close or mode changes. Do not replace it with safe_shutdown.
 
-| Method | Behavior |
+| Method | Contract |
 | --- | --- |
-| discover() | Return KSC101 identities; no Connect or output command |
-| connect(serial_number=None) | Discover/select, claim serial, initialize settings/polling and verify identity; return metadata without operating-feedback requests |
-| identify_device() | Return serial_number/description from GetDeviceInfo; no display-flashing IdentifyDevice call |
-| get_status() | Fresh full operating/TTL snapshot; read failures latch a fault |
-| get_operating_status() | Fresh operating/safeguard feedback only; no TTL settings requests |
-| get_trigger_config() | Fresh TTL settings only; no operating-status requests |
-| get_cached_status() | Last display observation without I/O; current fault/disconnection takes precedence |
-| close_shutter() | Send Inactive only; preserve mode; return None |
-| open_shutter() | Send Active only; preserve mode/enable state; return None |
-| enable_device() | Explicit SDK channel enable; no mode/state command or feedback; return None |
-| set_operating_state(state) | Send active or inactive only; return None |
-| set_operating_mode(mode) | Send manual, single, auto or triggered only; return None |
-| get_shutter_state() | Request position only: open, closed or unknown |
-| get_operating_state() | Request operation only: active, inactive or unknown |
-| get_operating_mode() | Request mode only: manual, single, auto, triggered or unknown |
-| get_status_bits() | Request raw status bits only |
-| disconnect(close_shutter=True) | Request Close then release; False releases communication only |
-| safe_shutdown() | Best-effort Close command and release; no closure readback |
+| discover() | Return matching KSC101 serials; no Connect/output |
+| connect(serial_number=None) | Use explicit/preselected serial or the sole discovered USB device; validate identity and retain ownership |
+| identify_device() | Read serial/description; does not flash the device display |
+| get_status() | Fresh full operating/TTL snapshot |
+| get_operating_status() | Fresh operating/key/interlock snapshot without TTL settings |
+| get_cached_status() | Last observation without I/O; current fault/disconnection takes precedence |
+| get_shutter_state(), get_operating_state(), get_operating_mode(), get_status_bits() | Request the named feedback only |
+| open_shutter(), close_shutter() | Request Active/Inactive only; preserve mode/enable state |
+| enable_device() | Explicit channel enable |
+| set_operating_state(state) | active or inactive |
+| set_operating_mode(mode) | manual, single, auto or triggered |
+| disconnect(close_shutter=True) | Attempt Close when requested, then communication release |
+| safe_shutdown() | Close/release without closure readback |
 
-**Setters send commands. Getters request feedback.** Setters perform no status
-requests, prerequisite reads, sleeps, retries, result readback or automatic
-recovery. They validate arguments and the locally retained handle/fault state,
-then issue vendor writes. Repeated calls send repeated commands. Native SDK calls
-can still block or raise. Successful return means only that the SDK call returned.
+Setters return None, invalidate display observations and perform no prerequisite
+reads, sleeps, retries, readback or automatic recovery. SDK errors latch faults.
+Callers own readiness, sequencing and verification; the GUI performs explicit
+application checks. Close/release remain available after faults. Native calls can
+block. A returned command does not establish physical state.
 
-```python
-c.disarm_triggers()  # Explicit Inactive/Manual preparation.
-baseline = c.get_operating_status()
-if not baseline.is_closed_manual:
-    raise RuntimeError("Expected Closed/Inactive/Manual before Enable.")
-c.enable_device()  # Explicit setup once when needed.
-c.open_shutter()  # Active only; returns None.
-print(c.get_shutter_state())  # Separate position request/read.
-c.close_shutter()  # Write, returns None.
-print(c.get_operating_status())  # Explicit operating snapshot if wanted.
-```
+The context manager connects on entry and attempts safe_shutdown on exit. Failed
+entry performs passive connection cleanup; failed release retains the object/claim.
 
-Active follows the selected mode: Manual opens, Single starts one cycle, Auto
-starts cycling, and Triggered primes trigger behavior. Inactive requests closure
-without selecting Manual. Use explicit mode setup when needed; Open/Close never
-repeat EnableDevice. The GUI uses Open/Close in Manual and Start/Stop in Single/Auto/Trigger,
-assuming an enabled controller. Mode selection requires Inactive/Closed feedback;
-Trigger Start reads the actual input settings. Arm remains a compound Enable/Triggered/Active command. See the
-[official KSC101 example](https://github.com/Thorlabs/Motion_Control_Examples/blob/main/Python/Kinesis/KCube/KSC101/KSC101_pythonnet.py),
-which enables once during setup before toggling Active/Inactive.
+## Status and TTL
 
-Direct API callers own sequencing, physical interlocks and any required
-verification. Hardware interlocks remain intact. The GUI performs its own explicit
-readiness reads and reads the selected panel again after commands. Setters clear
-cached observations; a sent command never fabricates a successful observation.
-Getter snapshots normalize undefined operating enums to `unknown`. Communication
-and SDK exceptions still latch faults; Close remains available after faults.
-
-Context manager: entering calls connect, exiting attempts safe_shutdown after the
-body, including body errors. A failed __enter__ does not run __exit__; connect
-itself attempts passive release and retains the object/claim on failed release.
-For identity-gated output cleanup on partial connections, see the staged helpers.
-
-## Status
-
-ShutterStatus is immutable. All values are SDK feedback, not independent sensing.
-
-| Field/property | Meaning |
-| --- | --- |
-| connection | disconnected, connected or fault |
-| has_device | Retained SDK handle, independent of communication health |
-| serial_number / description | Selected identity / vendor description |
-| shutter_state | open, closed or unknown |
-| operating_state | active, inactive or unknown |
-| operating_mode | manual, single, auto, triggered or unknown |
-| key_enabled | bool or None |
-| interlock_enabled | True for documented positive SDK bit, None when unverified/unavailable; clear does not prove physically disabled |
-| status_bits | Raw SDK integer or None |
-| operator_interlock_confirmed | Separate session verification for selected serial |
-| interlock_ready | Healthy connection and positive indication, or operator evidence when reading is None; known False is not overridden |
-| trigger_config | TriggerConfig or None |
-| ttl_armed | True for Triggered/Active, False for Manual or Inactive, otherwise None |
-| error | Latched diagnostic or None |
-
-Faulted snapshots invalidate operating/TTL values. Identity and handle information
-can remain available; release without known closure never claims physical Closed.
-
-## TRIG1/TRIG2 TTL
+ShutterStatus is immutable. It includes connection, has_device, serial_number,
+description, shutter_state, operating_state, operating_mode, key_enabled,
+interlock_enabled, trigger_config, error and status_bits. Undefined enums normalize
+to unknown. A clear interlock bit is unknown; users verify the physical circuit.
+is_closed_manual summarizes Closed/Inactive/Manual. ttl_armed reflects reported
+Triggered/Active, not position. Feedback is not independent optical sensing.
 
 ```python
 from thorlabs_shutter_control import TriggerConfig
 
-c.disarm_triggers()
-config = TriggerConfig(
+settings = TriggerConfig(
     trig1_mode="input", trig1_polarity="high", trig2_mode="disabled", trig2_polarity="high"
 )
-c.configure_triggers(config)
+c.configure_triggers(settings)
 print(c.get_trigger_config())
 ```
 
-This changes configuration; it requires a separately approved TTL setup.
-TriggerConfig is immutable, with modes disabled/input/output and polarity high/low.
-Defaults: TRIG1 input/high, TRIG2 output/high. Construction alone writes nothing.
+Directions: disabled/input/output. Polarity: high/low. configure_triggers only
+writes; get_trigger_config reads. arm_triggers explicitly enables, selects
+Triggered and requests Active; disarm_triggers sends Inactive then Manual.
+These direct methods do not read readiness. Arm may open immediately; see
+[GUI prerequisites](gui.md#trigger-settings) and [hardware limits](hardware.md).
 
-`configure_triggers(config)` sends the validated port settings and returns None.
-`get_trigger_config()` separately requests those settings. No automatic matching,
-retry, prerequisite read or EEPROM persist occurs in the setter.
-`arm_triggers()` sends Enable, Triggered, Active and returns None.
-`disarm_triggers()` explicitly sends Inactive then Manual. Close alone preserves
-the operating mode.
-Callers must establish the intended baseline, input configuration and readiness
-before Arm; the GUI and hardware lessons do this explicitly. Armed does not mean
-Open; an inactive input may leave the blade Closed.
-Active input/active-low with a disconnected LOW input may open immediately.
-No raw input-voltage measurement or calibrated pulse generation is provided.
+## Hub discovery and routing
 
-## Multiple controllers
+discover_available() returns (routes, warnings): serial -> endpoint, None for USB.
+It combines USB, configured-route discovery and one config-based LAN scan. Failed
+transports warn without hiding successful results. It changes no slot route.
+discover() returns a flat list for configured routes; discover_by_slot() groups
+matching lists after one discovery. Snapshots can omit retained handles; GUI
+identity/cleanup retention is separate.
+
+scan_lan(start_address=None, end_address=None, open_timeout_ms=None) uses
+config.LAN_SCAN_START_IP/END_IP/OPEN_TIMEOUT_MS when omitted. Explicit arguments
+override those defaults; LAN_SCAN_MAX_ADDRESSES limits every scan to1..256.
+Bounds must be IPv4 strings in ascending order; timeout is an integer50..1000ms.
+The SDK scans hub port40303, registers hosts' KEH3 ports40304..40307, builds once
+and refreshes asynchronous TCPIP identities. Result: LanDiscovery(hub_addresses,
+controllers), with LanDevice(serial_number, endpoint). No device Connect/output
+occurs. Release all process-owned handles before broad scanning.
+
+configure_slot(slot, ethernet_endpoint=endpoint) passively selects a LAN route;
+omitting the endpoint selects USB. A changed route replaces only a released
+channel, clears its serial and retains SDK folder/timeout/poll settings. Same
+route is a no-op. Failed-release handles forbid replacement. The endpoint tuple
+is read-only. There is no transport fallback or inferred KEH6 LAN mapping.
+
+Hub command/getter methods take slot first; their device contracts match the table
+above. safe_shutdown attempts every slot, aggregates failures and preserves
+interrupts after cleanup attempts. Successful communication release is not closure.
+
+## Embedded GUI
 
 ```python
-from thorlabs_shutter_control import ShutterHub
+from thorlabs_shutter_control.gui import create_app
 
-hub = ShutterHub(["68000001", "68000002", "68000003"])  # Fictional example IDs.
-# Supply actual distinct identities and verify each physical interlock separately.
+app = create_app(hub)  # A ShutterHub is required, including for one panel.
 ```
 
-ShutterHub accepts `slots=N` for any positive integer. Without it, USB-only hubs
-use `max(3, len(serial_numbers))`. When endpoints are supplied the default is
-`max(len(serial_numbers), len(ethernet_endpoints))`, avoiding implicit USB slots
-in a LAN-only hub. An explicit count must fit both lists.
-Omitted serials are None; omitted endpoints are USB. `controllers=`
-accepts distinct USB KCubeShutter objects only, without other hub options.
-Network channels belong to their creating hub and cannot be injected elsewhere.
-
-For Ethernet, configure explicit per-slot endpoints on the hub:
-
-```python
-hub = ShutterHub(
-    [68000001],
-    slots=1,
-    ethernet_endpoints=["192.0.2.10:40304"],  # Replace fictional ID/address.
-)
-try:
-    hub.connect(0, 68000001)
-    print(hub.identify_device(0))
-    print(hub.get_status(0))
-finally:
-    hub.disconnect(0, close_shutter=False)  # Passive release for this read-only example.
-```
-
-`ethernet_endpoints` is a read-only tuple snapshot: an IPv4 KEH3 cube endpoint
-selects network transport; None selects USB. Only the documented cube ports
-40304..40307 are accepted. One actual KEH3/KSC101 passive LAN connection is
-validated; Ethernet output actuation remains unqualified. No KEH6 map is inferred.
-LAN-only and mixed discovery register network entries, then call `BuildDeviceList`
-before refreshing `CheckForConnectionChanges` and reading/filtering the SDK list.
-Refresh/list polling continues until all configured network routes have KSC101
-identities or the controller timeout expires (default 5 s, 100 ms between polls).
-The rebuild is not repeated while waiting. Native calls can exceed this deadline.
-The SDK rebuild is needed for TCPIP too. No USB cable is needed
-for a hub whose slots all have explicit network endpoints.
-`hub.discover_by_slot()` returns a tuple of serial lists in slot order after one
-discovery. Each list contains only identities valid for that slot's USB or exact
-TCPIP route. These API results are discovery snapshots and may omit retained
-handles; the GUI separately keeps their identities and cleanup visible until
-released. `hub.discover()` still returns the combined flat list.
-
-`hub.configure_slot(slot, ethernet_endpoint="192.0.2.10:40304")` passively changes
-a released slot to LAN; `hub.configure_slot(slot)` selects USB. Endpoints use the
-same validation as construction. A retained handle, including a failed release,
-rejects changes. A changed route gets a fresh channel with no preselected serial;
-SDK folder, timeout and polling settings are retained. No SDK load, discovery,
-output command or automatic disconnect occurs. Configuring the same route is a
-no-op. The GUI uses this method to apply a detected route on **Connect**.
-
-Hub methods use a zero-based slot first: `open_shutter(slot)`,
-`close_shutter(slot)`, `set_operating_state(slot, state)`,
-`set_operating_mode(slot, mode)`, `configure_triggers(slot, config)`,
-`arm_triggers(slot)`, `disarm_triggers(slot)`, `enable_device(slot)`, and
-`confirm_interlock(slot, serial)`.
-Setters return None with no operating feedback request/wait/readback. Network
-writes check local SDK routing metadata first; a changed endpoint/provider faults
-and refuses ordinary output commands. Close/Inactive still attempts the retained
-handle for cleanup. Commands never rebind a handle or fall back to USB.
-
-Read methods also take a slot: `get_shutter_state`, `get_operating_state`,
-`get_operating_mode`, `get_status_bits`, `get_trigger_config`, `get_status`,
-`get_operating_status`, `get_cached_status`, and `identify_device`.
-Discovery registers the selected endpoints, builds one list and filters matching
-transports. Connect requires an explicit serial matching that slot's route.
-USB KCubeShutter discovery filters FTDI entries even after network registration.
-The normal launcher supports USB/LAN/mixed configuration and on-screen selection;
-`create_app(hub)` also accepts an explicitly configured network hub.
-Use hub methods for network lifecycle/commands rather than its internal channels.
-
-hub.safe_shutdown attempts every controller despite ordinary errors/interrupts,
-then aggregates errors by slot/serial. A native hang can block later attempts.
-The hub lock serializes GUI actions/snapshots; each driver also serializes calls.
-
-A GUI built from `ShutterHub`, including a one-slot hub, requires a selected
-serial for Connect. The direct `create_app(KCubeShutter(...))` convenience form
-retains the driver's optional-serial connection behavior.
-
-## Shutdown and faults
-
-Faults latch until successful release/reconnect. Close may succeed while the old
-fault remains. A failed Disconnect keeps the SDK handle and serial ownership
-claim; retain the same controller for diagnosis, rather than creating another owner.
-StopPolling failure does not skip Disconnect. Cleanup failures raise ShutterError;
-interruptions propagate after remaining cleanup attempts and include diagnostics.
-
-Separate process ownership is an operator responsibility. The launcher shutdown
-button and normal CLI Ctrl+C call hub cleanup; browser closure, forced process
-kill and USB/power loss do not provide
-that guarantee. Physical recovery and optical closure must be independently defined.
-
-Ethernet is described in the [qualification note](ethernet-assessment.md). Actual
-single-pair evidence and limits are in [hardware-validation.json](../records/hardware-validation.json).
-
-## Owned GUI shutdown
-
-`create_app(controller=None, *, on_shutdown=None)` builds the Dash application.
-The launcher supplies a nonblocking stop notification, exposing **Shut down GUI &
-devices**. The action calls hub.safe_shutdown first and signals its owner only on
-success. On failure the GUI shows diagnostics and keeps the host available.
-Embedded apps omit the button by default and retain host-server ownership.
-Closing the server releases SDK connections; it does not switch off hardware power.
+The host owns its server and cleanup. An optional on_shutdown callback enables
+cooperative server shutdown after successful hub cleanup; it must not block.

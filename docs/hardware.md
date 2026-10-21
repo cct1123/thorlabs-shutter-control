@@ -1,52 +1,39 @@
-# Hardware configuration and evidence
+# Hardware and evidence
 
-[README](../README.md) | [Interface](INTERFACE.md) | [Acceptance procedure](HARDWARE_VALIDATION.md)
+[README](../README.md) | [Commissioning](HARDWARE_VALIDATION.md) | [Ethernet](ethernet-assessment.md)
 
-![KSC101 controller and SH05R shutter](assets/ksc101-sh05r.webp)
+KSC101 drives an SH05R shutter through manufacturer-approved supply, wiring and
+physical interlock. USB addresses individual cube serials directly or through
+KEH3/KEH6 USB hubs. KEH6 and multiple real pairs are not qualified here; software
+panel count does not establish electrical/power capacity or simultaneous timing.
+Power down before redocking or changing shutter/interlock wiring.
 
-Manufacturer product photo: [Thorlabs](https://www.thorlabs.com/optical-shutters);
-illustrates the device pair, not the test bench.
+![Manufacturer KSC101/SH05R photo](assets/ksc101-sh05r.webp)
 
-Published identities below are aliases. Historically tested branch: computer USB -> KEH3 left bay -> KSC101 (alias CONTROLLER_A) -> SH05R.
-The cube reports hardware3, firmware1.0.7. Kinesis1.14.60.27990 with the FTDI USB
-interface is used on Windows x64/Python3.12.7. No COM port is assigned.
+[Photo source](https://www.thorlabs.com/optical-shutters); not a test-bench image.
 
-USB identity/status/reconnect, Open/Close and normal shutdown have actual bench
-readback evidence. The user independently confirmed the five-cycle SDK sequence.
-The earlier GUI was exercised in the real browser without a new physical
-observer. Current modern styling, mode selection and launcher shutdown have
-software-only validation; changed command paths require bench requalification. Readback, human observation and calibrated timing remain
-separate evidence. See [results](../records/hardware-validation.json).
+## Retained observations
 
-Three-pair operation, electrical TTL response, physical fault injection and
-calibrated exposure/shutdown timing remain unvalidated. Later E128 / TEST-138
-passed one KEH3/KSC101 explicit-endpoint LAN discovery, identity, Connect and
-communication-only release. Historical hub-only results preceded the corrected
-asynchronous SDK discovery path. Live range scanning, current LAN GUI operation,
-Ethernet actuation and timing remain untested. See [LAN evidence](ethernet-assessment.md).
+[hardware-evidence.json](../records/hardware-evidence.json) consolidates observations
+with their original revision/configuration scope. It is not a current calibration.
 
-Use manufacturer-approved supply, docking, cabling and shutter compatibility.
-Power down before changing interlock/shutter wiring. Do not infer installed
-supply rating or pin voltage from software success. Unmeasured fields remain
-explicitly incomplete in [the bench record](../records/hardware-bench.json).
+| Observation | Scope |
+| --- | --- |
+| USB identity/status/reconnect and five Open/hold/Close cycles | Electronic feedback passed; user confirmed the physical sequence on the recorded revision |
+| GUI and shutdown | Browser/USB readback and communication release passed on recorded revisions; independent shutdown timing unmeasured |
+| KEH3 explicit-endpoint Ethernet | One KSC101 discovery/identity/Connect/passive release passed; no output command in that test |
+| LAN notebook | User reports success; preserved output reports discovery, identity, Open/Close feedback and release |
+| No-cable TTL | Configuration/priming/Disarm passed; both active-low Open expectations failed with reported Closed; cause unknown |
 
-Primary references: [KSC101 manual, HA0368T RevD](https://media.thorlabs.com/contentassets/e92d618c92c94cea9096b3f231859611/etn017648-d02.pdf)
-(sections3-4 for setup, physical interlock, key and modes), and
-[KEH3 manual, DOC-103012, section4.3](https://media.thorlabscms.cn/globalassets/items/k/ke/keh/keh3/doc-103012.pdf?v=0129060351)
-for hub connections and Ethernet endpoint mapping. Their instructions describe
-equipment requirements, not additional operating authorization.
+## Current limits
 
-## KEH6 and larger USB installations
+Current source changes need affected USB/GUI/cleanup bench requalification.
+Live LAN range scans, Ethernet actuation/timing/recovery, KEH6/multiple actual
+pairs, external electrical TTL signals, physical communication-loss recovery and
+calibrated optical/exposure/shutdown timing remain unqualified. Controller
+readback and API call durations do not independently establish blade position.
+Software cleanup cannot bound a blocking native call; use independent protection.
 
-The [KEH6](https://www.thorlabs.com/item/KEH6) provides six cube bays; Thorlabs also
-describes USB OUT hub linking in its [hub overview](https://www.thorlabs.us/newgrouppage9.cfm?objectgroup_ID=16708).
-Software addresses each KSC101 serial through Kinesis and does not detect or
-restrict a USB hub model. KEH6 USB compatibility is therefore expected, not a new
-bench result. Existing USB evidence is one KSC101/SH05R on KEH3 only.
-
-Set `SLOTS` in project `config.py`, or configure enough distinct
-`SERIAL_NUMBERS` to expand the default beyond three. No app-defined count cap is imposed. Installed cube count must respect
-actual hub/power/USB limits; increasing N also increases sequential refresh and
-cleanup latency. Six/nine-device software tests do not qualify physical power,
-connections, timing or optical operation. Ethernet maps in the separate guide
-are KEH3-specific; KEH6 LAN endpoints have not been qualified or generalized.
+Physical acceptance requires documented topology, exact local identities/versions,
+approved conditions and independent observations. Keep raw bench data and executed
+notebook results in ignored inputs/private; publish sanitized summaries only.
