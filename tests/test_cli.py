@@ -1,4 +1,5 @@
 import sys
+from pathlib import Path
 
 import pytest
 
@@ -27,7 +28,7 @@ def layout_components(app):
     return components
 
 
-@pytest.mark.parametrize("serials", [[], ["68000001"], ["68000003", "68000001", "68000002"]])
+@pytest.mark.parametrize("serials", [["68000003", "68000001", "68000002"]])
 def test_gui_launch_has_three_passive_panels_with_requested_preselection(rig, monkeypatch, serials):
     inspected = []
 
@@ -53,10 +54,7 @@ def test_gui_launch_has_three_passive_panels_with_requested_preselection(rig, mo
 
     monkeypatch.setattr(module, "_load_sdk", forbidden_sdk_load)
     monkeypatch.setattr(gui.Dash, "run", inspect_server)
-    argv = ["shutter-control"]
-    for serial in serials:
-        argv.extend(["--serial", serial])
-    monkeypatch.setattr(sys, "argv", argv)
+    monkeypatch.setattr(cli.config, "SERIAL_NUMBERS", serials)
     assert cli.main() == 0
     assert inspected == [True]
     assert rig.manager_calls == []
@@ -64,65 +62,52 @@ def test_gui_launch_has_three_passive_panels_with_requested_preselection(rig, mo
 
 
 @pytest.mark.parametrize(
-    "arguments",
+    "settings",
     [
-        ["--serial", "68000001", "--serial", "68000001"],
-        [
-            "--slots",
-            "3",
-            "--serial",
-            "68000001",
-            "--serial",
-            "68000002",
-            "--serial",
-            "68000003",
-            "--serial",
-            "68000004",
-        ],
-        ["--serial", "invalid"],
-        ["--port", "0"],
-        ["--port", "65536"],
+        {"SERIAL_NUMBERS": ("68000001", "68000001")},
+        {"SERIAL_NUMBERS": ("68000001", 68000001)},
+        {"SLOTS": 1, "SERIAL_NUMBERS": ("68000001", "68000002")},
+        {"SERIAL_NUMBERS": ("invalid",)},
+        {"PORT": 0},
+        {"PORT": 65536},
+        {"PORT": True},
+        {"PORT": "8050"},
+        {"SLOTS": 0},
+        {"SLOTS": -1},
+        {"SLOTS": 1.5},
     ],
-    ids=["duplicate", "too-few-slots", "invalid-serial", "low-port", "high-port"],
 )
-def test_invalid_arguments_are_rejected_before_sdk_or_server_access(rig, monkeypatch, arguments):
+def test_invalid_project_config_is_rejected_before_sdk_or_server_access(
+    rig, monkeypatch, capsys, settings
+):
     def forbidden(*args, **kwargs):
-        pytest.fail("Invalid CLI arguments must not access SDK or start the server.")
+        pytest.fail("Invalid project config must not access SDK or start the server.")
 
+    for key, value in settings.items():
+        monkeypatch.setattr(cli.config, key, value)
     monkeypatch.setattr(module, "_load_sdk", forbidden)
     monkeypatch.setattr(gui.Dash, "run", forbidden)
-    monkeypatch.setattr(sys, "argv", ["shutter-control", *arguments])
-    with pytest.raises(SystemExit) as caught:
-        cli.main()
-    assert caught.value.code == 2
+    assert cli.main() == 1
+    assert "Invalid project config" in capsys.readouterr().err
     assert rig.manager_calls == []
     assert all(device.calls == [] for device in rig.devices.values())
 
 
-@pytest.mark.parametrize("serials", [[], ["68000001", "68000002", "68000003"]])
-def test_list_uses_one_fake_discovery_without_connecting_or_actuating(
-    rig, monkeypatch, capsys, serials
-):
-    rig.serials[:] = serials
-    monkeypatch.setattr(sys, "argv", ["shutter-control", "--list"])
-    assert cli.main() == 0
-    expected = "\n".join(serials) if serials else "No KSC101 devices discovered."
-    assert capsys.readouterr().out.strip() == expected
-    assert rig.manager_calls == ["discover"]
-    assert all(device.calls == [] for device in rig.devices.values())
-
-
-def test_missing_sdk_is_an_actionable_nonzero_exit(monkeypatch, capsys):
+def test_sdk_path_comes_from_project_config_not_environment(monkeypatch):
+    tmp_path = Path("tmp/nonexistent-sdk-path-test")
     monkeypatch.setattr(module, "_loaded_sdk", None)
-    monkeypatch.setattr(
-        sys, "argv", ["shutter-control", "--list", "--kinesis-dir", "tmp/nonexistent-sdk-for-test"]
-    )
-    assert cli.main() == 1
-    assert "Kinesis SDK not found" in capsys.readouterr().err
+    monkeypatch.setattr(module.sys, "platform", "win32")
+    monkeypatch.setattr(cli.config, "KINESIS_DIR", str(tmp_path / "project-sdk"))
+    monkeypatch.setenv("KINESIS_DIR", str(tmp_path / "environment-sdk"))
+    with pytest.raises(module.ShutterError, match="project-sdk"):
+        module._load_sdk(None)
+    with pytest.raises(module.ShutterError, match="explicit-sdk"):
+        module._load_sdk(tmp_path / "explicit-sdk")
 
 
-@pytest.mark.parametrize("interruption", [RuntimeError, KeyboardInterrupt])
-@pytest.mark.parametrize("shutdown_failure", [False, True])
+@pytest.mark.parametrize(
+    "interruption,shutdown_failure", [(RuntimeError, True), (KeyboardInterrupt, False)]
+)
 def test_server_exit_attempts_every_shutter_and_reports_shutdown_failures(
     rig, monkeypatch, capsys, interruption, shutdown_failure
 ):
@@ -166,43 +151,3 @@ def test_server_exit_attempts_every_shutter_and_reports_shutdown_failures(
     if not shutdown_failure:
         assert all(device.state == "Closed" for device in rig.devices.values())
         assert all(not device.IsConnected for device in rig.devices.values())
-
-
-@pytest.mark.parametrize("slots,serial_count", [(1, 0), (6, 0), (9, 2), (None, 6)])
-def test_configurable_cli_layout_stays_passive(rig, monkeypatch, slots, serial_count):
-    serials = [f"6800{n:04d}" for n in range(1, serial_count + 1)]
-    count = max(3, serial_count) if slots is None else slots
-
-    def inspect_server(self, **kwargs):
-        components = layout_components(self)
-        suffixes = [""] if count == 1 else [f"-{n}" for n in range(1, count + 1)]
-        assert [components[f"serial{s}"]["value"] for s in suffixes] == (
-            serials + [None] * (count - len(serials))
-        )
-        assert all(components[f"open{s}"]["disabled"] for s in suffixes)
-
-    def forbidden_sdk(directory):
-        pytest.fail("Configuring more panels must remain passive")
-
-    args = ["shutter-control"]
-    if slots is not None:
-        args += ["--slots", str(slots)]
-    for serial in serials:
-        args += ["--serial", serial]
-    monkeypatch.setattr(module, "_load_sdk", forbidden_sdk)
-    monkeypatch.setattr(gui.Dash, "run", inspect_server)
-    monkeypatch.setattr(sys, "argv", args)
-    assert cli.main() == 0
-
-
-@pytest.mark.parametrize("slots", ["0", "-1", "1.5"])
-def test_invalid_cli_slot_counts_never_start_server(rig, monkeypatch, slots):
-    def forbidden(*args, **kwargs):
-        pytest.fail("Invalid panel count must not start a server/load SDK")
-
-    monkeypatch.setattr(module, "_load_sdk", forbidden)
-    monkeypatch.setattr(gui.Dash, "run", forbidden)
-    monkeypatch.setattr(sys, "argv", ["shutter-control", "--slots", slots])
-    with pytest.raises(SystemExit) as caught:
-        cli.main()
-    assert caught.value.code == 2

@@ -12,41 +12,40 @@ alone does not install Kinesis or a USB driver.
 ```powershell
 uv sync --locked
 uv run --locked pytest -q -p no:cacheprovider --ignore=tests/test_sdk.py
-uv run --locked shutter-control --help
 ```
 
-These commands do not contact hardware. Default SDK location:
-`C:\Program Files\Thorlabs\Kinesis`. If different:
+These commands do not contact hardware.
+
+## Project configuration and launch
+
+Edit [config.py](../src/thorlabs_shutter_control/config.py), then launch:
 
 ```powershell
-$env:KINESIS_DIR = Read-Host 'Kinesis installation folder'
+uv run shutter-control
 ```
 
-## Hardware launch
-
-Preserve the manufacturer-approved power, docking and shutter wiring. Keep the
-source independently blocked and only one application owning each controller.
-Match discovery to the physical serial before connecting.
-
-```powershell
-uv run --locked shutter-control --list
-$env:SHUTTER_SERIAL = Read-Host 'Controller serial from local discovery'
-uv run --locked shutter-control --serial $env:SHUTTER_SERIAL --verified-interlock $env:SHUTTER_SERIAL
-```
-
-The flag records verified normal physical interlock/protection for that exact
-preselected serial in this process. It is needed for Open on this bench while
-the SDK reading is unknown; it performs no interlock write. GUI startup remains
-passive. See [current hardware evidence](../records/hardware-validation.json).
-
-| CLI option | Meaning |
+| Setting | Meaning |
 | --- | --- |
-| `--slots N` | Positive panel count; default at least three, growing to fit preselected serials |
-| `--serial SERIAL` | Preselect a panel; repeat for distinct identities; default panel count grows to fit |
-| `--verified-interlock SERIAL` | Confirm normal interlock/protection for the same preselected serial; repeat per device |
-| `--kinesis-dir PATH` | Override `KINESIS_DIR` and the default SDK location |
-| `--list` | Load the SDK and enumerate USB identities only |
-| `--port PORT` | Localhost port, default8050, accepted1..65535 |
+| `KINESIS_DIR` | SDK folder; default `C:\Program Files\Thorlabs\Kinesis` |
+| `SERIAL_NUMBERS` | Tuple of distinct serial strings or integers in panel order; empty means select in GUI |
+| `SLOTS` | Positive panel count; `None` means at least three, growing to fit serials |
+| `PORT` | Localhost port, integer 1..65535; default 8050 |
+
+For six empty panels, set `SLOTS = 6`. To preselect a controller, put its actual
+serial in `SERIAL_NUMBERS = ("your serial",)`; keep live identities out of shared
+commits. No launcher argument parsing or environment configuration is used.
+The Python API still accepts explicit constructor settings.
+
+Preserve manufacturer-approved power, docking and shutter wiring. Keep the source
+independently blocked and only one application owning each controller. Startup is
+passive: use GUI Discover/select and Connect, then verify identity and status.
+
+Users set and verify the physical interlock externally. GUI interlock feedback is
+informational and does not gate Open or Arm. Connection, key, operating feedback
+and TTL prerequisites still apply. Explicit session confirmation remains available
+through the Python API as informational metadata; project procedures do not
+gate on it.
+See [current hardware evidence](../records/hardware-validation.json).
 
 ## Troubleshooting
 
@@ -56,10 +55,10 @@ passive. See [current hardware evidence](../records/hardware-validation.json).
 | No controllers discovered | Inspect the approved USB/power arrangement and driver installation; this FTDI device need not have a COM port |
 | Identity mismatch | Stop; preserve both selected and reported serials. Firmware1.0.7 repaired the historical mismatch onCONTROLLER_A; never alias serials in code |
 | Already owned | Release the existing panel/process. A failed SDK disconnect retains its ownership claim |
-| Open disabled | Read the readiness hint: connection fault, key, unverified interlock or Triggered mode. Disarm/Close before manual Open |
+| Open disabled | Read the readiness hint: connection fault, key, unknown operating feedback or Triggered mode. Disarm/Close before manual Open |
 | Unknown operating state0 | Do not interpret it as Inactive. Preserve the report and diagnose; Close/Manual commands require separate output authority |
 | Close/shutdown fails | Use independent bench recovery. Release alone does not establish closure |
-| Port occupied | Use the existing GUI, stop its owning terminal normally, or choose another `--port` |
+| Port occupied | Use the existing GUI, stop its owning terminal normally, or edit `PORT` in `config.py` |
 | Ethernet hub only | Follow the [separate Ethernet assessment](ethernet-assessment.md); hub discovery is not cube communication |
 
 Do not run two GUIs against the same serial. Browser closure is not hardware

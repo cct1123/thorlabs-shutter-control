@@ -1,0 +1,58 @@
+{
+  "test": "TEST-104",
+  "scope": "Source method spans including docstrings/blanks; before is E094 working source, after includes shared error/recovery helper. No code compression or test deletion.",
+  "before_method_lines": {
+    "arm_triggers": 56,
+    "open_shutter": 44,
+    "close_shutter": 21
+  },
+  "after_method_lines": {
+    "arm_triggers": 39,
+    "open_shutter": 31,
+    "close_shutter": 13,
+    "_command": 21
+  },
+  "before_total": 121,
+  "after_total": 104,
+  "public_open_close_lines": {
+    "before": 65,
+    "after": 44
+  },
+  "shared_handler_used_by": [
+    "identify_device",
+    "get_trigger_config",
+    "configure_triggers",
+    "arm_triggers",
+    "open_shutter",
+    "close_shutter"
+  ],
+  "software_validation": {
+    "pytest_passed": 511,
+    "ruff_check": "PASS",
+    "ruff_format": "PASS",
+    "hardware_access": false
+  },
+  "command_trace": [
+    {
+      "method": "open_shutter",
+      "expected_programmed_sleep_s": 0.5,
+      "observed_programmed_sleep_s": 0.5,
+      "sdk_request_method_calls": 6,
+      "result": "PASS"
+    },
+    {
+      "method": "close_shutter",
+      "expected_programmed_sleep_s": 0.25,
+      "observed_programmed_sleep_s": 0.25,
+      "sdk_request_method_calls": 3,
+      "result": "PASS"
+    },
+    {
+      "method": "arm_triggers",
+      "expected_programmed_sleep_s": 0.5,
+      "observed_programmed_sleep_s": 0.5,
+      "sdk_request_method_calls": 8,
+      "result": "PASS"
+    }
+  ]
+}

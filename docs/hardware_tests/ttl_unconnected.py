@@ -55,27 +55,23 @@ def run_matrix(controller, *, armed_seconds, emit, ports=(1, 2)):
     emit("original_config", asdict(original))
 
     def restore():
-        require_closed(controller.disarm_triggers())
-        restored = controller.configure_triggers(original)
+        controller.disarm_triggers()
+        require_closed(controller.get_operating_status())
+        controller.configure_triggers(original)
+        restored = controller.get_trigger_config()
         emit("restored_config", asdict(restored))
 
     with ExitStack() as cleanup:
         cleanup.callback(restore)
-        require_closed(controller.disarm_triggers())
+        controller.disarm_triggers()
+        require_closed(controller.get_operating_status())
         # Unloaded outputs: settings/readback only. No measured voltage claim.
         for mode, polarity in (("disabled", "high"), ("output", "high"), ("output", "low")):
             config = TriggerConfig(mode, polarity, mode, polarity)
-            if controller.configure_triggers(config) != config:
+            controller.configure_triggers(config)
+            if controller.get_trigger_config() != config:
                 raise ShutterError("Configuration readback mismatch")
             require_closed(controller.get_status())
-            if mode == "disabled":
-                try:
-                    controller.arm_triggers()
-                except ShutterError as exc:
-                    if "at least one trigger input" not in str(exc):
-                        raise
-                else:
-                    raise ShutterError("Arm unexpectedly accepted with no trigger input")
             emit("configuration_pass", asdict(config))
 
         for port in ports:
@@ -88,7 +84,11 @@ def run_matrix(controller, *, armed_seconds, emit, ports=(1, 2)):
                 case = {"port": port, "polarity": polarity, "expected": expected}
                 emit("input_start", case)
                 try:
-                    status = controller.arm_triggers()
+                    ready = controller.get_status()
+                    if not ready.is_closed_manual or not ready.key_enabled:
+                        raise ShutterError("Verify Closed/Manual and key before Arm")
+                    controller.arm_triggers()
+                    status = controller.get_status()
                     emit("armed_feedback", dict(case, status=snapshot(status)))
                     started = time.monotonic()
                     # Arm feedback can precede the next position update. Allow
@@ -99,7 +99,6 @@ def run_matrix(controller, *, armed_seconds, emit, ports=(1, 2)):
                             or status.ttl_armed is not True
                             or status.trigger_config != config
                             or not status.key_enabled
-                            or not status.interlock_ready
                         ):
                             raise ShutterError(f"Armed readiness changed: {status}")
                         time.sleep(min(0.1, armed_seconds))
@@ -111,7 +110,6 @@ def run_matrix(controller, *, armed_seconds, emit, ports=(1, 2)):
                         or status.shutter_state != expected
                         or status.trigger_config != config
                         or not status.key_enabled
-                        or not status.interlock_ready
                     ):
                         raise ShutterError(f"Disconnected-input expectation failed: {status}")
                     emit(
@@ -119,7 +117,8 @@ def run_matrix(controller, *, armed_seconds, emit, ports=(1, 2)):
                         dict(case, elapsed_s=time.monotonic() - started, status=snapshot(status)),
                     )
                 finally:
-                    closed = controller.disarm_triggers()
+                    controller.disarm_triggers()
+                    closed = controller.get_operating_status()
                     emit("disarmed_feedback", dict(case, status=snapshot(closed)))
                     require_closed(closed)
 
@@ -128,13 +127,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("serial")
     parser.add_argument("--ports-unconnected", action="store_true", required=True)
-    parser.add_argument("--verified-interlock", required=True, metavar="SERIAL")
     parser.add_argument("--armed-seconds", type=float, required=True)
     parser.add_argument("--port", type=int, choices=(1, 2), action="append")
     parser.add_argument("--record", type=Path, required=True, help="New JSON evidence file")
     args = parser.parse_args()
-    if args.verified_interlock != args.serial:
-        parser.error("--verified-interlock must match the selected serial")
     if not math.isfinite(args.armed_seconds) or not 0 < args.armed_seconds <= 2:
         parser.error("--armed-seconds must be in (0, 2] for this bench procedure")
     if args.record.exists():
@@ -164,7 +160,6 @@ def main():
         print(action, json.dumps(data), flush=True)
 
     controller = KCubeShutter(args.serial)
-    controller.confirm_interlock(args.serial)
     save()  # Persist scope before SDK access.
     try:
         with ExitStack() as cleanup:
@@ -172,7 +167,8 @@ def main():
             status = controller.connect()
 
             def close_verified():
-                closed = controller.close_shutter()
+                controller.close_shutter()
+                closed = controller.get_operating_status()
                 emit("final_closed", snapshot(closed))
                 require_closed(closed)
 

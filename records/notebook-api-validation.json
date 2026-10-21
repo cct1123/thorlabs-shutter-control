@@ -1,0 +1,37 @@
+{
+  "test": "TEST-105",
+  "notebook": "docs/examples/open_close.ipynb",
+  "scope": "JSON structure, code compilation, cleared outputs and execution against existing fake SDK only; no hardware access.",
+  "results": [
+    {
+      "case": "success",
+      "result": "PASS",
+      "closed": true,
+      "disconnected": true
+    },
+    {
+      "case": "open-failure",
+      "result": "PASS",
+      "closed": true,
+      "disconnected": true
+    },
+    {
+      "case": "hold-interrupt",
+      "result": "PASS",
+      "closed": true,
+      "disconnected": true
+    },
+    {
+      "case": "wrong-identity",
+      "result": "PASS",
+      "closed": true,
+      "disconnected": true
+    },
+    {
+      "case": "invalid-hold",
+      "result": "PASS",
+      "closed": true,
+      "disconnected": true
+    }
+  ]
+}

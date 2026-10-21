@@ -29,25 +29,24 @@ uv sync --locked
 uv run --locked pytest -q -p no:cacheprovider --ignore=tests/test_sdk.py
 ```
 
-Default SDK folder: `C:\Program Files\Thorlabs\Kinesis`. Set `KINESIS_DIR` or
-`--kinesis-dir` when needed. See [setup](docs/getting-started.md).
+Edit hardware settings directly in [config.py](src/thorlabs_shutter_control/config.py):
+SDK folder, panel count, optional serial preselection and local port. No command-line
+options or environment parameters are needed. See [setup](docs/getting-started.md).
 
 ## Launch and operate
 
 Keep the source independently disabled or blocked, preserve the normal physical
 interlock, and close Kinesis/other controller owners. Match the physical shutter
-to the serial found locally. Keep the actual value out of committed examples:
+to the serial found locally.
 
 ```powershell
-uv run --locked shutter-control --list
-$env:SHUTTER_SERIAL = Read-Host 'Controller serial from local discovery'
-uv run --locked shutter-control --serial $env:SHUTTER_SERIAL --verified-interlock $env:SHUTTER_SERIAL
+uv run shutter-control
 ```
 
-Use `--verified-interlock` only after verifying the normal interlock and independent
-protection. It records selected-serial/session evidence without changing hardware
-interlock settings. Key, identity and communication checks still apply. Omit it
-for passive reads or where the device independently reports readiness.
+Use Discover in the GUI to find serials, or preselect them in `config.py`.
+Users set and verify the physical interlock externally. GUI interlock feedback is
+informational and does not gate Open or Arm; connection, key, operating feedback
+and TTL prerequisites still apply.
 
 Open [localhost:8050](http://127.0.0.1:8050/):
 
@@ -56,9 +55,9 @@ Open [localhost:8050](http://127.0.0.1:8050/):
 3. Expand Trigger settings only when needed. Draft edits do not apply or arm.
 4. Finish with **Close & disconnect all**, then normal terminal **Ctrl+C**.
 
-Use `--slots 6` for six panels, or any positive count. Repeat `--serial` for
-distinct devices in panel order; the default grows beyond three to fit them.
-Without a slot count or more serials, three panels are shown. Unused panels
+Set `SLOTS = 6` in `config.py` for six panels, or any positive count.
+`SERIAL_NUMBERS` preselects distinct devices in panel order. With `SLOTS = None`,
+the default is three panels, growing to fit the configured serials. Unused panels
 stay disconnected. Closing the browser does not shut down hardware. Cleanup is
 best effort and cannot bound a hung SDK call; use independent bench recovery on
 uncertainty. Reported states and software holds are not optical/timing measurements.
@@ -66,18 +65,16 @@ uncertainty. Reported states and software holds are not optical/timing measureme
 ## Python API
 
 ```python
-import os
-from thorlabs_shutter_control import KCubeShutter
+from thorlabs_shutter_control import KCubeShutter, config
 
-serial = os.environ["SHUTTER_SERIAL"]
+serial = config.SERIAL_NUMBERS[0]  # Set the intended serial in config.py first.
 shutter = KCubeShutter(serial)
-# Only after normal physical interlock/source protection have been verified:
-shutter.confirm_interlock(serial)
 verified = False
 try:
     shutter.connect()
     verified = True
-    print(shutter.close_shutter())
+    shutter.close_shutter()  # Send commands, returns None.
+    print(shutter.get_shutter_state())  # Explicit feedback read.
 finally:
     shutter.disconnect(close_shutter=verified)
 ```
@@ -85,6 +82,11 @@ finally:
 [Hardware tutorials](docs/examples/README.md) cover discovery, passive reads,
 Open/Close, three shutters and TTL. Read the [API](docs/python-api.md),
 [interface contract](docs/INTERFACE.md) and [architecture](docs/architecture.md).
+
+Setters send commands and return `None`; getters request feedback separately.
+Direct API callers own readiness and verification. The GUI performs explicit
+reads. Current command paths have software validation; historical hardware
+evidence below does not qualify the changed paths.
 
 ## Hub support and scale
 
@@ -94,7 +96,9 @@ hub; the same addressing path is expected to work through KEH3/KEH6 USB or linke
 USB hubs. KEH6 hardware has not been qualified here. Hub/power/USB limits still
 apply; an arbitrary software count does not imply unlimited physical capacity or
 simultaneous operation. Refresh and cleanup run sequentially, so latency grows
-with the connected count. Ethernet remains experimental; the GUI uses USB.
+with the connected count. Ethernet remains experimental and belongs to
+`ShutterHub(ethernet_endpoints=...)`; `KCubeShutter` is USB-only. The default
+launcher uses USB; an explicitly configured hub can be passed to `create_app`.
 
 ## What has been tested
 
@@ -117,10 +121,16 @@ condition with an unplugged input, despite the unresolved no-cable test result.
 ## Development
 
 ```powershell
+.venv\Scripts\python.exe -B -m pytest -q -p no:cacheprovider
 uv run --locked python tests/simulated_demo.py --api
 uv run --locked ruff check --no-cache src tests docs/examples docs/hardware_tests
 uv build --wheel
 ```
+
+Tests are grouped into controller, hub/routing, GUI, launcher, triggers,
+tutorials and representative diagnostic workflows. Exhaustive historical stage
+matrices have been replaced by smaller contract and integration checks. `-B` and
+`-p no:cacheprovider` keep test runs from recreating bytecode and pytest caches.
 
 The developer simulator never reaches the real SDK. The default test command
 excludes opt-in real-SDK enumeration. See the [evidence index](records/RECORDS.md),

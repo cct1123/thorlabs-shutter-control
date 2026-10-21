@@ -1,0 +1,78 @@
+{
+  "scope": "software only; no hardware access",
+  "superseded_tests": {
+    "tests/test_controller.py": [
+      "test_connect_rejects_unknown_operating_feedback_without_output",
+      "test_connect_retries_uninitialized_operating_state_without_output",
+      "test_connect_uninitialized_state_times_out_and_releases",
+      "test_unknown_operating_feedback_faults_before_open_output",
+      "test_operating_read_request_failure_releases_connect_without_output",
+      "test_open_disarms_auto_mode_before_enabling",
+      "test_open_does_not_enable_when_preparation_feedback_disagrees",
+      "test_open_respects_existing_safeguards",
+      "test_missing_feedback_does_not_turn_successful_write_into_success",
+      "test_clear_interlock_bit_means_unverified_and_blocks_output",
+      "test_open_recovery_interrupt_cannot_leave_healthy_status",
+      "test_display_snapshot_never_authorizes_open",
+      "test_close_always_requires_inactive_acknowledgment",
+      "test_safeguards_rechecked_after_timed_mode_preparation",
+      "test_command_handler_preserves_open_and_recovery_failures",
+      "test_open_skips_close_only_from_fresh_closed_inactive_manual",
+      "test_open_preserves_close_preparation_if_any_baseline_field_differs"
+    ],
+    "tests/test_triggers.py": [
+      "test_arm_refusals_do_not_enable_or_write_output",
+      "test_configuration_requires_closed_inactive_manual",
+      "test_setting_readback_mismatch_faults_and_prevents_arm",
+      "test_trigger_communication_errors_are_faults_and_cleanup_remains_available",
+      "test_failed_arm_attempts_disarm_and_latches_fault",
+      "test_repeat_arm_is_read_only_and_close_disarms_with_active_low_input",
+      "test_unacknowledged_inactive_cannot_switch_primed_closed_cube_to_manual",
+      "test_disarm_operating_feedback_does_not_depend_on_trigger_settings",
+      "test_configuration_checks_operating_baseline_without_reading_old_ttl",
+      "test_arm_reuses_fresh_manual_baseline_and_waits_only_once_for_feedback",
+      "test_arm_rechecks_safeguards_after_mode_preparation"
+    ],
+    "tests/test_operator_confirmation.py": [
+      "test_confirmation_cannot_override_key_or_communication_failure"
+    ]
+  },
+  "reason": "Explicit user request replaces implicit prerequisite reads, result readback, retries, waits and automatic recovery inside setters with direct commands. Replaced by zero-read setter contracts and explicit getter/caller tests.",
+  "requirement": "REQ-075",
+  "evidence": "E104",
+  "test": "TEST-113",
+  "result": "PASS (software only)",
+  "pytest": {
+    "command": ".venv/Scripts/python.exe -m pytest -q -p no:cacheprovider",
+    "passed": 495,
+    "failed": 0,
+    "errors": 0,
+    "skipped": [
+      {
+        "test": "test_real_sdk_loads_and_exposes_controller_contract",
+        "reason": "KINESIS_TEST_DIR not set"
+      }
+    ]
+  },
+  "checks": {
+    "ruff_check": "PASS: src tests docs/examples docs/hardware_tests",
+    "ruff_format": "PASS: 39 files",
+    "notebook": "PASS: success, failed Open, hold interrupt, wrong identity, invalid hold",
+    "simulation": "PASS: tests/simulated_demo.py --api, three independent software devices"
+  },
+  "contracts": {
+    "setters": "return None; no status requests/getters/sleeps/retries/readback/automatic recovery",
+    "specific_getters": "request only position, operating state, mode or status bits",
+    "connect": "identity/communication metadata only; no operating feedback dependency",
+    "unknown_zero": "reported unknown, never inferred Inactive",
+    "cache": "invalidated by writes, never fabricates result feedback",
+    "error_handling": "local fault/handle guards and SDK errors retained; Close/release available after fault"
+  },
+  "authority": "Explicit user request for direct setters and specific getters supersedes implicit driver prerequisite/readback/recovery workflows.",
+  "limits": [
+    "No hardware access or GUI server restart.",
+    "Native calls and physical settling times unmeasured.",
+    "Prior physical command/shutdown evidence is historical; changed paths UNTESTED.",
+    "Direct callers own readiness and verification."
+  ]
+}

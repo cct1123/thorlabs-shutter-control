@@ -19,6 +19,25 @@ def _enabled(value):
     return "unknown" if value is None else ("enabled" if value else "not enabled")
 
 
+def _open_ready(status):
+    return (
+        status.connection == "connected"
+        and status.key_enabled is True
+        and status.operating_mode == "manual"
+        and status.operating_state in ("active", "inactive")
+        and status.shutter_state in ("open", "closed")
+    )
+
+
+def _arm_ready(status, config):
+    return (
+        status.is_closed_manual
+        and status.key_enabled is True
+        and config is not None
+        and "input" in (config.trig1_mode, config.trig2_mode)
+    )
+
+
 def _panel(slot, serial_number, serials, suffix):
     return html.Section(
         [
@@ -43,7 +62,7 @@ def _panel(slot, serial_number, serials, suffix):
                         "Close & disconnect",
                         id=f"disconnect{suffix}",
                         disabled=True,
-                        title="Close this shutter and release its USB connection",
+                        title="Send Close and release this controller connection",
                     ),
                 ],
                 className="connection-actions",
@@ -139,7 +158,7 @@ def _panel(slot, serial_number, serials, suffix):
                                 "Apply requires Disarm/Close. Arm uses device readback "
                                 "and may open immediately. An open input is LOW; "
                                 "active-low can open with no cable. "
-                                "Close disarms TTL.",
+                                "Close requests Inactive; Disarm also selects Manual.",
                                 className="note",
                             ),
                         ],
@@ -166,6 +185,9 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
     single = count == 1
     suffixes = [""] if single else [f"-{slot + 1}" for slot in range(count)]
     serials = [c.serial_number for c in hub.controllers if c.serial_number]
+    transports = {"Ethernet" if endpoint else "USB" for endpoint in hub.ethernet_endpoints}
+    transport_label = " / ".join(sorted(transports))
+    last_ttl_settings = [None] * count  # Display only; Arm always reads device settings.
     app = Dash(__name__)
     app.title = "Shutter control"
     app_class = "app" if single else "app multi-app"
@@ -177,13 +199,15 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
                         [
                             html.P("OPTICS / LAB CONTROL", className="eyebrow"),
                             html.H1("Shutter control"),
-                            html.P("KSC101 controllers · USB", className="subtitle"),
+                            html.P(f"KSC101 controllers · {transport_label}", className="subtitle"),
                         ]
                     ),
                     html.Div(
                         [
                             html.Button(
-                                "Discover", id="discover", title="Find connected USB controllers"
+                                "Discover",
+                                id="discover",
+                                title="Find controllers on configured transports",
                             ),
                             html.Button(
                                 "Close & disconnect all",
@@ -317,7 +341,7 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
                     serials = hub.discover()
                     for index, shutter in enumerate(hub.controllers):
                         options[index] = serials
-                        if shutter.get_status().has_device:
+                        if shutter.get_operating_status().has_device:
                             # A discovery snapshot may omit a retained/lost device. Keep
                             # its identity visible until cleanup actually releases it.
                             selected[index] = shutter.serial_number
@@ -330,13 +354,16 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
                             else (serials[0] if single and len(serials) == 1 else None)
                         )
                     noun = "controller" if len(serials) == 1 else "controllers"
-                    hub_message = f"Found {len(serials)} USB {noun}. Select a serial, then Connect."
+                    hub_message = (
+                        f"Found {len(serials)} {transport_label} {noun}. "
+                        "Select a serial, then Connect."
+                    )
                 elif action == "shutdown-all":
-                    had_devices = [c.get_status().has_device for c in hub.controllers]
+                    had_devices = [c.get_cached_status().has_device for c in hub.controllers]
                     hub.safe_shutdown()
                     hub_message = "Shutdown attempts completed. Check each shutter's status."
                     messages = [
-                        "Close completed with controller feedback; disconnected."
+                        "Close command sent; disconnected. Verify physical closure."
                         if had_device
                         else no_update
                         for had_device in had_devices
@@ -351,21 +378,34 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
                             else hub.connect(slot, selections[slot])
                         )
                         selected[slot] = status.serial_number
+                        last_ttl_settings[slot] = hub.get_trigger_config(slot)
                         messages[slot] = "Connected."
                     elif command == "disconnect":
-                        shutter.safe_shutdown()
-                        messages[slot] = "Close completed with controller feedback; disconnected."
-                    elif command == "open":
-                        shutter.open_shutter()
-                        messages[slot] = "Open completed with controller feedback."
-                    elif command == "close":
-                        shutter.close_shutter()
-                        messages[slot] = "Close completed with controller feedback."
+                        hub.disconnect(slot)
+                        messages[slot] = (
+                            "Close command sent; disconnected. Verify physical closure."
+                        )
+                    elif command in ("open", "close"):
+                        if command == "open":
+                            status = hub.get_operating_status(slot)
+                            if not _open_ready(status):
+                                raise ShutterError(
+                                    "Open refused: verify feedback, key and disarm TTL."
+                                )
+                        getattr(hub, f"{command}_shutter")(slot)
+                        messages[slot] = f"{command.title()} command sent."
                     elif command == "apply-ttl":
-                        shutter.configure_triggers(TriggerConfig(*ttl_drafts[slot]))
+                        if not hub.get_operating_status(slot).is_closed_manual:
+                            raise ShutterError("Disarm/Close before configuring TTL.")
+                        requested = TriggerConfig(*ttl_drafts[slot])
+                        hub.configure_triggers(slot, requested)
+                        last_ttl_settings[slot] = hub.get_trigger_config(slot)
+                        if last_ttl_settings[slot] != requested:
+                            raise ShutterError("TTL readback mismatch; settings not confirmed.")
                         messages[slot] = "TTL settings applied and read back; disarmed."
                     elif command == "read-ttl":
-                        config = shutter.get_trigger_config()
+                        config = hub.get_trigger_config(slot)
+                        last_ttl_settings[slot] = config
                         drafts[slot] = [
                             config.trig1_mode,
                             config.trig1_polarity,
@@ -374,13 +414,20 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
                         ]
                         messages[slot] = "TTL settings read; draft selections replaced."
                     elif command == "arm-ttl":
-                        shutter.arm_triggers()
-                        messages[slot] = (
-                            "TTL armed with controller feedback. Input controls shutter."
-                        )
+                        status = hub.get_status(slot)
+                        config = status.trigger_config
+                        if config is not None and "input" not in (
+                            config.trig1_mode,
+                            config.trig2_mode,
+                        ):
+                            raise ShutterError("Arm refused: configure at least one trigger input.")
+                        if not _arm_ready(status, config):
+                            raise ShutterError("Arm refused: verify Closed/Manual, key and input.")
+                        hub.arm_triggers(slot)
+                        messages[slot] = "TTL arm command sent. Input controls shutter."
                     elif command == "disarm-ttl":
-                        shutter.disarm_triggers()
-                        messages[slot] = "TTL disarmed; Close completed with controller feedback."
+                        hub.disarm_triggers(slot)
+                        messages[slot] = "Disarm / Close command sent."
             except (ShutterError, ValueError) as exc:
                 if slot is None:
                     hub_message = str(exc)
@@ -389,7 +436,16 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
                     messages[slot] = str(exc)
                     error_slots.add(slot)
 
-            statuses = [shutter.get_status() for shutter in hub.controllers]
+            # Setters send commands only. Explicitly read the selected panel's
+            # feedback here; unrelated panels keep their previous observations.
+            statuses = [
+                shutter.get_operating_status()
+                if action == "refresh"
+                or action is None
+                or (index == slot and index not in error_slots)
+                else shutter.get_cached_status()
+                for index, shutter in enumerate(hub.controllers)
+            ]
             connected_count = sum(s.connection == "connected" for s in statuses)
             result = [
                 hub_message,
@@ -407,7 +463,11 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
                     " / ".join(v for v in (status.description, status.serial_number) if v)
                     or "Unknown"
                 )
-                config = status.trigger_config
+                if not connected:
+                    last_ttl_settings[index] = None
+                elif status.trigger_config is not None:
+                    last_ttl_settings[index] = status.trigger_config
+                config = last_ttl_settings[index]
                 ttl = "Unknown"
                 if not connected:
                     hint = (
@@ -417,16 +477,24 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
                     )
                 elif status.operating_mode == "triggered":
                     hint = "Use Disarm / Close before manual Open."
+                elif status.key_enabled is None:
+                    hint = "Controller key feedback is unknown; Open is unavailable."
                 elif not status.key_enabled:
                     hint = "Unlock the controller key to enable Open."
-                elif not status.interlock_ready:
-                    hint = "Normal interlock readiness has not been verified for this session."
+                elif not _open_ready(status):
+                    hint = (
+                        "Operating feedback is unknown or mode is not Manual; use Disarm / Close."
+                    )
                 else:
-                    hint = "Manual control ready. Close also disarms triggers."
+                    hint = (
+                        "Manual control ready. Users manage the physical interlock. "
+                        "Use Disarm / Close to return to Manual."
+                    )
                 if config is not None:
                     armed = {True: "Armed", False: "Disarmed", None: "Unknown"}[status.ttl_armed]
                     ttl = (
                         f"{armed} · {status.operating_mode}/{status.operating_state} · "
+                        "TTL settings last read: "
                         f"TRIG1 {config.trig1_mode}/{config.trig1_polarity} · "
                         f"TRIG2 {config.trig2_mode}/{config.trig2_polarity}"
                     )
@@ -445,29 +513,12 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
                         active,
                         active,
                         not active,
-                        not (
-                            connected
-                            and status.key_enabled
-                            and status.interlock_ready
-                            and status.operating_mode != "triggered"
-                        ),
+                        not _open_ready(status),
                         not active,
                         ttl,
-                        not (
-                            connected
-                            and status.operating_mode == "manual"
-                            and status.operating_state == "inactive"
-                            and status.shutter_state == "closed"
-                        ),
+                        not status.is_closed_manual,
                         not connected,
-                        not (
-                            connected
-                            and config is not None
-                            and status.ttl_armed is False
-                            and status.key_enabled
-                            and status.interlock_ready
-                            and "input" in (config.trig1_mode, config.trig2_mode)
-                        ),
+                        not _arm_ready(status, config),
                         not active,
                         *drafts[index],
                         "badge "

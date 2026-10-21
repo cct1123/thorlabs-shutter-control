@@ -1,0 +1,272 @@
+{
+  "test": "TEST-102",
+  "scope": "Software-only Dash HTTP callbacks through existing fake SDK and virtual sleep clock. Healthy devices, initially Closed/Inactive/Manual, first feedback reads succeed. Excludes real SDK/USB/browser/physical latency.",
+  "baseline": "records/gui-latency-analysis.json (TEST-101, before optimization)",
+  "results": [
+    {
+      "connected": 1,
+      "action": "open",
+      "expected_programmed_sleep_s": 0.5,
+      "observed_programmed_sleep_s": 0.5,
+      "request_method_calls": 6,
+      "target_writes": [
+        {
+          "at_s": 0.25,
+          "method": "enable",
+          "args": []
+        },
+        {
+          "at_s": 0.25,
+          "method": "set_state",
+          "args": [
+            "Active"
+          ]
+        }
+      ],
+      "sdk_call_counts_by_device": {
+        "68000001": {
+          "status": 2,
+          "request_mode": 2,
+          "request_operation": 2,
+          "enable": 1,
+          "set_state": 1
+        }
+      },
+      "result": "PASS"
+    },
+    {
+      "connected": 1,
+      "action": "close",
+      "expected_programmed_sleep_s": 0.25,
+      "observed_programmed_sleep_s": 0.25,
+      "request_method_calls": 3,
+      "target_writes": [
+        {
+          "at_s": 0.0,
+          "method": "set_state",
+          "args": [
+            "Inactive"
+          ]
+        }
+      ],
+      "sdk_call_counts_by_device": {
+        "68000001": {
+          "set_state": 1,
+          "status": 1,
+          "request_mode": 1,
+          "request_operation": 1
+        }
+      },
+      "result": "PASS"
+    },
+    {
+      "connected": 1,
+      "action": "refresh",
+      "expected_programmed_sleep_s": 0.25,
+      "observed_programmed_sleep_s": 0.25,
+      "request_method_calls": 3,
+      "target_writes": [],
+      "sdk_call_counts_by_device": {
+        "68000001": {
+          "status": 1,
+          "request_mode": 1,
+          "request_operation": 1
+        }
+      },
+      "result": "PASS"
+    },
+    {
+      "connected": 3,
+      "action": "open",
+      "expected_programmed_sleep_s": 0.5,
+      "observed_programmed_sleep_s": 0.5,
+      "request_method_calls": 6,
+      "target_writes": [
+        {
+          "at_s": 0.25,
+          "method": "enable",
+          "args": []
+        },
+        {
+          "at_s": 0.25,
+          "method": "set_state",
+          "args": [
+            "Active"
+          ]
+        }
+      ],
+      "sdk_call_counts_by_device": {
+        "68000001": {
+          "status": 2,
+          "request_mode": 2,
+          "request_operation": 2,
+          "enable": 1,
+          "set_state": 1
+        },
+        "68000002": {},
+        "68000003": {}
+      },
+      "result": "PASS"
+    },
+    {
+      "connected": 3,
+      "action": "close",
+      "expected_programmed_sleep_s": 0.25,
+      "observed_programmed_sleep_s": 0.25,
+      "request_method_calls": 3,
+      "target_writes": [
+        {
+          "at_s": 0.0,
+          "method": "set_state",
+          "args": [
+            "Inactive"
+          ]
+        }
+      ],
+      "sdk_call_counts_by_device": {
+        "68000001": {
+          "set_state": 1,
+          "status": 1,
+          "request_mode": 1,
+          "request_operation": 1
+        },
+        "68000002": {},
+        "68000003": {}
+      },
+      "result": "PASS"
+    },
+    {
+      "connected": 3,
+      "action": "refresh",
+      "expected_programmed_sleep_s": 0.75,
+      "observed_programmed_sleep_s": 0.75,
+      "request_method_calls": 9,
+      "target_writes": [],
+      "sdk_call_counts_by_device": {
+        "68000001": {
+          "status": 1,
+          "request_mode": 1,
+          "request_operation": 1
+        },
+        "68000002": {
+          "status": 1,
+          "request_mode": 1,
+          "request_operation": 1
+        },
+        "68000003": {
+          "status": 1,
+          "request_mode": 1,
+          "request_operation": 1
+        }
+      },
+      "result": "PASS"
+    },
+    {
+      "connected": 6,
+      "action": "open",
+      "expected_programmed_sleep_s": 0.5,
+      "observed_programmed_sleep_s": 0.5,
+      "request_method_calls": 6,
+      "target_writes": [
+        {
+          "at_s": 0.25,
+          "method": "enable",
+          "args": []
+        },
+        {
+          "at_s": 0.25,
+          "method": "set_state",
+          "args": [
+            "Active"
+          ]
+        }
+      ],
+      "sdk_call_counts_by_device": {
+        "68000001": {
+          "status": 2,
+          "request_mode": 2,
+          "request_operation": 2,
+          "enable": 1,
+          "set_state": 1
+        },
+        "68000002": {},
+        "68000003": {},
+        "68000004": {},
+        "68000005": {},
+        "68000006": {}
+      },
+      "result": "PASS"
+    },
+    {
+      "connected": 6,
+      "action": "close",
+      "expected_programmed_sleep_s": 0.25,
+      "observed_programmed_sleep_s": 0.25,
+      "request_method_calls": 3,
+      "target_writes": [
+        {
+          "at_s": 0.0,
+          "method": "set_state",
+          "args": [
+            "Inactive"
+          ]
+        }
+      ],
+      "sdk_call_counts_by_device": {
+        "68000001": {
+          "set_state": 1,
+          "status": 1,
+          "request_mode": 1,
+          "request_operation": 1
+        },
+        "68000002": {},
+        "68000003": {},
+        "68000004": {},
+        "68000005": {},
+        "68000006": {}
+      },
+      "result": "PASS"
+    },
+    {
+      "connected": 6,
+      "action": "refresh",
+      "expected_programmed_sleep_s": 1.5,
+      "observed_programmed_sleep_s": 1.5,
+      "request_method_calls": 18,
+      "target_writes": [],
+      "sdk_call_counts_by_device": {
+        "68000001": {
+          "status": 1,
+          "request_mode": 1,
+          "request_operation": 1
+        },
+        "68000002": {
+          "status": 1,
+          "request_mode": 1,
+          "request_operation": 1
+        },
+        "68000003": {
+          "status": 1,
+          "request_mode": 1,
+          "request_operation": 1
+        },
+        "68000004": {
+          "status": 1,
+          "request_mode": 1,
+          "request_operation": 1
+        },
+        "68000005": {
+          "status": 1,
+          "request_mode": 1,
+          "request_operation": 1
+        },
+        "68000006": {
+          "status": 1,
+          "request_mode": 1,
+          "request_operation": 1
+        }
+      },
+      "result": "PASS"
+    }
+  ]
+}

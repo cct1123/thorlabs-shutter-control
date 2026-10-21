@@ -1,75 +1,60 @@
 # Shutter controller report
 
-KCubeShutter controls one selected KSC101 through official Kinesis .NET;
-ShutterHub owns a configured number of independent slots and Dash exposes their controls.
-Startup is passive. Identity/communication/key guards, serial-scoped interlock
-evidence, explicit output actions and best-effort cleanup remain intact.
+The reviewed software uses a USB-only KCubeShutter and hub-owned Ethernet routes.
+Serials accept strings or integers. Open/Close send Active/Inactive only,
+preserving mode and enable state. Explicit enable_device() enables the channel;
+Disarm selects Inactive/Manual. Arm retains Enable/Triggered/Active.
+Setters send commands and return None;
+getters explicitly request feedback. Connect verifies identity without depending
+on operating state0, which is reported as unknown. Writes invalidate cached state.
+Shutdown attempts Close and releases every slot despite errors, without claiming
+physical closure. Native SDK calls may still block.
 
-## Demonstrated behavior and limits
+Users manage the physical interlock externally. No driver, GUI, tutorial, notebook
+or diagnostic operation gates on software interlock feedback/confirmation. The
+readout and optional Python metadata remain available. Independent identity,
+ownership, connection, key, operating-state and TTL prerequisites remain.
 
-| Check | Evidence and scope |
-| --- | --- |
-| Single-pair USB discovery/status/reconnect | Controller readback PASS; firmware 1.0.7 repaired the historical identity mismatch |
-| Open/Close | Five-cycle SDK readback PASS and user-confirmed physical sequence; later production/GUI readback PASS |
-| Shutdown/GUI lifecycle | Close/release/reconnect and normal Ctrl+C cleanup readback PASS; physical closure timing unmeasured |
-| TTL, both ports unconnected | Settings/priming/Disarm/restoration/release PASS; active-low Open expectation FAIL on each port, still reported Closed |
-| Manual positive control after TTL tests | Open/1s added hold/Close readback PASS; TTL discrepancy cause unknown |
-| Ethernet cube, three actual pairs, external TTL signals/voltage, physical faults/calibrated timing | Not qualified |
+The GUI uses the current hub API, separates command messages from controller
+feedback, preserves unknown states and supports connection retry. Launcher settings
+are in [config.py](../src/thorlabs_shutter_control/config.py); published defaults
+contain no device identity and startup is passive. No launcher interlock flag or
+hardware environment/CLI configuration is required.
 
-[Bench index](../records/hardware-validation.json) and
-[TTL observations](../records/ttl-summary.json) preserve these distinctions.
-Feedback/host holds do not establish independent blade state or exposure timing.
-Last E082 observation: Closed/Inactive/Manual, original input/high + output/high
-restored, all handles released; GUI running with slots disconnected. This is
-historical state, to be checked before future hardware operation.
+The [Open/Close notebook](../docs/examples/shutter_open_close_tutorial.ipynb)
+has sequential cells, identity-gated error cleanup, explicit feedback reads and
+separate API timings. Published outputs are cleared and repeat is disabled.
+Successful Open leaves the shutter commanded Open until the Close cell runs.
 
-## Practical use and documentation
+## Validation and pruning
 
-The [hardware reference](../docs/HARDWARE_VALIDATION.md) has three commissioning
-checks: connect/read; one Close/Open/hold/Close; GUI/cleanup. Reuse the GUI cycle.
-Routine unchanged-bench operation is connect/read, Closed baseline, intended
-operation, Close/release. Passive work needs no motion or repeated review gates.
+E114 / TEST-122: **186 passed, 1 skipped** against source and the extracted wheel.
+Ruff check and format PASS; three-device software simulation PASS. Notebook cells,
+documentation Python snippets, links and shareable-file checks are validated in
+[review-publication-validation.json](../records/review-publication-validation.json).
+The real-SDK test is opt-in and was skipped; this review issued no hardware
+commands and did not launch a GUI.
 
-[README](../README.md), [GUI guide](../docs/gui.md) and
-[hardware guide](../docs/hardware.md) show the actual unconfigured GUI, expanded
-trigger drafts and an attributed manufacturer KSC101/SH05R photo. These images
-contain no selected device identities and do not claim connected-bench operation.
-[Asset provenance/privacy scope](../docs/assets/README.md) describes their origin.
+Tests were consolidated from16 to8 modules and about half the Python lines;
+representative contracts replace duplicate and exhaustive historical matrices.
+[Pruning evidence](../records/test-pruning-validation.json) records the retained
+coverage and generated-file inventory. Environment, Git, private records and lab
+data are preserved. Old validation counts and hashes are historical checkpoints.
 
-## Review and retained evidence
+## Hardware scope and operation
 
-Private originals remain in ignored storage; public records use aliases and
-refreshed derivative hashes. Current-file checks exclude earlier Git history.
-The [evidence index](../records/RECORDS.md) preserves review and publication history.
-E084 tightened TTL-helper argument validation; valid-input command sequences and
-historical TTL results remain unchanged.
+Historical single-pair USB/browser evidence and user-observed motion are retained.
+Changed command/GUI paths need bench revalidation. Cube Ethernet, actual KEH6/
+multiple pairs, electrical TTL, physical recovery and calibrated timing remain
+unqualified. The active-low no-cable expectation failure is unresolved; see the
+[TTL summary](../records/ttl-summary.json). Software simulation cannot resolve it.
 
-E087 fixes one configurable-GUI inconsistency: a one-slot ShutterHub now requires
-an explicit dropdown selection for Connect, like larger hubs. The direct
-create_app(KCubeShutter(...)) convenience API retains optional-serial behavior.
-Two regression cases reproduced the defect before the fix. Current validation:
-489 source and 489 extracted-wheel software tests, Ruff/format and package checks
-PASS. No SDK or physical hardware was accessed. Corrected the screenshot scope
-and stale publication wording; removed redundant report prose. See
-[review validation](../records/review-validation.json) for checks and hashes.
+Start with [setup](../docs/getting-started.md), [GUI](../docs/gui.md),
+[API](../docs/python-api.md) and the [hardware procedure](../docs/HARDWARE_VALIDATION.md).
+The [illustrated supervisor notebook](supervisor-notebook.html) summarizes historical
+bench results with current configuration examples. Its original preview and old
+Notion attachment validation remain historical; this review updates local files only.
+Rebuild its self-contained HTML with `python -B outputs/render_supervisor_notebook.py`.
 
-## Configurable count and KEH6 USB - E085
-
-The software cap of three is removed. CLI `--slots N` or Python
-`ShutterHub(slots=N)` selects any positive panel count; without a count, the
-existing three-panel default grows to fit more preselected serials. Distinct
-identity/ownership guards and all-slot cleanup remain intact. Independent
-six/nine-device software lifecycle tests and actual empty-GUI layout captures
-exercise the extension. There is no claim of unlimited physical capacity,
-parallel control or bounded total polling/shutdown time.
-
-KEH6 USB compatibility is expected from per-cube SDK addressing and the official
-six-bay hub specification; actual KEH6/multiple-pair hardware remains untested.
-KEH6 Ethernet is not generalized from KEH3. The historical single-pair and TTL
-observations above are unchanged. Latest README privacy section is removed as
-requested; current documentation/evidence cleanup remains scoped to current files.
-
-E086 records the prior implementation a6b9e68 and publication checkpoint c9c45c2.
-E088 / TEST-097: follow-up implementation 25bbe8e pushed normally to origin/main,
-exact remote hash verified and checkout clean. Review/publication complete;
-physical qualification gaps above remain open.
+Publication: reviewed software prepared for commit/push to origin/main (REQ-082).
+Physical qualification remains open; no overall hardware completion is claimed.

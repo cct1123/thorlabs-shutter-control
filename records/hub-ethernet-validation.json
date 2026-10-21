@@ -1,0 +1,53 @@
+{
+  "requirement": "REQ-077",
+  "evidence": "E107b",
+  "test": "TEST-116b",
+  "scope": "software-only USB/Ethernet ownership boundary; no SDK DLL, socket or hardware access",
+  "result": "PASS (software; physical Ethernet untested)",
+  "full_suite": {
+    "command": ".venv/Scripts/python.exe -m pytest -q -p no:cacheprovider --tb=no",
+    "passed": 528,
+    "skipped": 1,
+    "failures": []
+  },
+  "ethernet_tests": {
+    "passed": 47,
+    "failed": 0
+  },
+  "other_checks": {
+    "ruff_check": "PASS: src tests docs/examples docs/hardware_tests, including current notebook",
+    "ruff_format": "PASS: 39 files including current notebook",
+    "simulation": "PASS: tests/simulated_demo.py --api, three USB software devices",
+    "documentation_snippets": "PASS: Python snippets in docs/python-api.md and docs/ethernet-assessment.md compile"
+  },
+  "architecture": {
+    "KCubeShutter": "USB-only; no network option/property/registration; filters FTDI entries",
+    "shared_base": "private _KinesisShutter reuses get/set/lifecycle/ownership; no endpoint-specific logic",
+    "ShutterHub": "owns immutable per-slot endpoints, TCPIP/comspec discovery/selection, network routing checks and public slot dispatch",
+    "private_channel": "_HubChannel is hub-owned, not KCubeShutter; delegates routing to hub",
+    "commands": "setters return None; no operating feedback requests, sleeps or result readback; network routing metadata checked before ordinary writes",
+    "GUI": "uses hub slot setters for USB and Ethernet",
+    "cleanup": "all slots attempted, failed release retains ownership; Close/Inactive targets retained handle after fault"
+  },
+  "notebook": {
+    "modified_by_this_task": false,
+    "current_files": [
+      {
+        "path": "docs/examples/shutter_open_close_tutorial.ipynb",
+        "sha256": "2f0e6b9e46bec4205565bfa12f5734fa2c0569d300687ba8e0adda1d718db9ba"
+      }
+    ],
+    "observation": "Concurrent notebook edits E105/E106 split/renamed the tutorial and updated its tests. Intermediate saved-notebook failures resolved; final full suite passes. Notebook was not changed by this transport task."
+  },
+  "limits": [
+    "Physical Ethernet discovery/actuation/timing remain unqualified.",
+    "Only existing documented KEH3 cube endpoints 40304..40307 accepted; KEH6 network map not inferred.",
+    "Default launcher remains USB; explicit create_app(hub) supports configured network slots."
+  ],
+  "source_sha256": {
+    "src/thorlabs_shutter_control/controller.py": "a154638ead81c47aa2640c1776b9175f93af0d124d351c5a3428db7ab57b1a48",
+    "src/thorlabs_shutter_control/gui.py": "5af79c1fb4585c8745887883850233fa5ed3b116916345f84603e7075f80d89b",
+    "tests/test_ethernet.py": "e443116e41a176ee56396d1b77fe47cabf6371398801329bf9ab2cfa40909235",
+    "tests/test_examples.py": "0a28c36e3b06af8f0b93945c2806e90a02cf3b139994449764724e99637978e7"
+  }
+}

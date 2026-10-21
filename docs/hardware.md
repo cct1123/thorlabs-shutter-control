@@ -41,8 +41,8 @@ Software addresses each KSC101 serial through Kinesis and does not detect or
 restrict a USB hub model. KEH6 USB compatibility is therefore expected, not a new
 bench result. Existing USB evidence is one KSC101/SH05R on KEH3 only.
 
-Use `--slots N`, or pass enough distinct serials to expand the default beyond
-three. No app-defined count cap is imposed. Installed cube count must respect
+Set `SLOTS` in project `config.py`, or configure enough distinct
+`SERIAL_NUMBERS` to expand the default beyond three. No app-defined count cap is imposed. Installed cube count must respect
 actual hub/power/USB limits; increasing N also increases sequential refresh and
 cleanup latency. Six/nine-device software tests do not qualify physical power,
 connections, timing or optical operation. Ethernet maps in the separate guide

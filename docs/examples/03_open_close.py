@@ -20,40 +20,38 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("serial", help="Actual serial recorded in lesson 1")
     parser.add_argument(
-        "--verified-interlock",
-        metavar="SERIAL",
-        help="Confirm normal physical interlock/protection for this selected serial, this run only",
-    )
-    parser.add_argument(
         "--open-seconds", type=float, required=True, help="Approved hold in seconds"
     )
     args = parser.parse_args()
     if not math.isfinite(args.open_seconds) or args.open_seconds <= 0:
         parser.error("--open-seconds must be a finite positive number")
-    if args.verified_interlock is not None and args.verified_interlock != args.serial:
-        parser.error("--verified-interlock must match the selected serial")
 
     shutter = KCubeShutter(args.serial)
-    if args.verified_interlock:
-        shutter.confirm_interlock(args.serial)
     with ExitStack() as cleanup:
         # Release even a partially connected handle. Never Close an unverified target.
         cleanup.callback(shutter.disconnect, close_shutter=False)
         shutter.connect()
-        cleanup.callback(shutter.close_shutter)  # Connect verified identity/feedback.
+        cleanup.callback(shutter.close_shutter)  # Connect verified identity.
         print("Identity:", shutter.identify_device())
 
-        # This first intentional output command also disarms a prior TTL mode.
-        print("Initial Close:", shutter.close_shutter().shutter_state)
+        # Explicit channel enable and Disarm establish the manual baseline.
+        shutter.enable_device()  # Explicit one-time channel setup.
+        shutter.disarm_triggers()  # Explicit Inactive/Manual preparation.
+        print("Initial Close:", shutter.get_operating_status().shutter_state)
 
-        # The driver checks the key/interlock and confirms preparation before Open.
-        print("Open:", shutter.open_shutter().shutter_state)
+        # Check readiness explicitly; setters only send commands.
+        ready = shutter.get_operating_status()
+        if not ready.is_closed_manual or not ready.key_enabled:
+            raise RuntimeError("Verify Closed/Manual and key before Open")
+        shutter.open_shutter()
+        print("Open:", shutter.get_operating_status().shutter_state)
         sleep(args.open_seconds)
-        print("Close:", shutter.close_shutter().shutter_state)
+        shutter.close_shutter()
+        print("Close:", shutter.get_operating_status().shutter_state)
         # ExitStack attempts Close then release, including on errors or Ctrl+C.
         # If cleanup also fails, Python retains the original exception chain.
 
-    print("Cleanup completed with controller feedback. Verify physical closure.")
+    print("Close command sent and connection released. Verify physical closure.")
 
 
 if __name__ == "__main__":

@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 def shutdown_case(controller, serial, *, open_seconds=None):
     """Connect/Close, optionally Open/hold, then shutdown itself must close.
 
-    No bypass of controller Open guards; no prompt or test retry. The caller
+    Readiness checks and feedback reads are explicit here; no prompt or test retry. The caller
     retains the object and must separately authorize hardware and hold limits.
     Successful return is reported-data evidence, not independent blade proof.
     """
@@ -55,8 +55,9 @@ def shutdown_case(controller, serial, *, open_seconds=None):
         ):
             raise ValueError("Target/status not verified")
         verified = True
-        phase = "initial Close"
-        closed = controller.close_shutter()
+        phase = "initial Disarm / Close"
+        controller.disarm_triggers()
+        closed = controller.get_operating_status()
         result["initial_close"] = asdict(closed)
         if (
             closed.connection,
@@ -66,8 +67,13 @@ def shutdown_case(controller, serial, *, open_seconds=None):
         ) != ("connected", "closed", "inactive", "manual"):
             raise ValueError("Initial Closed/Inactive/Manual not verified")
         if open_seconds is not None:
+            phase = "enable channel"
+            controller.enable_device()
             phase = "Open"
-            result["open"] = asdict(controller.open_shutter())
+            if not closed.key_enabled:
+                raise ValueError("Open refused: key not confirmed enabled")
+            controller.open_shutter()
+            result["open"] = asdict(controller.get_operating_status())
             if (
                 result["open"]["connection"],
                 result["open"]["shutter_state"],

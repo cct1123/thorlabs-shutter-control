@@ -21,14 +21,20 @@ controller's trigger example. Official references:
 [KEH3 manual section4.3](https://media.thorlabscms.cn/globalassets/items/k/ke/keh/keh3/doc-103012.pdf?v=0129060351).
 Static excerpts/checksums and bench investigations are preserved in the archive.
 
+KCubeShutter has no Ethernet argument/property/path. A private shared Kinesis
+implementation supplies lifecycle/getters/setters to USB cubes and hub-owned
+channels; ShutterHub owns all network endpoint selection and command dispatch.
+Only explicit documented KEH3 cube endpoints are accepted; no KEH6 network map
+or hub IP/firmware configuration is introduced.
+
 ## Communication and feedback
 
 | Operation | SDK contract |
 | --- | --- |
-| Discovery | BuildDeviceList/GetDeviceList(68); experimental explicit Ethernet checks provider/comspec |
-| Connect | CreateKCubeSolenoid, Connect, settings initialization, StartPolling, identity check, status requests |
+| Discovery | KCubeShutter filters FTDI USB entries; ShutterHub registers explicit network entries and filters TCPIP/comspec per slot |
+| Connect | CreateKCubeSolenoid, Connect, settings initialization, StartPolling, identity check; no operating-feedback request |
 | USB health | IsConnected true, USBConnected Connected or Connecting, CommsStatus OK |
-| Ethernet health | Selected TCPIP provider/comspec unchanged, IsConnected true, CommsStatus OK |
+| Ethernet health | ShutterHub owns endpoint/provider checks; its network channel requires IsConnected and CommsStatus OK |
 | Status | RequestStatus, RequestOperatingMode, RequestOperatingState, optional trigger request, then cached getters |
 | Identity | GetDeviceInfo; identify_device does not invoke the SDK's flashing IdentifyDevice operation |
 | Release | Attempt StopPolling then Disconnect even when stopping polling fails |
@@ -36,8 +42,12 @@ Static excerpts/checksums and bench investigations are preserved in the archive.
 Headless USB can remain Connecting while IsConnected/CommsStatus and actual reads
 work; Connecting alone is never accepted as readiness. Disconnected/unknown or
 communication errors fault the wrapper. Operating modes normalize Manual/SingleToggle/
-AutoToggle/Triggered to manual/single/auto/triggered. Operating state0 stays invalid;
-only Active/Inactive is accepted. A request/wait does not establish cache age.
+AutoToggle/Triggered to manual/single/auto/triggered. Operating state0 is undefined and reported as unknown; it is never treated as Inactive. A request/wait does not establish cache age.
+get_status() includes operating/TTL readback; get_operating_status() requests
+only operating feedback, and get_trigger_config() requests only TTL settings.
+get_cached_status() performs no I/O and is for display only, never output
+authorization. GUI actions explicitly read selected-panel feedback after commands;
+periodic refresh updates operating feedback while TTL settings are labelled last read.
 
 ## Key and physical interlock
 
@@ -54,18 +64,23 @@ or hardware write, clears on retargeting, and does not transfer to another objec
 or process. Unknown SDK readiness may use this evidence; a known negative report,
 key failure, wrong identity or communication fault is not overridden. Raw bits and
 interlock_enabled remain separate from operator_interlock_confirmed/interlock_ready.
+These values remain available to Python callers. GUI Open/Arm do not gate on
+interlock feedback or confirmation; users manage the physical interlock externally.
 
 ## Outputs and timing
 
-Close: SetOperatingState(Inactive) -> verify Closed/Inactive ->
-SetOperatingMode(Manual) -> verify Closed/Inactive/Manual.
-Open: require readiness/non-Triggered -> establish Close baseline -> EnableDevice ->
-SetOperatingState(Active) -> verify Open/Active/Manual with readiness.
-Failed Open attempts Inactive and latches the error. Cleanup is best effort.
+Close: SetOperatingState(Inactive) only; operating mode is preserved.
+Open: SetOperatingState(Active) only; operating mode and enable state are preserved.
+Enable: explicit enable_device() -> EnableDevice. Disarm: Inactive -> Manual.
+Setters return None and perform no prerequisite/status requests, feedback waits,
+readback or automatic recovery. SDK write errors latch a fault. The caller owns
+readiness and verification; the GUI performs explicit reads outside the setter.
+A returned setter call cannot prove Inactive was applied before the next write.
+Shutdown sends Close then releases; it does not verify physical closure.
 
-Default polling250ms; feedback timeout5s per wait stage; GUI refresh request1s.
-Native calls can block beyond these waits. Host sleeps, reported transitions and
-shutdown call durations are not calibrated blade/exposure measurements.
+Default polling/getter wait250ms; GUI refresh request1s. Native calls may block.
+Setters have no programmed wait or feedback timeout. Settings initialization uses
+the configured timeout. Host waits and snapshots are not optical measurements.
 
 ## TRIG1/TRIG2
 
@@ -75,11 +90,12 @@ shutdown call durations are not calibrated blade/exposure measurements.
 | Properties | Trigger1Mode/Trigger1Polarity/Trigger2Mode/Trigger2Polarity |
 | Direction enums | Disabled=0, TrigIN_GPI=1, TrigOUT_GPO=10 |
 | Polarity enums | TriggerHigh=1, TriggerLow=2 |
-| Arm | Close baseline, EnableDevice, Triggered, Active; confirm arming/readback |
-| Disarm | Same verified Inactive-before-Manual sequence as Close |
+| Arm | EnableDevice, Triggered, Active; no implicit readback |
+| Disarm | Inactive then Manual commands; Close alone preserves mode; no implicit readback |
 
-Apply requires Closed/Inactive/Manual; readback must match. Arm uses the current
-device settings and needs at least one input. The hardware manual describes5V
+The GUI checks Closed/Inactive/Manual and reads back Apply settings. It reads
+current settings and requires an input before Arm. Direct API setters do not
+perform those application checks. The hardware manual describes5V
 TTL and a disconnected input as LOW; active-low priming can open with no cable.
 The driver reports configuration/priming, not measured pin voltage or raw edges.
 No explicit PersistSettings/EEPROM call is made; power-cycle persistence has not

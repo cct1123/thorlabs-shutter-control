@@ -18,7 +18,6 @@ FEEDBACK_FIELDS = (
     "operating_state",
     "operating_mode",
     "key_enabled",
-    "interlock_enabled",
     "trigger_config",
 )
 
@@ -40,7 +39,6 @@ def validate_feedback(status, serial):
         or status.operating_state not in ("active", "inactive")
         or status.operating_mode not in ("manual", "single", "auto", "triggered")
         or type(status.key_enabled) is not bool
-        or (status.interlock_enabled is not None and type(status.interlock_enabled) is not bool)
         or status.trigger_config is None
     ):
         raise ValueError("Unknown/incomplete feedback; review before another cycle or actuation")
@@ -84,7 +82,8 @@ def passive_cycle(record, serial, controller, discovery_result):
     interrupted = None
     phase = "connect"
     try:
-        connected = controller.connect(serial)
+        controller.connect(serial)
+        connected = controller.get_status()
         result["connected_status"] = asdict(connected)
         validate_feedback(connected, serial)
         phase = "identity"

@@ -21,11 +21,6 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("serial", help="Actual serial recorded in lesson 1")
     parser.add_argument(
-        "--verified-interlock",
-        metavar="SERIAL",
-        help="Confirm normal physical interlock/protection for this selected serial, this run only",
-    )
-    parser.add_argument(
         "--armed-seconds",
         type=float,
         required=True,
@@ -34,16 +29,12 @@ def main():
     args = parser.parse_args()
     if not math.isfinite(args.armed_seconds) or args.armed_seconds <= 0:
         parser.error("--armed-seconds must be a finite positive number")
-    if args.verified_interlock is not None and args.verified_interlock != args.serial:
-        parser.error("--verified-interlock must match the selected serial")
 
     shutter = KCubeShutter(args.serial)
-    if args.verified_interlock:
-        shutter.confirm_interlock(args.serial)
     with ExitStack() as cleanup:
         cleanup.callback(shutter.disconnect, close_shutter=False)
         shutter.connect()
-        cleanup.callback(shutter.close_shutter)  # Only after verified Connect.
+        cleanup.callback(shutter.disarm_triggers)  # Only after verified Connect.
         print("Identity:", shutter.identify_device())
         shutter.disarm_triggers()  # Apply requires reported Closed/Inactive/Manual.
 
@@ -59,13 +50,18 @@ def main():
         print("Device settings readback:", shutter.get_trigger_config())
 
         # Arm selects Triggered and primes Active. The signal now controls position.
-        status = shutter.arm_triggers()
+        ready = shutter.get_status()
+        if not ready.is_closed_manual or not ready.key_enabled:
+            raise RuntimeError("Verify Closed/Manual and key before Arm")
+        shutter.arm_triggers()
+        status = shutter.get_status()
         print("Armed:", status.ttl_armed, "Reported position:", status.shutter_state)
         # Armed=True can coexist with Closed when the signal is inactive.
         # This program does not generate pulses or measure input voltage.
         sleep(args.armed_seconds)
 
-        print("Disarm / Close:", shutter.disarm_triggers().shutter_state)
+        shutter.disarm_triggers()
+        print("Disarm / Close:", shutter.get_operating_status().shutter_state)
         # ExitStack attempts Disarm/Close and release on errors or Ctrl+C,
         # preserving chained failures without writing through an unverified target.
 

@@ -14,8 +14,8 @@ an explicitly configured six-panel layout. Each was captured from a separate
 unconfigured application instance;
 no image editing, synthetic hardware state or actuation was used.
 
-Shareable documentation uses environment variables for live identities and
-`CONTROLLER_A`/`HUB_A` aliases for historical observations. Illustrative
+Live launch settings belong in project `config.py`; keep real identities out of
+shared commits. Historical observations use `CONTROLLER_A`/`HUB_A` aliases. Illustrative
 `192.0.2.x` addresses are documentation examples, not the bench network. Test
 fixtures use explicitly fictional identities to exercise validation.
 

@@ -1,0 +1,31 @@
+{
+  "evidence": "E090 / TEST-099",
+  "requirement": "REQ-061",
+  "source_revision": "ca0d15098e47e552518e985e71de3d2f6302eb7a",
+  "html_sha256": "f922c2b40d1af77ede12a350837da35b6dc550ec1b3727b260497546fc00678f",
+  "bytes": 154867,
+  "sections": 9,
+  "figures": 7,
+  "svg_figures": 6,
+  "internal_links": 47,
+  "embedded_gui_image_bytes": 88797,
+  "remote_dependencies": [],
+  "checks": "PASS: unique anchors, local citations, SVG XML, embedded original screenshot, privacy patterns, deterministic pinned-revision build, Python syntax",
+  "hardware_access": false,
+  "notion": {
+    "page_url": "https://app.notion.com/p/4005bb9cf275811c9d71f1a17d984397",
+    "page_id": "4005bb9c-f275-811c-9d71-f1a17d984397",
+    "file_upload_id": "4005bb9c-f275-810c-9be6-00b2c4164691",
+    "creation_mode": "draft",
+    "page_readback": "PASS: practical tutorial title, native outline and revised HTML embed",
+    "attachment_download": "PASS: exact complete content match",
+    "supervisor_signoff": false
+  },
+  "visual_review": "Original seven figures retained; revised prose/anchors/SVG checked structurally",
+  "preview": {
+    "path": "outputs/supervisor-notebook-preview.jpg",
+    "sha256": "b23c626cdec1c22f06e0cc492e73960c9255eeb37ee5016e4eac217c8fbe50e7"
+  },
+  "previous_review_html_sha256": "2428ea9673538b1152f81dca35778a2472ea9c4a086e8dcbf3df94d9b4469c63",
+  "presentation": "Practical tutorial; no displayed hashes/commit IDs/audit IDs; added passive starting examples"
+}

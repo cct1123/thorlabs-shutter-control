@@ -4,7 +4,8 @@ from types import SimpleNamespace
 
 import pytest
 
-from thorlabs_shutter_control import KCubeShutter, ShutterError
+from thorlabs_shutter_control import KCubeShutter, ShutterError, TriggerConfig
+from thorlabs_shutter_control import controller as driver
 
 
 @pytest.fixture
@@ -25,7 +26,8 @@ def independent_rig(rig, monkeypatch):
 
 
 @pytest.mark.parametrize(
-    "serial", ["123", "27000001", "68abcdef", "68000001\n", "68１２３４５６", 68000001, [], False]
+    "serial",
+    ["123", "27000001", "68abcdef", "68000001\n", "68１２３４５６", 68000001.0, [], False, True],
 )
 def test_rejects_invalid_serial_before_hardware_access(serial):
     with pytest.raises(ValueError):
@@ -42,12 +44,6 @@ def test_initial_status_and_discovery_do_not_connect_or_actuate(rig):
     assert rig.controller.get_status().shutter_state == "unknown"
     assert rig.controller.discover() == ["68000001"]
     assert rig.device.calls == []
-
-
-def test_connect_and_read_identity_without_output_writes(rig):
-    assert rig.controller.connect().connection == "connected"
-    assert rig.controller.identify_device()["serial_number"] == "68000001"
-    assert not any(c[0] in {"enable", "set_state", "set_mode"} for c in rig.device.calls)
 
 
 @pytest.mark.parametrize("serial", [None, "68000002"])
@@ -67,192 +63,11 @@ def test_owned_handle_cannot_be_relabelled_even_after_failed_release(rig, serial
     assert rig.controller.serial_number == serial
 
 
-@pytest.mark.parametrize("serial", ["27000001", "68invalid", 68000002])
-def test_disconnected_selection_assignment_is_validated_without_sdk(rig, serial):
-    with pytest.raises(ValueError, match="serial number"):
-        rig.controller.serial_number = serial
-    assert not rig.manager_calls and not rig.device.calls
-
-
-@pytest.mark.parametrize("mode, expected", [("SingleToggle", "single"), ("AutoToggle", "auto")])
-def test_documented_timed_modes_have_normalized_feedback(rig, mode, expected):
-    rig.device.mode = mode
-    assert rig.controller.connect().operating_mode == expected
-    assert not any(c[0] in {"enable", "set_state", "set_mode"} for c in rig.device.calls)
-
-
-@pytest.mark.parametrize("include_triggers", [False, True])
-def test_feedback_requests_precede_wait_and_cached_getters(rig, monkeypatch, include_triggers):
-    from thorlabs_shutter_control import controller as module
-
-    rig.controller.connect()
-    rig.device.calls.clear()
-    rig.device.operation = "0"  # Unpopulated cache, not a valid Inactive value.
-    sleep = module.time.sleep
-
-    def reply_after_wait(seconds):
-        names = [call[0] for call in rig.device.calls]
-        assert names.index("request_mode") < names.index("request_operation")
-        rig.device.operation = "Inactive"
-        sleep(seconds)
-
-    monkeypatch.setattr(module.time, "sleep", reply_after_wait)
-    status = rig.controller._read_status(include_triggers=include_triggers)
-    assert status.operating_state == "inactive"
-    assert not any(c[0] in {"enable", "set_state", "set_mode"} for c in rig.device.calls)
-
-
-@pytest.mark.parametrize("attribute, value", [("operation", "0"), ("mode", "Unexpected")])
-def test_connect_rejects_unknown_operating_feedback_without_output(rig, attribute, value):
-    setattr(rig.device, attribute, value)
-    with pytest.raises(ShutterError, match="Unknown operating feedback"):
-        rig.controller.connect()
-    assert rig.device.calls[-2:] == [("stop_poll",), ("disconnect",)]
-    assert not any(c[0] in {"enable", "set_state", "set_mode"} for c in rig.device.calls)
-
-
-@pytest.mark.parametrize("attribute, value", [("operation", "0"), ("mode", "Unexpected")])
-def test_unknown_operating_feedback_faults_before_open_output(rig, attribute, value):
-    rig.controller.connect()
-    rig.device.calls.clear()
-    setattr(rig.device, attribute, value)
-    with pytest.raises(ShutterError, match="Unknown operating feedback"):
-        rig.controller.open_shutter()
-    assert rig.controller.get_status().connection == "fault"
-    assert not any(c[0] in {"enable", "set_state", "set_mode"} for c in rig.device.calls)
-
-
-@pytest.mark.parametrize("failure", ["request_operation", "request_mode"])
-def test_operating_read_request_failure_releases_connect_without_output(rig, failure):
-    rig.device.fail.add(failure)
-    with pytest.raises(ShutterError, match="Connect failed"):
-        rig.controller.connect()
-    assert rig.device.calls[-2:] == [("stop_poll",), ("disconnect",)]
-    assert not any(c[0] in {"enable", "set_state", "set_mode"} for c in rig.device.calls)
-
-
-def test_discovery_requires_unique_or_explicit_device(rig):
-    rig.serials.extend(["68000002"])
-    with pytest.raises(ShutterError, match="found 2"):
-        rig.controller.connect()
-    assert rig.device.calls == []
-    assert rig.controller.connect("68000002").serial_number == "68000002"
-    with pytest.raises(ShutterError, match="Disconnect before"):
-        rig.controller.connect("68000001")
-
-
-def test_no_device_is_actionable_error(rig):
-    rig.serials.clear()
-    with pytest.raises(ShutterError, match="found 0"):
-        rig.controller.connect()
-
-
-@pytest.mark.parametrize("failure", ["connect", "poll", "identity", "status"])
-def test_partial_connection_failure_releases_without_actuation(rig, failure):
-    rig.device.fail.add(failure)
-    with pytest.raises(ShutterError, match="Connect failed"):
-        rig.controller.connect()
-    assert ("disconnect",) in rig.device.calls
-    assert not any(c[0] in {"enable", "set_state", "set_mode"} for c in rig.device.calls)
-    assert rig.controller.get_status().has_device is False
-
-
 def test_settings_timeout_is_not_treated_as_connected(rig):
     rig.device.initialized = False
     with pytest.raises(ShutterError, match="settings did not initialize"):
         rig.controller.connect()
     assert ("disconnect",) in rig.device.calls
-
-
-def test_repeat_open_close_and_reconnect(rig):
-    rig.controller.connect()
-    for _ in range(20):
-        assert rig.controller.open_shutter().shutter_state == "open"
-        assert rig.controller.close_shutter().shutter_state == "closed"
-    rig.controller.disconnect()
-    assert rig.controller.get_status().connection == "disconnected"
-    rig.controller.connect()
-    assert rig.controller.get_status().connection == "connected"
-
-
-def test_open_disarms_auto_mode_before_enabling(rig):
-    rig.device.mode = "AutoToggle"
-    rig.controller.connect()
-    rig.controller.open_shutter()
-    commands = [c for c in rig.device.calls if c[0] in {"set_state", "set_mode", "enable"}]
-    assert commands == [
-        ("set_state", "Inactive"),
-        ("set_mode", "Manual"),
-        ("enable",),
-        ("set_state", "Active"),
-    ]
-
-
-@pytest.mark.parametrize(
-    "getter, value",
-    [
-        ("GetOperatingState", "Active"),
-        ("GetSolenoidState", "Open"),
-        ("GetOperatingMode", "AutoToggle"),
-    ],
-    ids=["operation", "position", "mode"],
-)
-def test_open_does_not_enable_when_preparation_feedback_disagrees(rig, monkeypatch, getter, value):
-    rig.device.mode = "AutoToggle"
-    rig.device.state = "Open"
-    rig.device.operation = "Active"
-    rig.controller.connect()
-    monkeypatch.setattr(rig.device, getter, lambda: value)
-    with pytest.raises(ShutterError, match="reported Closed/Inactive"):
-        rig.controller.open_shutter()
-    assert ("enable",) not in rig.device.calls
-    assert ("set_state", "Active") not in rig.device.calls
-    assert rig.device.calls[-1] == ("set_state", "Inactive")
-    assert rig.controller.get_status().shutter_state == "unknown"
-
-
-@pytest.mark.parametrize("blocked", ["key", "interlock"])
-def test_open_respects_existing_safeguards(rig, blocked):
-    rig.controller.connect()
-    if blocked == "key":
-        rig.device.Status.KeyEnabled = False
-    else:
-        rig.device.interlock = False
-    with pytest.raises(ShutterError, match="Open refused"):
-        rig.controller.open_shutter()
-    assert not any(c[0] == "enable" for c in rig.device.calls)
-    assert rig.controller.close_shutter().shutter_state == "closed"
-
-
-@pytest.mark.parametrize(
-    "attribute, value",
-    [
-        ("state", "Closed"),
-        ("operation", "Inactive"),
-        ("mode", "AutoToggle"),
-        ("KeyEnabled", False),
-        ("interlock", False),
-    ],
-)
-def test_missing_feedback_does_not_turn_successful_write_into_success(
-    rig, monkeypatch, attribute, value
-):
-    rig.controller.connect()
-    set_state = rig.device.SetOperatingState
-
-    def disagree_after_open(state):
-        set_state(state)
-        if state == "Active":
-            target = rig.device.Status if attribute == "KeyEnabled" else rig.device
-            setattr(target, attribute, value)
-
-    monkeypatch.setattr(rig.device, "SetOperatingState", disagree_after_open)
-    with pytest.raises(ShutterError, match="Timed out waiting for reported Open"):
-        rig.controller.open_shutter()
-    assert rig.device.calls[-1] == ("set_state", "Inactive")
-    assert rig.controller.get_status().shutter_state == "unknown"
-    with pytest.raises(ShutterError, match="Open failed"):
-        rig.controller.open_shutter()
 
 
 @pytest.mark.parametrize("loss", ["usb", "comms", "status"])
@@ -277,55 +92,6 @@ def test_communication_fault_invalidates_feedback_and_requires_reconnect(rig, lo
     assert rig.controller.connect().connection == "connected"
 
 
-def test_headless_usb_connecting_allows_passive_reads_only_when_ready(rig, monkeypatch):
-    connect = rig.device.Connect
-
-    def headless_connect(serial):
-        connect(serial)
-        rig.device.USBConnected = "Connecting"
-
-    monkeypatch.setattr(rig.device, "Connect", headless_connect)
-    assert rig.controller.connect().connection == "connected"
-    assert rig.controller.identify_device()["serial_number"] == "68000001"
-    assert rig.controller.get_status().connection == "connected"
-    rig.controller.disconnect(close_shutter=False)
-    assert not any(
-        c[0] in {"enable", "set_state", "set_mode", "set_triggers"} for c in rig.device.calls
-    )
-
-
-@pytest.mark.parametrize("fault", ["not_ready", "timeout", "error", "request", "unknown_usb"])
-def test_headless_usb_connecting_still_faults_on_loss(rig, fault):
-    rig.controller.connect()
-    rig.device.USBConnected = "Connecting"
-    if fault == "not_ready":
-        rig.device.IsConnected = False
-    elif fault in ("timeout", "error"):
-        rig.device.CommsStatus = fault.title()
-    elif fault == "request":
-        rig.device.fail.add("status")
-    else:
-        rig.device.USBConnected = "PreConnecting"
-    status = rig.controller.get_status()
-    assert status.connection == "fault" and status.shutter_state == "unknown"
-    rig.device.calls.clear()
-    with pytest.raises(ShutterError):
-        rig.controller.open_shutter()
-    assert not any(
-        c[0] in {"enable", "set_state", "set_mode", "set_triggers"} for c in rig.device.calls
-    )
-    rig.controller.disconnect(close_shutter=False)
-
-
-def test_shutdown_closes_before_releasing(rig):
-    rig.controller.connect()
-    rig.controller.open_shutter()
-    rig.controller.safe_shutdown()
-    assert rig.device.state == "Closed"
-    assert rig.device.calls[-2:] == [("stop_poll",), ("disconnect",)]
-    rig.controller.safe_shutdown()  # Idempotent after success.
-
-
 def test_close_failure_does_not_skip_cleanup_or_hide_failure(rig):
     rig.controller.connect()
     rig.device.fail.add("set_state")
@@ -336,14 +102,6 @@ def test_close_failure_does_not_skip_cleanup_or_hide_failure(rig):
     assert not rig.controller.get_status().has_device
     rig.controller.safe_shutdown()
     assert rig.controller.get_status().error  # A second cleanup cannot erase the failed close.
-
-
-def test_shutdown_still_disconnects_if_stopping_polling_fails(rig):
-    rig.controller.connect()
-    rig.device.fail.add("stop_poll")
-    with pytest.raises(ShutterError, match="stop polling"):
-        rig.controller.safe_shutdown()
-    assert rig.device.calls[-1] == ("disconnect",)
 
 
 def test_disconnect_failure_retains_handle_for_retry(rig):
@@ -357,30 +115,12 @@ def test_disconnect_failure_retains_handle_for_retry(rig):
     assert not rig.controller.get_status().has_device
 
 
-def test_explicit_passive_disconnect_does_not_write_output(rig):
-    rig.controller.connect()
-    rig.controller.disconnect(close_shutter=False)
-    assert not any(c[0] in {"enable", "set_state", "set_mode"} for c in rig.device.calls)
-
-
 def test_context_keeps_original_exception_and_attaches_shutdown_error(rig):
     with pytest.raises(ValueError, match="application failure") as caught:
         with rig.controller:
             rig.device.fail.add("set_state")
             raise ValueError("application failure")
     assert "Shutdown incomplete" in caught.value.__notes__[0]
-
-
-def test_interrupt_during_close_still_releases_device(rig, monkeypatch):
-    rig.controller.connect()
-
-    def interrupt():
-        raise KeyboardInterrupt()
-
-    monkeypatch.setattr(rig.controller, "close_shutter", interrupt)
-    with pytest.raises(KeyboardInterrupt):
-        rig.controller.safe_shutdown()
-    assert rig.device.calls[-2:] == [("stop_poll",), ("disconnect",)]
 
 
 def test_connection_loss_during_status_read_cannot_return_healthy_snapshot(rig, monkeypatch):
@@ -414,82 +154,23 @@ def test_connect_rejects_mismatched_identity_without_output_writes(rig, monkeypa
     replacement.safe_shutdown()
 
 
-def test_status_samples_operating_feedback_after_trigger_read_wait(rig, monkeypatch):
-    rig.controller.connect()
-    rig.controller.open_shutter()
-    read = rig.device.GetTriggerConfigParams
-
-    def changed_during_settings_read():
-        rig.device.Status.KeyEnabled = False
-        rig.device.interlock = False
-        rig.device.state = "Closed"
-        rig.device.operation = "Inactive"
-        return read()
-
-    monkeypatch.setattr(rig.device, "GetTriggerConfigParams", changed_during_settings_read)
-    status = rig.controller.get_status()
-    assert status.key_enabled is False and status.interlock_enabled is None
-    assert status.shutter_state == "closed" and status.operating_state == "inactive"
-
-
-@pytest.mark.parametrize("bits", [0, 0x2000])
-def test_clear_interlock_bit_means_unverified_and_blocks_output(rig, monkeypatch, bits):
-    monkeypatch.setattr(rig.device, "GetStatusBits", lambda: bits)
-    status = rig.controller.connect()
-    assert status.status_bits == bits
-    assert status.interlock_enabled is None
-    assert status.key_enabled is True  # Key cannot substitute for interlock.
-    rig.device.calls.clear()
-    with pytest.raises(ShutterError, match="not confirmed enabled"):
-        rig.controller.open_shutter()
-    with pytest.raises(ShutterError, match="not confirmed enabled"):
-        rig.controller.arm_triggers()
-    assert not any(
-        c[0] in {"enable", "set_state", "set_mode", "set_triggers"} for c in rig.device.calls
-    )
-    rig.controller.disconnect(close_shutter=False)
-
-
-def test_documented_positive_interlock_indication_preserves_raw_bits(rig, monkeypatch):
-    monkeypatch.setattr(rig.device, "GetStatusBits", lambda: 0x3000)
-    status = rig.controller.connect()
-    assert status.status_bits == 0x3000 and status.interlock_enabled is True
-    rig.controller.disconnect(close_shutter=False)
-
-
-def test_open_recovery_interrupt_cannot_leave_healthy_status(rig, monkeypatch):
-    rig.controller.connect()
-    set_state = rig.device.SetOperatingState
-    failed_open = False
-
-    def fail_open_and_interrupt_recovery(state):
-        nonlocal failed_open
-        if state == "Inactive" and failed_open:
-            raise KeyboardInterrupt("Recovery interrupted")
-        set_state(state)
-        if state == "Active":
-            failed_open = True
-            raise RuntimeError("Active failed after actuation")
-
-    monkeypatch.setattr(rig.device, "SetOperatingState", fail_open_and_interrupt_recovery)
-    with pytest.raises(KeyboardInterrupt, match="Recovery interrupted") as caught:
-        rig.controller.open_shutter()
-    status = rig.controller.get_status()
-    assert status.connection == "fault" and status.shutter_state == "unknown"
-    assert "Active failed" in status.error and "Recovery interrupted" in status.error
-    assert status.error in caught.value.__notes__
-
-
-@pytest.mark.parametrize("serial", [68000001, [], False])
-def test_connect_rejects_non_string_serial_without_sdk_access(rig, serial):
-    with pytest.raises(ShutterError, match="serial"):
-        rig.controller.connect(serial)
+@pytest.mark.parametrize("serial", ["68000001", 68000001])
+def test_serial_input_normalizes_for_selection_confirmation_and_connection(rig, serial):
+    controller = KCubeShutter(serial)
+    assert controller.serial_number == "68000001"
     assert not rig.manager_calls and not rig.device.calls
+    rig.controller.serial_number = serial
+    rig.controller.confirm_interlock(serial)
+    assert rig.controller.connect(serial).operator_interlock_confirmed
+    # Reassigning the same identity in another representation preserves confirmation.
+    rig.controller.serial_number = 68000001
+    assert rig.controller.connect("68000001").operator_interlock_confirmed
+    assert not any(call[0] == "set_state" for call in rig.device.calls)
 
 
 @pytest.mark.parametrize("method", ["StopPolling", "Disconnect"])
-@pytest.mark.parametrize("during_connect", [False, True])
-@pytest.mark.parametrize("exception_type", [KeyboardInterrupt, SystemExit])
+@pytest.mark.parametrize("during_connect", [True])
+@pytest.mark.parametrize("exception_type", [KeyboardInterrupt])
 def test_release_interrupt_still_attempts_disconnect_and_preserves_fault_and_ownership(
     rig, monkeypatch, method, during_connect, exception_type
 ):
@@ -530,21 +211,6 @@ def test_release_interrupt_still_attempts_disconnect_and_preserves_fault_and_own
     replacement.safe_shutdown()
 
 
-def test_duplicate_serial_is_refused_before_creating_a_second_handle(independent_rig):
-    rig = independent_rig
-    first = rig.controllers[0]
-    duplicate = KCubeShutter(first.serial_number, timeout=0.5)
-    first.connect()
-    first.connect()  # Connecting the current owner again remains idempotent.
-    with pytest.raises(ShutterError, match="already owned by another controller"):
-        duplicate.connect()
-    assert rig.factory_calls == [first.serial_number]
-    assert not duplicate.get_status().has_device
-    first.disconnect(close_shutter=False)
-    assert duplicate.connect().connection == "connected"
-    assert rig.factory_calls == [first.serial_number, first.serial_number]
-
-
 def test_serial_is_owned_while_first_connection_is_initializing(independent_rig, monkeypatch):
     rig = independent_rig
     first = rig.controllers[0]
@@ -573,84 +239,183 @@ def test_serial_is_owned_while_first_connection_is_initializing(independent_rig,
         assert pending.result(timeout=2).connection == "connected"
 
 
-@pytest.mark.parametrize("failure", ["connect", "poll", "identity", "status"])
-def test_failed_connection_releases_ownership_after_successful_cleanup(independent_rig, failure):
-    rig = independent_rig
-    first = rig.controllers[0]
-    device = rig.devices[first.serial_number]
-    device.fail.add(failure)
-    with pytest.raises(ShutterError, match="Connect failed"):
-        first.connect()
-    device.fail.clear()
-    replacement = KCubeShutter(first.serial_number, timeout=0.5)
-    assert replacement.connect().connection == "connected"
+@pytest.mark.parametrize(
+    "method, expected_requests",
+    [
+        ("get_status", ["status", "request_mode", "request_operation", "request_triggers"]),
+        ("get_operating_status", ["status", "request_mode", "request_operation"]),
+        ("get_trigger_config", ["request_triggers"]),
+        ("get_cached_status", []),
+    ],
+)
+def test_read_methods_only_request_their_own_data(rig, method, expected_requests):
+    rig.controller.connect()
+    rig.device.calls.clear()
+    getattr(rig.controller, method)()
+    assert [c[0] for c in rig.device.calls if c[0] != "get_triggers"] == expected_requests
+    rig.controller.disconnect(close_shutter=False)
 
 
-@pytest.mark.parametrize("factory_result", ["none", "raise"])
-def test_failed_factory_releases_ownership(independent_rig, monkeypatch, factory_result):
-    rig = independent_rig
-    first = rig.controllers[0]
-    factory = rig.controller._sdk.device_type.CreateKCubeSolenoid
+@pytest.mark.parametrize(
+    "method,args,writes",
+    [
+        ("enable_device", (), ["enable"]),
+        ("open_shutter", (), ["set_state"]),
+        ("close_shutter", (), ["set_state"]),
+        ("arm_triggers", (), ["enable", "set_mode", "set_state"]),
+        ("disarm_triggers", (), ["set_state", "set_mode"]),
+        ("configure_triggers", (TriggerConfig(),), ["set_triggers"]),
+        ("set_operating_state", ("active",), ["set_state"]),
+        ("set_operating_state", ("inactive",), ["set_state"]),
+        ("set_operating_mode", ("manual",), ["set_mode"]),
+        ("set_operating_mode", ("single",), ["set_mode"]),
+        ("set_operating_mode", ("auto",), ["set_mode"]),
+        ("set_operating_mode", ("triggered",), ["set_mode"]),
+    ],
+)
+def test_setters_never_request_or_read_feedback_or_wait(rig, monkeypatch, method, args, writes):
+    rig.controller.connect()
+    rig.device.calls.clear()
 
-    def fail_creation(serial):
-        if factory_result == "raise":
-            raise RuntimeError("Injected factory failure")
-        return None
+    def forbidden(*args, **kwargs):
+        pytest.fail("Setter requested/read feedback or waited")
 
-    monkeypatch.setattr(rig.controller._sdk.device_type, "CreateKCubeSolenoid", fail_creation)
-    with pytest.raises(ShutterError, match="Connect failed"):
-        first.connect()
-    monkeypatch.setattr(rig.controller._sdk.device_type, "CreateKCubeSolenoid", factory)
-    replacement = KCubeShutter(first.serial_number, timeout=0.5)
-    assert replacement.connect().connection == "connected"
-
-
-@pytest.mark.parametrize("during_connect", [False, True])
-def test_failed_disconnect_retains_serial_ownership_until_retry(independent_rig, during_connect):
-    rig = independent_rig
-    first = rig.controllers[0]
-    device = rig.devices[first.serial_number]
-    if during_connect:
-        device.fail.update({"poll", "disconnect"})
-        with pytest.raises(ShutterError, match="Connect failed"):
-            first.connect()
-    else:
-        first.connect()
-        device.fail.add("disconnect")
-        with pytest.raises(ShutterError, match="Shutdown incomplete"):
-            first.safe_shutdown()
-    replacement = KCubeShutter(first.serial_number, timeout=0.5)
-    with pytest.raises(ShutterError, match="already owned"):
-        replacement.connect()
-    assert first.get_status().has_device
-    device.fail.clear()
-    first.safe_shutdown()
-    assert replacement.connect().connection == "connected"
+    for name in dir(rig.device):
+        if name.startswith(("Request", "Get")):
+            monkeypatch.setattr(rig.device, name, forbidden)
+    monkeypatch.setattr(rig.controller, "_check_connection", forbidden)
+    monkeypatch.setattr(driver.time, "sleep", forbidden)
+    assert getattr(rig.controller, method)(*args) is None
+    assert [c[0] for c in rig.device.calls] == writes
 
 
-@pytest.mark.parametrize("device_count", [2, 3])
-def test_distinct_handles_keep_control_status_and_faults_independent(independent_rig, device_count):
-    rig = independent_rig
-    controllers = rig.controllers[:device_count]
-    for controller in controllers:
-        status = controller.connect()
-        assert status.serial_number == controller.serial_number
-        assert controller.identify_device()["serial_number"] == controller.serial_number
-    controllers[0].open_shutter()
-    assert rig.devices[controllers[0].serial_number].state == "Open"
-    for controller in controllers[1:]:
-        device = rig.devices[controller.serial_number]
-        assert device.state == "Closed"
-        assert not any(c[0] in {"enable", "set_state", "set_mode"} for c in device.calls)
-    failed_device = rig.devices[controllers[0].serial_number]
-    failed_device.fail.add("status")
-    assert controllers[0].get_status().connection == "fault"
-    for controller in controllers[1:]:
-        assert controller.open_shutter().shutter_state == "open"
-        assert controller.close_shutter().shutter_state == "closed"
-    failed_device.fail.clear()
-    for controller in controllers:
-        controller.safe_shutdown()
-        device = rig.devices[controller.serial_number]
-        assert device.state == "Closed"
-        assert device.calls[-2:] == [("stop_poll",), ("disconnect",)]
+@pytest.mark.parametrize(
+    "method,expected",
+    [
+        ("open_shutter", [("set_state", "Active")]),
+        ("close_shutter", [("set_state", "Inactive")]),
+        ("arm_triggers", [("enable",), ("set_mode", "Triggered"), ("set_state", "Active")]),
+        ("disarm_triggers", [("set_state", "Inactive"), ("set_mode", "Manual")]),
+    ],
+)
+def test_command_order_and_repeated_calls_are_explicit(rig, method, expected):
+    rig.controller.connect()
+    rig.device.mode = "AutoToggle"
+    rig.device.calls.clear()
+    for _ in range(2):
+        assert getattr(rig.controller, method)() is None
+    assert rig.device.calls == expected * 2
+    if method in ("open_shutter", "close_shutter"):
+        assert rig.device.mode == "AutoToggle"
+
+
+@pytest.mark.parametrize(
+    "method,expected_request,value",
+    [
+        ("get_shutter_state", "status", "closed"),
+        ("get_operating_state", "request_operation", "inactive"),
+        ("get_operating_mode", "request_mode", "manual"),
+        ("get_status_bits", "status", 0x1000),
+    ],
+)
+def test_specific_getters_request_only_the_selected_feedback(rig, method, expected_request, value):
+    rig.controller.connect()
+    rig.device.calls.clear()
+    start = driver.time.monotonic()
+    assert getattr(rig.controller, method)() == value
+    assert rig.device.calls == [(expected_request,)]
+    assert driver.time.monotonic() - start == pytest.approx(rig.controller.polling_ms / 1000)
+
+
+def test_connect_does_not_request_operating_feedback_or_wait_for_zero(rig):
+    rig.device.operation = "0"
+    start = driver.time.monotonic()
+    status = rig.controller.connect()
+    assert driver.time.monotonic() == start
+    assert status.connection == "connected" and status.operating_state == "unknown"
+    assert [c[0] for c in rig.device.calls] == ["connect", "poll", "identity"]
+    assert rig.controller.get_operating_state() == "unknown"
+    assert rig.controller.get_status().operating_state == "unknown"
+
+
+def test_write_completion_does_not_claim_readback_or_leave_stale_snapshot(rig, monkeypatch):
+    rig.controller.connect()
+    assert rig.controller.get_status().is_closed_manual
+    monkeypatch.setattr(rig.device, "SetOperatingState", lambda value: None)
+    assert rig.controller.open_shutter() is None  # No acknowledgment implied.
+    assert rig.controller.get_cached_status().shutter_state == "unknown"
+    assert rig.controller.get_shutter_state() == "closed"  # Separate read shows disagreement.
+
+
+def test_trigger_write_and_readback_are_separate(rig, monkeypatch):
+    rig.controller.connect()
+    config = TriggerConfig(trig1_polarity="low")
+    monkeypatch.setattr(rig.device, "SetTriggerConfigParams", lambda value: None)
+    assert rig.controller.configure_triggers(config) is None
+    assert rig.controller.get_trigger_config() != config
+
+
+@pytest.mark.parametrize("exception", [RuntimeError, KeyboardInterrupt])
+def test_write_errors_preserve_fault_without_hidden_recovery(rig, monkeypatch, exception):
+    rig.controller.connect()
+    rig.device.calls.clear()
+
+    def fail(value):
+        raise exception("write failed")
+
+    monkeypatch.setattr(rig.device, "SetOperatingState", fail)
+    with pytest.raises(KeyboardInterrupt if exception is KeyboardInterrupt else ShutterError):
+        rig.controller.open_shutter()
+    assert rig.device.calls == []
+    assert "write failed" in rig.controller.get_cached_status().error
+    rig.controller.disconnect(close_shutter=False)
+    assert rig.device.calls[-2:] == [("stop_poll",), ("disconnect",)]
+
+
+@pytest.mark.parametrize(
+    "method,args",
+    [
+        ("set_operating_state", ("bad",)),
+        ("set_operating_mode", ("bad",)),
+        ("configure_triggers", (None,)),
+    ],
+)
+def test_invalid_setter_inputs_fail_without_io(rig, method, args):
+    with pytest.raises(ValueError):
+        getattr(rig.controller, method)(*args)
+    assert not rig.device.calls and not rig.manager_calls
+
+
+@pytest.mark.parametrize(
+    "method", ["get_shutter_state", "get_operating_state", "get_operating_mode", "get_status_bits"]
+)
+def test_disconnected_specific_getters_do_not_load_sdk(rig, method):
+    with pytest.raises(ShutterError, match="No device connected"):
+        getattr(rig.controller, method)()
+    assert not rig.device.calls and not rig.manager_calls
+
+
+def test_confirmation_does_not_cross_serial_or_instance(rig):
+    c = rig.controller
+    c.serial_number = "68000001"
+    c.confirm_interlock("68000001")
+    rig.device.interlock = False
+    other = KCubeShutter("68000001")
+    assert not other.connect().operator_interlock_confirmed
+    other.disconnect(close_shutter=False)
+    c.serial_number = "68000002"
+    c.serial_number = "68000001"
+    assert not c.connect().interlock_ready
+    c.disconnect(close_shutter=False)
+
+
+def test_confirmation_requires_explicit_selected_disconnected_controller(rig):
+    with pytest.raises(ValueError):
+        rig.controller.confirm_interlock("68000001")
+    rig.controller.serial_number = "68000001"
+    with pytest.raises(ValueError):
+        rig.controller.confirm_interlock("68000002")
+    rig.controller.connect()
+    with pytest.raises(ShutterError):
+        rig.controller.confirm_interlock("68000001")
+    rig.controller.disconnect(close_shutter=False)

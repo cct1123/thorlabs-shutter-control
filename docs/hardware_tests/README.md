@@ -55,7 +55,7 @@ configures and may actuate hardware:
 
 ```powershell
 New-Item -ItemType Directory -Force inputs/private | Out-Null
-uv run --locked python docs/hardware_tests/ttl_unconnected.py $env:SHUTTER_SERIAL --ports-unconnected --verified-interlock $env:SHUTTER_SERIAL --armed-seconds 1 --record inputs/private/ttl-new-run.json
+uv run --locked python docs/hardware_tests/ttl_unconnected.py $env:SHUTTER_SERIAL --ports-unconnected --armed-seconds 1 --record inputs/private/ttl-new-run.json
 ```
 
 Checks: disabled/output settings readback, Arm refusal without an input, each input

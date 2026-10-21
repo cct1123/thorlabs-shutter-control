@@ -20,26 +20,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("serials", nargs=3, metavar="SERIAL", help="Three distinct actual serials")
     parser.add_argument(
-        "--verified-interlock",
-        action="append",
-        default=[],
-        metavar="SERIAL",
-        help="Confirm normal interlock/protection for a selected serial; repeat per device",
-    )
-    parser.add_argument(
         "--open-seconds", type=float, required=True, help="Approved hold in seconds"
     )
     args = parser.parse_args()
     if not math.isfinite(args.open_seconds) or args.open_seconds <= 0:
         parser.error("--open-seconds must be a finite positive number")
-    if any(serial not in args.serials for serial in args.verified_interlock):
-        parser.error("--verified-interlock must name a selected serial")
 
     # The hub creates one independent KCubeShutter for each serial; no connection yet.
     hub = ShutterHub(args.serials)
-    for shutter in hub.controllers:
-        if shutter.serial_number in args.verified_interlock:
-            shutter.confirm_interlock(shutter.serial_number)
     with ExitStack() as cleanup:
         for shutter in hub.controllers:
             cleanup.callback(shutter.disconnect, close_shutter=False)
@@ -49,15 +37,21 @@ def main():
             shutter = hub.controllers[slot]
             cleanup.callback(shutter.close_shutter)  # Only a verified connection.
             print(f"Shutter {slot + 1}:", shutter.identify_device())
-            shutter.close_shutter()  # Establish Closed/disarmed for all before opening any.
+            shutter.enable_device()  # Explicit one-time channel setup.
+            shutter.disarm_triggers()  # Establish Manual/Inactive before opening any.
 
         for number, shutter in enumerate(hub.controllers, start=1):
             try:
-                print(f"Opening shutter {number}:", shutter.open_shutter().shutter_state)
+                ready = shutter.get_operating_status()
+                if not ready.is_closed_manual or not ready.key_enabled:
+                    raise RuntimeError("Verify Closed/Manual and key before Open")
+                shutter.open_shutter()
+                print(f"Opening shutter {number}:", shutter.get_operating_status().shutter_state)
                 sleep(args.open_seconds)
             finally:
                 # Close this shutter before the loop can open the next one.
-                print(f"Closing shutter {number}:", shutter.close_shutter().shutter_state)
+                shutter.close_shutter()
+                print(f"Closing shutter {number}:", shutter.get_operating_status().shutter_state)
         # ExitStack closes verified targets and releases every handle despite
         # callback failures. A failed identity never authorizes an output command.
 

@@ -46,7 +46,6 @@ PAIR_FIELDS = (
     "shutter_cable_label",
     "initial_blade_position",
     "initial_mode_and_output",
-    "key_and_interlock",
     "external_trigger_arrangement",
 )
 

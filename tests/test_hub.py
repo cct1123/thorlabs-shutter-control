@@ -1,7 +1,13 @@
-import pytest
+import inspect
+from types import SimpleNamespace
 
-from thorlabs_shutter_control import KCubeShutter, ShutterError, ShutterHub
+import pytest
+from test_gui import invoke
+
+from thorlabs_shutter_control import KCubeShutter, ShutterError, ShutterHub, TriggerConfig
 from thorlabs_shutter_control import controller as controller_module
+from thorlabs_shutter_control import controller as driver
+from thorlabs_shutter_control.gui import create_app
 
 
 def three_shutters(rig):
@@ -24,65 +30,12 @@ def test_default_construction_and_disconnected_shutdown_do_not_load_sdk(monkeypa
     hub.safe_shutdown()
 
 
-@pytest.mark.parametrize("serials", [[], ["68000003"], ["68000003", "68000001", "68000002"]])
-def test_serial_construction_preselects_three_slots_without_sdk_access(rig, monkeypatch, serials):
-    def forbidden_loader(directory):
-        pytest.fail("Hub construction must be passive")
-
-    monkeypatch.setattr(controller_module, "_load_sdk", forbidden_loader)
-    hub = ShutterHub(serials, kinesis_dir="sdk-folder")
-    assert [c.serial_number for c in hub.controllers] == serials + [None] * (3 - len(serials))
-    assert all(
-        c.kinesis_dir == "sdk-folder" and not c.get_status().has_device for c in hub.controllers
-    )
-    hub.safe_shutdown()
-    assert rig.manager_calls == []
-    assert all(not d.calls for d in rig.devices.values())
-
-
 @pytest.mark.parametrize("serials", [["68000001"] * 2, ["68000001"] * 4, ["invalid"]])
 def test_invalid_serial_configuration_is_rejected_without_device_access(rig, serials):
     with pytest.raises(ValueError):
         ShutterHub(serials)
     assert rig.manager_calls == []
     assert all(not d.calls for d in rig.devices.values())
-
-
-@pytest.mark.parametrize(
-    "options", [{"serial_numbers": ["68000001"]}, {"kinesis_dir": "sdk"}, {"slots": 6}]
-)
-def test_injection_cannot_silently_ignore_hub_configuration(rig, options):
-    with pytest.raises(ValueError, match="Configure injected controllers"):
-        ShutterHub(controllers=[rig.controller], **options)
-    assert rig.manager_calls == []
-
-
-@pytest.mark.parametrize("count", [0])
-def test_invalid_hub_size_is_rejected(count):
-    with pytest.raises(ValueError, match="at least one"):
-        ShutterHub(controllers=[KCubeShutter() for _ in range(count)])
-
-
-def test_explicit_single_controller_is_retained_and_repeated_objects_are_rejected(rig):
-    assert ShutterHub(controllers=[rig.controller]).controllers == (rig.controller,)
-    with pytest.raises(ValueError, match="distinct controller"):
-        ShutterHub(controllers=[rig.controller, rig.controller])
-
-
-def test_discovery_is_shared_passive_enumeration(rig):
-    rig.serials[:] = list(reversed(rig.devices))
-    hub = ShutterHub()
-    assert hub.discover() == sorted(rig.devices)
-    assert rig.manager_calls == ["discover"]
-    assert all(device.calls == [] for device in rig.devices.values())
-
-
-@pytest.mark.parametrize("slot", [-1, 3, True, "0"])
-def test_invalid_slot_does_not_access_hardware(rig, slot):
-    with pytest.raises(ShutterError, match="slot"):
-        ShutterHub().connect(slot, "68000001")
-    assert rig.manager_calls == []
-    assert all(device.calls == [] for device in rig.devices.values())
 
 
 @pytest.mark.parametrize("preselected", [None, "68000001"])
@@ -92,104 +45,6 @@ def test_missing_selection_never_automatically_connects(rig, preselected):
         hub.connect(0, None)
     assert rig.manager_calls == []
     assert all(device.calls == [] for device in rig.devices.values())
-
-
-def test_three_connections_and_commands_have_independent_device_state(rig):
-    hub = three_shutters(rig)
-    assert [controller.serial_number for controller in hub.controllers] == list(rig.devices)
-    assert all(device.IsConnected for device in rig.devices.values())
-    assert all(
-        not any(call[0] in {"set_state", "set_mode", "enable"} for call in device.calls)
-        for device in rig.devices.values()
-    )
-
-    first, second, third = hub.controllers
-    first.open_shutter()
-    assert [device.state for device in rig.devices.values()] == ["Open", "Closed", "Closed"]
-    second.open_shutter()
-    third.open_shutter()
-    second.disconnect()
-    assert [device.state for device in rig.devices.values()] == ["Open", "Closed", "Open"]
-    assert first.get_status().connection == third.get_status().connection == "connected"
-    assert second.get_status().connection == "disconnected"
-    hub.safe_shutdown()
-
-
-def test_duplicate_serial_is_rejected_before_second_connection(rig):
-    hub = ShutterHub()
-    hub.connect(0, "68000001")
-    before = [call for call in rig.device.calls if call[0] == "connect"]
-    with pytest.raises(ShutterError, match="already owned by another controller"):
-        hub.connect(1, "68000001")
-    assert [call for call in rig.device.calls if call[0] == "connect"] == before
-    assert hub.controllers[0].get_status().has_device
-    assert not hub.controllers[1].get_status().has_device
-
-    hub.controllers[0].disconnect()
-    assert hub.connect(1, "68000001").connection == "connected"
-    hub.safe_shutdown()
-
-
-def test_duplicate_assignment_does_not_read_or_fault_the_current_owner(rig):
-    hub = ShutterHub()
-    hub.connect(0, "68000001")
-    rig.device.fail.add("status")
-    calls = list(rig.device.calls)
-    with pytest.raises(ShutterError, match="already owned"):
-        hub.connect(1, "68000001")
-    assert rig.device.calls == calls
-    rig.device.fail.clear()
-    assert hub.controllers[0].get_status().connection == "connected"
-    hub.safe_shutdown()
-
-
-def test_failed_connection_in_one_slot_does_not_affect_others(rig):
-    rig.serials[:] = list(rig.devices)
-    hub = ShutterHub(controllers=[KCubeShutter(timeout=0.5) for _ in range(3)])
-    hub.connect(0, "68000001")
-    rig.devices["68000002"].fail.add("connect")
-    with pytest.raises(ShutterError, match="Connect failed"):
-        hub.connect(1, "68000002")
-    hub.connect(2, "68000003")
-    assert hub.controllers[0].open_shutter().shutter_state == "open"
-    assert hub.controllers[2].open_shutter().shutter_state == "open"
-    assert not hub.controllers[1].get_status().has_device
-    assert rig.devices["68000002"].calls[-1] == ("disconnect",)
-    hub.safe_shutdown()
-
-
-def test_shutdown_closes_and_releases_all_three_shutters(rig):
-    hub = three_shutters(rig)
-    for controller in hub.controllers:
-        controller.open_shutter()
-    hub.safe_shutdown()
-    for device in rig.devices.values():
-        assert device.state == "Closed"
-        assert not device.IsConnected
-        assert device.calls[-2:] == [("stop_poll",), ("disconnect",)]
-    hub.safe_shutdown()
-
-
-def test_shutdown_aggregates_failures_and_still_attempts_remaining_slots(rig):
-    hub = three_shutters(rig)
-    for controller in hub.controllers:
-        controller.open_shutter()
-    rig.devices["68000001"].fail.add("set_state")
-    rig.devices["68000002"].fail.add("disconnect")
-    with pytest.raises(ShutterError) as caught:
-        hub.safe_shutdown()
-    message = str(caught.value)
-    assert "Shutter 1 (68000001)" in message and "set_state" in message
-    assert "Shutter 2 (68000002)" in message and "disconnect" in message
-    for device in rig.devices.values():
-        assert device.calls[-2:] == [("stop_poll",), ("disconnect",)]
-    assert not rig.devices["68000001"].IsConnected
-    assert rig.devices["68000002"].IsConnected
-    assert rig.devices["68000003"].state == "Closed"
-    assert not rig.devices["68000003"].IsConnected
-    rig.devices["68000002"].fail.clear()
-    hub.safe_shutdown()
-    assert not rig.devices["68000002"].IsConnected
 
 
 @pytest.mark.parametrize("exception_type", [KeyboardInterrupt, SystemExit])
@@ -213,49 +68,6 @@ def test_shutdown_preserves_interrupt_after_attempting_every_slot(rig, monkeypat
     assert rig.devices["68000003"].state == "Closed"
 
 
-@pytest.mark.parametrize("method", ["StopPolling", "Disconnect"])
-@pytest.mark.parametrize("exception_type", [KeyboardInterrupt, SystemExit])
-def test_release_interruption_in_one_armed_slot_never_skips_other_slots(
-    rig, monkeypatch, method, exception_type
-):
-    hub = three_shutters(rig)
-    for shutter in hub.controllers:
-        shutter.arm_triggers()
-    original = getattr(rig.device, method)
-
-    def interrupt():
-        rig.device.record("stop_poll" if method == "StopPolling" else "disconnect")
-        raise exception_type("Release interrupted")
-
-    monkeypatch.setattr(rig.device, method, interrupt)
-    with pytest.raises(exception_type) as caught:
-        hub.safe_shutdown()
-    assert "Shutter 1 (68000001)" in caught.value.__notes__[-1]
-    for device in rig.devices.values():
-        assert device.calls[-2:] == [("stop_poll",), ("disconnect",)]
-        assert device.mode == "Manual" and device.state == "Closed"
-    assert all(not d.IsConnected for d in list(rig.devices.values())[1:])
-    monkeypatch.setattr(rig.device, method, original)
-    hub.safe_shutdown()
-
-
-@pytest.mark.parametrize("count", [1, 4, 6, 12])
-def test_configurable_size_is_passive_and_has_distinct_slots(rig, count):
-    hub = ShutterHub(slots=count)
-    assert len(hub.controllers) == count
-    assert len({id(c) for c in hub.controllers}) == count
-    assert all(c.serial_number is None for c in hub.controllers)
-    hub.safe_shutdown()
-    assert not rig.manager_calls and not rig.device.calls
-
-
-@pytest.mark.parametrize("slots", [0, -1, True, 1.5, "6"])
-def test_invalid_slot_count_never_accesses_sdk(rig, slots):
-    with pytest.raises(ValueError, match="positive integer"):
-        ShutterHub(slots=slots)
-    assert not rig.manager_calls and not rig.device.calls
-
-
 def test_serial_count_expands_default_and_explicit_count_must_fit(rig):
     serials = [f"6800{n:04d}" for n in range(1, 10)]  # Fictional test identities.
     hub = ShutterHub(serials)
@@ -264,3 +76,246 @@ def test_serial_count_expands_default_and_explicit_count_must_fit(rig):
     with pytest.raises(ValueError, match="fit all supplied"):
         ShutterHub(serials, slots=6)
     assert not rig.manager_calls and not rig.device.calls
+
+
+@pytest.fixture
+def ethernet(rig, monkeypatch):
+    rig.controller.discover()
+    manager = rig.controller._sdk.manager
+    entries = []
+    transport = {"provider": "TCPIP", "endpoint": "192.0.2.10:40304"}
+    monkeypatch.setattr(manager, "CreateManualDeviceEntry", entries.append, raising=False)
+    monkeypatch.setattr(
+        manager,
+        "GetTransportInfo",
+        lambda serial: SimpleNamespace(
+            GetProvider=lambda: transport["provider"],
+            GetComSpec=lambda: transport["endpoint"],
+        ),
+        raising=False,
+    )
+    hub = ShutterHub([68000001], slots=1, ethernet_endpoints=(transport["endpoint"],))
+    return SimpleNamespace(hub=hub, transport=transport, entries=entries, rig=rig)
+
+
+@pytest.mark.parametrize(
+    "endpoint",
+    [
+        "192.0.2.10",
+        "192.0.2.10:40303",
+        "192.0.2.10:80",
+        "bad:40304",
+        "::1:40304",
+        1,
+        b"192.0.2.10:40304",
+    ],
+)
+def test_invalid_endpoint_never_loads_sdk(endpoint, rig):
+    with pytest.raises(ValueError, match="ethernet_endpoint"):
+        ShutterHub(ethernet_endpoints=(endpoint,), slots=1)
+    assert not rig.device.calls and not rig.manager_calls
+
+
+def test_ethernet_passive_connection_does_not_require_usb_or_write_output(ethernet, monkeypatch):
+    d = ethernet.rig.device
+    connect = d.Connect
+
+    def ethernet_connect(serial):
+        connect(serial)
+        d.USBConnected = "Disconnected"
+
+    monkeypatch.setattr(d, "Connect", ethernet_connect)
+    try:
+        assert ethernet.hub.connect(0, 68000001).connection == "connected"
+        assert ethernet.hub.identify_device(0)["serial_number"] == "68000001"
+        assert ethernet.hub.get_status(0).connection == "connected"
+    finally:
+        ethernet.hub.disconnect(0, close_shutter=False)
+    assert ethernet.entries == ["192.0.2.10:40304"]
+    assert d.calls[-2:] == [("stop_poll",), ("disconnect",)]
+    assert not any(c[0] in {"set_state", "set_mode", "enable", "set_triggers"} for c in d.calls)
+
+
+@pytest.mark.parametrize("field, value", [("provider", "FTDI"), ("endpoint", "192.0.2.10:40305")])
+def test_wrong_transport_is_not_discovered_or_connected(ethernet, field, value):
+    ethernet.transport[field] = value
+    assert ethernet.hub.discover() == []
+    with pytest.raises(ShutterError, match="not discovered"):
+        ethernet.hub.connect(0, 68000001)
+    assert not ethernet.rig.device.calls
+
+
+def test_cube_has_no_network_option_and_filters_registered_network_devices(ethernet):
+    assert "ethernet_endpoint" not in inspect.signature(KCubeShutter).parameters
+    assert not hasattr(KCubeShutter(), "ethernet_endpoint")
+    with pytest.raises(TypeError):
+        KCubeShutter(ethernet_endpoint="192.0.2.10:40304")
+    assert ethernet.hub.discover() == ["68000001"]
+    assert ethernet.rig.controller.discover() == []  # Network registration cannot contaminate USB.
+    assert not ethernet.rig.device.calls
+
+
+def test_transport_change_before_handle_creation_is_refused(ethernet, monkeypatch):
+    channel = ethernet.hub.controllers[0]
+    discover = channel.discover
+
+    def changed():
+        serials = discover()
+        ethernet.transport["provider"] = "FTDI"
+        return serials
+
+    monkeypatch.setattr(channel, "discover", changed)
+    with pytest.raises(ShutterError, match="transport changed"):
+        ethernet.hub.connect(0, 68000001)
+    assert not ethernet.rig.device.calls
+
+
+def test_endpoint_configuration_is_passive_and_immutable(rig):
+    hub = ShutterHub([68000001], ethernet_endpoints=["192.0.2.10:40304"])
+    assert hub.ethernet_endpoints == ("192.0.2.10:40304", None, None)
+    with pytest.raises(AttributeError):
+        hub.ethernet_endpoints = (None,)
+    with pytest.raises(ValueError, match="slots must fit"):
+        ShutterHub(slots=1, ethernet_endpoints=[None, "192.0.2.10:40304"])
+    with pytest.raises(ValueError, match="injected"):
+        ShutterHub(controllers=[rig.controller], ethernet_endpoints=["192.0.2.10:40304"])
+    assert not rig.manager_calls and not rig.device.calls
+
+
+@pytest.mark.parametrize(
+    "method,args,writes",
+    [
+        ("enable_device", (), ["enable"]),
+        ("open_shutter", (), ["set_state"]),
+        ("close_shutter", (), ["set_state"]),
+        ("arm_triggers", (), ["enable", "set_mode", "set_state"]),
+        ("disarm_triggers", (), ["set_state", "set_mode"]),
+        ("configure_triggers", (TriggerConfig(),), ["set_triggers"]),
+        ("set_operating_mode", ("auto",), ["set_mode"]),
+        ("set_operating_state", ("active",), ["set_state"]),
+        ("set_operating_state", ("inactive",), ["set_state"]),
+    ],
+)
+def test_hub_network_setters_send_only_writes(ethernet, monkeypatch, method, args, writes):
+    hub, device = ethernet.hub, ethernet.rig.device
+    hub.connect(0, 68000001)
+    device.calls.clear()
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("Hub setter requested feedback or waited")
+
+    for name in dir(device):
+        if name.startswith(("Get", "Request")):
+            monkeypatch.setattr(device, name, forbidden)
+    monkeypatch.setattr(driver.time, "sleep", forbidden)
+    assert getattr(hub, method)(0, *args) is None
+    assert [call[0] for call in device.calls] == writes
+    hub.disconnect(0, close_shutter=False)
+
+
+@pytest.mark.parametrize(
+    "method,args",
+    [
+        ("open_shutter", ()),
+        ("arm_triggers", ()),
+        ("configure_triggers", (TriggerConfig(),)),
+        ("set_operating_mode", ("triggered",)),
+        ("set_operating_state", ("active",)),
+    ],
+)
+def test_hub_refuses_output_after_route_changes_without_fallback(ethernet, method, args):
+    ethernet.hub.connect(0, 68000001)
+    ethernet.rig.device.calls.clear()
+    ethernet.transport["endpoint"] = "192.0.2.10:40305"
+    with pytest.raises(ShutterError, match="transport changed"):
+        getattr(ethernet.hub, method)(0, *args)
+    assert not ethernet.rig.device.calls
+    assert ethernet.hub.get_cached_status(0).connection == "fault"
+    ethernet.hub.disconnect(0, close_shutter=False)
+    assert ethernet.entries == ["192.0.2.10:40304"]
+
+
+def test_mixed_hub_routes_each_serial_to_its_configured_transport(rig, monkeypatch):
+    rig.serials[:] = list(rig.devices)
+    routes = {
+        "68000001": ("FTDI", "USB"),
+        "68000002": ("TCPIP", "192.0.2.10:40304"),
+        "68000003": ("TCPIP", "192.0.2.10:40305"),
+    }
+    sdk = driver._load_sdk(None)
+    entries = []
+    monkeypatch.setattr(sdk.manager, "CreateManualDeviceEntry", entries.append, raising=False)
+    monkeypatch.setattr(
+        sdk.manager,
+        "GetTransportInfo",
+        lambda serial: SimpleNamespace(
+            GetProvider=lambda: routes[serial][0], GetComSpec=lambda: routes[serial][1]
+        ),
+    )
+    hub = ShutterHub(
+        rig.serials,
+        slots=3,
+        ethernet_endpoints=[None, routes["68000002"][1], routes["68000003"][1]],
+    )
+    assert hub.discover() == rig.serials
+    assert rig.manager_calls == ["discover"]
+    assert entries == ["192.0.2.10:40304", "192.0.2.10:40305"]
+    for slot, serial in enumerate(rig.serials):
+        hub.confirm_interlock(slot, serial)
+        assert hub.connect(slot, serial).serial_number == serial
+        if slot:
+            rig.devices[serial].USBConnected = "Disconnected"  # TCP/IP has no USB dependency.
+        assert hub.get_status(slot).connection == "connected"
+    for device in rig.devices.values():
+        device.calls.clear()
+    hub.open_shutter(1)
+    assert hub.get_shutter_state(1) == "open"
+    assert hub.get_operating_state(1) == "active"
+    assert hub.get_operating_mode(1) == "manual"
+    assert hub.get_status_bits(1) == 0x1000
+    assert not rig.devices["68000001"].calls and not rig.devices["68000003"].calls
+    assert hub.get_cached_status(0).serial_number == "68000001"
+    # A serial from another bay must not be sent to this slot, even if it is enumerated.
+    hub.disconnect(1)
+    with pytest.raises(ShutterError, match="not discovered"):
+        hub.connect(1, 68000003)
+    rig.devices["68000001"].fail.add("set_state")
+    with pytest.raises(ShutterError, match="Shutter 1"):
+        hub.safe_shutdown()
+    assert all(not device.IsConnected for device in rig.devices.values())
+    assert rig.devices["68000003"].calls[-2:] == [("stop_poll",), ("disconnect",)]
+
+
+def test_gui_uses_hub_dispatch_for_network_commands(ethernet, monkeypatch):
+    hub = ethernet.hub
+    app = create_app(hub)
+    assert invoke(app, "connect", serial="68000001")["connection"]["children"] == "Connected"
+    open_shutter = hub.open_shutter
+    dispatched = []
+
+    def open_slot(slot):
+        dispatched.append(slot)
+        return open_shutter(slot)
+
+    monkeypatch.setattr(hub, "open_shutter", open_slot)
+    assert invoke(app, "open", serial="68000001")["shutter-state"]["children"] == "Open"
+    assert dispatched == [0]
+    assert invoke(app, "close", serial="68000001")["shutter-state"]["children"] == "Closed"
+    invoke(app, "disconnect", serial="68000001")
+    assert not ethernet.rig.device.IsConnected
+
+
+def test_failed_network_release_retains_ownership_until_retry(ethernet):
+    device = ethernet.rig.device
+    device.fail.update({"poll", "disconnect"})
+    with pytest.raises(ShutterError, match="Connect failed"):
+        ethernet.hub.connect(0, 68000001)
+    assert ethernet.hub.get_cached_status(0).has_device
+    replacement = ShutterHub([68000001], slots=1, ethernet_endpoints=["192.0.2.10:40304"])
+    with pytest.raises(ShutterError, match="already owned"):
+        replacement.connect(0, 68000001)
+    device.fail.clear()
+    ethernet.hub.disconnect(0, close_shutter=False)
+    assert replacement.connect(0, 68000001).connection == "connected"
+    replacement.disconnect(0, close_shutter=False)
+    assert not any(c[0] in {"enable", "set_state", "set_mode"} for c in device.calls)

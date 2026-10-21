@@ -1,5 +1,14 @@
 # Hardware tutorials
 
+For an interactive walkthrough, open
+[shutter_open_close_tutorial.ipynb](shutter_open_close_tutorial.ipynb). Separate
+cells cover settings, validation, controller/error cleanup, connection, initial
+Close, Open/hold, Close, optional repetition, and disconnect. Run them in order
+with the project `.venv` kernel. Successful steps keep the connection active;
+Open leaves the shutter open until Close. Each hardware step attempts cleanup
+on errors/Ctrl+C. Always finish with Disconnect. Repetition is disabled by default.
+Restart the kernel after controller or configuration changes.
+
 These five scripts use real hardware. `--help` and imports are passive. Match each
 serial to the physical shutter and establish independent source protection, normal
 interlock, ownership and operating limits before running an output example.
@@ -18,14 +27,12 @@ have been verified:
 ```powershell
 uv run --locked python docs/examples/01_discover.py
 uv run --locked python docs/examples/02_connect_and_read_status.py $env:SHUTTER_SERIAL
-uv run --locked python docs/examples/03_open_close.py $env:SHUTTER_SERIAL --open-seconds 2 --verified-interlock $env:SHUTTER_SERIAL
+uv run --locked python docs/examples/03_open_close.py $env:SHUTTER_SERIAL --open-seconds 2
 ```
 
-`--verified-interlock SERIAL` is the same explicit selected-serial/session
-confirmation as in the GUI launcher. It performs no hardware interlock write.
-The three-shutter example accepts the option repeatedly for selected devices.
-Without confirmation, unknown SDK interlock readiness continues to refuse Open/Arm.
-Wrong confirmation serials are rejected before SDK access.
+Users manage the physical interlock externally. There is no software interlock
+gate or confirmation flag. The lessons explicitly check identity, connection, key
+and operating state before Open/Arm; driver setters only send commands.
 
 Examples4/5 remain unqualified on three actual devices/electrical trigger inputs.
 Supply actual serials and explicitly approved `--open-seconds` or `--armed-seconds`;
@@ -34,7 +41,7 @@ not maximum exposure bounds. The TTL example can open immediately on an active
 input. Read [the interface contract](../INTERFACE.md) before using it.
 
 The actuation examples use ExitStack to register passive release before Connect,
-and Close only after identity/feedback verification succeeds. All registered
+and Close only after connection identity verification succeeds. All registered
 callbacks are attempted despite failures, with normal Python exception chaining.
 A failed identity plus failed release never authorizes Close of the unverified
 target. Release alone does not prove closure. Follow the

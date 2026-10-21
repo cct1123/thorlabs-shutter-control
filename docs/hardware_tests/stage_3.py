@@ -64,7 +64,6 @@ def _motion_cycle(record, serial, controller, prior_review, *, stage, open_secon
             or not status.has_device
             or status.serial_number != serial
             or type(status.key_enabled) is not bool
-            or (status.interlock_enabled is not None and type(status.interlock_enabled) is not bool)
         ):
             raise ValueError(f"{label}: unhealthy/unknown target feedback")
         if (
@@ -75,7 +74,9 @@ def _motion_cycle(record, serial, controller, prior_review, *, stage, open_secon
         return status
 
     try:
-        capture("connected", controller.connect(serial))
+        controller.connect(serial)
+        phase = "pre-motion status"
+        capture("connected", controller.get_status())
         phase = "identity"
         result["identity"] = controller.identify_device()
         if result["identity"].get("serial_number") != serial:
@@ -83,17 +84,29 @@ def _motion_cycle(record, serial, controller, prior_review, *, stage, open_secon
         phase = "pre-motion status"
         capture("pre_motion", controller.get_status())
         verified = True
-        phase = "initial Close"
-        capture("initial_close", controller.close_shutter(), ("closed", "inactive", "manual"))
+        phase = "initial Disarm / Close"
+        controller.disarm_triggers()
+        capture(
+            "initial_close", controller.get_operating_status(), ("closed", "inactive", "manual")
+        )
         if stage == 4:
+            phase = "enable channel"
+            controller.enable_device()
             phase = "Open"
-            opened = capture("open", controller.open_shutter(), ("open", "active", "manual"))
-            if not opened.key_enabled or not opened.interlock_ready:
-                raise ValueError("Open feedback lacks enabled key/interlock")
+            ready = controller.get_operating_status()
+            if not ready.is_closed_manual or not ready.key_enabled:
+                raise ValueError("Open refused: key or baseline not verified")
+            controller.open_shutter()
+            opened = capture(
+                "open", controller.get_operating_status(), ("open", "active", "manual")
+            )
+            if not opened.key_enabled:
+                raise ValueError("Open feedback lacks enabled key")
             phase = "added Open hold"
             time.sleep(open_seconds)
             phase = "Close"
-            capture("close", controller.close_shutter(), ("closed", "inactive", "manual"))
+            controller.close_shutter()
+            capture("close", controller.get_operating_status(), ("closed", "inactive", "manual"))
         phase = "final feedback"
         capture("final", controller.get_status(), ("closed", "inactive", "manual"))
     except BaseException as exc:

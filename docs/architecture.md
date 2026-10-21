@@ -7,7 +7,9 @@ flowchart TD
     User[Operator] --> GUI[Dash GUI: configured independent panels]
     Experiment[Experiment code] --> Hub[ShutterHub]
     GUI --> Hub
-    Hub --> Driver[KCubeShutter: one selected serial]
+    Hub --> Driver[KCubeShutter: one USB serial]
+    Hub --> Network[Hub-owned TCPIP channels]
+    Network --> SDK
     Driver --> SDK[Official Kinesis .NET through Python.NET]
     SDK --> USB[Direct USB or KEH3/KEH6 USB]
     USB --> Cube[KSC101]
@@ -17,41 +19,55 @@ flowchart TD
 
 The diagram is editable Mermaid. `controller.py` contains lazy SDK loading,
 normalized status/configuration, one-controller behavior and all-slot cleanup.
-`gui.py` translates controls into driver/hub calls; it contains no vendor commands.
+`gui.py` routes controls through the hub slot API; it contains no vendor commands.
+KCubeShutter handles USB only. ShutterHub owns network endpoints, discovery/filtering
+and command dispatch. Private shared Kinesis code avoids duplicating get/set,
+identity, ownership and cleanup behavior across transports.
 `__main__.py` owns one local server process and cleanup on normal exit.
 
 ## Boundaries
 
-- Import, construction and unconnected GUI startup do not load the SDK. Discovery
-  loads it explicitly; Connect initializes settings, polling, identity and feedback
-  without explicit output/mode writes.
+- Import/construction/startup are passive. Discovery loads the SDK explicitly.
+  Connect initializes communication/polling and verifies identity without operating
+  feedback requests or output writes.
+- KCubeShutter separates writes from reads. Open/Close/Arm/Disarm/configuration
+  send commands and return None. They do not query feedback, sleep, retry or
+  recover automatically. Specific getters request only the selected feedback;
+  full snapshots remain available for applications that need them.
+- Open/Close send Active/Inactive only and preserve the mode/enable state.
+  Explicit enable_device provides channel setup; Disarm sends Inactive/Manual.
+  Arm retains its compound Enable/Triggered/Active sequence.
+- Applications own readiness, sequence and verification. The GUI explicitly
+  reads prerequisites for Open/Apply/Arm and reads the selected panel after a
+  command. Hardware lessons also issue explicit reads. These application reads
+  are outside driver setters.
+- Setters invalidate display snapshots rather than inventing new physical state.
+  Undefined operating feedback is unknown; communication/SDK exceptions latch
+  faults. Close and release remain available after faults. Command completion
+  does not establish physical closure or optical timing.
 - Each controller has a lock. SDK enumeration/handle creation and serial ownership
-  claims share a process-wide lock. Failed disconnect retains the handle/claim.
-  Other processes must still be excluded by the operator.
-- The hub serializes GUI actions/status and attempts every slot during shutdown,
-  aggregating failures and preserving interrupts. Shutdown is sequential; a hung
-  native call can prevent reaching later slots.
-- Status faults latch and invalidate reported state. Close/cleanup remain available
-  while a handle exists. Feedback waits are not calibrated sensor measurements.
-- Open readiness combines an enabled key with reported interlock readiness or
-  explicit operator verification when the SDK reading is unknown. Confirmation is
-  object/serial scoped and clears on retargeting; it is never a hardware write.
-- Close requires Closed/Inactive before selecting Manual, then verifies again.
-  Open first establishes that baseline. TTL Arm uses device settings, not drafts;
-  Close/Disarm/default cleanup do not restore the prior triggered/timed mode.
+  share a process-wide lock. Failed disconnect retains ownership; other processes
+  must still be excluded by the operator.
+- Hub shutdown attempts every controller and aggregates errors/interrupts.
+  It sends Close commands and releases handles without verifying closure. Native
+  calls can block subsequent work. Independent source protection remains necessary.
 
-The GUI uses one callback and a panel count fixed for that session, configured
-with `--slots N` or the number of preselected serials (default at least three). Draft trigger edits survive ordinary
-refresh; Read replaces drafts. Trigger settings are natively collapsible. Status,
-readiness hints and error styling derive from the same driver snapshots. A delayed
-busy cue avoids highlighting every brief poll, without disabling Close.
+The GUI uses one callback and a configured panel count (default at least three).
+Draft edits survive refresh; Read replaces drafts. Apply separately writes and
+reads back settings. Arm reads actual device settings rather than GUI drafts.
+Other panels keep their prior observations until periodic refresh. Confirmation
+of the normal physical interlock is object/serial scoped; it is not a hardware write.
+The GUI treats interlock feedback as informational: users manage the physical
+interlock externally. GUI Open/Arm do not require software interlock confirmation.
 
-Default polling is250ms and GUI refresh1s. A full status read waits one polling
-interval for trigger settings. For N connected panels, reads add at least N *250ms of those
-waits plus SDK time; six panels add at least1.5s. There is no app-defined count
-cap, but host/SDK resources and sequential polling/cleanup limit practical scale. The5s feedback timeout applies per wait stage, not to total
-shutdown or a blocking native call. No simultaneous/synchronized control claim.
+Default polling and getter wait are 250ms. Driver setters have **zero programmed
+waits**, excluding unmeasured vendor-call time. GUI Open adds explicit prerequisite
+and result reads (0.50s programmed waits), Close adds a result read (0.25s).
+Periodic refresh still takes N * 250ms for N connected panels; a refresh in
+progress can delay a click. There is no app-defined count cap or synchronization
+guarantee. `timeout` applies to SDK settings initialization; setters do not have
+feedback timeout loops. It does not bound a blocking native call.
 
-USB is the qualified single-pair branch. Explicit Python Ethernet endpoints are
-experimental and [passively software-tested](ethernet-assessment.md); cube Ethernet
-hardware communication, three real devices and physical TTL remain separate.
+USB has historical single-pair evidence. The changed command paths require new
+bench qualification. Hub Ethernet endpoints remain experimental;
+three real devices, physical TTL and calibrated timing remain separate gaps.

@@ -1,0 +1,51 @@
+{
+  "test": "TEST-107",
+  "scope": "Existing fake SDK/virtual clock, polling250ms, no real hardware. Current controller after focused conditional Close change.",
+  "trace": [
+    {
+      "method": "open_shutter",
+      "expected_programmed_sleep_s": 0.5,
+      "observed_programmed_sleep_s": 0.5,
+      "writes": [
+        [
+          "enable"
+        ],
+        [
+          "set_state",
+          "Active"
+        ]
+      ],
+      "result": "PASS"
+    },
+    {
+      "method": "close_shutter",
+      "expected_programmed_sleep_s": 0.5,
+      "observed_programmed_sleep_s": 0.5,
+      "writes": [
+        [
+          "set_state",
+          "Inactive"
+        ],
+        [
+          "set_mode",
+          "Manual"
+        ]
+      ],
+      "result": "PASS"
+    }
+  ],
+  "focused_open_tests": {
+    "passed": 14,
+    "deselected": 98
+  },
+  "full_suite_before": {
+    "passed": 462,
+    "failed": 49
+  },
+  "full_suite_after": {
+    "passed": 467,
+    "failed": 48
+  },
+  "lint_format": "PASS",
+  "limitations": "Full suite not green: prior controller/GUI API drift remains. No new failing test; timed-preparation safeguard test now passes."
+}

@@ -153,11 +153,17 @@ def rig(monkeypatch):
         manager=SimpleNamespace(
             BuildDeviceList=lambda: manager_calls.append("discover"),
             GetDeviceList=lambda type_id: serials if type_id == 68 else [],
+            GetTransportInfo=lambda serial: SimpleNamespace(GetProvider=lambda: "FTDI"),
         ),
         device_type=SimpleNamespace(CreateKCubeSolenoid=lambda serial: devices[serial]),
         enums=SimpleNamespace(
             OperatingStates=SimpleNamespace(Active="Active", Inactive="Inactive"),
-            OperatingModes=SimpleNamespace(Manual="Manual", Triggered="Triggered"),
+            OperatingModes=SimpleNamespace(
+                Manual="Manual",
+                SingleToggle="SingleToggle",
+                AutoToggle="AutoToggle",
+                Triggered="Triggered",
+            ),
         ),
         trigger_settings=FakeTriggerSettings,
     )

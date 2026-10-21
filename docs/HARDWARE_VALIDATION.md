@@ -17,7 +17,7 @@ they did not independently measure blade motion or exposure timing.
 | Searching for a COM port led nowhere | This USB path uses Kinesis/FTDI; discover the controller serial instead. |
 | USB reported `Connecting` despite successful reads | Judge the combined identity, `IsConnected`, `CommsStatus` and responses. One SDK label is insufficient. |
 | Firmware 1.0.6 returned a mismatched hardware serial | The official 1.0.7 update repaired USB identity. Never conceal a mismatch with a software alias; firmware work is separate maintenance. |
-| Repeated interlock reads and jack/key changes did not resolve readiness | The jack matrix established no software continuity signal. Preserve unknown; key feedback is separate. Use serial-scoped confirmation after verifying the normal circuit/protection. |
+| Repeated interlock reads and jack/key changes did not resolve readiness | The jack matrix established no software continuity signal. Preserve unknown; key feedback is separate. Users manage the physical circuit externally; no software interlock gate. |
 | Mode/status interpretation delayed useful tests | Auto is a valid mode. Undocumented operating value `0` does not mean Inactive. Use documented commands and verify the resulting state. |
 | Ethernet found only the hub in both our code and Kinesis | A responding hub/port does not prove cube communication. Those tests preceded the cube update; post-update Ethernet remains untested. |
 | Actual GUI actions exposed issues that helper stages missed | Exercise the production path early, including refresh, reconnect and cleanup. |
@@ -51,7 +51,8 @@ uv run --locked python docs/examples/02_connect_and_read_status.py $env:SHUTTER_
 ### 2. Close, then one Open/hold/Close
 
 Read status first. With verified identity and readiness, command Close and require
-Closed/Inactive/Manual. Command Open, require Open/Active/Manual, hold for the
+Closed/Inactive/Manual using explicit Disarm; enable the channel once as needed.
+Command Open, require Open/Active/Manual, hold for the
 approved interval, then Close and require Closed/Inactive/Manual. The qualified
 bench used a **2-second added hold**; this is not a universal limit or calibrated
 exposure. One cycle is sufficient for this functional check.

@@ -1,0 +1,18 @@
+{
+  "test": "TEST-106",
+  "scope": "Fake SDK and virtual clock; current source, initially Manual Closed; no hardware access. Prior optimized trace does not match current controller.",
+  "results": [
+    {
+      "method": "open_shutter",
+      "expected_programmed_sleep_s": 1.0,
+      "observed_programmed_sleep_s": 1.0,
+      "result": "PASS"
+    },
+    {
+      "method": "close_shutter",
+      "expected_programmed_sleep_s": 0.5,
+      "observed_programmed_sleep_s": 0.5,
+      "result": "PASS"
+    }
+  ]
+}
