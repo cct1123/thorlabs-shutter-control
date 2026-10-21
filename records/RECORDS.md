@@ -1,5 +1,8 @@
 # Baseline evidence and decisions
 
+Current test delivery: E141 / TEST-151 below. E138/139 describe the original
+baseline before its tests were replaced; their old totals/hashes are historical.
+
 ## D038 - Current baseline, REQ-101
 
 Source: user request quoted in PROJECT.md. The current USB/LAN system becomes the
@@ -68,3 +71,29 @@ d1453d3730db4c18e1af085dc1637b393bfeb298, equal to HEAD; git status clean. PASS.
 Final documentation-only checkpoint records completion. Its annotated baseline
 marker and branch are published together, then both refs are checked against
 the same final HEAD. No source change after TEST-148; no physical operation.
+
+## E141 / TEST-151 - Rewrite all tests as essential workflows
+
+REQ-102; user request in PROJECT.md. Expected: a newly written, small suite for
+normal USB/LAN/TTL, GUI/launcher, both notebooks and essential identity/ownership/
+cleanup failures. Production code and private results unchanged; software only.
+
+Replaced all10 test/helper files with3 test modules and1 new shared protocol fake.
+2486->405 lines;217 tests/1 optional skip ->15 tests/0 skips. Removed fuzz/type
+matrices, implementation traps, speculative races/forged-input checks, the real
+SDK opt-in test and preview helper. No old test module remains. The new fake has
+no physical TTL/timing model or real SDK/network access. Normal callbacks use
+actual Dash Flask HTTP, and both notebooks execute one complete software cycle.
+Operational failures retained: wrong identity, failed release retaining ownership,
+continuing all-slot cleanup after Close failure, LAN scan failure preserving USB,
+and the observed unknown operating-state0 keeping GUI activation unavailable.
+
+Observed: first source run15 passed; extracted-wheel15 passed. Ruff lint/format,
+package Python/CSS parity and current source/CSS hashes PASS. Production unchanged
+from runtime baseline8e50258. Commands: .venv/Scripts/python.exe -B -m pytest -q
+-p no:cacheprovider --tb=short; Ruff check/format --check --no-cache .;
+uv build --wheel --offline --out-dir tmp/essential-tests-package; extracted-wheel
+PYTHONPATH import-origin check and pytest. Current commands/docs updated; native
+operations and physical qualification are outside this test rewrite.
+[Machine evidence](tests-validation.json) records scope and hashes. PASS means
+the15 essential cases pass; it does not retain the removed suite's coverage claims.

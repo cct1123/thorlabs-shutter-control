@@ -7,11 +7,11 @@ runtime and vendor drivers separately from project dependencies.
 
 ```powershell
 uv sync --locked
-uv run --locked python -B -m pytest -q -p no:cacheprovider --ignore=tests/test_sdk.py
+uv run --locked python -B -m pytest -q -p no:cacheprovider
 uv run shutter-control
 ```
 
-Dependency setup and the excluded-SDK test suite do not contact hardware. GUI
+Dependency setup and the software-only test suite do not contact hardware. GUI
 startup is passive. Visit [localhost:8050](http://127.0.0.1:8050/).
 
 ## Project configuration

@@ -1,0 +1,79 @@
+{
+  "date": "2026-10-21",
+  "requirement": "REQ-102",
+  "evidence": "E141 / TEST-151",
+  "scope": "15 essential software workflows; no real SDK/network/device access; not exhaustive",
+  "source": {
+    "passed": 15,
+    "skipped": 0
+  },
+  "extracted_wheel": {
+    "passed": 15,
+    "skipped": 0
+  },
+  "suite": {
+    "before_files": 10,
+    "after_files": 4,
+    "test_modules": 3,
+    "before_lines": 2486,
+    "after_lines": 405
+  },
+  "covered": [
+    "passive construction",
+    "USB commands and explicit feedback",
+    "TTL round-trip/Arm/Disarm",
+    "identity mismatch passive cleanup",
+    "failed release retains exclusive owner",
+    "all-slot cleanup after Close failure",
+    "asynchronous exact-route LAN discovery/connect",
+    "unified USB/LAN discovery",
+    "partial LAN failure preserves USB",
+    "GUI detected route on explicit Connect",
+    "four GUI modes and cooperative shutdown",
+    "observed unknown operating feedback disables activation",
+    "passive launcher and normal exit",
+    "one USB notebook cycle",
+    "one LAN notebook cycle"
+  ],
+  "removed": [
+    "old test modules and shared double",
+    "real SDK opt-in and preview helper",
+    "fuzz/type matrices",
+    "implementation traps and request-count matrices",
+    "speculative race and forged-input scenarios"
+  ],
+  "quality": {
+    "ruff_lint": "PASS",
+    "ruff_format": "PASS",
+    "production_source_css_unchanged": true,
+    "package_source_css_parity": "PASS (6 files)",
+    "packaged_readme_matches": true,
+    "local_links_and_anchors": 70,
+    "python_doc_snippets": 5,
+    "private_executed_notebook_unchanged": true
+  },
+  "package": {
+    "sha256": "561f9814ee434907d5710c50496be4ddb6b509cb32aee61d14ddd34c59bc198f",
+    "import_origin": "tmp/essential-tests-package/extracted/thorlabs_shutter_control/__init__.py"
+  },
+  "production_sha256": {
+    "src/thorlabs_shutter_control/config.py": "62ca4da608f956123f0b3ae9161f65e3ba8dc82bf8a43ebdc9e50648a8fa3e47",
+    "src/thorlabs_shutter_control/controller.py": "1a9b97c6e83ff2148ec0d49a8efbdbcd2e13c1843f9e00d5d42dc32b0237482d",
+    "src/thorlabs_shutter_control/gui.py": "5b42329531e0d9dd9b681604851449b2a30e3c8585ca82f9b110b0413513f998",
+    "src/thorlabs_shutter_control/__init__.py": "9968bd00d5520f9de214c78c05892965134b9d8f5ff99c7f5d27bd28ab79e281",
+    "src/thorlabs_shutter_control/__main__.py": "6e6475b2913ee076784c8eb6b4ac73a119f745c3478ee0a8c5e9ac0201a218b5",
+    "src/thorlabs_shutter_control/assets/style.css": "54fbe35bc43bfad34f8bfbfa6026ef731a6b72a12ea2e96eb056b8c7482b0f47"
+  },
+  "current_test_sha256": {
+    "tests/conftest.py": "5ae316e5e197458aaee03a0bda30e0b76f8758f70b34456b89618c6f42d09427",
+    "tests/test_application.py": "e50aec577cb9ec026073f5129f32c8fedd43f67b106657e15431eb04a45342c3",
+    "tests/test_core.py": "76014b4fa3409f50c36d79f60787f4044ffa0f2dab5d94893c79e341487333ba",
+    "tests/test_notebooks.py": "d358e35ea86135213f22657b6a0dfd60f448550b337273dd1fed89cdd75e4241"
+  },
+  "limits": [
+    "No real hardware qualification",
+    "No physical TTL or timing model",
+    "Coverage intentionally narrowed to essential workflows; previous 217-case suite superseded",
+    "Runtime baseline tag unchanged; no production behavior change"
+  ]
+}

@@ -1,6 +1,17 @@
 # Engineering state
 
-## REQ-101 COMPLETE - current software baseline
+## REQ-102 COMPLETE - essential tests
+
+Source: PROJECT.md latest test-rewrite request. E141 / TEST-151: source and
+extracted wheel each15 passed,0 skipped. All tests and doubles rewritten:
+3 test modules plus1 fixture,405 lines versus2486 across10 files. Real-SDK opt-in,
+preview helper, input-fuzz matrices and speculative/internal checks are removed.
+The suite covers normal workflows and selected essential operational failures;
+it is not exhaustive. Current evidence: records/tests-validation.json.
+Production source/CSS hashes, private results and .venv are unchanged. No hardware
+or actual network operation. The runtime baseline marker remains baseline-2026-10-21.
+
+## Runtime baseline - REQ-101
 
 Source: PROJECT.md current baseline request. Prior tree: 5ab1f91, 109 tracked
 files, 2,323,179 bytes. Historical records/checkpoints are hash-verified in ignored
@@ -10,9 +21,9 @@ Removed obsolete diagnostic stages, duplicate script tutorials, supervisor outpu
 superseded screenshots and incremental development records. GUI construction now
 requires ShutterHub; operator-confirmation metadata/API and alternate scan-address
 format adaptation are removed. Current USB/LAN control and explicit reads/writes
-remain. E138 / TEST-148: source and extracted wheel each217 passed,1 optional SDK
-skip. E139 / TEST-149: current docs/notebooks/package/private archive checks PASS.
-The maintained tree is43 files, about0.54MB versus109 files/2.32MB before cleanup.
+remain. E138 / TEST-148 and E139 / TEST-149 record the original baseline's test/tree
+delivery; TEST-151 supersedes that suite with the essential current tests above.
+The original baseline tree was43 files versus109 before cleanup.
 Implementation77ede6a and pruned baseline d1453d3 are pushed; origin/main was
 independently verified at d1453d3730db4c18e1af085dc1637b393bfeb298 (E140/TEST-150).
 This final checkpoint is marked baseline-2026-10-21. Physical acceptance remains
@@ -34,6 +45,7 @@ Kinesis folder defaults to C:/Program Files/Thorlabs/Kinesis. Native calls may b
 
 | ID | Current criterion | Method | Status |
 | --- | --- | --- | --- |
+| REQ-102 | Rewrite all tests as a small essential suite | TEST-151 source/wheel,15 cases,405 lines | PASS software |
 | REQ-101 | Slim current baseline, no compatibility paths | TEST-148 source/wheel; TEST-149 tree/docs; TEST-150 publication | PASS software baseline/publication |
 | REQ-099 | Unified USB/LAN Discover and detected-route Connect | TEST-148 fake SDK and actual Dash callback HTTP | PASS software |
 | REQ-020 | Ownership and all-slot cleanup | TEST-148 lifecycle/error/interrupt regressions | PASS software |

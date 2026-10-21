@@ -1,61 +1,42 @@
-"""Software-only .NET test double. It never imports Kinesis or contacts hardware."""
+"""Small protocol double: no DLL loading, sockets, physical timing or TTL model."""
 
 from copy import copy
-from types import SimpleNamespace
+from types import SimpleNamespace as NS
 
 import pytest
 
-from thorlabs_shutter_control import KCubeShutter
-from thorlabs_shutter_control import controller as module
+from thorlabs_shutter_control import config, controller
 
 
-class FakeTriggerSettings:
-    TriggerPortMode = SimpleNamespace(
-        Disabled="Disabled", TrigIN_GPI="TrigIN_GPI", TrigOUT_GPO="TrigOUT_GPO"
-    )
-    TriggerPolarity = SimpleNamespace(TriggerHigh="TriggerHigh", TriggerLow="TriggerLow")
+class TriggerSettings:
+    TriggerPortMode = NS(Disabled="Disabled", TrigIN_GPI="TrigIN_GPI", TrigOUT_GPO="TrigOUT_GPO")
+    TriggerPolarity = NS(TriggerHigh="TriggerHigh", TriggerLow="TriggerLow")
 
     def __init__(self):
-        self.Trigger1Mode = "TrigIN_GPI"
-        self.Trigger1Polarity = "TriggerHigh"
-        self.Trigger2Mode = "TrigOUT_GPO"
-        self.Trigger2Polarity = "TriggerHigh"
+        self.Trigger1Mode, self.Trigger1Polarity = "TrigIN_GPI", "TriggerHigh"
+        self.Trigger2Mode, self.Trigger2Polarity = "TrigOUT_GPO", "TriggerHigh"
 
 
-class FakeDevice:
-    def __init__(self, serial="68000001"):
-        self.calls = []
-        self.IsConnected = False
-        self.USBConnected = "Disconnected"
-        self.CommsStatus = "OK"
-        self.Status = SimpleNamespace(KeyEnabled=True)
-        self.interlock = True
-        self.state = "Closed"
-        self.operation = "Inactive"
-        self.mode = "Manual"
-        self.initialized = True
-        self.polling = 0
-        self.serial = serial  # Explicitly fictional test identity.
-        self.fail = set()
-        self.trigger_config = FakeTriggerSettings()
-        self.inputs = [False, False]  # KSC101 open/disconnected trigger input is LOW.
+class Device:
+    def __init__(self, serial):
+        self.serial = self.identity = serial
+        self.IsConnected, self.USBConnected = False, "Disconnected"
+        self.CommsStatus, self.Status = "OK", NS(KeyEnabled=True)
+        self.position, self.operation, self.mode = "Closed", "Inactive", "Manual"
+        self.calls, self.fail, self.polling = [], None, 0
+        self.settings = TriggerSettings()
 
     def record(self, name, *args):
         self.calls.append((name, *args))
-        if name in self.fail:
-            raise RuntimeError(f"Injected {name} failure")
+        if self.fail == name:
+            raise RuntimeError(f"{name} failed")
 
     def Connect(self, serial):
         self.record("connect", serial)
-        self.serial = serial
-        self.IsConnected = True
-        self.USBConnected = "Connected"
+        self.IsConnected, self.USBConnected = True, "Connected"
 
     def IsSettingsInitialized(self):
-        return self.initialized
-
-    def WaitForSettingsInitialized(self, milliseconds):
-        self.record("settings", milliseconds)
+        return True
 
     def StartPolling(self, milliseconds):
         self.record("poll", milliseconds)
@@ -66,72 +47,50 @@ class FakeDevice:
 
     def GetDeviceInfo(self):
         self.record("identity")
-        return SimpleNamespace(
-            Description="TEST DOUBLE, NOT HARDWARE", SerialNumberText=self.serial
-        )
+        return NS(SerialNumberText=self.identity, Description="FICTIONAL SOFTWARE DEVICE")
 
     def RequestStatus(self):
         self.record("status")
-        if self.mode == "Triggered":
-            self._trigger_state()
 
-    def _trigger_state(self):
-        active = any(
-            getattr(self.trigger_config, f"Trigger{port}Mode") == "TrigIN_GPI"
-            and self.inputs[port - 1]
-            == (getattr(self.trigger_config, f"Trigger{port}Polarity") == "TriggerHigh")
-            for port in (1, 2)
-        )
-        self.state = (
-            "Open"
-            if (self.operation == "Active" and active and self.Status.KeyEnabled and self.interlock)
-            else "Closed"
-        )
+    def RequestOperatingState(self):
+        self.record("operation")
+
+    def RequestOperatingMode(self):
+        self.record("mode_read")
 
     def GetStatusBits(self):
-        return 0x1000 if self.interlock else 0
+        return 0x2000
 
     def GetSolenoidState(self):
-        return self.state
+        return self.position
 
     def GetOperatingState(self):
         return self.operation
 
-    def RequestOperatingState(self):
-        self.record("request_operation")
-
-    def RequestOperatingMode(self):
-        self.record("request_mode")
-
     def GetOperatingMode(self):
         return self.mode
 
-    def SetOperatingState(self, state):
-        self.record("set_state", state)
-        self.operation = state
-        self.state = "Open" if state == "Active" else "Closed"
-        if self.mode == "Triggered":
-            self._trigger_state()
+    def SetOperatingState(self, value):
+        self.record("state", value)
+        self.operation = value
+        self.position = "Open" if value == "Active" else "Closed"
 
-    def SetOperatingMode(self, mode):
-        self.record("set_mode", mode)
-        self.mode = mode
-        if mode == "Manual":
-            self.state = "Open" if self.operation == "Active" else "Closed"
+    def SetOperatingMode(self, value):
+        self.record("mode", value)
+        self.mode = value
 
     def EnableDevice(self):
         self.record("enable")
 
     def RequestTriggerConfigParams(self):
-        self.record("request_triggers")
+        self.record("ttl_read")
 
     def GetTriggerConfigParams(self):
-        self.record("get_triggers")
-        return copy(self.trigger_config)
+        return copy(self.settings)
 
-    def SetTriggerConfigParams(self, config):
-        self.record("set_triggers", copy(config))
-        self.trigger_config = copy(config)
+    def SetTriggerConfigParams(self, settings):
+        self.record("ttl_write")
+        self.settings = copy(settings)
 
     def StopPolling(self):
         self.record("stop_poll")
@@ -139,48 +98,77 @@ class FakeDevice:
 
     def Disconnect(self):
         self.record("disconnect")
-        self.IsConnected = False
-        self.USBConnected = "Disconnected"
+        self.IsConnected, self.USBConnected = False, "Disconnected"
+
+
+class Manager:
+    def __init__(self, routes):
+        self.routes, self.entries, self.calls = routes, [], []
+        self.refreshes, self.ready_after, self.scan_error = 0, 1, False
+
+    def BuildDeviceList(self):
+        self.calls.append(("build",))
+        self.refreshes = 0
+
+    def CreateManualDeviceEntry(self, endpoint):
+        self.entries.append(endpoint)
+
+    def CheckForConnectionChanges(self):
+        self.refreshes += 1
+
+    def GetDeviceList(self, kind):
+        return [
+            s
+            for s, endpoint in self.routes.items()
+            if endpoint is None or (endpoint in self.entries and self.refreshes >= self.ready_after)
+        ]
+
+    def GetTransportInfo(self, serial):
+        endpoint = self.routes[serial]
+        return NS(
+            GetProvider=lambda: "TCPIP" if endpoint else "FTDI",
+            GetComSpec=lambda: endpoint or "USB",
+        )
+
+    def ScanEthernetRange(self, start, end, port, timeout):
+        self.calls.append(("scan", start, end, port, timeout))
+        if self.scan_error:
+            raise RuntimeError("LAN scan failed")
+        return ["192.0.2.10"]
 
 
 @pytest.fixture
-def rig(monkeypatch):
-    devices = {f"6800000{index}": FakeDevice(f"6800000{index}") for index in range(1, 4)}
-    device = devices["68000001"]
-    serials = [device.serial]
-    manager_calls = []
-    sdk = SimpleNamespace(
-        manager=SimpleNamespace(
-            BuildDeviceList=lambda: manager_calls.append("discover"),
-            CheckForConnectionChanges=lambda: {},
-            ScanEthernetRange=lambda *args: [],
-            GetDeviceList=lambda type_id: serials if type_id == 68 else [],
-            GetTransportInfo=lambda serial: SimpleNamespace(GetProvider=lambda: "FTDI"),
-        ),
-        device_type=SimpleNamespace(CreateKCubeSolenoid=lambda serial: devices[serial]),
-        enums=SimpleNamespace(
-            OperatingStates=SimpleNamespace(Active="Active", Inactive="Inactive"),
-            OperatingModes=SimpleNamespace(
+def bench(monkeypatch):
+    usb, lan = Device("68000001"), Device("68000002")
+    devices = {d.serial: d for d in (usb, lan)}
+    endpoint = "192.0.2.10:40304"
+    manager = Manager({usb.serial: None, lan.serial: endpoint})
+    sdk = NS(
+        manager=manager,
+        device_type=NS(CreateKCubeSolenoid=devices.__getitem__),
+        trigger_settings=TriggerSettings,
+        enums=NS(
+            OperatingStates=NS(Active="Active", Inactive="Inactive"),
+            OperatingModes=NS(
                 Manual="Manual",
                 SingleToggle="SingleToggle",
                 AutoToggle="AutoToggle",
                 Triggered="Triggered",
             ),
         ),
-        trigger_settings=FakeTriggerSettings,
     )
-    monkeypatch.setattr(module, "_device_owners", {}, raising=False)
-    monkeypatch.setattr(module, "_load_sdk", lambda directory: sdk)
-    clock = [0.0]
+    loads, clock = [], [0.0]
+
+    def load(directory):
+        loads.append(directory)
+        return sdk
 
     def sleep(seconds):
         clock[0] += seconds
 
-    monkeypatch.setattr(module, "time", SimpleNamespace(sleep=sleep, monotonic=lambda: clock[0]))
-    return SimpleNamespace(
-        device=device,
-        devices=devices,
-        controller=KCubeShutter(timeout=0.5),
-        serials=serials,
-        manager_calls=manager_calls,
-    )
+    monkeypatch.setattr(controller, "_load_sdk", load)
+    monkeypatch.setattr(controller, "_device_owners", {})
+    monkeypatch.setattr(controller, "time", NS(sleep=sleep, monotonic=lambda: clock[0]))
+    monkeypatch.setattr(config, "LAN_SCAN_START_IP", "192.0.2.0")
+    monkeypatch.setattr(config, "LAN_SCAN_END_IP", "192.0.2.255")
+    return NS(usb=usb, lan=lan, devices=devices, manager=manager, endpoint=endpoint, loads=loads)

@@ -23,12 +23,19 @@ calls may block. See [README](../README.md), [GUI](../docs/gui.md) and [API](../
 
 ## Validation and limitations
 
-TEST-148: source and extracted wheel each217 passed,1 optional SDK skip. Lint,
-format, package/source parity, fake API simulation and notebook scenarios PASS.
-TEST-149: current docs/links/snippets, absence of obsolete paths, private archive
-hashes and public identity checks PASS. The maintained tree drops109 to43 files,
-about2.32MB to0.54MB (about77% smaller). [Evidence index](../records/RECORDS.md)
-and [machine evidence](../records/baseline-validation.json) record the results.
+REQ-102 / TEST-151 rewrites all tests/doubles as15 essential cases in3 modules
+plus1 fixture:405 lines, down from2486. Source and extracted wheel each15 passed,
+0 skipped; lint/format and package/source parity PASS. Scope: normal USB/LAN/TTL,
+identity, retained ownership, cleanup, GUI/launcher and both notebook cycles, plus
+selected operational failures. This is representative functional coverage, not
+exhaustive validation. Production source/CSS is unchanged. The real-SDK opt-in
+test, preview helper and speculative/fuzz/internal check matrices are removed.
+[Current test evidence](../records/tests-validation.json) records the result.
+
+TEST-148/149 record the original runtime baseline's delivery and pruning; their
+test suite has been superseded. The original cleanup dropped109 to43 files and
+about2.32MB to0.54MB. [Evidence index](../records/RECORDS.md) and
+[baseline evidence](../records/baseline-validation.json) retain that scope.
 Implementation77ede6a and pruned baseline d1453d3 are pushed and origin/main's
 exact hash verified. This final checkpoint is marked baseline-2026-10-21.
 No actual hardware/network discovery or actuation is performed for this cleanup.

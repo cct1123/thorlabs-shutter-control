@@ -1,5 +1,17 @@
 # Project intent
 
+## Essential tests - REQ-102
+
+User: "clean out all tests. rewrite all tests. simply and essential. no speculative
+check tests." Replace the full test suite and its doubles/helpers with a small
+current-contract suite. Cover normal USB/LAN commands and feedback, TTL settings,
+identity and retained ownership/cleanup, unified GUI discovery/modes, passive
+launcher shutdown and both notebook workflows. Keep only essential failure cases
+with an operational reason; remove fuzz/type matrices, implementation traps,
+speculative race scenarios and real-device opt-in tests. Production behavior,
+private results and the environment remain unchanged. Validate software only;
+record the narrower scope honestly and update the documented test command.
+
 ## Current baseline - REQ-101
 
 User: "update. clean out development trash. slim down repo. remove all legacy.

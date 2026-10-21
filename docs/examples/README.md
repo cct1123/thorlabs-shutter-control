@@ -20,5 +20,4 @@ API call durations, host waits and controller feedback do not establish optical
 state or calibration. Current physical limits and prior notebook observations are
 in [hardware evidence](../hardware.md). Preserve executed copies/results in ignored
 inputs/private/notebooks; keep public examples free of actual device identifiers.
-Tests execute these notebooks only against fake devices. Developer simulation is
-separate: `uv run --locked python -B tests/simulated_demo.py --api`.
+Tests execute one complete cycle in each notebook using fake devices only.
