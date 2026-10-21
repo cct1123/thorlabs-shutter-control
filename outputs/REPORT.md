@@ -59,3 +59,10 @@ remain unqualified. The active-low no-cable expectation failed and is unresolved
 see [TTL results](../records/ttl-summary.json) and
 [hardware procedure](../docs/HARDWARE_VALIDATION.md). Software simulation cannot
 resolve these physical gaps; no overall hardware completion is claimed.
+
+## Publication
+
+REQ-089 / E123-E124: implementation **a19c33c** pushed to origin/main; exact remote
+hash verified. The two superseded red-style previews and repeated reporting were
+pruned. Concurrent controller.py/test_hub.py edits were preserved outside this
+publication and are not qualified by its validation.

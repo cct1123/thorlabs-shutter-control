@@ -1,12 +1,18 @@
 # Engineering state
 
-## Pruning and publication in progress - REQ-089
+## Pruning and publication COMPLETE - REQ-089
 
-TEST-131 / E123: superseded red-style previews pruned, repeated checkpoint/report
-text consolidated; behavior coverage and bench artifacts preserved. Source suite
-204 passed,1 optional SDK skip; full lint/format and doc checks PASS. Evidence:
-records/prune-publication-validation.json. Ready for explicit staging, commit and
-push origin/main. No hardware operation or live GUI restart.
+TEST-131 / E123: superseded previews and repeated reporting pruned. Source suite
+204 passed,1 optional SDK skip; full lint/format/docs/privacy checks PASS.
+Implementation a19c33c pushed to origin/main and exact remote hash verified
+(E124 / TEST-132). Current software evidence and physical limitations remain in
+records/prune-publication-validation.json and outputs/REPORT.md.
+
+Concurrent uncommitted edits appeared in src/thorlabs_shutter_control/controller.py
+and tests/test_hub.py during publication. Preserved/excluded from this commit;
+validation here covers the published implementation, not those concurrent edits.
+No hardware operation or live GUI restart. No human action required for this
+publication. Final evidence checkpoint follows as a documentation-only commit.
 
 ## Documentation and screenshots COMPLETE (software) - REQ-088
 
@@ -206,6 +212,6 @@ acceptance. No broader electrical/physical completion is inferred from no-cable 
 
 | REQ-085 | Kinesis-style four-mode instrument panels | TEST-127 / E119; source/wheel204 passed,1 skipped; desktop/narrow browser checks | PASS (software) |
 
-| REQ-089 | Prune, commit and push integrated changes | TEST-131 / E123; software PASS, publication pending | IN PROGRESS |
+| REQ-089 | Prune, commit and push integrated changes | TEST-131 / E123; E124 / TEST-132 exact remote hash | PASS (published) |
 | REQ-088 | Documentation, screenshots and integrated consistency | TEST-130 / E122; docs/links/screenshots/regressions | PASS (software) |
 | REQ-087 | Modern compact design with Kinesis control layout/four modes | TEST-129 / E121; source204/1, desktop/narrow browser | PASS (software) |

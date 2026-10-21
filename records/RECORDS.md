@@ -1334,3 +1334,14 @@ and records JSON parse PASS; exact counts in prune-publication-validation.json.
 No generated/cache directories at repo root; .venv/Git/private inputs preserved.
 No real SDK/device operation or live GUI restart. Commit/push authorized; explicit
 path staging and remote-hash verification follow. Physical gaps remain open.
+
+
+## E124 / TEST-132 - Verified publication
+
+REQ-089: implementation a19c33c867f755cf2298659b2a868adcb2b1ba3f committed and pushed
+normally to origin/main. git ls-remote --exit-code origin refs/heads/main returned
+the exact local commit hash. Staged explicit33 files; cached diff check and
+identity/scope scan PASS (fictional device identities only; no private inputs).
+Two concurrent uncommitted edits appeared during publication: controller.py and
+tests/test_hub.py. Preserved/excluded; no validation claim for these new edits.
+No hardware operation or live GUI restart. Final checkpoint is documentation only.

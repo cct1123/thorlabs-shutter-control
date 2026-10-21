@@ -33,5 +33,16 @@
     "Software-only; no hardware qualification or live GUI restart",
     "No new wheel build for this revision"
   ],
-  "publication": "Validated for commit; push pending"
+  "publication": {
+    "implementation_commit": "a19c33c867f755cf2298659b2a868adcb2b1ba3f",
+    "remote": "origin",
+    "branch": "main",
+    "push": "PASS",
+    "remote_hash_verified": "a19c33c867f755cf2298659b2a868adcb2b1ba3f",
+    "excluded_concurrent_changes": [
+      "src/thorlabs_shutter_control/controller.py",
+      "tests/test_hub.py"
+    ],
+    "scope": "Concurrent edits preserved outside this publication; implementation validation does not qualify those edits"
+  }
 }
