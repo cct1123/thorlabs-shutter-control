@@ -1,5 +1,20 @@
 # Project intent
 
+## Beginner readability - REQ-104
+
+User: "implement the readability and scaffolding reduction. prioritize beginner
+understanding. keep behavior unchanged. improve docstrings and comments where
+needed. validate and commit step by step."
+
+Derived acceptance: give a developer with basic Python a clear source reading
+path; explain state, ownership and failure contracts; replace positional GUI
+output bookkeeping with named values; separate action handling from presentation;
+keep tests understandable and cover one/multiple panels. Preserve public APIs,
+GUI element IDs/messages, startup, discovery, command/read order, waits and cleanup.
+Validate with software-only regressions and before/after callback and SDK-call
+comparisons. Commit focused stages. Hardware operations are outside this request.
+An actual novice handoff exercise remains separate from software validation.
+
 ## Essential tests - REQ-102
 
 User: "clean out all tests. rewrite all tests. simply and essential. no speculative

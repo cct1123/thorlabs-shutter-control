@@ -139,6 +139,12 @@ class Manager:
 
 @pytest.fixture
 def bench(monkeypatch):
+    """Provide one fictional USB cube and one LAN cube, with no real SDK calls.
+
+    Replacing the SDK loader prevents DLL/network/device access. The virtual clock
+    advances requested sleeps immediately; it measures software waits, not motion.
+    Device.fail injects one named SDK failure for ownership/cleanup checks.
+    """
     usb, lan = Device("68000001"), Device("68000002")
     devices = {d.serial: d for d in (usb, lan)}
     endpoint = "192.0.2.10:40304"

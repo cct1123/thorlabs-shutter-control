@@ -57,3 +57,83 @@ duration. These are software waits, not calibrated optical timing.
 Tests replace the SDK and use virtual waits, independent fake devices and real
 Dash callback HTTP. Notebooks run only against those doubles during validation.
 Physical evidence and limits are separate in [hardware evidence](hardware.md).
+
+## Developer walkthrough
+
+Start here if you know basic Python and are new to instrument control. Kinesis is
+Thorlabs' software development kit (SDK). Python.NET lets Python call its .NET
+classes. A device handle is the Python-visible SDK object for one cube; retaining
+that object preserves the target for cleanup. FTDI and TCPIP are the SDK's USB and
+Ethernet provider names. TTL means the controller's electrical trigger interface.
+
+### Reading order
+
+| Read | Responsibility |
+| --- | --- |
+| config.py | Defaults, including panel count, SDK folder and LAN scan range |
+| __main__.py:main | Construct the hub/app, serve localhost requests, clean up on exit |
+| gui.py:create_app | Build passive panels and connect button events to application logic |
+| controller.py:ShutterStatus, TriggerConfig | Values passed between driver and GUI |
+| controller.py:ShutterHub | Own slots/routes and dispatch commands to their drivers |
+| controller.py:_KinesisShutter | Shared connection, feedback, commands and release |
+| tests/test_core.py, tests/test_application.py | Executable examples using fictional devices |
+
+Read the normal command path before SDK loading or error cleanup. A slot is a
+zero-based panel index. An Ethernet endpoint is one exact IPv4:port route. Polling
+means the SDK updates feedback periodically; an explicit getter also requests
+feedback and waits. Neither a successful setter nor a sleep proves blade motion.
+
+### Trace one Open and one LAN Connect
+
+GUI Open enters the callback in create_app. It requests operating feedback through
+hub.get_operating_status(slot), checks readiness, and additionally reads actual TTL
+settings in Trigger mode. It calls hub.open_shutter(slot), which dispatches to the
+channel's open_shutter(). That sends SDK SetOperatingState(Active). The callback
+then reads the selected panel's operating feedback and updates its display. The
+setter itself contains no readiness reads or sleeps. Close sends Inactive without
+the Open prerequisite check, so it remains available after a communication fault.
+
+GUI Connect chooses a serial and applies its detected route with configure_slot()
+when needed. hub.connect() calls the selected channel's shared connect() method.
+For USB, KCubeShutter.discover() enumerates USB identities. For LAN,
+_HubChannel.discover() asks its hub's _discover_slot() for configured-route
+identities. Current LAN discovery waits for all configured endpoints or its
+deadline; this readability change does not alter that behavior. Base connect()
+claims exclusive serial ownership, creates/connects the SDK handle, initializes
+settings/polling and verifies identity/transport. GUI Connect then reads TTL and
+operating feedback. Connection alone never enables the channel or writes outputs.
+
+### State and failures to preserve
+
+- `has_device` means a handle is retained; it can be true while `connection` is
+  faulted. Never discard that target or open a replacement after failed release.
+- `get_status()` and `get_operating_status()` return a fault snapshot on read
+  failure. Inspect `connection`/`error`. Narrow getters and commands raise
+  `ShutterError`; their errors remain recorded on the channel.
+- `_command()` guards operations, clears cached display feedback before writes,
+  and records SDK failures. It does not read hardware or authorize output.
+- `_release()` attempts StopPolling and Disconnect. Shutdown attempts every slot
+  even after failure or Ctrl+C, then propagates errors/interrupts. This is why
+  cleanup deliberately catches `BaseException`.
+- Dash `no_update` leaves a browser property unchanged. Returning `None` sets a
+  value; these are different choices. All tabs share one hub and its locks.
+
+### Develop without hardware
+
+Use the install/test commands in [Setup](getting-started.md). Tests request the
+`bench` fixture from tests/conftest.py; pytest supplies fixtures by argument name.
+It replaces `_load_sdk` with fictional USB/LAN devices and replaces time with a
+virtual clock. SDK-style capitalized method names in those fakes match .NET. They
+prove control flow, not electrical, optical or native SDK behavior. Run the tests
+instead of launching the GUI against real hardware for development validation.
+
+For a first change, add a readout of the existing `ShutterStatus.status_bits`.
+Locate the panel layout and presentation code in gui.py, then follow the callback's
+output wiring. Add the readout and a GUI assertion using `bench`, exercising one
+and multiple panels. No new driver request is needed: operating snapshots already
+contain the bits. Reuse the small HTTP helper in tests/test_application.py; it posts
+the same Dash callback request as the browser without opening a server socket.
+
+For configuration changes, trace the chosen setting from config.py to its consumer.
+LAN bounds change the scan scope; timeouts/poll intervals change waits. Startup
+must remain passive. Validate with the fake SDK, without executing a live scan.

@@ -78,6 +78,9 @@ application readiness checks, automatic recovery or physical closure verificatio
 
 ## Validation and development
 
+New contributors: start with the [developer walkthrough](docs/architecture.md#developer-walkthrough)
+for the source reading order, command flow and a first software-only change.
+
 ```powershell
 .venv\Scripts\python.exe -B -m pytest -q -p no:cacheprovider
 uv run --locked ruff check --no-cache src tests

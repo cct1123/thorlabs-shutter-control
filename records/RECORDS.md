@@ -1,5 +1,24 @@
 # Baseline evidence and decisions
 
+## E144 / TEST-154 - Beginner contracts and guide, REQ-104 stage 1
+
+Expected: explain state/error/ownership contracts and provide a developer reading
+path without changing execution. Observed: added driver/fixture docstrings and
+cleanup rationale; extended the architecture guide with terminology, source map,
+Open/LAN Connect traces and software-only first-change instructions. Driver and
+fixture ASTs match HEAD when docstrings are stripped. All 15 tests pass in 0.17 s;
+59 before/after callback responses, cumulative SDK-call histories and virtual waits
+match for one/three panels, modes/TTL/discovery/faults/release/shutdown. Ruff check
+and format --check pass for src/tests; git diff --check passes. PASS software.
+
+Commands: .venv/Scripts/python.exe -B -m pytest -q -p no:cacheprovider --tb=short;
+.venv/Scripts/python.exe -B tmp/readability/compare_behavior.py compare;
+.venv/Scripts/ruff.exe check --no-cache src tests; same tool format --check --no-cache.
+Temporary probe and fictional baseline are ignored under tmp/readability. No real
+SDK/network/device operation. Review checkpoint is committed as 2498ee8. Actual
+novice handoff remains unexecuted; this stage validates documentation/execution
+separation, not independent beginner performance.
+
 ## E143 / TEST-153 - Beginner handoff and scaffolding review, REQ-103
 
 2026-10-21; user refinement makes beginner understanding and development takeover

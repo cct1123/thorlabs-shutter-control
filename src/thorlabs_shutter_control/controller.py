@@ -57,18 +57,31 @@ class TriggerConfig:
 
 @dataclass(frozen=True)
 class LanDevice:
+    """One discovered cube and its exact IPv4:port Ethernet route."""
+
     serial_number: str
     endpoint: str
 
 
 @dataclass(frozen=True)
 class LanDiscovery:
+    """Responding hub addresses and cube identities; neither implies a connection."""
+
     hub_addresses: tuple[str, ...]
     controllers: tuple[LanDevice, ...]
 
 
 @dataclass(frozen=True)
 class ShutterStatus:
+    """An immutable observation for display and application readiness checks.
+
+    has_device means this object still holds an SDK device handle, even if
+    communication or disconnect failed. connection describes communication health.
+    Active/Inactive is operating_state; it is distinct from blade Open/Closed.
+    Unknown fields are not evidence of a safe physical state. Cached observations
+    may be old, and even requested feedback does not independently prove motion.
+    """
+
     connection: str = "disconnected"
     has_device: bool = False
     serial_number: str | None = None
@@ -315,6 +328,11 @@ class _KinesisShutter:
             raise ShutterError(f"Kinesis communication status: {comms_status}.")
 
     def _read_status(self, *, include_triggers: bool = True) -> ShutterStatus:
+        """Request feedback, wait one poll interval, then sample the SDK's values.
+
+        include_triggers shares that wait with a TTL settings request. The fixed
+        wait is not a response acknowledgement or a guarantee of feedback age.
+        """
         self._check_connection()
         self._device.RequestStatus()
         self._device.RequestOperatingMode()
@@ -365,7 +383,11 @@ class _KinesisShutter:
         )
 
     def get_trigger_config(self) -> TriggerConfig:
-        """Read only TTL settings; do not request unrelated operating feedback."""
+        """Read only TTL settings; raise ShutterError on missing handle/read failure.
+
+        Unlike the snapshot getters, a failed read raises instead of returning a
+        fault snapshot. No operating-state feedback is requested here.
+        """
         with self._lock, self._command("TTL settings read", reading=True):
             self._check_connection()
             config = self._read_trigger_config()
@@ -428,7 +450,11 @@ class _KinesisShutter:
             )
 
     def _refresh_status(self, *, include_triggers: bool) -> ShutterStatus:
-        """Own read fault handling for both fresh snapshot APIs."""
+        """Return a snapshot, converting read exceptions into its fault/error fields.
+
+        A disconnected or already faulted handle is not queried. Callers must
+        inspect connection/error rather than assume a returned object means OK.
+        """
         with self._lock:
             if self._device is not None and self._fault is None:
                 try:
@@ -438,14 +464,15 @@ class _KinesisShutter:
             return self.get_cached_status()
 
     def get_status(self) -> ShutterStatus:
-        """Request full operating/TTL feedback; read failures latch a fault."""
+        """Request operating/TTL feedback; return a fault snapshot if a read fails."""
         return self._refresh_status(include_triggers=True)
 
     def get_operating_status(self) -> ShutterStatus:
-        """Request operating/safeguard feedback only; read failures latch a fault."""
+        """Request operating/key/interlock feedback; return a fault snapshot on failure."""
         return self._refresh_status(include_triggers=False)
 
     def _get_value(self, request: str, getter: str):
+        """Pair one SDK request with its getter after the configured wait; errors raise."""
         with self._lock, self._command("Read feedback", reading=True):
             self._check_connection()
             getattr(self._device, request)()
@@ -515,7 +542,13 @@ class _KinesisShutter:
 
     @contextmanager
     def _command(self, name, *, allow_fault=False, reading=False):
-        """Guard local handle ownership and preserve errors; never query feedback."""
+        """Guard an SDK operation and record failures without requesting feedback.
+
+        The caller holds the channel lock. Writes invalidate the display snapshot;
+        reading=True keeps it. A recorded fault blocks ordinary operations, while
+        allow_fault=True keeps Close/Disarm available on the retained handle.
+        SDK failures latch _fault and raise ShutterError; interrupts are re-raised.
+        """
         if self._device is None:
             raise ShutterError("No device connected.")
         if self._fault and not allow_fault:
@@ -534,6 +567,12 @@ class _KinesisShutter:
             raise ShutterError(self._fault) from exc
 
     def _release(self) -> tuple[list[str], BaseException | None]:
+        """Attempt both native release steps and return errors plus any interrupt.
+
+        Catch BaseException here so Ctrl+C cannot skip Disconnect. The caller
+        propagates the interrupt after cleanup. Keep the handle and serial claim
+        when Disconnect fails, preventing another controller from opening it.
+        """
         errors = []
         interrupted = None
         if self._device is not None:
@@ -638,7 +677,12 @@ class KCubeShutter(_KinesisShutter):
 
 
 class _HubChannel(_KinesisShutter):
-    """A hub-owned SDK channel; transport selection is delegated to its hub."""
+    """The Ethernet variant of the shared driver; its hub owns route discovery.
+
+    Base connect() calls discover() before creating a handle. This adapter asks
+    the hub for serials on this slot's endpoint, then uses the same lifecycle and
+    command implementation as USB. Call network channels through their hub.
+    """
 
     def __init__(self, hub, slot, serial, *, kinesis_dir, timeout=5.0, polling_ms=250):
         super().__init__(serial, kinesis_dir=kinesis_dir, timeout=timeout, polling_ms=polling_ms)
@@ -663,6 +707,9 @@ class ShutterHub:
     is three for USB, or fits the supplied network routes. Existing controllers can
     be injected instead. Construction never loads the SDK.
     The lock serializes GUI actions/status with shutdown; drivers also lock calls.
+    A slot is a zero-based panel/channel index. An endpoint is an IPv4:port route,
+    or None for USB. Public device methods take slot first and share the driver's
+    read/write/error contracts; safe_shutdown always attempts every slot.
     """
 
     @staticmethod
@@ -955,6 +1002,11 @@ class ShutterHub:
                 )
 
     def _discover_slot(self, slot: int) -> list[str]:
+        """Run configured hub discovery, then select this Ethernet slot's identities.
+
+        This intentionally retains whole-hub discovery and its timeout behavior.
+        The channel adapter calls it before base connect() creates a device.
+        """
         with self.lock:
             return [s for s in self.discover() if self._matches_endpoint(slot, s)]
 
@@ -974,6 +1026,11 @@ class ShutterHub:
             return controller.connect(serial_number)
 
     def _dispatch(self, slot: int, method: str, *args, **kwargs):
+        """Call a slot's driver under the hub lock, checking LAN routes before writes.
+
+        The named public wrappers below keep signatures discoverable. This shared
+        boundary owns routing policy, not output readiness or feedback requests.
+        """
         with self.lock:
             controller = self._controller(slot)
             with controller._lock:
@@ -1064,6 +1121,7 @@ class ShutterHub:
             errors = []
             interrupted = None
             first_error = None
+            # Preserve Ctrl+C, but propagate it only after attempting every slot.
             for index, controller in enumerate(self.controllers):
                 serial = controller.serial_number or "unselected"
                 try:

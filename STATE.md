@@ -1,5 +1,26 @@
 # Engineering state
 
+## REQ-104 IN PROGRESS - beginner readability implementation
+
+Source: PROJECT.md user request to implement readability/scaffolding reduction,
+preserve behavior and validate/commit step by step. Derived criteria: approachable
+source walkthrough and state/error explanations; named GUI output wiring; clear
+action/render separation; readable one/multiple-panel software checks; unchanged
+public APIs, DOM IDs/messages, command/read order, waits, discovery and cleanup.
+Review checkpoint committed as 2498ee8. Before changes, all 15 tests passed and
+59 single/three-panel callback responses, SDK-call histories and virtual waits were
+captured in ignored tmp/readability for comparison (TEST-154 baseline).
+
+E144 / TEST-154 PASS stage 1: driver/fixture executable AST unchanged after excluding
+docstrings; 15 tests pass; all 59 baseline callback/call-history/wait observations
+match. Ruff lint/format and whitespace checks pass. Driver contracts, fixture
+explanation and existing-guide walkthrough are ready for their focused commit.
+
+Plan: (1) commit validated contracts/guide; (2) replace positional
+GUI output lists and extract pure rendering; (3) clarify action coordination/test
+helpers, validate final source/wheel and commit delivery. Hardware remains outside
+scope. Actual uncoached beginner handoff is untested and is not software acceptance.
+
 ## REQ-103 COMPLETE - holistic efficiency review
 
 Source: user request, 2026-10-21: holistic review of communication, latency,
