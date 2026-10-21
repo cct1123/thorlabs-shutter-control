@@ -1,5 +1,22 @@
 # Baseline evidence and decisions
 
+## E145 / TEST-155 - Named GUI outputs and pure rendering, REQ-104 stage 2
+
+Expected: remove positional output coupling and separate presentation without
+changing DOM IDs, displayed values or device execution. Observed: `_panel_view`
+maps component names to property values; `_panel_outputs` derives matching Dash
+outputs from that view. `_control_hint` and presentation perform no device I/O.
+Removed the separate 48-position schema/result list; callback shrinks 300 -> 195
+lines. Total GUI lines 780 -> 777, prioritizing explicit names over compression.
+Expanded the existing GUI workflows to one/three panels and included Apply/Read/
+Arm/Disarm TTL. The HTTP helper now takes explicit selections and plain branches.
+
+18 tests pass in 0.28 s. All 59 pre-refactor full callback responses, cumulative
+SDK-call histories and virtual waits match, including normal actions, partial
+discovery, unknown feedback, faulted Close, retained failed release and shutdown.
+Ruff check/format and git diff --check pass. Commands/method: TEST-154, with the
+updated essential suite. PASS software only; no native SDK/network/device action.
+
 ## E144 / TEST-154 - Beginner contracts and guide, REQ-104 stage 1
 
 Expected: explain state/error/ownership contracts and provide a developer reading

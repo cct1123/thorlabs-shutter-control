@@ -16,9 +16,14 @@ docstrings; 15 tests pass; all 59 baseline callback/call-history/wait observatio
 match. Ruff lint/format and whitespace checks pass. Driver contracts, fixture
 explanation and existing-guide walkthrough are ready for their focused commit.
 
-Plan: (1) commit validated contracts/guide; (2) replace positional
-GUI output lists and extract pure rendering; (3) clarify action coordination/test
-helpers, validate final source/wheel and commit delivery. Hardware remains outside
+Contracts/guide committed as 117ff78. E145 / TEST-155 PASS stage 2: GUI uses named
+component/property maps and pure presentation helpers; the positional field list
+is removed. Existing DOM IDs, messages and I/O are preserved. All 18 essential
+tests pass (one/three-panel GUI cases plus TTL actions); all 59 baseline observations
+match. GUI callback reduced from 300 to 195 lines. Ruff/whitespace checks pass.
+
+Plan: (1) commit validated named outputs/rendering; (2) clarify action coordination,
+validate final source/wheel and commit delivery. Hardware remains outside
 scope. Actual uncoached beginner handoff is untested and is not software acceptance.
 
 ## REQ-103 COMPLETE - holistic efficiency review

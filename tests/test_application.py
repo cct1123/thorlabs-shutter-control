@@ -3,20 +3,32 @@
 from contextlib import contextmanager
 from types import SimpleNamespace
 
+import pytest
+
 from thorlabs_shutter_control import ShutterHub, gui
 from thorlabs_shutter_control import __main__ as launcher
 
 
-def click(app, action, serial=None):
-    key, callback = next(iter(app.callback_map.items()))
+def click(app, action, selections=None):
+    """Post the app's one callback without a browser, socket or real SDK.
+
+    selections maps serial component IDs to chosen values. The remaining State
+    fields use the panel's default TTL draft. Dash expects flattened output IDs
+    and State values even though our callback uses named groups internally.
+    """
+    ((key, callback),) = app.callback_map.items()
+    selections = selections or {}
     states = []
     for item in callback["state"]:
         name = item["id"]
-        value = (
-            serial
-            if name == "serial"
-            else ("high" if "polarity" in name else "input" if "trig1" in name else "output")
-        )
+        if name.startswith("serial"):
+            value = selections.get(name)
+        elif "polarity" in name:
+            value = "high"
+        elif name.startswith("trig1-mode"):
+            value = "input"
+        else:
+            value = "output"
         states.append(dict(item, value=value))
     response = app.server.test_client().post(
         "/_dash-update-component",
@@ -34,44 +46,64 @@ def click(app, action, serial=None):
     return response.get_json()["response"]
 
 
-def test_gui_discovers_and_connects_the_selected_lan_route(bench):
-    hub = ShutterHub(slots=1)
+@pytest.mark.parametrize("panels", [1, 3])
+def test_gui_discovers_and_connects_the_selected_lan_route(bench, panels):
+    suffix = "" if panels == 1 else "-1"
+    selections = {f"serial{suffix}": bench.lan.serial}
+    hub = ShutterHub(slots=panels)
     app = gui.create_app(hub)
     assert not bench.loads
     found = click(app, "discover")
-    assert len(found["serial"]["options"]) == 2
+    assert len(found[f"serial{suffix}"]["options"]) == 2
     assert not bench.lan.IsConnected
-    connected = click(app, "connect", bench.lan.serial)
-    assert connected["connection"]["children"] == "Connected"
-    assert connected["serial"]["disabled"]
-    assert hub.ethernet_endpoints == (bench.endpoint,)
-    click(app, "disconnect", bench.lan.serial)
+    connected = click(app, f"connect{suffix}", selections)
+    assert connected[f"connection{suffix}"]["children"] == "Connected"
+    assert connected[f"serial{suffix}"]["disabled"]
+    assert hub.ethernet_endpoints == (bench.endpoint,) + (None,) * (panels - 1)
+    if panels == 3:
+        assert connected["connection-2"]["children"] == "Disconnected"
+        assert connected["close-2"]["disabled"]
+    click(app, f"disconnect{suffix}", selections)
     assert not bench.lan.IsConnected
 
 
-def test_gui_operates_four_modes_and_stops_the_owned_server(bench):
+@pytest.mark.parametrize("panels", [1, 3])
+def test_gui_operates_four_modes_and_stops_the_owned_server(bench, panels):
+    suffix = "" if panels == 1 else "-1"
+    selections = {f"serial{suffix}": bench.usb.serial}
     stopped = []
-    app = gui.create_app(ShutterHub(slots=1), on_shutdown=lambda: stopped.append(True))
-    click(app, "connect", bench.usb.serial)
+    app = gui.create_app(ShutterHub(slots=panels), on_shutdown=lambda: stopped.append(True))
+    click(app, f"connect{suffix}", selections)
     for mode in ("manual", "single", "auto", "triggered"):
-        selected = click(app, f"mode-{mode}", bench.usb.serial)
-        assert selected[f"mode-{mode}"]["aria-pressed"] == "true"
-        started = click(app, "open", bench.usb.serial)
-        assert started["open"]["children"] == ("Open" if mode == "manual" else "Start")
+        selected = click(app, f"mode-{mode}{suffix}", selections)
+        assert selected[f"mode-{mode}{suffix}"]["aria-pressed"] == "true"
+        started = click(app, f"open{suffix}", selections)
+        assert started[f"open{suffix}"]["children"] == ("Open" if mode == "manual" else "Start")
         assert bench.usb.operation == "Active"
-        click(app, "close", bench.usb.serial)
+        click(app, f"close{suffix}", selections)
         assert bench.usb.operation == "Inactive"
-    click(app, "stop-server", bench.usb.serial)
+    click(app, f"mode-manual{suffix}", selections)
+    click(app, f"apply-ttl{suffix}", selections)
+    read = click(app, f"read-ttl{suffix}", selections)
+    assert read[f"trig1-mode{suffix}"]["value"] == "input"
+    click(app, f"arm-ttl{suffix}", selections)
+    assert bench.usb.mode == "Triggered" and bench.usb.operation == "Active"
+    click(app, f"disarm-ttl{suffix}", selections)
+    assert bench.usb.mode == "Manual" and bench.usb.operation == "Inactive"
+    click(app, "stop-server", selections)
     assert stopped == [True] and not bench.usb.IsConnected
 
 
-def test_gui_keeps_activation_disabled_for_unknown_feedback(bench):
+@pytest.mark.parametrize("panels", [1, 3])
+def test_gui_keeps_activation_disabled_for_unknown_feedback(bench, panels):
+    suffix = "" if panels == 1 else "-1"
+    selections = {f"serial{suffix}": bench.usb.serial}
     bench.usb.operation = "0"  # Observed KSC101 startup value; not Inactive.
-    app = gui.create_app(ShutterHub(slots=1))
-    result = click(app, "connect", bench.usb.serial)
-    assert result["connection"]["children"] == "Connected"
-    assert result["open"]["disabled"] and result["arm-ttl"]["disabled"]
-    click(app, "disconnect", bench.usb.serial)
+    app = gui.create_app(ShutterHub(slots=panels))
+    result = click(app, f"connect{suffix}", selections)
+    assert result[f"connection{suffix}"]["children"] == "Connected"
+    assert result[f"open{suffix}"]["disabled"] and result[f"arm-ttl{suffix}"]["disabled"]
+    click(app, f"disconnect{suffix}", selections)
 
 
 def test_launcher_builds_passive_panels_and_exits_normally(bench, monkeypatch):

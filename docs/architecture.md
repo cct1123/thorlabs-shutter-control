@@ -128,8 +128,10 @@ prove control flow, not electrical, optical or native SDK behavior. Run the test
 instead of launching the GUI against real hardware for development validation.
 
 For a first change, add a readout of the existing `ShutterStatus.status_bits`.
-Locate the panel layout and presentation code in gui.py, then follow the callback's
-output wiring. Add the readout and a GUI assertion using `bench`, exercising one
+Add its element to `_panel()` and its named component/property value to
+`_panel_view()` in gui.py. `_panel_outputs()` derives Dash output wiring from that
+same view; no separate field list or matching return position is needed. Rendering
+and control hints perform no device I/O. Add a GUI assertion using `bench`, exercising one
 and multiple panels. No new driver request is needed: operating snapshots already
 contain the bits. Reuse the small HTTP helper in tests/test_application.py; it posts
 the same Dash callback request as the browser without opening a server socket.

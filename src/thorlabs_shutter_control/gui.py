@@ -4,7 +4,7 @@ from collections.abc import Callable
 
 from dash import Dash, Input, Output, State, ctx, dcc, html, no_update
 
-from .controller import ShutterError, ShutterHub, TriggerConfig
+from .controller import ShutterError, ShutterHub, ShutterStatus, TriggerConfig
 
 
 def _message(text, component_id):
@@ -294,6 +294,149 @@ def _panel(slot, serial_number, serials, suffix, endpoint):
     )
 
 
+def _control_hint(status, config):
+    """Explain the current command prerequisites without requesting hardware feedback."""
+    if status.connection != "connected":
+        if status.error:
+            return "Resolve the connection fault before Open."
+        return "Select a controller, then Connect to enable manual controls."
+    if status.key_enabled is None:
+        return "Controller key feedback is unknown; Open is unavailable."
+    if not status.key_enabled:
+        return "Unlock the controller key to enable Open."
+    if (
+        status.operating_mode in ("single", "auto", "triggered")
+        and status.operating_state == "active"
+    ):
+        return f"{dict(MODES)[status.operating_mode]} active. Use Stop before changing mode."
+    if not _action_ready(status, config):
+        return (
+            "Operating feedback is unknown or not ready; Stop/Close before Start or mode selection."
+        )
+    mode_name = dict(MODES).get(status.operating_mode, "Manual")
+    if status.operating_mode == "triggered":
+        detail = "Trigger may open immediately."
+    elif status.operating_mode in ("single", "auto"):
+        detail = "Start uses stored cycle settings."
+    else:
+        detail = "Open/Close preserve Manual mode."
+    return f"{mode_name} ready. Users manage the physical interlock. {detail}"
+
+
+def _panel_view(
+    status: ShutterStatus,
+    config: TriggerConfig | None,
+    *,
+    message=no_update,
+    options=no_update,
+    selected=no_update,
+    draft=None,
+    error=False,
+    endpoint=None,
+):
+    """Map panel component names to browser properties; perform no device I/O.
+
+    These names also define the callback outputs in _panel_outputs(). Add a
+    readout here and in _panel(); there is no separate positional field list.
+    no_update preserves a browser value, while None explicitly clears it.
+    """
+    connected = status.connection == "connected"
+    has_handle = status.has_device
+    timed = status.operating_mode in ("single", "auto", "triggered")
+    if draft is None:
+        draft = [no_update] * 4
+    if connected:
+        badge = "online"
+    elif status.connection == "fault":
+        badge = "fault"
+    else:
+        badge = "offline"
+    message_class = no_update
+    if message is not no_update:
+        message_class = "message message-error" if error else "message message-success"
+    ttl = "Unknown"
+    if config is not None:
+        armed = {True: "Armed", False: "Disarmed", None: "Unknown"}[status.ttl_armed]
+        ttl = (
+            f"{armed} · {status.operating_mode}/{status.operating_state} · "
+            "TTL settings last read: "
+            f"TRIG1 {config.trig1_mode}/{config.trig1_polarity} · "
+            f"TRIG2 {config.trig2_mode}/{config.trig2_polarity}"
+        )
+
+    view = {
+        "connection": {"children": status.connection.title(), "className": "badge " + badge},
+        "identity": {
+            "children": " / ".join(v for v in (status.description, status.serial_number) if v)
+            or "Unknown"
+        },
+        "shutter-state": {
+            "children": status.shutter_state.title(),
+            "className": "shutter-state is-" + status.shutter_state,
+        },
+        "safeguards": {
+            "children": f"Key: {_enabled(status.key_enabled)} · "
+            f"Interlock: {_enabled(status.interlock_enabled)}"
+        },
+        "message": {"children": message, "className": message_class},
+        "serial": {"options": options, "value": selected, "disabled": has_handle},
+        "connect": {"disabled": has_handle},
+        "disconnect": {"disabled": not has_handle},
+        "open": {
+            "disabled": not _action_ready(status, config),
+            "children": "Start" if timed else "Open",
+            "className": "action-control start-control" + ("" if timed else " manual-control"),
+        },
+        "close": {
+            "disabled": not has_handle,
+            "children": "Stop" if timed else "Close",
+            "className": "action-control stop-control" + ("" if timed else " manual-control"),
+        },
+        "ttl-status": {"children": ttl},
+        "apply-ttl": {"disabled": not status.is_closed_manual},
+        "read-ttl": {"disabled": not connected},
+        "arm-ttl": {"disabled": not _arm_ready(status, config)},
+        "disarm-ttl": {"disabled": not has_handle},
+        "trig1-mode": {"value": draft[0]},
+        "trig1-polarity": {"value": draft[1]},
+        "trig2-mode": {"value": draft[2]},
+        "trig2-polarity": {"value": draft[3]},
+        "control-hint": {"children": _control_hint(status, config)},
+        "operating-mode": {"children": dict(MODES).get(status.operating_mode, "Unknown")},
+        "transport": {"children": _route_label(endpoint)},
+    }
+    lamps = {
+        "key": status.key_enabled,
+        "ready": _action_ready(status, config) if connected else None,
+        "error": bool(status.error),
+        "active": status.operating_state == "active"
+        if connected and status.operating_state != "unknown"
+        else None,
+        "open": status.shutter_state == "open"
+        if connected and status.shutter_state != "unknown"
+        else None,
+    }
+    for name, value in lamps.items():
+        view[f"lamp-{name}"] = {"children": _lamp(value, error=name == "error")}
+    for mode, _ in MODES:
+        chosen = status.operating_mode == mode
+        view[f"mode-{mode}"] = {
+            "className": "mode-button" + (" selected" if chosen else ""),
+            "disabled": not _mode_ready(status),
+            "aria-pressed": "true" if chosen else "false",
+        }
+    return view
+
+
+def _panel_outputs(suffix):
+    """Wire the named view properties to this panel's existing component IDs."""
+    outputs = {}
+    # Only the property names are used; rendering this empty snapshot is passive.
+    for component, properties in _panel_view(ShutterStatus(), None).items():
+        outputs[component] = {prop: Output(f"{component}{suffix}", prop) for prop in properties}
+    return outputs
+
+
 def create_app(
     hub: ShutterHub,
     *,
@@ -388,47 +531,6 @@ def create_app(
         **{"aria-busy": "false"},
     )
 
-    fields = [
-        ("connection", "children"),
-        ("identity", "children"),
-        ("shutter-state", "children"),
-        ("safeguards", "children"),
-        ("message", "children"),
-        ("serial", "options"),
-        ("serial", "value"),
-        ("serial", "disabled"),
-        ("connect", "disabled"),
-        ("disconnect", "disabled"),
-        ("open", "disabled"),
-        ("close", "disabled"),
-        ("ttl-status", "children"),
-        ("apply-ttl", "disabled"),
-        ("read-ttl", "disabled"),
-        ("arm-ttl", "disabled"),
-        ("disarm-ttl", "disabled"),
-        ("trig1-mode", "value"),
-        ("trig1-polarity", "value"),
-        ("trig2-mode", "value"),
-        ("trig2-polarity", "value"),
-        ("connection", "className"),
-        ("shutter-state", "className"),
-        ("control-hint", "children"),
-        ("message", "className"),
-    ]
-    fields += [
-        ("operating-mode", "children"),
-        ("open", "children"),
-        ("close", "children"),
-        ("open", "className"),
-        ("close", "className"),
-    ]
-    fields += [(f"lamp-{key}", "children") for key in ("key", "ready", "error", "active", "open")]
-    fields += [
-        (f"mode-{mode}", prop)
-        for mode, _ in MODES
-        for prop in ("className", "disabled", "aria-pressed")
-    ]
-    fields += [("transport", "children")]
     actions = {
         f"{action}{suffix}": (slot, action)
         for slot, suffix in enumerate(suffixes)
@@ -446,12 +548,12 @@ def create_app(
     }
 
     @app.callback(
-        [
-            Output("hub-message", "children"),
-            Output("connection-summary", "children"),
-            Output("hub-message", "className"),
-        ]
-        + [Output(f"{name}{suffix}", prop) for suffix in suffixes for name, prop in fields],
+        output={
+            "hub_message": Output("hub-message", "children"),
+            "connection_summary": Output("connection-summary", "children"),
+            "hub_message_class": Output("hub-message", "className"),
+            "panels": [_panel_outputs(suffix) for suffix in suffixes],
+        },
         inputs={
             "_events": [
                 Input("discover", "n_clicks"),
@@ -636,145 +738,40 @@ def create_app(
                 for index, shutter in enumerate(hub.controllers)
             ]
             connected_count = sum(s.connection == "connected" for s in statuses)
-            result = [
-                hub_message,
-                f"{connected_count} of {count} connected",
-                "message message-error"
+            result = {
+                "hub_message": hub_message,
+                "connection_summary": f"{connected_count} of {count} connected",
+                "hub_message_class": "message message-error"
                 if hub_error
                 else ("message" if hub_message is not no_update else no_update),
-            ]
+                "panels": [],
+            }
             for index, status in enumerate(statuses):
                 if status.error:
                     messages[index] = status.error
                     error_slots.add(index)
-                connected, active = status.connection == "connected", status.has_device
-                identity = (
-                    " / ".join(v for v in (status.description, status.serial_number) if v)
-                    or "Unknown"
-                )
-                if not connected:
+                if status.connection != "connected":
                     last_ttl_settings[index] = None
                 elif status.trigger_config is not None:
                     last_ttl_settings[index] = status.trigger_config
-                config = last_ttl_settings[index]
-                ttl = "Unknown"
-                if not connected:
-                    hint = (
-                        "Resolve the connection fault before Open."
-                        if status.error
-                        else ("Select a controller, then Connect to enable manual controls.")
-                    )
-                elif status.key_enabled is None:
-                    hint = "Controller key feedback is unknown; Open is unavailable."
-                elif not status.key_enabled:
-                    hint = "Unlock the controller key to enable Open."
-                elif (
-                    status.operating_mode in ("single", "auto", "triggered")
-                    and status.operating_state == "active"
-                ):
-                    hint = (
-                        f"{dict(MODES)[status.operating_mode]} active. "
-                        "Use Stop before changing mode."
-                    )
-                elif not _action_ready(status, config):
-                    hint = (
-                        "Operating feedback is unknown or not ready; "
-                        "Stop/Close before Start or mode selection."
-                    )
-                else:
-                    mode_name = dict(MODES).get(status.operating_mode, "Manual")
-                    detail = (
-                        "Trigger may open immediately."
-                        if status.operating_mode == "triggered"
-                        else "Start uses stored cycle settings."
-                        if status.operating_mode in ("single", "auto")
-                        else "Open/Close preserve Manual mode."
-                    )
-                    hint = f"{mode_name} ready. Users manage the physical interlock. {detail}"
-                if config is not None:
-                    armed = {True: "Armed", False: "Disarmed", None: "Unknown"}[status.ttl_armed]
-                    ttl = (
-                        f"{armed} · {status.operating_mode}/{status.operating_state} · "
-                        "TTL settings last read: "
-                        f"TRIG1 {config.trig1_mode}/{config.trig1_polarity} · "
-                        f"TRIG2 {config.trig2_mode}/{config.trig2_polarity}"
-                    )
-
-                result.extend(
-                    [
-                        status.connection.title(),
-                        identity,
-                        status.shutter_state.title(),
-                        f"Key: {_enabled(status.key_enabled)} · "
-                        f"Interlock: {_enabled(status.interlock_enabled)}",
-                        messages[index],
-                        options[index],
-                        selected[index],
-                        active,
-                        active,
-                        not active,
-                        not _action_ready(status, config),
-                        not active,
-                        ttl,
-                        not status.is_closed_manual,
-                        not connected,
-                        not _arm_ready(status, config),
-                        not active,
-                        *drafts[index],
-                        "badge "
-                        + (
-                            "online"
-                            if connected
-                            else ("fault" if status.connection == "fault" else "offline")
-                        ),
-                        "shutter-state is-" + status.shutter_state,
-                        hint,
-                        (
-                            "message message-error"
-                            if index in error_slots
-                            else "message message-success"
-                        )
-                        if messages[index] is not no_update
-                        else no_update,
-                    ]
-                )
-                timed = status.operating_mode in ("single", "auto", "triggered")
-                result.extend(
-                    [
-                        dict(MODES).get(status.operating_mode, "Unknown"),
-                        "Start" if timed else "Open",
-                        "Stop" if timed else "Close",
-                        "action-control start-control" + ("" if timed else " manual-control"),
-                        "action-control stop-control" + ("" if timed else " manual-control"),
-                        _lamp(status.key_enabled),
-                        _lamp(_action_ready(status, config) if connected else None),
-                        _lamp(bool(status.error), error=True),
-                        _lamp(
-                            status.operating_state == "active"
-                            if connected and status.operating_state != "unknown"
-                            else None
-                        ),
-                        _lamp(
-                            status.shutter_state == "open"
-                            if connected and status.shutter_state != "unknown"
-                            else None
-                        ),
-                    ]
-                )
-                for mode, _ in MODES:
-                    chosen = status.operating_mode == mode
-                    result.extend(
-                        [
-                            "mode-button" + (" selected" if chosen else ""),
-                            not _mode_ready(status),
-                            "true" if chosen else "false",
-                        ]
-                    )
-                serial = selected[index] if selected[index] is not no_update else selections[index]
+                serial = selected[index]
+                if serial is no_update:
+                    serial = selections[index]
                 endpoint = hub.ethernet_endpoints[index]
-                if not active and serial in discovered_routes:
+                if not status.has_device and serial in discovered_routes:
                     endpoint = discovered_routes[serial]
-                result.append(_route_label(endpoint))
+                result["panels"].append(
+                    _panel_view(
+                        status,
+                        last_ttl_settings[index],
+                        message=messages[index],
+                        options=options[index],
+                        selected=selected[index],
+                        draft=drafts[index],
+                        error=index in error_slots,
+                        endpoint=endpoint,
+                    )
+                )
             return result
 
     return app
