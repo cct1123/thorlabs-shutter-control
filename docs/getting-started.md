@@ -64,7 +64,7 @@ See [current hardware evidence](../records/hardware-validation.json).
 | Symptom | Action |
 | --- | --- |
 | SDK missing/load failure | Check x64 alignment, SDK folder, .NET Framework and vendor dependencies; restart Python after fixing installation |
-| No controllers discovered | Inspect the approved USB/power arrangement and driver installation; this FTDI device need not have a COM port |
+| No controllers discovered | Read the USB/LAN discovery warning. For USB, inspect power/cabling and FTDI drivers; no COM port is needed. For LAN, check the config.py scan range, release process handles and follow the [Ethernet guide](ethernet-assessment.md) |
 | Identity mismatch | Stop; preserve both selected and reported serials. Firmware1.0.7 repaired the historical mismatch onCONTROLLER_A; never alias serials in code |
 | Already owned | Release the existing panel/process. A failed SDK disconnect retains its ownership claim |
 | Open/Start disabled | Read the readiness hint. Manual needs healthy known feedback and key enabled; Single/Auto/Trigger need Inactive/Closed, with an actual input configured for Trigger. No software interlock gate |

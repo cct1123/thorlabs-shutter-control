@@ -52,8 +52,11 @@ timing are separate targeted work, not the next mandatory helper numbers.
 `ttl_unconnected.py` tests one verified controller with IO1/TRIG1 and IO2/TRIG2
 connected to nothing. Release any GUI/Kinesis handle first. Existing source
 protection, normal interlock and actuation authority must apply. Help/imports
-are passive. Set `SHUTTER_SERIAL` locally using the
-[launch example](../../README.md#launch-and-operate). This explicit command
+are passive. Set `$env:SHUTTER_SERIAL` to the intended cube's actual eight-digit
+serial before using these diagnostic commands; for example,
+`$env:SHUTTER_SERIAL = "68000001"` with the fictional serial replaced locally.
+This diagnostic setting is separate from the GUI's project configuration.
+This explicit command
 configures and may actuate hardware:
 
 ```powershell

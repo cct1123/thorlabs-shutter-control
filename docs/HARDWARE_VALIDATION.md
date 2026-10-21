@@ -99,7 +99,7 @@ ownership: preserve the handle/error instead of creating another owner.
 
 | Test | Question and current limit |
 | --- | --- |
-| Ethernet | Can the cube identify/read through its bay with USB IN disconnected? Hub 40303; left/middle/right bays 40304/40305/40306. Follow the [passive Ethernet note](ethernet-assessment.md); post-update cube communication is untested. |
+| Ethernet | E128 / TEST-138 passed one KEH3/KSC101 explicit-endpoint discovery, identity, Connect and passive release. Hub 40303; left/middle/right bays 40304/40305/40306. Follow the [passive Ethernet note](ethernet-assessment.md); range scanning, current GUI bench operation and Ethernet actuation/timing remain unqualified. |
 | Three controllers | Do three real mappings operate independently and all clean up? Single-pair success does not qualify this; REQ-023 remains open. |
 | TTL | Actual no-cable configuration/Arm/Disarm passed, but both active-low position checks failed (still reported Closed). See [E082 results](../records/ttl-summary.json). External signals/voltage remain untested; REQ-031 stays open. Arm can open immediately. |
 | Loss/recovery | Does a specifically authorized Closed-state communication-loss test fault and recover correctly? Physical injection remains untested, REQ-006. |

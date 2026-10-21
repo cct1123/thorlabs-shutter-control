@@ -17,6 +17,9 @@ Implementation/tests committed as 66ebe49; documentation/evidence/pruning as
 This final checkpoint records that publication. No remaining software action or
 pending helper. No hardware/network discovery or actual GUI restart performed.
 Physical project acceptance remains incomplete, as detailed below.
+Follow-up README/docs audit E137 / TEST-147 corrected one stale Ethernet evidence
+row and diagnostic/troubleshooting instructions; 18 Markdown files,137 local
+links/anchors and10 Python snippets PASS. No source/package change.
 
 ## Architecture and configuration
 

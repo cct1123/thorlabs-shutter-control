@@ -1899,3 +1899,20 @@ with verified publication. Its commit/push is followed by another exact remote
 comparison; it introduces no source/package change and needs no repeated software
 suite. E135's source/wheel251 passed,1 optional SDK skip remains current. All
 physical limitations and local private notebook preservation remain unchanged.
+
+## E137 / TEST-147 - Follow-up README and documentation audit
+
+User asks whether README/docs were updated. Confirmed committed README, GUI,
+setup, API, architecture and Ethernet guides against current config/controller/GUI.
+Found and corrected a remaining HARDWARE_VALIDATION Ethernet row that contradicted
+its own E128 passive-connection evidence, a diagnostic serial-setting instruction
+pointing to a removed launch example, and USB-only discovery troubleshooting.
+README already documents unified USB/LAN Discover, detected routes and config
+defaults; no README content change was needed. Physical limits remain explicit.
+
+Expected: current guides agree with code/evidence and local references resolve.
+Observed18 Markdown files,137 local links/anchors and10 Python snippets PASS via
+file/heading checks and ast.parse; git diff --check PASS. Documentation only; no
+hardware or software behavior change, so E135 source/wheel validation remains
+applicable. Follow-up correction is committed/pushed under the existing REQ-100
+consistency/publication authorization, with final remote equality checked.
