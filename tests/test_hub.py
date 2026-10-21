@@ -352,7 +352,6 @@ def test_mixed_hub_routes_each_serial_to_its_configured_transport(rig, monkeypat
     assert all(not device.calls for device in rig.devices.values())
     for slot, serial in enumerate(rig.serials):
         entries.clear()
-        hub.confirm_interlock(slot, serial)
         assert hub.connect(slot, serial).serial_number == serial
         if slot:
             rig.devices[serial].USBConnected = "Disconnected"  # TCP/IP has no USB dependency.

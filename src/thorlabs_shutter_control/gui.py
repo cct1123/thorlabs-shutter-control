@@ -4,7 +4,7 @@ from collections.abc import Callable
 
 from dash import Dash, Input, Output, State, ctx, dcc, html, no_update
 
-from .controller import KCubeShutter, ShutterError, ShutterHub, TriggerConfig
+from .controller import ShutterError, ShutterHub, TriggerConfig
 
 
 def _message(text, component_id):
@@ -295,16 +295,13 @@ def _panel(slot, serial_number, serials, suffix, endpoint):
 
 
 def create_app(
-    controller: KCubeShutter | ShutterHub | None = None,
+    hub: ShutterHub,
     *,
     on_shutdown: Callable[[], None] | None = None,
 ) -> Dash:
     """Build passive panels; an owning server may supply its stop notification."""
-    hub = (
-        controller
-        if isinstance(controller, ShutterHub)
-        else ShutterHub(controllers=[controller] if controller is not None else None)
-    )
+    if not isinstance(hub, ShutterHub):
+        raise TypeError("create_app requires a ShutterHub.")
     count = len(hub.controllers)
     single = count == 1
     suffixes = [""] if single else [f"-{slot + 1}" for slot in range(count)]
@@ -453,7 +450,6 @@ def create_app(
             Output("hub-message", "children"),
             Output("connection-summary", "children"),
             Output("hub-message", "className"),
-            Output("transport-summary", "children"),
         ]
         + [Output(f"{name}{suffix}", prop) for suffix in suffixes for name, prop in fields],
         inputs={
@@ -547,11 +543,7 @@ def create_app(
                                 shutter = hub.controllers[slot]
                                 last_ttl_settings[slot] = None
                                 drafts[slot] = ["input", "high", "output", "high"]
-                        status = (
-                            shutter.connect(selections[slot])
-                            if isinstance(controller, KCubeShutter) and controller is shutter
-                            else hub.connect(slot, selections[slot])
-                        )
+                        status = hub.connect(slot, serial)
                         selected[slot] = status.serial_number
                         last_ttl_settings[slot] = hub.get_trigger_config(slot)
                         messages[slot] = "Connected."
@@ -650,7 +642,6 @@ def create_app(
                 "message message-error"
                 if hub_error
                 else ("message" if hub_message is not no_update else no_update),
-                "KSC101 controllers · USB / Ethernet LAN",
             ]
             for index, status in enumerate(statuses):
                 if status.error:
@@ -715,8 +706,7 @@ def create_app(
                         identity,
                         status.shutter_state.title(),
                         f"Key: {_enabled(status.key_enabled)} · "
-                        f"Interlock: {_enabled(status.interlock_enabled)}"
-                        + (" (operator verified)" if status.operator_interlock_confirmed else ""),
+                        f"Interlock: {_enabled(status.interlock_enabled)}",
                         messages[index],
                         options[index],
                         selected[index],

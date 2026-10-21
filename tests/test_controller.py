@@ -155,16 +155,11 @@ def test_connect_rejects_mismatched_identity_without_output_writes(rig, monkeypa
 
 
 @pytest.mark.parametrize("serial", ["68000001", 68000001])
-def test_serial_input_normalizes_for_selection_confirmation_and_connection(rig, serial):
+def test_serial_input_normalizes_for_selection_and_connection(rig, serial):
     controller = KCubeShutter(serial)
     assert controller.serial_number == "68000001"
     assert not rig.manager_calls and not rig.device.calls
-    rig.controller.serial_number = serial
-    rig.controller.confirm_interlock(serial)
-    assert rig.controller.connect(serial).operator_interlock_confirmed
-    # Reassigning the same identity in another representation preserves confirmation.
-    rig.controller.serial_number = 68000001
-    assert rig.controller.connect("68000001").operator_interlock_confirmed
+    assert rig.controller.connect(serial).serial_number == "68000001"
     assert not any(call[0] == "set_state" for call in rig.device.calls)
 
 
@@ -393,29 +388,3 @@ def test_disconnected_specific_getters_do_not_load_sdk(rig, method):
     with pytest.raises(ShutterError, match="No device connected"):
         getattr(rig.controller, method)()
     assert not rig.device.calls and not rig.manager_calls
-
-
-def test_confirmation_does_not_cross_serial_or_instance(rig):
-    c = rig.controller
-    c.serial_number = "68000001"
-    c.confirm_interlock("68000001")
-    rig.device.interlock = False
-    other = KCubeShutter("68000001")
-    assert not other.connect().operator_interlock_confirmed
-    other.disconnect(close_shutter=False)
-    c.serial_number = "68000002"
-    c.serial_number = "68000001"
-    assert not c.connect().interlock_ready
-    c.disconnect(close_shutter=False)
-
-
-def test_confirmation_requires_explicit_selected_disconnected_controller(rig):
-    with pytest.raises(ValueError):
-        rig.controller.confirm_interlock("68000001")
-    rig.controller.serial_number = "68000001"
-    with pytest.raises(ValueError):
-        rig.controller.confirm_interlock("68000002")
-    rig.controller.connect()
-    with pytest.raises(ShutterError):
-        rig.controller.confirm_interlock("68000001")
-    rig.controller.disconnect(close_shutter=False)

@@ -81,20 +81,6 @@ class ShutterStatus:
     trigger_config: TriggerConfig | None = None
     error: str | None = None
     status_bits: int | None = None
-    operator_interlock_confirmed: bool = False
-
-    @property
-    def interlock_ready(self) -> bool:
-        """Informational metadata: reported enabled or explicitly operator-verified.
-
-        A known negative report is never overridden. This is readiness evidence,
-        not a command to alter the hardware interlock. Project operations do not
-        gate on this property; users manage the physical circuit externally.
-        """
-        return self.connection == "connected" and (
-            self.interlock_enabled is True
-            or (self.interlock_enabled is None and self.operator_interlock_confirmed)
-        )
 
     @property
     def is_closed_manual(self) -> bool:
@@ -235,24 +221,7 @@ class _KinesisShutter:
             serial = _normalize_serial(serial)
             if self._device is not None and serial != self._serial_number:
                 raise ShutterError("Disconnect before selecting another device.")
-            if serial != getattr(self, "_serial_number", None):
-                self._operator_verified_serial = None
             self._serial_number = serial
-
-    def confirm_interlock(self, serial: str | int) -> None:
-        """Record explicit physical interlock verification for this selected serial.
-
-        Call before connection only after the operator confirms the normal circuit
-        and independent protection. No device command or persistent setting; the
-        confirmation belongs to this object/serial and clears on retargeting.
-        """
-        with self._lock:
-            serial = _normalize_serial(serial)
-            if serial is None or serial != self.serial_number:
-                raise ValueError("Interlock confirmation requires the selected explicit serial.")
-            if self._device is not None:
-                raise ShutterError("Disconnect before changing interlock confirmation.")
-            self._operator_verified_serial = serial
 
     def connect(self, serial_number: str | int | None = None) -> ShutterStatus:
         """Connect the selected device, or the only discovered KSC101. No output write."""
@@ -377,9 +346,6 @@ class _KinesisShutter:
             interlock_enabled=True if bits & 0x1000 else None,
             trigger_config=config,
             status_bits=bits,
-            operator_interlock_confirmed=(
-                getattr(self, "_operator_verified_serial", None) == self.serial_number
-            ),
         )
         self._check_connection()
         self._last_status = status
@@ -459,10 +425,6 @@ class _KinesisShutter:
                 serial_number=self.serial_number,
                 description=self._description,
                 error=self._fault,
-                operator_interlock_confirmed=(
-                    getattr(self, "_operator_verified_serial", None) == self.serial_number
-                    and self.serial_number is not None
-                ),
             )
 
     def _refresh_status(self, *, include_triggers: bool) -> ShutterStatus:
@@ -861,12 +823,8 @@ class ShutterHub:
                 )
                 hosts = set()
                 for entry in addresses:
-                    # SDK versions may report a bare address or address:port.
-                    address, sep, port = str(entry).partition(":")
-                    if sep and port != "40303":
-                        continue
                     try:
-                        ip = IPv4Address(address)
+                        ip = IPv4Address(str(entry))
                     except ValueError:
                         continue
                     if start <= ip <= end:
@@ -1043,9 +1001,6 @@ class ShutterHub:
 
     def identify_device(self, slot: int) -> dict[str, str]:
         return self._dispatch(slot, "identify_device")
-
-    def confirm_interlock(self, slot: int, serial: str | int) -> None:
-        self._dispatch(slot, "confirm_interlock", serial)
 
     def get_status(self, slot: int) -> ShutterStatus:
         return self._dispatch(slot, "get_status")

@@ -39,7 +39,7 @@ def invoke(app, action, *, serial=None, serials=None, clicks=1, ttl=None):
 
 
 def test_gui_runs_entire_manual_lifecycle_through_controller(rig):
-    app = create_app(rig.controller)
+    app = create_app(ShutterHub(controllers=[rig.controller]))
     assert "stop-server" not in app.server.test_client().get("/_dash-layout").get_data(as_text=True)
     discovered = invoke(app, "discover")
     assert discovered["serial"]["options"] == [{"label": "68000001 · USB", "value": "68000001"}]
@@ -55,9 +55,18 @@ def test_gui_runs_entire_manual_lifecycle_through_controller(rig):
     assert invoke(app, "disconnect")["connection"]["children"] == "Disconnected"
 
 
+def test_gui_requires_a_hub_and_an_explicit_selected_serial(rig):
+    with pytest.raises(TypeError, match="requires a ShutterHub"):
+        create_app(rig.controller)
+    app = create_app(ShutterHub(controllers=[rig.controller]))
+    result = invoke(app, "connect", serial=None)
+    assert "Select a KSC101 serial" in result["message"]["children"]
+    assert not rig.manager_calls and not rig.device.calls
+
+
 def test_gui_reports_fault_and_allows_cleanup_and_reconnect(rig):
-    app = create_app(rig.controller)
-    invoke(app, "connect")
+    app = create_app(ShutterHub(controllers=[rig.controller]))
+    invoke(app, "connect", serial="68000001")
     rig.device.CommsStatus = "Timeout"
     result = invoke(app, "refresh")
     assert result["shutter-state"]["children"] == "Unknown"
@@ -69,7 +78,7 @@ def test_gui_reports_fault_and_allows_cleanup_and_reconnect(rig):
     result = invoke(app, "disconnect")
     assert result["connect"]["disabled"] is False
     rig.device.CommsStatus = "OK"
-    assert invoke(app, "connect")["connection"]["children"] == "Connected"
+    assert invoke(app, "connect", serial="68000001")["connection"]["children"] == "Connected"
 
 
 @pytest.mark.parametrize("feedback", [None, False, True])
@@ -80,8 +89,8 @@ def test_interlock_is_display_only_and_users_manage_it_externally(rig, monkeypat
         "_read_status",
         lambda **kwargs: replace(read_status(**kwargs), interlock_enabled=feedback),
     )
-    app = create_app(rig.controller)
-    result = invoke(app, "connect")
+    app = create_app(ShutterHub(controllers=[rig.controller]))
+    result = invoke(app, "connect", serial="68000001")
     assert result["connection"]["children"] == "Connected"
     display = {None: "unknown", False: "not enabled", True: "enabled"}[feedback]
     assert f"Interlock: {display}" in result["safeguards"]["children"]
@@ -172,8 +181,8 @@ def test_ttl_drafts_apply_readback_and_arming_are_independent_per_panel(rig):
 
 
 def test_action_readiness_distinguishes_key_and_selected_mode(rig):
-    app = create_app(rig.controller)
-    invoke(app, "connect")
+    app = create_app(ShutterHub(controllers=[rig.controller]))
+    invoke(app, "connect", serial="68000001")
     rig.device.Status.KeyEnabled = False
     keyed = invoke(app, "refresh")
     assert keyed["open"]["disabled"] and "key" in keyed["control-hint"]["children"]
@@ -229,8 +238,8 @@ def test_manual_actions_reuse_feedback_without_reading_other_panels(rig, count):
 
 
 def test_cached_ttl_display_cannot_authorize_arm_with_changed_device_settings(rig):
-    app = create_app(rig.controller)
-    invoke(app, "connect")
+    app = create_app(ShutterHub(controllers=[rig.controller]))
+    invoke(app, "connect", serial="68000001")
     rig.device.trigger_config.Trigger1Mode = "Disabled"
     result = invoke(app, "refresh")
     assert "TRIG1 input/high" in result["ttl-status"]["children"]
@@ -246,8 +255,8 @@ def test_cached_ttl_display_cannot_authorize_arm_with_changed_device_settings(ri
 @pytest.mark.parametrize("field", ["operation", "state", "mode"])
 def test_connect_with_unknown_feedback_keeps_connection_but_disables_open(rig, field):
     setattr(rig.device, field, "0")
-    app = create_app(rig.controller)
-    result = invoke(app, "connect")
+    app = create_app(ShutterHub(controllers=[rig.controller]))
+    result = invoke(app, "connect", serial="68000001")
     assert result["connection"]["children"] == "Connected"
     assert result["open"]["disabled"] is True
     assert result["arm-ttl"]["disabled"] is True
@@ -261,8 +270,8 @@ def test_connect_with_unknown_feedback_keeps_connection_but_disables_open(rig, f
 
 
 def test_arm_button_requires_closed_inactive_manual_feedback(rig):
-    app = create_app(rig.controller)
-    assert invoke(app, "connect")["arm-ttl"]["disabled"] is False
+    app = create_app(ShutterHub(controllers=[rig.controller]))
+    assert invoke(app, "connect", serial="68000001")["arm-ttl"]["disabled"] is False
     result = invoke(app, "open")
     assert result["arm-ttl"]["disabled"] is True
     rig.device.calls.clear()
@@ -274,14 +283,14 @@ def test_arm_button_requires_closed_inactive_manual_feedback(rig):
 
 
 def test_failed_connect_can_retry_without_output_commands(rig):
-    app = create_app(rig.controller)
+    app = create_app(ShutterHub(controllers=[rig.controller]))
     rig.device.fail.add("connect")
-    failed = invoke(app, "connect")
+    failed = invoke(app, "connect", serial="68000001")
     assert failed["connection"]["children"] == "Fault"
     assert "Connect failed" in failed["message"]["children"]
     assert failed["connect"]["disabled"] is False
     rig.device.fail.clear()
-    connected = invoke(app, "connect")
+    connected = invoke(app, "connect", serial="68000001")
     assert connected["connection"]["children"] == "Connected"
     assert connected["message"]["children"] == "Connected."
     assert not any(
@@ -293,8 +302,10 @@ def test_failed_connect_can_retry_without_output_commands(rig):
 @pytest.mark.parametrize("cleanup_fails", [False, True])
 def test_owned_server_stops_only_after_device_cleanup(rig, cleanup_fails):
     stopped = []
-    app = create_app(rig.controller, on_shutdown=lambda: stopped.append(True))
-    invoke(app, "connect")
+    app = create_app(
+        ShutterHub(controllers=[rig.controller]), on_shutdown=lambda: stopped.append(True)
+    )
+    invoke(app, "connect", serial="68000001")
     invoke(app, "open")
     if cleanup_fails:
         rig.device.fail.add("set_state")
@@ -311,8 +322,8 @@ def test_owned_server_stops_only_after_device_cleanup(rig, cleanup_fails):
 
 @pytest.mark.parametrize("mode", ["manual", "single", "auto", "triggered"])
 def test_mode_panels_select_without_activation_and_start_stop_preserve_mode(rig, mode):
-    app = create_app(rig.controller)
-    invoke(app, "connect")
+    app = create_app(ShutterHub(controllers=[rig.controller]))
+    invoke(app, "connect", serial="68000001")
     rig.device.calls.clear()
     selected = invoke(app, f"mode-{mode}")
     assert selected[f"mode-{mode}"]["aria-pressed"] == "true"
@@ -336,8 +347,8 @@ def test_mode_panels_select_without_activation_and_start_stop_preserve_mode(rig,
 
 
 def test_trigger_start_rereads_input_configuration_and_never_uses_drafts(rig):
-    app = create_app(rig.controller)
-    invoke(app, "connect")
+    app = create_app(ShutterHub(controllers=[rig.controller]))
+    invoke(app, "connect", serial="68000001")
     invoke(app, "mode-triggered")
     rig.device.trigger_config.Trigger1Mode = "Disabled"
     rig.device.calls.clear()
@@ -349,8 +360,8 @@ def test_trigger_start_rereads_input_configuration_and_never_uses_drafts(rig):
 
 
 def test_mode_highlight_uses_feedback_instead_of_requested_value(rig, monkeypatch):
-    app = create_app(rig.controller)
-    invoke(app, "connect")
+    app = create_app(ShutterHub(controllers=[rig.controller]))
+    invoke(app, "connect", serial="68000001")
     monkeypatch.setattr(rig.device, "SetOperatingMode", lambda mode: None)
     result = invoke(app, "mode-auto")
     assert result["mode-manual"]["aria-pressed"] == "true"
