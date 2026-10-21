@@ -6,7 +6,7 @@ Exports: KCubeShutter, ShutterHub, ShutterStatus, TriggerConfig and ShutterError
 Import/construction is passive. SDK loading occurs on explicit discovery/connection.
 `KCubeShutter` accepts USB devices only. Ethernet endpoints belong to `ShutterHub`.
 
-## Construction and confirmation
+## Construction
 
 ```python
 from thorlabs_shutter_control import KCubeShutter, config
@@ -22,7 +22,8 @@ c = KCubeShutter(config.SERIAL_NUMBERS[0], timeout=5.0, polling_ms=250)
 | timeout | Finite0.5..60s, at least two polling intervals; settings initialization wait only, not an end-to-end deadline |
 | polling_ms | Integer100..1000ms; default250 |
 
-Confirmation requires the same explicitly selected serial and no retained handle.
+Optional `confirm_interlock(serial)` requires the same explicitly selected serial
+and no retained handle.
 It is object/serial scoped, survives ordinary reconnect within that session,
 clears on retargeting and does not transfer to another object/process. It changes
 no hardware interlock setting. Positive SDK indication or this explicit evidence
@@ -82,7 +83,9 @@ can still block or raise. Successful return means only that the SDK call returne
 
 ```python
 c.disarm_triggers()               # Explicit Inactive/Manual preparation.
-print(c.get_operating_status())    # Establish the intended baseline first.
+baseline = c.get_operating_status()
+if not baseline.is_closed_manual:
+    raise RuntimeError("Expected Closed/Inactive/Manual before Enable.")
 c.enable_device()                 # Explicit setup once when needed.
 c.open_shutter()                  # Active only; returns None.
 print(c.get_shutter_state())       # Separate position request/read.
@@ -93,8 +96,9 @@ print(c.get_operating_status())    # Explicit operating snapshot if wanted.
 Active follows the selected mode: Manual opens, Single starts one cycle, Auto
 starts cycling, and Triggered primes trigger behavior. Inactive requests closure
 without selecting Manual. Use explicit mode setup when needed; Open/Close never
-repeat EnableDevice. The GUI manual Open requires Manual and assumes an enabled
-controller. Arm remains a compound Enable/Triggered/Active command. See the
+repeat EnableDevice. The GUI uses Open/Close in Manual and Start/Stop in Single/Auto/Trigger,
+assuming an enabled controller. Mode selection requires Inactive/Closed feedback;
+Trigger Start reads the actual input settings. Arm remains a compound Enable/Triggered/Active command. See the
 [official KSC101 example](https://github.com/Thorlabs/Motion_Control_Examples/blob/main/Python/Kinesis/KCube/KSC101/KSC101_pythonnet.py),
 which enables once during setup before toggling Active/Inactive.
 
@@ -232,9 +236,19 @@ claim; retain the same controller for diagnosis, rather than creating another ow
 StopPolling failure does not skip Disconnect. Cleanup failures raise ShutterError;
 interruptions propagate after remaining cleanup attempts and include diagnostics.
 
-Separate process ownership is an operator responsibility. Normal CLI Ctrl+C calls
-hub cleanup; browser closure, forced process kill and USB/power loss do not provide
+Separate process ownership is an operator responsibility. The launcher shutdown
+button and normal CLI Ctrl+C call hub cleanup; browser closure, forced process
+kill and USB/power loss do not provide
 that guarantee. Physical recovery and optical closure must be independently defined.
 
 Ethernet is described in the [qualification note](ethernet-assessment.md). Actual
 single-pair evidence and limits are in [hardware-validation.json](../records/hardware-validation.json).
+
+## Owned GUI shutdown
+
+`create_app(controller=None, *, on_shutdown=None)` builds the Dash application.
+The launcher supplies a nonblocking stop notification, exposing **Shut down GUI &
+devices**. The action calls hub.safe_shutdown first and signals its owner only on
+success. On failure the GUI shows diagnostics and keeps the host available.
+Embedded apps omit the button by default and retain host-server ownership.
+Closing the server releases SDK connections; it does not switch off hardware power.

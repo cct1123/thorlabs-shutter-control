@@ -1,6 +1,9 @@
 """Launch the passive GUI using project settings; no command-line options."""
 
 import sys
+from threading import Event
+
+from werkzeug.serving import make_server
 
 from . import config
 from .controller import ShutterError, ShutterHub
@@ -19,9 +22,14 @@ def main() -> int:
 
     result = 0
     try:
-        app = create_app(hub)
-        # One process/operator owns all slots. Reloaders must not duplicate handles.
-        app.run(host="127.0.0.1", port=config.PORT, debug=False, use_reloader=False, threaded=False)
+        stop_requested = Event()
+        app = create_app(hub, on_shutdown=stop_requested.set)
+        # Handle one request at a time, finishing the shutdown response before exit.
+        with make_server("127.0.0.1", config.PORT, app.server, threaded=False) as server:
+            server.timeout = 0.5
+            print(f"Shutter control: http://127.0.0.1:{server.server_port}/", flush=True)
+            while not stop_requested.is_set():
+                server.handle_request()
     except KeyboardInterrupt:
         pass
     finally:

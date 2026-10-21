@@ -1,9 +1,16 @@
 # Hardware tutorials
 
+For Ethernet/LAN, use [shutter_lan_tutorial.ipynb](shutter_lan_tutorial.ipynb):
+KEH3 bay endpoints, explicit ShutterHub routing, passive discovery/identity,
+Manual preparation, one Open/hold/Close cycle and release. Enter the actual
+address/serial and an approved hold. Saved outputs are empty; physical Ethernet
+cube control remains unqualified. See [LAN qualification](../ethernet-assessment.md).
+
 For an interactive walkthrough, open
 [shutter_open_close_tutorial.ipynb](shutter_open_close_tutorial.ipynb). Separate
-cells cover settings, validation, controller/error cleanup, connection, initial
-Close, Open/hold, Close, optional repetition, and disconnect. Run them in order
+cells cover settings, validation, controller/error cleanup, connection, explicit
+Disarm/Closed verification/Enable setup, Open/hold, Close, optional repetition,
+and disconnect. Run them in order
 with the project `.venv` kernel. Successful steps keep the connection active;
 Open leaves the shutter open until Close. Each hardware step attempts cleanup
 on errors/Ctrl+C. Always finish with Disconnect. Repetition is disabled by default.

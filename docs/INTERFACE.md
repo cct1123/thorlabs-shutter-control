@@ -61,8 +61,8 @@ software jack-continuity report was established.
 `confirm_interlock(serial)` records verified normal physical circuit/protection
 for the explicitly selected object/serial before connection. It performs no SDK
 or hardware write, clears on retargeting, and does not transfer to another object
-or process. Unknown SDK readiness may use this evidence; a known negative report,
-key failure, wrong identity or communication fault is not overridden. Raw bits and
+or process. It contributes only to informational interlock_ready metadata; it
+does not authorize output or override key/identity/communication checks. Raw bits and
 interlock_enabled remain separate from operator_interlock_confirmed/interlock_ready.
 These values remain available to Python callers. GUI Open/Arm do not gate on
 interlock feedback or confirmation; users manage the physical interlock externally.
@@ -93,8 +93,11 @@ the configured timeout. Host waits and snapshots are not optical measurements.
 | Arm | EnableDevice, Triggered, Active; no implicit readback |
 | Disarm | Inactive then Manual commands; Close alone preserves mode; no implicit readback |
 
-The GUI checks Closed/Inactive/Manual and reads back Apply settings. It reads
-current settings and requires an input before Arm. Direct API setters do not
+The GUI checks Closed/Inactive/Manual before Apply and Arm and reads back Apply
+settings. Arm enables the channel, selects Triggered and sends Active. The main
+Trigger Start instead preserves enable state/mode and sends only Active, after
+Inactive/Closed feedback and an actual input-settings read. Both require a key
+enabled indication. Direct API setters do not
 perform those application checks. The hardware manual describes5V
 TTL and a disconnected input as LOW; active-low priming can open with no cable.
 The driver reports configuration/priming, not measured pin voltage or raw edges.

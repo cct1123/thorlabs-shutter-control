@@ -1,0 +1,36 @@
+{
+  "requirement": "REQ-087",
+  "test": "TEST-129",
+  "record": "E121",
+  "scope": "Modern styling only; Kinesis layout and four-mode behavior preserved. Software-only validation.",
+  "source_suite": {
+    "passed": 204,
+    "skipped": 1,
+    "skip": "Optional real SDK opt-in"
+  },
+  "lint": "PASS: ruff check --no-cache src tests",
+  "format": "PASS: ruff format --check --no-cache src tests",
+  "browser": {
+    "desktop": "PASS: three independent panels; Manual/Single/Trigger selected; all four selectors visible",
+    "expanded_ttl": "PASS",
+    "narrow": {
+      "viewport_width_px": 375,
+      "document_width_px": 360,
+      "panel_column_width_px": 340,
+      "horizontal_overflow": false
+    },
+    "computed_panel_background_image": "none",
+    "computed_start_button_background_image": "none",
+    "simulation_only": true,
+    "screenshots": [
+      "docs/assets/gui-modern-simulation.png",
+      "docs/assets/gui-modern-trigger-settings.png"
+    ],
+    "cleanup": "Shutdown response received, process exited 0, port50911 released, viewport reset and temporary tab closed"
+  },
+  "limitations": [
+    "No real SDK or hardware operation",
+    "No deployment or live GUI restart",
+    "No new wheel validation for this styling revision"
+  ]
+}

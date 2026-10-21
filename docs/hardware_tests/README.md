@@ -37,6 +37,9 @@ shutdown from Closed or, with an explicitly supplied approved positive hold, fro
 Open. Stage 6 exercises actual GUI callback responses, refresh without replay,
 release/reconnect and global cleanup. No disabled control is forced. A normal
 Ctrl+C test uses the server's owning terminal; browser closure is not shutdown.
+The current launcher also offers **Shut down GUI & devices**; its cooperative
+server-exit path has software HTTP coverage, separate from historical Stage 6
+bench results.
 
 `READBACK_PASS` establishes electronic evidence, not observed blade motion or
 calibrated timing. Existing [bench results](../../records/hardware-validation.json)
@@ -76,7 +79,7 @@ independent blade/timing measurements remain untested.
 ## Software-only regression
 
 ```powershell
-uv run --locked pytest -q -p no:cacheprovider --ignore=tests/test_sdk.py
+uv run --locked python -B -m pytest -q -p no:cacheprovider --ignore=tests/test_sdk.py
 ```
 
 The excluded `tests/test_sdk.py` can enumerate real hardware. The default suite

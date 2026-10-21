@@ -1150,3 +1150,187 @@ Generated wheel/extraction directories were inventoried and removed; zero genera
 cache/temp paths remained outside protected .git/.venv. Private inputs/environment
 preserved. This documentation/evidence checkpoint records verified publication;
 no runtime source change or physical operation follows from it.
+
+## E118 / TEST-126 - Launcher-owned GUI and device shutdown
+
+REQ-084, user asks for a GUI button to shut down the Dash server and device when
+running as main. Added optional nonblocking on_shutdown notification to create_app;
+only the owning launcher supplies it by default, exposing Shut down GUI & devices.
+Existing Close & disconnect all still leaves the server running. The new action
+attempts hub.safe_shutdown first and signals exit only on success. Errors stay
+visible with the server available for resolution/retry. No forced process exit,
+SDK flag change, interlock gate or firmware/power command introduced.
+
+Launcher now owns a single-thread Werkzeug WSGI server, handling requests until
+an Event is signalled. Callback finishes before loop exit/socket closure; no
+shutdown() call from the serving thread, extra worker process or reloader.
+Main finally still attempts device cleanup after Ctrl+C/server failure. Werkzeug
+already comes from required Dash dependencies and is present in uv.lock.
+
+Expected: passive startup has the button; embedded default does not. Successful
+click closes/releases devices and exits server after its response; cleanup failure
+keeps it available. Observed191 passed,1 optional real-SDK skip in full offline
+suite. Success/failure cases exercise actual Dash callbacks with software devices.
+Launcher loop tests cover passive startup, invalid config, normal exit, exceptions,
+Ctrl+C and aggregated device failures. Real localhost HTTP test uses OS-selected
+port and an unconnected fake-SDK hub: POST response received with shutdown message,
+main returned0, thread terminated, and a fresh TCP connection was refused.
+This proves software server lifecycle, not real hardware closure or power-off.
+
+Commands: .venv/Scripts/python.exe -B -m pytest -q -p no:cacheprovider --tb=short;
+Ruff check --no-cache and format --check --no-cache on source/tests/examples/
+hardware_tests/renderer PASS (32 files). Updated README, GUI/API/architecture
+instructions. git diff --check PASS. No real SDK/device operation, live GUI
+restart, commit or push for this new feature request. Existing environment and
+private data preserved.
+
+## E120 / TEST-128 - Ethernet ShutterHub tutorial notebook
+
+REQ-086: added docs/examples/shutter_lan_tutorial.ipynb and links from the tutorial
+index and Ethernet assessment. KEH3 port mapping follows the existing project
+assessment/manual section 4.3 reference; attempted online manual retrieval was
+unavailable this session. No new vendor compatibility claim is made.
+
+Expected: one configured TCPIP cube route, no USB fallback, passive discovery and
+identity/readback, explicit Inactive/Manual then Enable, one Open/hold/Close cycle,
+explicit readback and cleanup. Wrong route/identity must never actuate. Passive
+release sends no output writes. Interrupt/failed Open must attempt Close/release.
+An unset hold must reject actuation; setup reruns cannot discard a live handle.
+
+Observed: 74 tests PASS in tests/test_examples.py and tests/test_hub.py, including
+seven notebook-source scenarios: cycle, passive, wrong route, wrong identity,
+Open failure after write, hold interruption and missing hold. Fake TCPIP metadata
+and USB-disconnected status exercise routing; no real SDK/network/device access.
+All saved outputs/execution counts are empty. Ruff check PASS on the notebook and
+changed test; test formatting and git diff --check PASS. Commands:
+.venv/Scripts/python.exe -B -m pytest tests/test_examples.py tests/test_hub.py -q
+-p no:cacheprovider --tb=short; Ruff check --no-cache on the notebook/test.
+
+Notebook delivery PASS (software scope). Real Ethernet delivery, motion, optical
+closure and timing remain unmeasured; REQ-043 is not promoted. Existing unrelated
+GUI modifications preserved. No real actuation, commit, push or GUI restart.
+
+## E119 / TEST-127 - Four-mode GUI (historical styling)
+
+REQ-085: user supplies Manual/Single/Auto/Trigger KSC101 screenshots after asking
+for a similar GUI. References guide visual design only; real serial in attachments
+is not copied into source or screenshots. Red title strips, silver panels, 2x2
+mode selectors, glossy round actions and truthful feedback lamps implemented.
+Existing mode/state APIs are reused. Mode selection requires Inactive/Closed;
+Start follows Single/Auto/Trigger while Open/Close retain Manual state-only behavior.
+Trigger Start rereads actual input configuration, rather than using drafts.
+No cycle durations/counts invented or new SDK timing API added.
+
+REQ-084 shutdown edits preserved. Concurrent LAN notebook/examples/test additions
+are outside this GUI task and are being preserved. Browser preview is an isolated
+software-only test fixture, labelled SOFTWARE SIMULATION, on an ephemeral localhost
+port; all SDK access is replaced. No live GUI owner or real device touched.
+Final software and browser checks follow.
+
+E119 final: Manual/Single selectors occupy the left column; Auto/Trigger the right,
+as in the four user images. Mode highlights follow reported mode, never a guessed
+write acknowledgement. Grey marks unknown values. Ready is application command
+readiness; Error is the latched driver/communication diagnostic, not a separate
+native hardware alarm. Single/Auto use stored cycle parameters; no cycle timing
+editor or Identify/display-flashing command was invented.
+
+Tests cover every mode's selection/no activation, Start/Stop preserving mode,
+refusal to switch while Active, fresh Trigger input settings instead of drafts,
+mode write without acknowledgement, fault lamps and existing interlock-display,
+cleanup/launcher contracts. Source and extracted wheel each204 passed,1 skipped;
+packaged Python/assets byte parity PASS. Ruff check source/tests/examples/helpers/
+renderer PASS. Format check src/tests PASS; broad formatting detects only the
+concurrent LAN notebook style drift, deliberately outside this edit scope.
+
+Actual browser preview used a labelled fake-SDK hub: Manual, Single, Auto, Trigger,
+Trigger Start/Stop and expanded TTL controls checked. Desktop three-column layout
+PASS. At375px viewport, document width360px and one340px column; no horizontal
+overflow. Full-page desktop and expanded-TTL captures saved under docs/assets as
+gui-kinesis-simulation.png and gui-kinesis-trigger-settings.png. No actual serial
+from user attachments copied. Relative-link/private-serial scan PASS. A browser
+console callback timeout belonged to the previously stopped preview URL, consistent
+with its polling after server exit, not a current mode callback failure.
+
+Both isolated preview processes exited normally via their own shutdown controls;
+viewport reset and agent-created reference/preview tabs closed. No production GUI
+owner, SDK hardware, firmware, physical interlock or private data touched. README,
+GUI/API/architecture docs updated; older JPGs retained as historical visual evidence.
+Evidence: records/gui-design-validation.json. No commit/push/live GUI restart for
+this new feature request; physical behavior remains unqualified.
+
+
+## E121 / TEST-129 - Modern compact GUI styling
+
+REQ-087: user retains the Kinesis control layout and four modes while replacing
+its copied aesthetics. Neutral cards, thin borders, compact flat buttons and
+selected-mode checks replace red title frames, silver gradients and glossy round
+controls. gui.py changes only presentation class names; command behavior stays
+unchanged. Existing shutdown and concurrent LAN notebook work preserved.
+
+Expected: same modes/actions/feedback, compact desktop and narrow layouts with no
+horizontal overflow; all existing behavior regressions pass. Observed: source
+pytest204 passed,1 optional real-SDK skip; ruff check and format for src/tests PASS.
+Commands: .venv/Scripts/python.exe -B -m pytest -q -p no:cacheprovider --tb=short;
+.venv/Scripts/ruff.exe check --no-cache src tests;
+.venv/Scripts/ruff.exe format --check --no-cache src tests.
+
+Actual browser: desktop panels and expanded TTL settings inspected; viewport375px,
+document360px and panel column340px, no horizontal overflow. Computed panel and
+Start button background-image both none. Direct simulation screenshots:
+docs/assets/gui-modern-simulation.png and gui-modern-trigger-settings.png.
+Software preview used fictional devices only; shutdown returned the release
+response, process exited0 and localhost port50911 was released. Viewport reset and
+temporary tab closed. No real device operation or live GUI restart. PASS within
+software styling scope; physical mode/timing qualification remains open. No wheel
+claim for this revision. No commit/push. See records/gui-modern-validation.json.
+
+
+## E122 / TEST-130 - Documentation and screenshot consistency review
+
+REQ-088: review all public docs/READMEs against current source and refresh GUI
+screenshots. Expected: current command/readiness/ownership descriptions agree,
+references resolve, examples parse, notebook outputs are empty, direct browser
+captures show modern controls and software regressions pass.
+
+Reviewed17 Markdown documents plus both notebook narratives/code cells. Corrected
+setup's obsolete Trigger-mode Open refusal; documented four-mode actions, explicit
+Disarm/read/Enable setup, main Trigger Start versus compound Arm TTL, optional
+interlock metadata and launcher versus embedded shutdown. Architecture now shows
+the LAN route and extra Trigger Start read wait. Hardware/GUI bench claims are
+explicitly historical. Added documentation navigation and removed duplicated old
+visual-style reporting. Preserved original evidence and historical screenshots.
+
+Refreshed six direct modern PNG captures with labelled software-only previews:
+startup, Manual/Single/Trigger panels, Auto, expanded TTL, six empty panels and
+narrow375px layout. Desktop1280px: six panels in three columns, document1265px.
+Narrow375px: document360px, one340px panel column, no horizontal overflow.
+Fake SDK replaced real loading throughout preview/cleanup. All preview processes
+exited0; ports65150/55388/53854 released; viewport reset and temporary tab closed.
+
+Commands: .venv/Scripts/python.exe -B -m pytest -q -p no:cacheprovider --tb=short
+=>204 passed,1 optional real-SDK skip. ruff check/format --check --no-cache over
+src tests docs/examples docs/hardware_tests =>PASS,32 files formatted. Corrected
+LAN notebook formatting only; affected behavior tests rerun. Local links/anchors,
+Markdown Python snippets and notebook cells checked with pathlib/ast/JSON; counts
+and screenshot dimensions/SHA256 recorded in records/documentation-review-validation.json.
+PASS within documentation/software scope. External URLs were not re-fetched;
+vendor facts retained from recorded sources. No real device actuation, wheel
+build, live GUI restart, commit/push or new physical qualification claimed.
+
+
+## E123 / TEST-131 - Integrated pruning and publication preparation
+
+REQ-089: user authorizes prune, commit and push. Removed two superseded untracked
+red-style preview PNGs after verifying exact regular-file paths inside the repo.
+Their historical test observations remain in gui-design-validation.json with
+explicit pruning metadata. Kept six modern captures and all referenced bench
+images/evidence. Consolidated repeated feature checkpoint/report paragraphs;
+retained mode, cleanup and LAN tests because they cover distinct behavior.
+
+Reviewed pending launcher/GUI/notebook and regression changes. Final source suite
+204 passed,1 optional real-SDK skip; Ruff check and format PASS across32 files.
+Public Markdown links/anchors, Python snippets, both notebook code/output states
+and records JSON parse PASS; exact counts in prune-publication-validation.json.
+No generated/cache directories at repo root; .venv/Git/private inputs preserved.
+No real SDK/device operation or live GUI restart. Commit/push authorized; explicit
+path staging and remote-hash verification follow. Physical gaps remain open.

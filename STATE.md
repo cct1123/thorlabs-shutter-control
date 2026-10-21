@@ -1,5 +1,42 @@
 # Engineering state
 
+## Pruning and publication in progress - REQ-089
+
+TEST-131 / E123: superseded red-style previews pruned, repeated checkpoint/report
+text consolidated; behavior coverage and bench artifacts preserved. Source suite
+204 passed,1 optional SDK skip; full lint/format and doc checks PASS. Evidence:
+records/prune-publication-validation.json. Ready for explicit staging, commit and
+push origin/main. No hardware operation or live GUI restart.
+
+## Documentation and screenshots COMPLETE (software) - REQ-088
+
+TEST-130 / E122: reviewed17 public Markdown documents and both tutorial notebooks
+against current source. Corrected mode/start readiness, explicit setup, Arm versus
+Trigger Start, shutdown ownership and historical hardware scope. Refreshed six
+modern screenshots: startup, main modes, Auto, expanded TTL, six panels and375px
+layout. Existing old captures retained as historical evidence.
+
+Source suite204 passed,1 optional SDK skip; full source/tests/examples/hardware
+helper lint and format PASS (32 files). LAN notebook formatting drift resolved.
+Local links/anchors and Python snippets validated; notebook outputs remain clear.
+Evidence: records/documentation-review-validation.json. All isolated preview
+servers exited0, listeners released, viewport reset and temporary tab closed.
+No real SDK/device operation, live GUI restart, commit or push. Hardware timing,
+current mode controls and Ethernet remain unqualified physically. No human action
+required for documentation delivery.
+
+## Current feature validation - REQ-084 through REQ-088
+
+Launcher shutdown closes/releases devices and exits after its response; failures
+keep the server available (E118 / TEST-126). Four-mode controls preserve state-only
+commands; Trigger Start reads actual input settings (E119 / TEST-127). Modern flat
+styling supersedes the red Kinesis aesthetic (E121 / TEST-129). Current captures
+are in docs/assets/gui-modern-*.png; superseded red preview files were pruned.
+LAN tutorial routes through ShutterHub with passive and explicit actuation paths
+(E120 / TEST-128). Current integrated suite204 passed,1 optional SDK skip; full
+lint/format PASS. Detailed historical evidence remains in records/RECORDS.md and
+validation JSON. Physical mode/timing/TTL/Ethernet qualification remains open.
+
 ## Follow-up review and publication complete - REQ-083
 
 TEST-124 / E116: source and extracted-wheel suites each188 passed,1 skipped.
@@ -81,6 +118,7 @@ acceptance. No broader electrical/physical completion is inferred from no-cable 
 
 | ID | Short criterion | Validation / evidence | Status |
 | --- | --- | --- | --- |
+| REQ-086 | LAN ShutterHub-to-cube tutorial (derived, PROJECT.md) | TEST-128 / E120; seven notebook scenarios, 74 affected tests | PASS (notebook/software only) |
 | REQ-044 | Firmware update procedure preparation | E048 / TEST-058, update later completed E050 | PASS (preparation) |
 | REQ-043 | Resolve KSC101 through KEH3 Ethernet with minimal code and passive tests (derived, latest PROJECT.md request) | TEST-055 / E045 software path PASS; TEST-056 / E046 hub PASS, confirmed left cube bay silent; human vendor-GUI comparison also hub only | BLOCKED (physical communication) |
 | REQ-042 | Revise actual-hardware acceptance procedure (derived, latest PROJECT.md request) | TEST-054 / E044; current evidence reconciliation, snippet compilation and 8 software-device cases | PASS (plan only) |
@@ -163,3 +201,11 @@ acceptance. No broader electrical/physical completion is inferred from no-cable 
 | REQ-082 | Review, fix, prune, commit and push | E114/E115 / TEST-122/123; source/wheel PASS; f2934c8 pushed and remote verified | PASS (software publication) |
 
 | REQ-083 | Follow-up review, consistency fixes and publication | TEST-124/125 / E116/E117; source/wheel each188 passed,1 skipped; fd70b46 pushed/verified | PASS (software publication) |
+
+| REQ-084 | Shut down GUI server and devices from launcher button | TEST-126 / E118; actual localhost HTTP exit/listener release plus software cleanup regressions | PASS (software) |
+
+| REQ-085 | Kinesis-style four-mode instrument panels | TEST-127 / E119; source/wheel204 passed,1 skipped; desktop/narrow browser checks | PASS (software) |
+
+| REQ-089 | Prune, commit and push integrated changes | TEST-131 / E123; software PASS, publication pending | IN PROGRESS |
+| REQ-088 | Documentation, screenshots and integrated consistency | TEST-130 / E122; docs/links/screenshots/regressions | PASS (software) |
+| REQ-087 | Modern compact design with Kinesis control layout/four modes | TEST-129 / E121; source204/1, desktop/narrow browser | PASS (software) |

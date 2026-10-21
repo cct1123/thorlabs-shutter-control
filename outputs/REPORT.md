@@ -1,76 +1,61 @@
 # Shutter controller report
 
-The reviewed software uses a USB-only KCubeShutter and hub-owned Ethernet routes.
-Serials accept strings or integers. Open/Close send Active/Inactive only,
-preserving mode and enable state. Explicit enable_device() enables the channel;
-Disarm selects Inactive/Manual. Arm retains Enable/Triggered/Active.
-Setters send commands and return None;
-getters explicitly request feedback. Connect verifies identity without depending
-on operating state0, which is reported as unknown. Writes invalidate cached state.
-Shutdown attempts Close and releases every slot despite errors, without claiming
-physical closure. Native SDK calls may still block.
+The current software provides a passive local Dash GUI, USB-only KCubeShutter
+and ShutterHub routing for USB or explicit experimental KEH3 Ethernet endpoints.
+Serials accept strings or integers. Setters send commands and return None; getters
+request feedback separately. Open/Close send Active/Inactive only, preserving mode
+and enable state. Explicit Enable sets up the channel; Disarm sends Inactive/Manual
+and Arm sends Enable/Triggered/Active. Users manage physical interlocks externally;
+software interlock feedback and confirmation are informational.
 
-Users manage the physical interlock externally. No driver, GUI, tutorial, notebook
-or diagnostic operation gates on software interlock feedback/confirmation. The
-readout and optional Python metadata remain available. Independent identity,
-ownership, connection, key, operating-state and TTL prerequisites remain.
+## GUI and operation
 
-The GUI uses the current hub API, separates command messages from controller
-feedback, preserves unknown states and supports connection retry. Launcher settings
-are in [config.py](../src/thorlabs_shutter_control/config.py); published defaults
-contain no device identity and startup is passive. No launcher interlock flag or
-hardware environment/CLI configuration is required.
+Compact modern panels retain the Kinesis control layout and four modes. Manual
+uses Open/Close; Single/Auto/Trigger use Start/Stop. Mode changes require fresh
+Inactive/Closed feedback. Trigger Start rereads actual input settings; Single/Auto
+use stored cycle settings. Ready describes application readiness; Error describes
+driver/communication faults. Reported position is not independent blade sensing.
 
-The [Open/Close notebook](../docs/examples/shutter_open_close_tutorial.ipynb)
-has sequential cells, identity-gated error cleanup, explicit feedback reads and
-separate API timings. Published outputs are cleared and repeat is disabled.
-Successful Open leaves the shutter commanded Open until the Close cell runs.
+The launcher-owned shutdown button attempts Close/release on every device and
+exits after returning its HTTP response. Cleanup failures leave the server
+available. Embedded apps retain host ownership unless given a shutdown callback.
+Browser closure does not stop devices; native SDK calls can block cleanup.
 
-## Follow-up correction
+[Setup](../docs/getting-started.md), [GUI](../docs/gui.md),
+[API](../docs/python-api.md), [architecture](../docs/architecture.md) and
+[interface contract](../docs/INTERFACE.md) describe configuration and operation.
+The [tutorial index](../docs/examples/README.md) includes USB and LAN notebooks,
+explicit setup, feedback and cleanup. Published notebook outputs are clear.
 
-REQ-083 / E116 / TEST-124: manual tutorials/notebook now send Disarm and verify
-Inactive/Manual before enabling, so a retained Active state is deactivated first.
-Open/Close keep their state-only contract. The notebook repetition checks readiness
-once before its loop; its explanation now matches that behavior. Removed a duplicate
-repeat condition and a redundant lesson status read. Timeout documentation now
-matches settings initialization only; test instructions avoid bytecode caches.
+## Current software validation
 
-Current source and wheel: **188 passed, 1 skipped** each; lint/format, simulation,
-package parity and documentation checks PASS. Details:
-[follow-up-review-validation.json](../records/follow-up-review-validation.json).
-Implementation **fd70b46** pushed to origin/main and exact remote hash verified
-(E117 / TEST-125). Hardware behavior of the revised sequence remains untested.
+REQ-084 through REQ-088: **204 passed, 1 skipped** (optional real SDK); lint and
+format PASS across32 source/test/example/helper files. Six current browser
+captures cover startup, all four modes across main/Auto views, expanded TTL, six
+empty panels and375px layout. Connected captures use fictional software devices.
+No real SDK/device operation or live GUI restart occurred during these changes.
+Preview servers exited normally and released listeners.
 
-## Prior integrated validation and pruning
+[Documentation validation](../records/documentation-review-validation.json),
+[modern styling validation](../records/gui-modern-validation.json),
+[four-mode validation](../records/gui-design-validation.json) and
+[evidence index](../records/RECORDS.md) distinguish current source checks from
+historical wheel/bench results. REQ-089 prunes superseded red-style screenshots
+and repeated reporting while retaining useful tests and bench evidence.
 
-E114 / TEST-122: **186 passed, 1 skipped** against source and the extracted wheel.
-Ruff check and format PASS; three-device software simulation PASS. Notebook cells,
-documentation Python snippets, links and shareable-file checks are validated in
-[review-publication-validation.json](../records/review-publication-validation.json).
-The real-SDK test is opt-in and was skipped; this review issued no hardware
-commands and did not launch a GUI.
+![Modern panels in software simulation](../docs/assets/gui-modern-simulation.png)
 
-Tests were consolidated from16 to8 modules and about half the Python lines;
-representative contracts replace duplicate and exhaustive historical matrices.
-[Pruning evidence](../records/test-pruning-validation.json) records the retained
-coverage and generated-file inventory. Environment, Git, private records and lab
-data are preserved. Old validation counts and hashes are historical checkpoints.
+All current screenshots and retained historical captures are indexed in
+[asset provenance](../docs/assets/README.md). The historical
+[supervisor notebook](supervisor-notebook.html) and its renderer preserve earlier
+bench reporting; they do not qualify current command/GUI paths.
 
-## Hardware scope and operation
+## Physical qualification limits
 
-Historical single-pair USB/browser evidence and user-observed motion are retained.
-Changed command/GUI paths need bench revalidation. Cube Ethernet, actual KEH6/
-multiple pairs, electrical TTL, physical recovery and calibrated timing remain
-unqualified. The active-low no-cable expectation failure is unresolved; see the
-[TTL summary](../records/ttl-summary.json). Software simulation cannot resolve it.
-
-Start with [setup](../docs/getting-started.md), [GUI](../docs/gui.md),
-[API](../docs/python-api.md) and the [hardware procedure](../docs/HARDWARE_VALIDATION.md).
-The [illustrated supervisor notebook](supervisor-notebook.html) summarizes historical
-bench results with current configuration examples. Its original preview and old
-Notion attachment validation remain historical; this review updates local files only.
-Rebuild its self-contained HTML with `python -B outputs/render_supervisor_notebook.py`.
-
-Publication: implementation **f2934c8** pushed to origin/main; exact remote hash
-verified (E115 / TEST-123 / REQ-082).
-Physical qualification remains open; no overall hardware completion is claimed.
+Historical single-pair USB/browser readback and user-observed motion remain
+recorded. Changed command/GUI paths need affected bench validation. Cube Ethernet,
+KEH6/multiple real pairs, electrical TTL, physical recovery and calibrated timing
+remain unqualified. The active-low no-cable expectation failed and is unresolved;
+see [TTL results](../records/ttl-summary.json) and
+[hardware procedure](../docs/HARDWARE_VALIDATION.md). Software simulation cannot
+resolve these physical gaps; no overall hardware completion is claimed.

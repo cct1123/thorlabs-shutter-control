@@ -7,8 +7,9 @@
 
 The working configuration is **computer -> USB -> KEH3 left bay -> KSC101
 (alias CONTROLLER_A), firmware 1.0.7 -> SH05R**, using Kinesis 1.14.60.27990 on Windows x64.
-USB identity/status/reconnect, Open/Close, production shutdown and real GUI actions
-worked. The user confirmed five physical Open/2-second hold/Close/2-second hold
+Historical USB identity/status/reconnect, Open/Close, production shutdown and real
+GUI actions worked on their recorded revisions. Current mode controls and
+launcher shutdown have software validation and need affected bench checks. The user confirmed five physical Open/2-second hold/Close/2-second hold
 cycles. Later GUI/shutdown runs established electronic feedback and cleanup;
 they did not independently measure blade motion or exposure timing.
 
@@ -68,7 +69,9 @@ soak stage is required. Repeat only to answer a specific question.
 Check the selected controller/state, one Open/Close interaction, refresh without
 replay, and release/reconnect. Reuse Stage 2's cycle if it ran through the GUI.
 Unused slots should stay disconnected. Finish Closed with **Close & disconnect
-all**, then normal terminal **Ctrl+C**; verify release and server exit. For
+all** to retain the server, or **Shut down GUI & devices** to release and exit the
+launcher. Normal terminal **Ctrl+C** also attempts cleanup. Verify release and
+server exit when requested. For
 commissioning, reconnect once to check identity/Closed, then release.
 **Pass:** expected UI feedback, no replay/duplicate owner, closure feedback and
 successful cleanup; retain any physical-observation limit from Stage 2.
@@ -84,8 +87,8 @@ exercised on this bench, and is not a routine-session requirement.
 No commissioning rerun, repeated passive-connect cycles, firmware check, complete
 bench form or approval between ordinary commands. A status-only task ends with
 passive release and needs no Open/Close cycle. Use the
-[normal GUI launcher](../README.md#launch-and-operate); serial confirmation records
-verified normal interlock/protection without changing the hardware circuit.
+[normal GUI launcher](../README.md#launch-and-operate). Users manage the physical
+interlock externally; software confirmation is optional informational metadata.
 
 On failure, stop the sequence; do not automatically replay commands. Attempt
 Close/cleanup on a verified target and use independent recovery if needed. After

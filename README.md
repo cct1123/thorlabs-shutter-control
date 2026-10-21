@@ -3,7 +3,8 @@
 A local Dash GUI and reusable Python API for a configurable number of **KSC101** solenoid
 controllers. Control an **SH05R** optical shutter through the official Kinesis
 SDK, directly by USB or through a **KEH3/KEH6** hub in USB mode. Each panel has explicit device
-selection, Open/Close, trigger settings and cleanup. Startup is passive.
+selection, four operating modes, state controls, trigger settings and cleanup.
+Startup is passive.
 
 ![KSC101 solenoid controller and SH05R optical shutter](docs/assets/ksc101-sh05r.webp)
 
@@ -12,11 +13,11 @@ It illustrates the supported device pair; it is not a photograph of the test ben
 
 ## GUI
 
-![Shutter control GUI with three unselected controller panels](docs/assets/gui-startup.jpg)
+![Modern shutter panels in software simulation](docs/assets/gui-modern-simulation.png)
 
-Actual application at startup, with no device selected or connected. Trigger
-settings expand within each card; see the [GUI guide](docs/gui.md) for the second
-screenshot and control behavior. These captures contain no bench identifiers.
+Compact neutral panels retain the Kinesis control layout: four mode selectors,
+flat action controls and status lamps. This capture uses fictional software devices, not real hardware.
+Trigger settings expand within each card; see the [GUI guide](docs/gui.md).
 
 ## Install
 
@@ -51,11 +52,16 @@ and TTL prerequisites still apply.
 Open [localhost:8050](http://127.0.0.1:8050/):
 
 1. Discover/select the intended controller and Connect. Read identity and status.
-2. Establish Closed, then use Open/Close within the approved operating limits.
+2. Establish Inactive/Closed, select Manual, Single, Auto or Trigger, and use
+   Open/Close (Manual) or Start/Stop (other modes) within approved limits.
+   Controls assume an enabled channel; see the [GUI guide](docs/gui.md#main-controls)
+   for explicit setup and stored cycle settings.
 3. Expand Trigger settings only when needed. Draft edits do not apply or arm.
-4. Finish with **Close & disconnect all**, then normal terminal **Ctrl+C**.
+4. Finish with **Shut down GUI & devices** to release all devices and exit the server.
+   **Close & disconnect all** releases devices while keeping the GUI running.
 
 Set `SLOTS = 6` in `config.py` for six panels, or any positive count.
+See the [current six-panel preview](docs/gui.md#six-panel-layout).
 `SERIAL_NUMBERS` preselects distinct devices in panel order. With `SLOTS = None`,
 the default is three panels, growing to fit the configured serials. Unused panels
 stay disconnected. Closing the browser does not shut down hardware. Cleanup is
@@ -108,10 +114,13 @@ with no COM-port dependency. Published records use device aliases.
 
 | Check | Evidence |
 | --- | --- |
-| USB identity, status, reconnect, Open/Close and shutdown | Controller readback passed; user confirmed the five-cycle physical sequence |
-| GUI controls, refresh, reconnect and cleanup | Actual browser and USB readback passed |
+| Historical USB identity, status, reconnect, Open/Close and shutdown | Controller readback passed; user confirmed the five-cycle physical sequence |
+| Historical GUI controls, refresh, reconnect and cleanup | Actual browser and USB readback passed for the recorded revision |
 | TTL, both ports disconnected | Configuration/Arm/Disarm passed; active-low Open expectation failed on both ports |
 | Ethernet cube communication, three real pairs, external TTL signals/voltage, fault injection, calibrated timing | Not qualified |
+
+Current modern GUI, mode selection and launcher shutdown have software-only
+validation; historical bench results do not qualify these changed paths.
 
 [Results](records/hardware-validation.json), [TTL observations](records/ttl-summary.json)
 and the [short hardware test procedure](docs/HARDWARE_VALIDATION.md) preserve these
@@ -135,3 +144,18 @@ matrices have been replaced by smaller contract and integration checks. `-B` and
 The developer simulator never reaches the real SDK. The default test command
 excludes opt-in real-SDK enumeration. See the [evidence index](records/RECORDS.md),
 [current checkpoint](STATE.md) and [report](outputs/REPORT.md) for project status.
+
+## Documentation
+
+| Topic | Guide |
+| --- | --- |
+| Install, configure and troubleshoot | [Setup](docs/getting-started.md) |
+| Modes, lamps, TTL and shutdown | [GUI guide](docs/gui.md) |
+| Driver and hub calls | [Python API](docs/python-api.md), [interface contract](docs/INTERFACE.md) |
+| USB and Ethernet tutorials | [Examples](docs/examples/README.md) |
+| Hardware and qualification limits | [Hardware](docs/hardware.md), [commissioning](docs/HARDWARE_VALIDATION.md), [Ethernet](docs/ethernet-assessment.md) |
+| Software structure and validation | [Architecture](docs/architecture.md), [evidence](records/RECORDS.md), [report](outputs/REPORT.md) |
+
+Current screenshots and historical capture provenance are indexed in
+[documentation assets](docs/assets/README.md). All current connected previews
+use fictional software devices.

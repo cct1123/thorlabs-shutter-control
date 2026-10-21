@@ -8,6 +8,39 @@ from thorlabs_shutter_control import __main__ as cli
 from thorlabs_shutter_control import controller as module
 
 
+def install_server(monkeypatch, serve_request):
+    """Exercise main's owned-server loop without binding a port or loading the SDK."""
+    create = gui.create_app
+    owned = {}
+
+    def create_app(*args, **kwargs):
+        owned["stop"] = kwargs["on_shutdown"]
+        owned["app"] = create(*args, **kwargs)
+        return owned["app"]
+
+    class Server:
+        server_port = 8050
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            owned["closed"] = True
+
+        def handle_request(self):
+            serve_request(owned["app"])
+            owned["stop"]()
+
+    def make_server(host, port, app, **kwargs):
+        assert host == "127.0.0.1" and port == 8050
+        assert app is owned["app"].server and kwargs == {"threaded": False}
+        return Server()
+
+    monkeypatch.setattr(gui, "create_app", create_app)
+    monkeypatch.setattr(cli, "make_server", make_server)
+    return owned
+
+
 def layout_components(app):
     """Inspect the served Dash layout without starting a network listener."""
     components = {}
@@ -35,15 +68,9 @@ def test_gui_launch_has_three_passive_panels_with_requested_preselection(rig, mo
     def forbidden_sdk_load(directory):
         pytest.fail("GUI launch and unconnected shutdown must not load the SDK.")
 
-    def inspect_server(self, **kwargs):
-        assert kwargs == {
-            "host": "127.0.0.1",
-            "port": 8050,
-            "debug": False,
-            "use_reloader": False,
-            "threaded": False,
-        }
+    def inspect_server(self):
         components = layout_components(self)
+        assert components["stop-server"]["children"] == "Shut down GUI & devices"
         for slot in range(3):
             assert components[f"serial-{slot + 1}"]["value"] == (
                 serials[slot] if slot < len(serials) else None
@@ -53,7 +80,7 @@ def test_gui_launch_has_three_passive_panels_with_requested_preselection(rig, mo
         inspected.append(True)
 
     monkeypatch.setattr(module, "_load_sdk", forbidden_sdk_load)
-    monkeypatch.setattr(gui.Dash, "run", inspect_server)
+    install_server(monkeypatch, inspect_server)
     monkeypatch.setattr(cli.config, "SERIAL_NUMBERS", serials)
     assert cli.main() == 0
     assert inspected == [True]
@@ -86,7 +113,7 @@ def test_invalid_project_config_is_rejected_before_sdk_or_server_access(
     for key, value in settings.items():
         monkeypatch.setattr(cli.config, key, value)
     monkeypatch.setattr(module, "_load_sdk", forbidden)
-    monkeypatch.setattr(gui.Dash, "run", forbidden)
+    monkeypatch.setattr(cli, "make_server", forbidden)
     assert cli.main() == 1
     assert "Invalid project config" in capsys.readouterr().err
     assert rig.manager_calls == []
@@ -116,11 +143,7 @@ def test_server_exit_attempts_every_shutter_and_reports_shutdown_failures(
     supplied = iter(controllers)
     monkeypatch.setattr(module, "KCubeShutter", lambda *args, **kwargs: next(supplied))
 
-    def interrupt_server(self, **kwargs):
-        assert kwargs["debug"] is False
-        assert kwargs["use_reloader"] is False
-        assert kwargs["host"] == "127.0.0.1"
-        assert kwargs["threaded"] is False
+    def interrupt_server(self):
         for controller, serial in zip(controllers, rig.serials, strict=True):
             controller.connect(serial)
             controller.open_shutter()
@@ -129,7 +152,7 @@ def test_server_exit_attempts_every_shutter_and_reports_shutdown_failures(
             rig.devices["68000002"].fail.add("disconnect")
         raise interruption("server failure")
 
-    monkeypatch.setattr(gui.Dash, "run", interrupt_server)
+    install_server(monkeypatch, interrupt_server)
     monkeypatch.setattr(sys, "argv", ["shutter-control"])
     if interruption is RuntimeError:
         # Preserving the server exception also preserves its nonzero process exit.
@@ -151,3 +174,79 @@ def test_server_exit_attempts_every_shutter_and_reports_shutdown_failures(
     if not shutdown_failure:
         assert all(device.state == "Closed" for device in rig.devices.values())
         assert all(not device.IsConnected for device in rig.devices.values())
+
+
+def test_shutdown_button_returns_response_then_releases_http_listener(rig, monkeypatch):
+    import json
+    import socket
+    from threading import Event, Thread
+    from urllib.request import Request, urlopen
+
+    from werkzeug.serving import make_server
+
+    ready = Event()
+    servers = []
+    apps = []
+    stops = []
+    errors = []
+    results = []
+    create = gui.create_app
+
+    def create_app(*args, **kwargs):
+        app = create(*args, **kwargs)
+        stops.append(kwargs["on_shutdown"])
+        apps.append(app)
+        return app
+
+    def bind(host, port, app, **kwargs):
+        server = make_server(host, 0, app, **kwargs)  # OS-selected localhost test port.
+        servers.append(server)
+        ready.set()
+        return server
+
+    def run():
+        try:
+            results.append(cli.main())
+        except BaseException as exc:
+            errors.append(exc)
+
+    monkeypatch.setattr(gui, "create_app", create_app)
+    monkeypatch.setattr(cli, "make_server", bind)
+    worker = Thread(target=run, daemon=True)
+    worker.start()
+    try:
+        assert ready.wait(5)
+        app = apps[0]
+        url = f"http://127.0.0.1:{servers[0].server_port}"
+        key, callback = next(iter(app.callback_map.items()))
+        payload = {
+            "output": key,
+            "outputs": [
+                {"id": o.component_id, "property": o.component_property} for o in callback["output"]
+            ],
+            "inputs": [dict(item, value=1) for item in callback["inputs"]],
+            "state": [
+                dict(item, value=None if item["id"].startswith("serial") else "high")
+                for item in callback["state"]
+            ],
+            "changedPropIds": ["stop-server.n_clicks"],
+        }
+        request = Request(
+            url + "/_dash-update-component",
+            data=json.dumps(payload).encode(),
+            headers={"Content-Type": "application/json"},
+        )
+        with urlopen(request, timeout=5) as response:
+            result = json.load(response)["response"]
+        assert "server shutting down" in result["hub-message"]["children"]
+        worker.join(5)
+        assert not worker.is_alive() and results == [0] and not errors
+        with socket.socket() as probe:
+            probe.settimeout(1)
+            assert probe.connect_ex(("127.0.0.1", servers[0].server_port)) != 0
+        assert not rig.manager_calls and not rig.device.calls
+    finally:
+        # Bound cleanup even if an assertion fails before the shutdown request.
+        if worker.is_alive() and stops:
+            stops[0]()
+        worker.join(2)

@@ -1,5 +1,55 @@
 # Project intent
 
+## Prune, commit and push (REQ-089, derived)
+
+User authorizes pruning redundant deliverables, reviewing the integrated pending
+changes, committing them and pushing to the configured origin/main. Preserve
+private inputs, environment, bench evidence and useful regression coverage.
+Validate the final software revision; no incidental hardware actions.
+
+## Documentation and screenshot review (REQ-088, derived)
+
+User requests all documentation/READMEs and screenshots updated with a comprehensive
+consistency review. Match current source behavior, distinguish historical bench
+evidence from current software validation, refresh current GUI captures using
+software devices only, verify links/snippets and run regressions. Preserve private
+artifacts and concurrent work; no real device operation or live GUI restart.
+
+## Modern compact GUI styling (REQ-087, derived)
+
+User clarifies: retain the Kinesis control layout and four modes, but do not copy
+its aesthetics. Replace red frames, silver gradients and glossy round buttons
+with neutral surfaces, compact flat controls and clear status indicators. Preserve
+all existing mode/state behavior and shutdown. This supersedes the visual style
+of REQ-085 only. Validate browser desktop/narrow layouts without real hardware.
+
+## Ethernet tutorial notebook (REQ-086, derived)
+
+User requests a tutorial notebook using Ethernet/LAN through ShutterHub to control
+the shutter cube. Provide explicit KEH3 endpoint/serial settings, passive discovery
+and identity checks, deliberate Manual setup, one Open/hold/Close cycle, cleanup
+and troubleshooting. Validate with software TCPIP devices; no incidental real
+actuation or claim of physical Ethernet qualification. Preserve existing GUI work.
+
+## Kinesis-style GUI (REQ-085, derived)
+
+User requests a Kinesis-like design and supplies Manual, Single, Auto and Trigger
+mode screenshots. Implement red instrument title bars, compact silver panels, a
+2x2 mode selector, round Open/Close or Start/Stop controls and truthful status lamps.
+Use existing mode/state APIs; keep independent serial panels, TTL drafts/readback,
+passive startup, cleanup and launcher shutdown. No software interlock gate, fake
+timing values, implied blade sensing or physical actuation during validation.
+Validate all mode transitions with software devices and inspect browser layouts.
+
+## Launcher shutdown button (REQ-084, derived)
+
+User requests a button to shut down the Dash GUI server and device when the GUI
+is run as main. The owning launcher exposes the button; it attempts Close/release
+for every device, returns feedback and exits its local server normally. Keep the
+server available on cleanup failure. Embedded create_app instances retain host
+server ownership unless explicitly supplied a shutdown callback. Validate with
+software devices and an unconnected localhost HTTP server; no real actuation.
+
 ## Follow-up integrated review (REQ-083, derived)
 
 User repeats: review all changes, fix issues, ensure consistency, prune, commit

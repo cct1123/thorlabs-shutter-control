@@ -7,14 +7,15 @@
 Manufacturer product photo: [Thorlabs](https://www.thorlabs.com/optical-shutters);
 illustrates the device pair, not the test bench.
 
-Published identities below are aliases. Current qualified branch: computer USB -> KEH3 left bay -> KSC101 (alias CONTROLLER_A) -> SH05R.
+Published identities below are aliases. Historically tested branch: computer USB -> KEH3 left bay -> KSC101 (alias CONTROLLER_A) -> SH05R.
 The cube reports hardware3, firmware1.0.7. Kinesis1.14.60.27990 with the FTDI USB
 interface is used on Windows x64/Python3.12.7. No COM port is assigned.
 
 USB identity/status/reconnect, Open/Close and normal shutdown have actual bench
 readback evidence. The user independently confirmed the five-cycle SDK sequence.
-The redesigned production GUI was exercised in the real browser without a new
-physical observer. Readback, human observation and calibrated timing remain
+The earlier GUI was exercised in the real browser without a new physical
+observer. Current modern styling, mode selection and launcher shutdown have
+software-only validation; changed command paths require bench requalification. Readback, human observation and calibrated timing remain
 separate evidence. See [results](../records/hardware-validation.json).
 
 Three-pair operation, electrical TTL response, physical fault injection and

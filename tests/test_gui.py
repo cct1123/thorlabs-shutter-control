@@ -40,6 +40,7 @@ def invoke(app, action, *, serial=None, serials=None, clicks=1, ttl=None):
 
 def test_gui_runs_entire_manual_lifecycle_through_controller(rig):
     app = create_app(rig.controller)
+    assert "stop-server" not in app.server.test_client().get("/_dash-layout").get_data(as_text=True)
     discovered = invoke(app, "discover")
     assert discovered["serial"]["options"] == ["68000001"]
     assert invoke(app, "connect")["connection"]["children"] == "Connected"
@@ -59,6 +60,8 @@ def test_gui_reports_fault_and_allows_cleanup_and_reconnect(rig):
     assert result["shutter-state"]["children"] == "Unknown"
     assert "Timeout" in result["message"]["children"]
     assert result["open"]["disabled"] is True
+    assert result["lamp-error"]["children"]["props"]["aria-label"] == "On"
+    assert result["lamp-ready"]["children"]["props"]["aria-label"] == "Unknown"
     assert result["close"]["disabled"] is False
     result = invoke(app, "disconnect")
     assert result["connect"]["disabled"] is False
@@ -165,7 +168,7 @@ def test_ttl_drafts_apply_readback_and_arming_are_independent_per_panel(rig):
     assert all(not d.IsConnected for d in rig.devices.values())
 
 
-def test_open_disabled_reason_distinguishes_key_and_trigger_mode(rig):
+def test_action_readiness_distinguishes_key_and_selected_mode(rig):
     app = create_app(rig.controller)
     invoke(app, "connect")
     rig.device.Status.KeyEnabled = False
@@ -178,8 +181,9 @@ def test_open_disabled_reason_distinguishes_key_and_trigger_mode(rig):
     assert "Users manage the physical interlock" in interlock["control-hint"]["children"]
     rig.device.mode = "Triggered"
     triggered = invoke(app, "refresh")
-    assert triggered["open"]["disabled"]
-    assert "Disarm / Close" in triggered["control-hint"]["children"]
+    assert triggered["open"]["disabled"] is False
+    assert triggered["open"]["children"] == "Start"
+    assert "Trigger may open immediately" in triggered["control-hint"]["children"]
     rig.controller.safe_shutdown()
 
 
@@ -281,3 +285,72 @@ def test_failed_connect_can_retry_without_output_commands(rig):
         c[0] in {"enable", "set_mode", "set_state", "set_triggers"} for c in rig.device.calls
     )
     rig.controller.disconnect(close_shutter=False)
+
+
+@pytest.mark.parametrize("cleanup_fails", [False, True])
+def test_owned_server_stops_only_after_device_cleanup(rig, cleanup_fails):
+    stopped = []
+    app = create_app(rig.controller, on_shutdown=lambda: stopped.append(True))
+    invoke(app, "connect")
+    invoke(app, "open")
+    if cleanup_fails:
+        rig.device.fail.add("set_state")
+    result = invoke(app, "stop-server")
+    assert not rig.device.IsConnected
+    assert rig.device.calls[-2:] == [("stop_poll",), ("disconnect",)]
+    if cleanup_fails:
+        assert not stopped
+        assert "Shutdown incomplete" in result["hub-message"]["children"]
+    else:
+        assert rig.device.state == "Closed" and stopped == [True]
+        assert "server shutting down" in result["hub-message"]["children"]
+
+
+@pytest.mark.parametrize("mode", ["manual", "single", "auto", "triggered"])
+def test_mode_panels_select_without_activation_and_start_stop_preserve_mode(rig, mode):
+    app = create_app(rig.controller)
+    invoke(app, "connect")
+    rig.device.calls.clear()
+    selected = invoke(app, f"mode-{mode}")
+    assert selected[f"mode-{mode}"]["aria-pressed"] == "true"
+    assert (
+        selected["operating-mode"]["children"]
+        == {"manual": "Manual", "single": "Single", "auto": "Auto", "triggered": "Trigger"}[mode]
+    )
+    assert not any(c[0] in {"enable", "set_state"} for c in rig.device.calls)
+    started = invoke(app, "open")
+    assert started["open"]["children"] == ("Open" if mode == "manual" else "Start")
+    assert rig.device.operation == "Active"
+    rig.device.calls.clear()
+    refused = invoke(app, "mode-auto")
+    assert "Inactive/Closed" in refused["message"]["children"]
+    assert not any(c[0] == "set_mode" for c in rig.device.calls)
+    stopped = invoke(app, "close")
+    assert rig.device.operation == "Inactive"
+    assert stopped[f"mode-{mode}"]["aria-pressed"] == "true"
+    assert stopped["close"]["children"] == ("Close" if mode == "manual" else "Stop")
+    rig.controller.safe_shutdown()
+
+
+def test_trigger_start_rereads_input_configuration_and_never_uses_drafts(rig):
+    app = create_app(rig.controller)
+    invoke(app, "connect")
+    invoke(app, "mode-triggered")
+    rig.device.trigger_config.Trigger1Mode = "Disabled"
+    rig.device.calls.clear()
+    result = invoke(app, "open")
+    assert "Open refused" in result["message"]["children"]
+    assert any(c[0] == "request_triggers" for c in rig.device.calls)
+    assert not any(c[0] in {"enable", "set_state", "set_mode"} for c in rig.device.calls)
+    rig.controller.safe_shutdown()
+
+
+def test_mode_highlight_uses_feedback_instead_of_requested_value(rig, monkeypatch):
+    app = create_app(rig.controller)
+    invoke(app, "connect")
+    monkeypatch.setattr(rig.device, "SetOperatingMode", lambda mode: None)
+    result = invoke(app, "mode-auto")
+    assert result["mode-manual"]["aria-pressed"] == "true"
+    assert result["mode-auto"]["aria-pressed"] == "false"
+    assert result["operating-mode"]["children"] == "Manual"
+    rig.controller.safe_shutdown()

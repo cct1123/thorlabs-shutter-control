@@ -1,5 +1,8 @@
 # KEH3 Ethernet qualification
 
+Interactive procedure: [Ethernet ShutterHub tutorial](examples/shutter_lan_tutorial.ipynb).
+It separates passive LAN checks from explicit cube actuation and cleanup.
+
 `KCubeShutter` is USB-only. `ShutterHub` owns Ethernet endpoint registration,
 connection selection, slot command dispatch and transport checks through the
 Kinesis API. Its `ethernet_endpoints` sequence selects explicit per-slot routes;

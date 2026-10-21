@@ -1,5 +1,7 @@
 """Local single-operator Dash UI for configured independently owned shutters."""
 
+from collections.abc import Callable
+
 from dash import Dash, Input, Output, State, ctx, dcc, html, no_update
 
 from .controller import KCubeShutter, ShutterError, ShutterHub, TriggerConfig
@@ -38,60 +40,162 @@ def _arm_ready(status, config):
     )
 
 
+MODES = (("manual", "Manual"), ("auto", "Auto"), ("single", "Single"), ("triggered", "Trigger"))
+
+
+def _lamp(value, *, error=False):
+    text = "Unknown" if value is None else ("On" if value else "Off")
+    state = "unknown" if value is None else ("on" if value else "off")
+    return html.Span(
+        className=f"lamp lamp-{state}" + (" lamp-error" if error else ""),
+        role="img",
+        title=text,
+        **{"aria-label": text},
+    )
+
+
+def _mode_ready(status):
+    return (
+        status.connection == "connected"
+        and status.operating_state == "inactive"
+        and status.shutter_state == "closed"
+    )
+
+
+def _action_ready(status, config):
+    if status.operating_mode not in ("single", "auto", "triggered"):
+        return _open_ready(status)
+    return (
+        _mode_ready(status)
+        and status.key_enabled is True
+        and (
+            status.operating_mode != "triggered"
+            or (config is not None and "input" in (config.trig1_mode, config.trig2_mode))
+        )
+    )
+
+
 def _panel(slot, serial_number, serials, suffix):
     return html.Section(
         [
             html.Div(
                 [
-                    html.H2(f"Shutter {slot + 1}"),
+                    html.Div(
+                        [
+                            html.Span("KSC101", className="model-label"),
+                            html.H2(f"Shutter {slot + 1}"),
+                        ]
+                    ),
                     html.Span("Disconnected", id=f"connection{suffix}", className="badge offline"),
                 ],
                 className="panel-heading",
             ),
-            html.Label("Device serial number", htmlFor=f"serial{suffix}"),
-            dcc.Dropdown(
-                id=f"serial{suffix}",
-                options=serials,
-                value=serial_number,
-                placeholder="Discover, then select a controller",
-            ),
             html.Div(
                 [
-                    html.Button("Connect", id=f"connect{suffix}", className="connect-button"),
-                    html.Button(
-                        "Close & disconnect",
-                        id=f"disconnect{suffix}",
-                        disabled=True,
-                        title="Send Close and release this controller connection",
+                    html.Label("Device serial", htmlFor=f"serial{suffix}"),
+                    dcc.Dropdown(
+                        id=f"serial{suffix}",
+                        options=serials,
+                        value=serial_number,
+                        placeholder="Discover, then select a controller",
+                    ),
+                    html.Div(
+                        [
+                            html.Button(
+                                "Connect", id=f"connect{suffix}", className="connect-button"
+                            ),
+                            html.Button(
+                                "Close & disconnect",
+                                id=f"disconnect{suffix}",
+                                disabled=True,
+                                title="Send Close and release this controller connection",
+                            ),
+                        ],
+                        className="connection-actions",
                     ),
                 ],
-                className="connection-actions",
+                className="device-connection",
             ),
             html.P("No controller connected", id=f"identity{suffix}", className="device-identity"),
             html.Div(
                 [
-                    html.Span("Shutter · controller reported", className="state-label"),
-                    html.Strong(
-                        "Unknown", id=f"shutter-state{suffix}", className="shutter-state is-unknown"
+                    html.Div(
+                        [
+                            html.Div(
+                                [
+                                    html.Button(
+                                        label,
+                                        id=f"mode-{mode}{suffix}",
+                                        className="mode-button",
+                                        disabled=True,
+                                        **{"aria-pressed": "false"},
+                                    )
+                                    for mode, label in MODES
+                                ],
+                                className="mode-grid",
+                                role="group",
+                                **{"aria-label": "Operating mode"},
+                            ),
+                            html.Div(
+                                [
+                                    html.Button(
+                                        "Close",
+                                        id=f"close{suffix}",
+                                        disabled=True,
+                                        className="action-control stop-control",
+                                    ),
+                                    html.Button(
+                                        "Open",
+                                        id=f"open{suffix}",
+                                        disabled=True,
+                                        className="action-control start-control manual-control",
+                                        **{"aria-describedby": f"control-hint{suffix}"},
+                                    ),
+                                ],
+                                className="shutter-actions",
+                            ),
+                        ],
+                        className="instrument-controls",
                     ),
-                    html.P("Key / interlock: unknown", id=f"safeguards{suffix}", className="note"),
+                    html.Div(
+                        [
+                            html.Div(
+                                [
+                                    html.Span(label),
+                                    html.Span(_lamp(None), id=f"lamp-{key}{suffix}"),
+                                ],
+                                className="indicator-row",
+                            )
+                            for key, label in (
+                                ("key", "Key enabled"),
+                                ("ready", "Ready"),
+                                ("error", "Error"),
+                                ("active", "Active"),
+                                ("open", "Open"),
+                            )
+                        ],
+                        className="indicator-bank",
+                        title="Controller feedback and GUI command readiness",
+                    ),
                 ],
-                className="state-display",
+                className="instrument-body",
             ),
             html.Div(
                 [
-                    html.Button(
-                        "Open",
-                        id=f"open{suffix}",
-                        disabled=True,
-                        **{"aria-describedby": f"control-hint{suffix}"},
+                    html.Span("POSITION", className="state-label"),
+                    html.Strong(
+                        "Unknown", id=f"shutter-state{suffix}", className="shutter-state is-unknown"
                     ),
-                    html.Button("Close", id=f"close{suffix}", disabled=True, className="primary"),
+                    html.Span("MODE", className="state-label"),
+                    html.Strong("Unknown", id=f"operating-mode{suffix}", className="mode-readback"),
                 ],
-                className="shutter-actions",
+                className="state-display",
             ),
             html.P(
-                "Connect this shutter to enable manual controls.",
+                "Key / interlock: unknown", id=f"safeguards{suffix}", className="note safeguards"
+            ),
+            html.P(
+                "Connect this shutter to enable controls.",
                 id=f"control-hint{suffix}",
                 className="control-hint",
             ),
@@ -174,8 +278,12 @@ def _panel(slot, serial_number, serials, suffix):
     )
 
 
-def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
-    """Build passive panels for the supplied hub, defaulting to three slots."""
+def create_app(
+    controller: KCubeShutter | ShutterHub | None = None,
+    *,
+    on_shutdown: Callable[[], None] | None = None,
+) -> Dash:
+    """Build passive panels; an owning server may supply its stop notification."""
     hub = (
         controller
         if isinstance(controller, ShutterHub)
@@ -197,7 +305,7 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
                 [
                     html.Div(
                         [
-                            html.P("OPTICS / LAB CONTROL", className="eyebrow"),
+                            html.P("INSTRUMENT CONTROL", className="eyebrow"),
                             html.H1("Shutter control"),
                             html.P(f"KSC101 controllers · {transport_label}", className="subtitle"),
                         ]
@@ -213,6 +321,11 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
                                 "Close & disconnect all",
                                 id="shutdown-all",
                                 className="shutdown-button",
+                            ),
+                            *(
+                                [html.Button("Shut down GUI & devices", id="stop-server")]
+                                if on_shutdown is not None
+                                else []
                             ),
                         ],
                         className="hub-actions",
@@ -280,6 +393,19 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
         ("control-hint", "children"),
         ("message", "className"),
     ]
+    fields += [
+        ("operating-mode", "children"),
+        ("open", "children"),
+        ("close", "children"),
+        ("open", "className"),
+        ("close", "className"),
+    ]
+    fields += [(f"lamp-{key}", "children") for key in ("key", "ready", "error", "active", "open")]
+    fields += [
+        (f"mode-{mode}", prop)
+        for mode, _ in MODES
+        for prop in ("className", "disabled", "aria-pressed")
+    ]
     actions = {
         f"{action}{suffix}": (slot, action)
         for slot, suffix in enumerate(suffixes)
@@ -292,6 +418,7 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
             "read-ttl",
             "arm-ttl",
             "disarm-ttl",
+            *(f"mode-{mode}" for mode, _ in MODES),
         )
     }
 
@@ -308,6 +435,7 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
                 Input("shutdown-all", "n_clicks"),
                 Input("refresh", "n_intervals"),
             ]
+            + ([Input("stop-server", "n_clicks")] if on_shutdown is not None else [])
             + [Input(name, "n_clicks") for name in actions],
             "selections": [State(f"serial{suffix}", "value") for suffix in suffixes],
             "ttl_drafts": [
@@ -358,6 +486,12 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
                         f"Found {len(serials)} {transport_label} {noun}. "
                         "Select a serial, then Connect."
                     )
+                elif action == "stop-server" and on_shutdown is not None:
+                    hub.safe_shutdown()
+                    on_shutdown()
+                    hub_message = (
+                        "Devices released; GUI server shutting down. Verify physical closure."
+                    )
                 elif action == "shutdown-all":
                     had_devices = [c.get_cached_status().has_device for c in hub.controllers]
                     hub.safe_shutdown()
@@ -385,15 +519,37 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
                         messages[slot] = (
                             "Close command sent; disconnected. Verify physical closure."
                         )
+                    elif command.startswith("mode-"):
+                        status = hub.get_operating_status(slot)
+                        if not _mode_ready(status):
+                            raise ShutterError(
+                                "Stop/Close and verify Inactive/Closed before changing mode."
+                            )
+                        mode = command.removeprefix("mode-")
+                        hub.set_operating_mode(slot, mode)
+                        messages[slot] = f"{dict(MODES)[mode]} mode command sent."
                     elif command in ("open", "close"):
                         if command == "open":
                             status = hub.get_operating_status(slot)
-                            if not _open_ready(status):
+                            config = None
+                            if status.operating_mode == "triggered":
+                                config = hub.get_trigger_config(slot)
+                                last_ttl_settings[slot] = config
+                            if not _action_ready(status, config):
                                 raise ShutterError(
-                                    "Open refused: verify feedback, key and disarm TTL."
+                                    "Open refused: verify feedback, key and input settings; "
+                                    "timed modes require Inactive/Closed."
                                 )
+                        timed_action = shutter.get_cached_status().operating_mode in (
+                            "single",
+                            "auto",
+                            "triggered",
+                        )
                         getattr(hub, f"{command}_shutter")(slot)
-                        messages[slot] = f"{command.title()} command sent."
+                        label = command.title()
+                        if timed_action:
+                            label = "Start" if command == "open" else "Stop"
+                        messages[slot] = f"{label} command sent."
                     elif command == "apply-ttl":
                         if not hub.get_operating_status(slot).is_closed_manual:
                             raise ShutterError("Disarm/Close before configuring TTL.")
@@ -475,21 +631,33 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
                         if status.error
                         else ("Select a controller, then Connect to enable manual controls.")
                     )
-                elif status.operating_mode == "triggered":
-                    hint = "Use Disarm / Close before manual Open."
                 elif status.key_enabled is None:
                     hint = "Controller key feedback is unknown; Open is unavailable."
                 elif not status.key_enabled:
                     hint = "Unlock the controller key to enable Open."
-                elif not _open_ready(status):
+                elif (
+                    status.operating_mode in ("single", "auto", "triggered")
+                    and status.operating_state == "active"
+                ):
                     hint = (
-                        "Operating feedback is unknown or mode is not Manual; use Disarm / Close."
+                        f"{dict(MODES)[status.operating_mode]} active. "
+                        "Use Stop before changing mode."
+                    )
+                elif not _action_ready(status, config):
+                    hint = (
+                        "Operating feedback is unknown or not ready; "
+                        "Stop/Close before Start or mode selection."
                     )
                 else:
-                    hint = (
-                        "Manual control ready. Users manage the physical interlock. "
-                        "Use Disarm / Close to return to Manual."
+                    mode_name = dict(MODES).get(status.operating_mode, "Manual")
+                    detail = (
+                        "Trigger may open immediately."
+                        if status.operating_mode == "triggered"
+                        else "Start uses stored cycle settings."
+                        if status.operating_mode in ("single", "auto")
+                        else "Open/Close preserve Manual mode."
                     )
+                    hint = f"{mode_name} ready. Users manage the physical interlock. {detail}"
                 if config is not None:
                     armed = {True: "Armed", False: "Disarmed", None: "Unknown"}[status.ttl_armed]
                     ttl = (
@@ -513,7 +681,7 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
                         active,
                         active,
                         not active,
-                        not _open_ready(status),
+                        not _action_ready(status, config),
                         not active,
                         ttl,
                         not status.is_closed_manual,
@@ -538,6 +706,38 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
                         else no_update,
                     ]
                 )
+                timed = status.operating_mode in ("single", "auto", "triggered")
+                result.extend(
+                    [
+                        dict(MODES).get(status.operating_mode, "Unknown"),
+                        "Start" if timed else "Open",
+                        "Stop" if timed else "Close",
+                        "action-control start-control" + ("" if timed else " manual-control"),
+                        "action-control stop-control" + ("" if timed else " manual-control"),
+                        _lamp(status.key_enabled),
+                        _lamp(_action_ready(status, config) if connected else None),
+                        _lamp(bool(status.error), error=True),
+                        _lamp(
+                            status.operating_state == "active"
+                            if connected and status.operating_state != "unknown"
+                            else None
+                        ),
+                        _lamp(
+                            status.shutter_state == "open"
+                            if connected and status.shutter_state != "unknown"
+                            else None
+                        ),
+                    ]
+                )
+                for mode, _ in MODES:
+                    chosen = status.operating_mode == mode
+                    result.extend(
+                        [
+                            "mode-button" + (" selected" if chosen else ""),
+                            not _mode_ready(status),
+                            "true" if chosen else "false",
+                        ]
+                    )
             return result
 
     return app

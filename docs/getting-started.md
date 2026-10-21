@@ -43,8 +43,8 @@ passive: use GUI Discover/select and Connect, then verify identity and status.
 Users set and verify the physical interlock externally. GUI interlock feedback is
 informational and does not gate Open or Arm. Connection, key, operating feedback
 and TTL prerequisites still apply. Explicit session confirmation remains available
-through the Python API as informational metadata; project procedures do not
-gate on it.
+through the Python API as informational metadata; it is optional and project
+procedures do not gate on it.
 See [current hardware evidence](../records/hardware-validation.json).
 
 ## Troubleshooting
@@ -55,14 +55,18 @@ See [current hardware evidence](../records/hardware-validation.json).
 | No controllers discovered | Inspect the approved USB/power arrangement and driver installation; this FTDI device need not have a COM port |
 | Identity mismatch | Stop; preserve both selected and reported serials. Firmware1.0.7 repaired the historical mismatch onCONTROLLER_A; never alias serials in code |
 | Already owned | Release the existing panel/process. A failed SDK disconnect retains its ownership claim |
-| Open disabled | Read the readiness hint: connection fault, key, unknown operating feedback or Triggered mode. Disarm/Close before manual Open |
+| Open/Start disabled | Read the readiness hint. Manual needs healthy known feedback and key enabled; Single/Auto/Trigger need Inactive/Closed, with an actual input configured for Trigger. No software interlock gate |
+| Mode selector disabled | Establish fresh Inactive/Closed feedback with Stop/Close; mode selection does not Stop or Enable implicitly |
+| Start uses unexpected duration/count | Single/Auto use stored controller settings; this GUI does not edit or read cycle timing/counts |
 | Unknown operating state0 | Do not interpret it as Inactive. Preserve the report and diagnose; Close/Manual commands require separate output authority |
 | Close/shutdown fails | Use independent bench recovery. Release alone does not establish closure |
 | Port occupied | Use the existing GUI, stop its owning terminal normally, or edit `PORT` in `config.py` |
 | Ethernet hub only | Follow the [separate Ethernet assessment](ethernet-assessment.md); hub discovery is not cube communication |
 
 Do not run two GUIs against the same serial. Browser closure is not hardware
-shutdown; use Close & disconnect all and normal terminal Ctrl+C.
+shutdown. The launcher provides **Shut down GUI & devices**; **Close & disconnect
+all** keeps the server running, and normal terminal Ctrl+C also attempts cleanup.
+See [GUI ownership and finish](gui.md#ownership-and-finish).
 
 ## Optional developer simulation
 
@@ -70,6 +74,10 @@ shutdown; use Close & disconnect all and normal terminal Ctrl+C.
 uv run --locked python tests/simulated_demo.py --port 8051
 uv run --locked python tests/simulated_demo.py --api
 ```
+
+This helper embeds the GUI and has no server-shutdown button; finish with normal
+terminal Ctrl+C. Documentation screenshots use a separately labelled isolated
+software preview with an owner-provided shutdown callback.
 
 The source-checkout helper reuses the fake SDK fixture. Its identities and states
 are fictional. It establishes software behavior, not physical performance.

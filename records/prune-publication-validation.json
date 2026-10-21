@@ -1,0 +1,37 @@
+{
+  "requirement": "REQ-089",
+  "evidence": "E123",
+  "test": "TEST-131",
+  "scope": "Integrated software, docs pruning and publication preparation; no hardware operation",
+  "pruned": [
+    "Superseded red-style software screenshot pair",
+    "Repeated feature checkpoint paragraphs",
+    "Repeated report validation/publication history"
+  ],
+  "preserved": [
+    "Historical bench images/records",
+    "Private inputs and .venv",
+    "Useful four-mode, cleanup and LAN regression tests",
+    "Six current modern screenshots"
+  ],
+  "source_suite": {
+    "passed": 204,
+    "skipped": 1,
+    "skip": "Optional real SDK"
+  },
+  "lint": "PASS: src tests docs/examples docs/hardware_tests",
+  "format": "PASS: 32 files",
+  "documentation": {
+    "markdown_files": 17,
+    "local_links_and_anchors": 128,
+    "python_snippets": 8,
+    "notebooks": 2,
+    "json": "PASS",
+    "errors": []
+  },
+  "limitations": [
+    "Software-only; no hardware qualification or live GUI restart",
+    "No new wheel build for this revision"
+  ],
+  "publication": "Validated for commit; push pending"
+}
