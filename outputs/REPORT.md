@@ -29,7 +29,8 @@ TEST-149: current docs/links/snippets, absence of obsolete paths, private archiv
 hashes and public identity checks PASS. The maintained tree drops109 to43 files,
 about2.32MB to0.54MB (about77% smaller). [Evidence index](../records/RECORDS.md)
 and [machine evidence](../records/baseline-validation.json) record the results.
-Publication and baseline-2026-10-21 marker are pending final commits/verification.
+Implementation77ede6a and pruned baseline d1453d3 are pushed and origin/main's
+exact hash verified. This final checkpoint is marked baseline-2026-10-21.
 No actual hardware/network discovery or actuation is performed for this cleanup.
 
 [Physical evidence](../records/hardware-evidence.json) retains prior USB observations,

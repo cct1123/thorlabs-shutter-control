@@ -1,6 +1,6 @@
 # Engineering state
 
-## REQ-101 VALIDATED - publication pending
+## REQ-101 COMPLETE - current software baseline
 
 Source: PROJECT.md current baseline request. Prior tree: 5ab1f91, 109 tracked
 files, 2,323,179 bytes. Historical records/checkpoints are hash-verified in ignored
@@ -13,6 +13,10 @@ format adaptation are removed. Current USB/LAN control and explicit reads/writes
 remain. E138 / TEST-148: source and extracted wheel each217 passed,1 optional SDK
 skip. E139 / TEST-149: current docs/notebooks/package/private archive checks PASS.
 The maintained tree is43 files, about0.54MB versus109 files/2.32MB before cleanup.
+Implementation77ede6a and pruned baseline d1453d3 are pushed; origin/main was
+independently verified at d1453d3730db4c18e1af085dc1637b393bfeb298 (E140/TEST-150).
+This final checkpoint is marked baseline-2026-10-21. Physical acceptance remains
+incomplete; software completion does not change the limits below.
 
 ## Architecture and configuration
 
@@ -30,7 +34,7 @@ Kinesis folder defaults to C:/Program Files/Thorlabs/Kinesis. Native calls may b
 
 | ID | Current criterion | Method | Status |
 | --- | --- | --- | --- |
-| REQ-101 | Slim current baseline, no compatibility paths | TEST-148 source/wheel; TEST-149 tree/docs/private preservation | PASS software; publication pending |
+| REQ-101 | Slim current baseline, no compatibility paths | TEST-148 source/wheel; TEST-149 tree/docs; TEST-150 publication | PASS software baseline/publication |
 | REQ-099 | Unified USB/LAN Discover and detected-route Connect | TEST-148 fake SDK and actual Dash callback HTTP | PASS software |
 | REQ-020 | Ownership and all-slot cleanup | TEST-148 lifecycle/error/interrupt regressions | PASS software |
 | REQ-075 | Direct setters and explicit getters | TEST-148 controller/GUI/notebook regressions | PASS software |
@@ -48,7 +52,7 @@ No hardware/network discovery or actuation is performed during baseline cleanup.
 
 ## Next action and human action required
 
-Prune generated package/checker scratch; commit/push focused stages and mark
-baseline-2026-10-21 after verification. No human action needed for software delivery. Physical acceptance
+No remaining software action, generated scratch or pending process. Current baseline
+marker: baseline-2026-10-21. No human action needed for software delivery. Physical acceptance
 requires a separately authorized bench session with the intended topology,
 independent source protection and observations recorded under the current revision.

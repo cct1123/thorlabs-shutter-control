@@ -3,6 +3,7 @@
 A local Dash GUI and Python API for KSC101 controllers and SH05R shutters.
 Connect directly by USB, through KEH3/KEH6 USB hubs, or through documented
 KEH3 Ethernet routes. Startup is passive; connection and output actions are explicit.
+Current baseline marker: `baseline-2026-10-21`.
 
 ![KSC101 and SH05R](docs/assets/ksc101-sh05r.webp)
 

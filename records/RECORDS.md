@@ -57,3 +57,14 @@ Exact generated cleanup targets are resolved inside the workspace, checked for
 reparse points/tracked contents and inventoried before removal. Final checks and
 source/package/archive hashes are in baseline-validation.json. Focused commits,
 normal push/remote equality and the baseline marker follow after cleanup.
+
+## E140 / TEST-150 - Baseline publication
+
+Expected: focused commits, clean tracked tree, exact origin/main equality and
+baseline-2026-10-21 marker on the final checkpoint. Observed implementation77ede6a,
+baseline/tree/docs/evidence d1453d3; cached paths/diffs/whitespace reviewed, both
+commits pushed normally. Independent git ls-remote returned
+d1453d3730db4c18e1af085dc1637b393bfeb298, equal to HEAD; git status clean. PASS.
+Final documentation-only checkpoint records completion. Its annotated baseline
+marker and branch are published together, then both refs are checked against
+the same final HEAD. No source change after TEST-148; no physical operation.

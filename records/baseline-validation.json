@@ -96,8 +96,14 @@
     "No new browser capture; maintained layout capture visually unchanged; actual callback HTTP tests cover changed construction/dispatch"
   ],
   "publication": {
-    "status": "pending focused commits and push",
-    "baseline_marker": "baseline-2026-10-21"
+    "status": "PASS",
+    "evidence": "E140 / TEST-150",
+    "implementation_commit": "77ede6a33a5e8fd8398f2c0b41c85b360359ecca",
+    "baseline_tree_commit": "d1453d3730db4c18e1af085dc1637b393bfeb298",
+    "remote": "origin/main",
+    "verified_remote_hash": "d1453d3730db4c18e1af085dc1637b393bfeb298",
+    "baseline_marker": "baseline-2026-10-21",
+    "marker_target": "final documentation checkpoint; branch and annotated tag published atomically and checked against final HEAD"
   },
   "generated_cleanup": [
     {
