@@ -49,6 +49,8 @@ before listener closure. Cleanup failures keep it running. No reloader is used.
 
 Default getter wait/polling is250ms. GUI Manual Open requests prerequisite and
 result reads (0.50s programmed waits); Close requests a result read (0.25s).
+Connect requests one combined operating/TTL snapshot (0.25s programmed wait) and
+uses it for the display instead of requesting the result a second time.
 Trigger Start adds an actual input-settings read. Refresh is requested every1s
 and serial reads scale with connected count. Native calls may block; timeout
 limits settings initialization/asynchronous discovery polling, not total native
@@ -102,8 +104,10 @@ _HubChannel.discover() asks its hub's _discover_slot() for configured-route
 identities. Current LAN discovery waits for all configured endpoints or its
 deadline; this readability change does not alter that behavior. Base connect()
 claims exclusive serial ownership, creates/connects the SDK handle, initializes
-settings/polling and verifies identity/transport. GUI Connect then reads TTL and
-operating feedback. Connection alone never enables the channel or writes outputs.
+settings/polling and verifies identity/transport. GUI Connect then reads one full
+operating/TTL snapshot and returns it to `update()` for display. A snapshot error
+keeps the fault visible and activation disabled. Connection alone never enables
+the channel or writes outputs.
 
 ### State and failures to preserve
 
@@ -125,6 +129,9 @@ without triggering it. Named `Output` groups describe where returned values go.
 `create_app()` keeps discovery choices and last-read TTL settings in local variables
 shared by its nested functions. Each call to `update()` creates one small dictionary
 of changes per panel, handles the action, reads feedback, then calls `_panel_view()`.
+An action can return its completed feedback snapshot so `update()` can reuse that
+event's result. None requests the usual result read; previous events' snapshots
+are never reused as new action feedback.
 It keeps the existing hub lock throughout that sequence so commands cannot overlap.
 
 ### Develop without hardware

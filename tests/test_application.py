@@ -5,7 +5,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from thorlabs_shutter_control import ShutterHub, gui
+from thorlabs_shutter_control import ShutterHub, controller, gui
 from thorlabs_shutter_control import __main__ as launcher
 
 
@@ -105,6 +105,45 @@ def test_gui_keeps_activation_disabled_for_unknown_feedback(bench, panels):
     assert result[f"connection{suffix}"]["children"] == "Connected"
     assert result[f"open{suffix}"]["disabled"] and result[f"arm-ttl{suffix}"]["disabled"]
     click(app, f"disconnect{suffix}", selections)
+
+
+@pytest.mark.parametrize("transport", ["usb", "lan"])
+def test_gui_connect_reads_one_combined_feedback_batch(bench, transport):
+    device = bench.usb if transport == "usb" else bench.lan
+    endpoints = [None] if transport == "usb" else [bench.endpoint]
+    app = gui.create_app(ShutterHub(slots=1, ethernet_endpoints=endpoints))
+    selections = {"serial": device.serial}
+
+    start = controller.time.monotonic()
+    result = click(app, "connect", selections)
+    assert controller.time.monotonic() - start == pytest.approx(0.25)
+    assert [call[0] for call in device.calls] == [
+        "connect",
+        "poll",
+        "identity",
+        "status",
+        "mode_read",
+        "operation",
+        "ttl_read",
+    ]
+    assert result["connection"]["children"] == "Connected"
+    assert "TRIG1 input/high" in result["ttl-status"]["children"]
+    assert not result["open"]["disabled"]
+    # There was no Enable, mode, output or TTL write in the call history.
+    click(app, "disconnect", selections)
+
+
+def test_gui_connect_keeps_fault_and_cleanup_after_combined_read_failure(bench):
+    app = gui.create_app(ShutterHub(slots=1))
+    selections = {"serial": bench.usb.serial}
+    bench.usb.fail = "ttl_read"
+    result = click(app, "connect", selections)
+    assert result["connection"]["children"] == "Fault"
+    assert "ttl_read failed" in result["message"]["children"]
+    assert result["open"]["disabled"] and result["arm-ttl"]["disabled"]
+    assert result["serial"]["disabled"] and not result["close"]["disabled"]
+    click(app, "disconnect", selections)
+    assert not bench.usb.IsConnected
 
 
 def test_launcher_builds_passive_panels_and_exits_normally(bench, monkeypatch):

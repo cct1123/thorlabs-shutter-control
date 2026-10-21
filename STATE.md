@@ -1,5 +1,27 @@
 # Engineering state
 
+## REQ-105 IN PROGRESS - simple Connect / Apply TTL latency
+
+Source: PROJECT.md current user request. Derived criteria: Connect uses one full
+snapshot (250 ms default wait); Apply retains its prerequisite and compares one
+full result snapshot (500 ms total default waits). Reuse only the current action's
+completed feedback in the callback. Retain route/identity/ownership, no output on
+Connect, TTL comparison, faults and cleanup. No changes to polling/discovery or
+other actions. Baseline is clean 9d4491c; earlier TEST-156 hashes remain historical
+once GUI changes. Physical qualification remains outside scope.
+
+Plan: (1) validate/commit Connect batching and result reuse; (2) validate/commit
+Apply batching, safety regressions and final package/docs. TEST-158/159 will record
+virtual waits and actual callback HTTP with fictional USB/LAN devices. No push is
+included in the current request.
+
+E148 / TEST-158 PASS Connect: existing 18 tests pass before changes; two new timing
+checks first observed 500 ms (expected 250 ms). After batching, 21 tests pass; USB
+and LAN Connect each wait 250 ms and issue no output/enable/mode/TTL write. Combined
+read failure retains its fault/handle, blocks activation and allows cleanup. Full
+result is reused only during the current callback. Ruff and whitespace checks pass.
+Apply remains UNTESTED for its new target (implementation follows this commit).
+
 ## REQ-104 COMPLETE - beginner readability implementation
 
 Source: PROJECT.md user request to implement readability/scaffolding reduction,

@@ -580,12 +580,13 @@ def create_app(
             hub_error = True
         return hub_message, hub_error
 
-    def run_panel_action(slot, command, serial, ttl_draft, updates):
+    def run_panel_action(slot, command, serial, ttl_draft, updates) -> ShutterStatus | None:
         """Check prerequisites and issue one panel action under the caller's hub lock.
 
         Change only this action's browser values and last-read TTL display cache.
         Errors propagate to update(), which preserves partial updates and chooses
-        whether to request result feedback. Keep commands and reads in this order.
+        whether to request result feedback. Return a snapshot when this action has
+        already read its full result; None asks update() to read it as usual.
         """
         if command == "connect":
             if discovery_attempted and serial not in discovered_routes:
@@ -598,8 +599,13 @@ def create_app(
                     updates["draft"] = ["input", "high", "output", "high"]
             status = hub.connect(slot, serial)
             updates["selected"] = status.serial_number
-            last_ttl_settings[slot] = hub.get_trigger_config(slot)
+            # One full snapshot shares the operating and TTL feedback wait.
+            status = hub.get_status(slot)
+            if status.error:
+                raise ShutterError(status.error)
+            last_ttl_settings[slot] = status.trigger_config
             updates["message"] = "Connected."
+            return status
         elif command == "disconnect":
             hub.disconnect(slot)
             updates["message"] = "Close command sent; disconnected. Verify physical closure."
@@ -670,6 +676,7 @@ def create_app(
         elif command == "disarm-ttl":
             hub.disarm_triggers(slot)
             updates["message"] = "Disarm / Close command sent."
+        return None
 
     @app.callback(
         output={
@@ -722,6 +729,7 @@ def create_app(
             hub_message = no_update
             action = ctx.triggered_id
             slot = None
+            action_status = None
             error_slots = set()
             hub_error = False
             try:
@@ -744,7 +752,7 @@ def create_app(
                             )
                 elif action in actions:
                     slot, command = actions[action]
-                    run_panel_action(
+                    action_status = run_panel_action(
                         slot, command, selections[slot], ttl_drafts[slot], panel_updates[slot]
                     )
             except (ShutterError, ValueError) as exc:
@@ -755,14 +763,16 @@ def create_app(
                     panel_updates[slot]["message"] = str(exc)
                     error_slots.add(slot)
 
-            # Setters send commands only. Explicitly read the selected panel's
-            # feedback here; unrelated panels keep their previous observations.
+            # Reuse feedback only from this event, never from a prior action.
+            # Other successful panel actions still need their result read here.
             statuses = []
             for index, shutter in enumerate(hub.controllers):
                 read_feedback = action in (None, "refresh") or (
                     index == slot and index not in error_slots
                 )
-                if read_feedback:
+                if index == slot and action_status is not None:
+                    statuses.append(action_status)
+                elif read_feedback:
                     statuses.append(shutter.get_operating_status())
                 else:
                     statuses.append(shutter.get_cached_status())

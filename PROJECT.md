@@ -1,5 +1,21 @@
 # Project intent
 
+## Simple GUI latency improvements - REQ-105
+
+User: "now implement the simple latency improvements for Connect and Apply TTL.
+keep code beginner-readable and retain safety checks. validate and commit step by
+step."
+
+Derived acceptance: use the existing combined operating/TTL snapshot to reduce
+default programmed waits for GUI Connect from 500 to 250 ms, and Apply TTL from
+750 to 500 ms. Reuse the completed action's result in the callback rather than
+reading it again. Preserve Connect identity/route/ownership and passive output
+behavior; preserve Apply's Closed/Inactive/Manual prerequisite, actual TTL
+readback comparison and fault/cleanup handling. Keep other command paths, driver
+contracts, polling intervals and discovery policy unchanged. Validate software
+only and commit Connect and Apply separately. These waits exclude native calls
+and do not establish physical response time. No hardware action is authorized.
+
 ## Beginner readability - REQ-104
 
 User: "implement the readability and scaffolding reduction. prioritize beginner

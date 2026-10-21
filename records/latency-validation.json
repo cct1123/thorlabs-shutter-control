@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-21",
+  "requirement": "REQ-105",
+  "baseline_revision": "9d4491c",
+  "scope": "software-only programmed waits; no real SDK, network or device operation",
+  "connect_stage": {
+    "evidence": "E148 / TEST-158",
+    "source_passed": 21,
+    "transports": ["USB", "LAN"],
+    "before_wait_s": 0.5,
+    "after_wait_s": 0.25,
+    "polling_ms": 250,
+    "feedback_requests": ["status", "mode_read", "operation", "ttl_read"],
+    "no_output_or_configuration_write": true,
+    "combined_read_failure_retains_fault_and_cleanup": true,
+    "lint_format_whitespace": "PASS"
+  },
+  "apply_ttl_stage": "UNTESTED - next implementation stage",
+  "limits": [
+    "Virtual-clock waits exclude native calls and transport overhead",
+    "No response-age or optical timing guarantee",
+    "No physical qualification"
+  ]
+}

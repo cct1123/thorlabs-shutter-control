@@ -1,5 +1,25 @@
 # Baseline evidence and decisions
 
+## E148 / TEST-158 - Combined GUI Connect feedback, REQ-105 stage 1
+
+Expected: default GUI Connect programmed waits 500 -> 250 ms for USB and LAN,
+retaining passive identity/route/ownership and safe fault handling. Before source
+changes, existing 18 cases pass; the two new timing tests fail with observed
+0.5 s versus expected 0.25 s. After implementation, all 21 tests pass in 0.45 s.
+Successful Connect calls the existing full getter once, rejects its error field,
+and returns that snapshot to the callback. The callback reuses only this event's
+result. Normal call history is Connect, Poll, Identity, Status, Mode request,
+Operation request, TTL request; no Enable, output, mode or TTL write occurs.
+
+A failed combined TTL request remains a fault, disables Open/Arm, retains the
+handle/selector and permits disconnect. Existing unknown-feedback, wrong-identity,
+ownership, cleanup, four-mode, one/three-panel and notebook regressions pass. Driver,
+transport, discovery, polling interval and other action paths are unchanged. Ruff
+lint/format and git diff --check pass. Commands: source pytest with
+-B -m pytest -q -p no:cacheprovider --tb=short; Ruff check/format --check --no-cache
+src tests. PASS software-only: no real SDK/network/device operation, measured
+transport latency or physical timing. [Current evidence](latency-validation.json).
+
 ## E147 / TEST-157 - Readability publication
 
 2026-10-21; user explicitly requested push. Expected: publish the committed
