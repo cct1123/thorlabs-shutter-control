@@ -42,8 +42,11 @@ def test_gui_runs_entire_manual_lifecycle_through_controller(rig):
     app = create_app(rig.controller)
     assert "stop-server" not in app.server.test_client().get("/_dash-layout").get_data(as_text=True)
     discovered = invoke(app, "discover")
-    assert discovered["serial"]["options"] == ["68000001"]
-    assert invoke(app, "connect")["connection"]["children"] == "Connected"
+    assert discovered["serial"]["options"] == [{"label": "68000001 · USB", "value": "68000001"}]
+    assert (
+        invoke(app, "connect", serial=discovered["serial"]["value"])["connection"]["children"]
+        == "Connected"
+    )
     assert invoke(app, "open")["shutter-state"]["children"] == "Open"
     commands_before = [c for c in rig.device.calls if c[0] == "set_state"]
     invoke(app, "refresh", clicks=20)  # Old click counts must never replay an Open command.

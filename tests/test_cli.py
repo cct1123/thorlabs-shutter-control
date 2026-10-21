@@ -89,6 +89,34 @@ def test_gui_launch_has_three_passive_panels_with_requested_preselection(rig, mo
 
 
 @pytest.mark.parametrize(
+    "endpoints,expected_routes",
+    [
+        (("192.0.2.10:40304",), ["Ethernet LAN · 192.0.2.10:40304"]),
+        ((None, "192.0.2.10:40304"), ["USB", "Ethernet LAN · 192.0.2.10:40304"]),
+    ],
+)
+def test_launcher_configures_lan_panels_without_discovering_on_startup(
+    rig, monkeypatch, endpoints, expected_routes
+):
+    def forbidden_sdk(directory):
+        pytest.fail("Configured LAN startup must stay passive")
+
+    def inspect_server(app):
+        components = layout_components(app)
+        suffixes = [""] if len(expected_routes) == 1 else ["-1", "-2"]
+        for suffix, route in zip(suffixes, expected_routes, strict=True):
+            assert components[f"transport{suffix}"]["children"] == route
+            assert components[f"connection{suffix}"]["children"] == "Disconnected"
+            assert components[f"open{suffix}"]["disabled"] is True
+
+    monkeypatch.setattr(cli.config, "ETHERNET_ENDPOINTS", endpoints)
+    monkeypatch.setattr(module, "_load_sdk", forbidden_sdk)
+    install_server(monkeypatch, inspect_server)
+    assert cli.main() == 0
+    assert not rig.manager_calls and not rig.device.calls
+
+
+@pytest.mark.parametrize(
     "settings",
     [
         {"SERIAL_NUMBERS": ("68000001", "68000001")},
@@ -102,6 +130,9 @@ def test_gui_launch_has_three_passive_panels_with_requested_preselection(rig, mo
         {"SLOTS": 0},
         {"SLOTS": -1},
         {"SLOTS": 1.5},
+        {"ETHERNET_ENDPOINTS": "192.0.2.10:40304"},
+        {"ETHERNET_ENDPOINTS": ("192.0.2.10:40303",)},
+        {"SLOTS": 1, "ETHERNET_ENDPOINTS": (None, "192.0.2.10:40304")},
     ],
 )
 def test_invalid_project_config_is_rejected_before_sdk_or_server_access(

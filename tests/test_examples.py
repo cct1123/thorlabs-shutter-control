@@ -71,8 +71,7 @@ def test_lan_notebook_routes_and_cleans_up(rig, monkeypatch, scenario):
     namespace = {}
     exec(compile(cells["settings"], "settings", "exec"), namespace)
     namespace.update(HUB_IP="192.0.2.10", CUBE_SERIAL=68000001, sleep=hold)
-    if scenario != "no_hold":
-        namespace["HOLD_SECONDS"] = 0.1
+    namespace["HOLD_SECONDS"] = None if scenario == "no_hold" else 0.1
 
     def run():
         for name, source in cells.items():

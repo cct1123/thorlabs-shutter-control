@@ -136,6 +136,81 @@ def test_ethernet_passive_connection_does_not_require_usb_or_write_output(ethern
     assert not any(c[0] in {"set_state", "set_mode", "enable", "set_triggers"} for c in d.calls)
 
 
+def test_lan_only_discovery_refreshes_tcpip_identities_without_usb_devices(rig, monkeypatch):
+    sdk = driver._load_sdk(None)
+    registered = []
+
+    events = []
+
+    def register(endpoint):
+        registered.append(endpoint)
+        events.append("register")
+
+    def build():
+        assert registered  # Manual TCPIP route must exist before the SDK rebuild.
+        events.append("build")
+
+    def refresh():
+        assert events[-1] in {"build", "refresh"}
+        events.append("refresh")
+        return {"68000001": True}
+
+    monkeypatch.setattr(sdk.manager, "BuildDeviceList", build)
+    monkeypatch.setattr(sdk.manager, "CheckForConnectionChanges", refresh)
+    monkeypatch.setattr(sdk.manager, "CreateManualDeviceEntry", register, raising=False)
+    monkeypatch.setattr(
+        sdk.manager,
+        "GetDeviceList",
+        lambda type_id: ["68000001"] if events[-1:] == ["refresh"] else [],
+    )
+    monkeypatch.setattr(
+        sdk.manager,
+        "GetTransportInfo",
+        lambda serial: SimpleNamespace(
+            GetProvider=lambda: "TCPIP", GetComSpec=lambda: "192.0.2.10:40304"
+        ),
+    )
+    hub = ShutterHub(ethernet_endpoints=["192.0.2.10:40304"])
+    assert len(hub.controllers) == 1
+    assert hub.discover() == ["68000001"]
+    assert hub.connect(0, "68000001").serial_number == "68000001"
+    hub.disconnect(0, close_shutter=False)
+    assert registered == ["192.0.2.10:40304"] * 2
+    assert events == ["register", "build", "refresh"] * 2
+    assert not any(c[0] in {"set_state", "set_mode", "enable"} for c in rig.device.calls)
+
+
+@pytest.mark.parametrize("responds", [True, False])
+def test_lan_discovery_waits_for_async_refresh_without_restarting_build(rig, monkeypatch, responds):
+    sdk = driver._load_sdk(None)
+    events = []
+    polls = []
+    monkeypatch.setattr(
+        sdk.manager, "CreateManualDeviceEntry", lambda ep: events.append(ep), raising=False
+    )
+    monkeypatch.setattr(sdk.manager, "BuildDeviceList", lambda: events.append("build"))
+    monkeypatch.setattr(sdk.manager, "CheckForConnectionChanges", lambda: polls.append("refresh"))
+    monkeypatch.setattr(
+        sdk.manager,
+        "GetDeviceList",
+        lambda type_id: ["68000001"] if responds and len(polls) >= 4 else [],
+    )
+    monkeypatch.setattr(
+        sdk.manager,
+        "GetTransportInfo",
+        lambda serial: SimpleNamespace(
+            GetProvider=lambda: "TCPIP", GetComSpec=lambda: "192.0.2.10:40304"
+        ),
+    )
+    hub = ShutterHub(ethernet_endpoints=["192.0.2.10:40304"])
+    start = driver.time.monotonic()
+    assert hub.discover() == (["68000001"] if responds else [])
+    assert events == ["192.0.2.10:40304", "build"]
+    assert len(polls) >= 4
+    assert driver.time.monotonic() - start == pytest.approx(0.3 if responds else 5.0)
+    assert not rig.device.calls  # No Connect or output commands during discovery.
+
+
 @pytest.mark.parametrize("field, value", [("provider", "FTDI"), ("endpoint", "192.0.2.10:40305")])
 def test_wrong_transport_is_not_discovered_or_connected(ethernet, field, value):
     ethernet.transport[field] = value
@@ -172,7 +247,9 @@ def test_transport_change_before_handle_creation_is_refused(ethernet, monkeypatc
 
 def test_endpoint_configuration_is_passive_and_immutable(rig):
     hub = ShutterHub([68000001], ethernet_endpoints=["192.0.2.10:40304"])
-    assert hub.ethernet_endpoints == ("192.0.2.10:40304", None, None)
+    assert hub.ethernet_endpoints == ("192.0.2.10:40304",)
+    mixed = ShutterHub(slots=3, ethernet_endpoints=["192.0.2.10:40304"])
+    assert mixed.ethernet_endpoints == ("192.0.2.10:40304", None, None)
     with pytest.raises(AttributeError):
         hub.ethernet_endpoints = (None,)
     with pytest.raises(ValueError, match="slots must fit"):
@@ -244,6 +321,13 @@ def test_mixed_hub_routes_each_serial_to_its_configured_transport(rig, monkeypat
     }
     sdk = driver._load_sdk(None)
     entries = []
+
+    def build_device_list():
+        rig.manager_calls.append("discover")
+        if entries:  # A USB slot also performs its own independent USB enumeration.
+            assert entries[-2:] == ["192.0.2.10:40304", "192.0.2.10:40305"]
+
+    monkeypatch.setattr(sdk.manager, "BuildDeviceList", build_device_list)
     monkeypatch.setattr(sdk.manager, "CreateManualDeviceEntry", entries.append, raising=False)
     monkeypatch.setattr(
         sdk.manager,
@@ -260,7 +344,14 @@ def test_mixed_hub_routes_each_serial_to_its_configured_transport(rig, monkeypat
     assert hub.discover() == rig.serials
     assert rig.manager_calls == ["discover"]
     assert entries == ["192.0.2.10:40304", "192.0.2.10:40305"]
+    app = create_app(hub)
+    result = invoke(app, "discover", serials=[None, None, None])
+    assert rig.manager_calls == ["discover"] * 3  # USB + configured routes, shared by all panels.
+    for index, _serial in enumerate(rig.serials, 1):
+        assert [item["value"] for item in result[f"serial-{index}"]["options"]] == rig.serials
+    assert all(not device.calls for device in rig.devices.values())
     for slot, serial in enumerate(rig.serials):
+        entries.clear()
         hub.confirm_interlock(slot, serial)
         assert hub.connect(slot, serial).serial_number == serial
         if slot:
@@ -277,6 +368,7 @@ def test_mixed_hub_routes_each_serial_to_its_configured_transport(rig, monkeypat
     assert hub.get_cached_status(0).serial_number == "68000001"
     # A serial from another bay must not be sent to this slot, even if it is enumerated.
     hub.disconnect(1)
+    entries.clear()
     with pytest.raises(ShutterError, match="not discovered"):
         hub.connect(1, 68000003)
     rig.devices["68000001"].fail.add("set_state")
@@ -303,6 +395,57 @@ def test_gui_uses_hub_dispatch_for_network_commands(ethernet, monkeypatch):
     assert invoke(app, "close", serial="68000001")["shutter-state"]["children"] == "Closed"
     invoke(app, "disconnect", serial="68000001")
     assert not ethernet.rig.device.IsConnected
+
+
+def test_gui_lan_discovery_preserves_a_retained_identity_after_route_loss(ethernet):
+    hub = ethernet.hub
+    hub.connect(0, "68000001")
+    app = create_app(hub)
+    ethernet.transport["provider"] = "FTDI"
+    result = invoke(app, "discover", serial="68000001")
+    assert [item["value"] for item in result["serial"]["options"]] == ["68000001"]
+    assert result["serial"]["value"] == "68000001"
+    assert result["connection"]["children"] == "Fault"
+    assert result["disconnect"]["disabled"] is False
+    hub.disconnect(0, close_shutter=False)
+    assert not any(
+        call[0] in {"enable", "set_state", "set_mode"} for call in ethernet.rig.device.calls
+    )
+
+
+def test_configure_slot_preserves_retained_handle_until_release(ethernet):
+    hub = ShutterHub([68000001], slots=1)
+    endpoint = "192.0.2.10:40304"
+    before = list(ethernet.rig.manager_calls)
+    hub.configure_slot(0, ethernet_endpoint=endpoint)
+    assert hub.controllers[0].serial_number is None
+    assert ethernet.rig.manager_calls == before and not ethernet.rig.device.calls
+    hub.connect(0, "68000001")
+    old = hub.controllers[0]
+    with pytest.raises(ShutterError, match="Disconnect"):
+        hub.configure_slot(0)
+    ethernet.rig.device.fail.add("disconnect")
+    with pytest.raises(ShutterError, match="Shutdown incomplete"):
+        hub.disconnect(0, close_shutter=False)
+    with pytest.raises(ShutterError, match="Disconnect"):
+        hub.configure_slot(0)
+    assert hub.controllers[0] is old
+    ethernet.rig.device.fail.clear()
+    hub.disconnect(0, close_shutter=False)
+    hub.configure_slot(0)
+    assert hub.ethernet_endpoints == (None,)
+    assert isinstance(hub.controllers[0], KCubeShutter)
+    assert hub.controllers[0].serial_number is None
+    assert not any(c[0] in {"enable", "set_state", "set_mode"} for c in ethernet.rig.device.calls)
+
+
+@pytest.mark.parametrize("endpoint", ["", "not-an-ip:40304", "192.0.2.10:40303"])
+def test_invalid_route_configuration_is_passive_and_preserves_route(rig, endpoint):
+    hub = ShutterHub(controllers=[rig.controller])
+    with pytest.raises(ValueError, match="ethernet_endpoints"):
+        hub.configure_slot(0, ethernet_endpoint=endpoint)
+    assert hub.controllers == (rig.controller,) and hub.ethernet_endpoints == (None,)
+    assert not rig.manager_calls and not rig.device.calls
 
 
 def test_failed_network_release_retains_ownership_until_retry(ethernet):

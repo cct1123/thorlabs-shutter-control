@@ -56,6 +56,18 @@ class TriggerConfig:
 
 
 @dataclass(frozen=True)
+class LanDevice:
+    serial_number: str
+    endpoint: str
+
+
+@dataclass(frozen=True)
+class LanDiscovery:
+    hub_addresses: tuple[str, ...]
+    controllers: tuple[LanDevice, ...]
+
+
+@dataclass(frozen=True)
 class ShutterStatus:
     connection: str = "disconnected"
     has_device: bool = False
@@ -666,8 +678,8 @@ class KCubeShutter(_KinesisShutter):
 class _HubChannel(_KinesisShutter):
     """A hub-owned SDK channel; transport selection is delegated to its hub."""
 
-    def __init__(self, hub, slot, serial, *, kinesis_dir):
-        super().__init__(serial, kinesis_dir=kinesis_dir)
+    def __init__(self, hub, slot, serial, *, kinesis_dir, timeout=5.0, polling_ms=250):
+        super().__init__(serial, kinesis_dir=kinesis_dir, timeout=timeout, polling_ms=polling_ms)
         self._hub = hub
         self._slot = slot
 
@@ -686,10 +698,29 @@ class ShutterHub:
     """Own slots, network routing and command dispatch for connected shutters.
 
     Serials preselect slots; omitted slots remain unselected. The default count
-    is at least three, growing to fit supplied serials. Existing controllers can
+    is three for USB, or fits the supplied network routes. Existing controllers can
     be injected instead. Construction never loads the SDK.
     The lock serializes GUI actions/status with shutdown; drivers also lock calls.
     """
+
+    @staticmethod
+    def _validate_endpoint(endpoint):
+        if endpoint is None:
+            return
+        try:
+            address, port = endpoint.rsplit(":", 1)
+            if str(IPv4Address(address)) != address or port not in (
+                "40304",
+                "40305",
+                "40306",
+                "40307",
+            ):
+                raise ValueError
+        except (AttributeError, TypeError, ValueError) as exc:
+            raise ValueError(
+                "ethernet_endpoints entries must be IPv4 KEH3 cube endpoints "
+                "(ports 40304..40307), or None for USB."
+            ) from exc
 
     def __init__(
         self,
@@ -708,22 +739,7 @@ class ShutterHub:
             raise ValueError("ethernet_endpoints must be a sequence of per-slot endpoints.")
         endpoints = tuple(ethernet_endpoints)
         for endpoint in endpoints:
-            if endpoint is None:
-                continue
-            try:
-                address, port = endpoint.rsplit(":", 1)
-                if str(IPv4Address(address)) != address or port not in (
-                    "40304",
-                    "40305",
-                    "40306",
-                    "40307",
-                ):
-                    raise ValueError
-            except (AttributeError, TypeError, ValueError) as exc:
-                raise ValueError(
-                    "ethernet_endpoints entries must be IPv4 KEH3 cube endpoints "
-                    "(ports 40304..40307), or None for USB."
-                ) from exc
+            self._validate_endpoint(endpoint)
         if controllers is not None and (
             serial_numbers or kinesis_dir is not None or slots is not None or endpoints
         ):
@@ -732,7 +748,8 @@ class ShutterHub:
             serials = tuple(_normalize_serial(serial) for serial in serial_numbers)
             if len(set(serials)) != len(serials):
                 raise ValueError("Supply distinct serial numbers.")
-            count = max(3, len(serials), len(endpoints)) if slots is None else slots
+            default_count = max(len(serials), len(endpoints)) if endpoints else max(3, len(serials))
+            count = default_count if slots is None else slots
             if max(len(serials), len(endpoints)) > count:
                 raise ValueError("slots must fit all supplied serial numbers and endpoints.")
             self._ethernet_endpoints = endpoints + (None,) * (count - len(endpoints))
@@ -758,8 +775,34 @@ class ShutterHub:
 
     @property
     def ethernet_endpoints(self) -> tuple[str | None, ...]:
-        """Immutable per-slot selection; None means USB, never network fallback."""
+        """Read-only route snapshot; configure_slot changes only released slots."""
         return self._ethernet_endpoints
+
+    def configure_slot(self, slot: int, *, ethernet_endpoint: str | None = None) -> None:
+        """Passively choose USB (None) or LAN after releasing this slot's handle."""
+        self._validate_endpoint(ethernet_endpoint)
+        with self.lock:
+            old = self._controller(slot)
+            with old._lock:
+                if old._device is not None:
+                    raise ShutterError("Disconnect this controller before changing its connection.")
+                if self.ethernet_endpoints[slot] == ethernet_endpoint:
+                    return
+                kwargs = dict(
+                    kinesis_dir=old.kinesis_dir, timeout=old.timeout, polling_ms=old.polling_ms
+                )
+                replacement = (
+                    KCubeShutter(**kwargs)
+                    if ethernet_endpoint is None
+                    else _HubChannel(self, slot, None, **kwargs)
+                )
+                replacement._sdk = old._sdk
+                endpoints = list(self.ethernet_endpoints)
+                endpoints[slot] = ethernet_endpoint
+                controllers = list(self.controllers)
+                controllers[slot] = replacement
+                self._ethernet_endpoints = tuple(endpoints)
+                self.controllers = tuple(controllers)
 
     def _matches_endpoint(self, slot: int, serial: str) -> bool:
         with _sdk_lock:
@@ -770,8 +813,97 @@ class ShutterHub:
                 and str(info.GetComSpec()) == self.ethernet_endpoints[slot]
             )
 
+    def scan_lan(
+        self,
+        start_address: str | None = None,
+        end_address: str | None = None,
+        *,
+        open_timeout_ms: int | None = None,
+    ) -> LanDiscovery:
+        """Find KEH3 hosts and KSC101 bay identities without connecting a cube.
+
+        Vendor scanning probes port 40303, then SDK registration enumerates the
+        documented cube ports. Omitted arguments use config.LAN_SCAN_* defaults.
+        Range is inclusive and limited by LAN_SCAN_MAX_ADDRESSES (at most 256).
+        Async identity polling uses the controllers' timeout; native calls can
+        exceed it. Release all process-owned handles before scanning.
+        """
+        start_address = config.LAN_SCAN_START_IP if start_address is None else start_address
+        end_address = config.LAN_SCAN_END_IP if end_address is None else end_address
+        open_timeout_ms = (
+            config.LAN_SCAN_OPEN_TIMEOUT_MS if open_timeout_ms is None else open_timeout_ms
+        )
+        limit = config.LAN_SCAN_MAX_ADDRESSES
+        if type(limit) is not int or not 1 <= limit <= 256:
+            raise ValueError("LAN_SCAN_MAX_ADDRESSES must be an integer from 1 to 256.")
+        if not isinstance(start_address, str) or not isinstance(end_address, str):
+            raise ValueError("LAN range must contain two IPv4 address strings.")
+        try:
+            start, end = IPv4Address(start_address), IPv4Address(end_address)
+        except (ValueError, TypeError) as exc:
+            raise ValueError("LAN range must contain two IPv4 addresses.") from exc
+        if not 0 <= int(end) - int(start) < limit:
+            raise ValueError(f"LAN range must be ascending and contain at most {limit} addresses.")
+        if type(open_timeout_ms) is not int or not 50 <= open_timeout_ms <= 1000:
+            raise ValueError("LAN open timeout must be an integer from 50 to 1000 ms.")
+        with self.lock, _sdk_lock:
+            # Ownership/handle creation is serialized by _sdk_lock. Do not take
+            # channel locks here: connect takes a channel lock before this lock.
+            if _device_owners or any(c._device is not None for c in self.controllers):
+                raise ShutterError("Disconnect all controllers before scanning the LAN.")
+            try:
+                first = self.controllers[0]
+                sdk = first._sdk or _load_sdk(first.kinesis_dir)
+                for channel in self.controllers:
+                    channel._sdk = sdk
+                addresses = sdk.manager.ScanEthernetRange(
+                    str(start), str(end), 40303, open_timeout_ms
+                )
+                hosts = set()
+                for entry in addresses:
+                    # SDK versions may report a bare address or address:port.
+                    address, sep, port = str(entry).partition(":")
+                    if sep and port != "40303":
+                        continue
+                    try:
+                        ip = IPv4Address(address)
+                    except ValueError:
+                        continue
+                    if start <= ip <= end:
+                        hosts.add(ip)
+                ordered_hosts = tuple(str(ip) for ip in sorted(hosts))
+                if not hosts:
+                    return LanDiscovery((), ())
+                candidates = {
+                    f"{host}:{port}" for host in ordered_hosts for port in range(40304, 40308)
+                }
+                for endpoint in sorted(candidates):
+                    sdk.manager.CreateManualDeviceEntry(endpoint)
+                sdk.manager.BuildDeviceList()
+                deadline = time.monotonic() + max(c.timeout for c in self.controllers)
+                while True:
+                    sdk.manager.CheckForConnectionChanges()
+                    found = {}
+                    for value in sdk.manager.GetDeviceList(68):
+                        serial = str(value)
+                        if not re.fullmatch(r"68[0-9]{6}", serial):
+                            continue
+                        info = sdk.manager.GetTransportInfo(serial)
+                        if info is None or str(info.GetProvider()) != "TCPIP":
+                            continue
+                        endpoint = str(info.GetComSpec())
+                        if endpoint in candidates:
+                            found[serial] = LanDevice(serial, endpoint)
+                    remaining = deadline - time.monotonic()
+                    if remaining <= 0:
+                        break
+                    time.sleep(min(0.1, remaining))
+                return LanDiscovery(ordered_hosts, tuple(found[s] for s in sorted(found)))
+            except Exception as exc:
+                raise ShutterError(f"LAN discovery failed: {exc}") from exc
+
     def discover(self) -> list[str]:
-        """Register selected network entries and enumerate matching slots; no outputs."""
+        """Register configured LAN entries, rebuild the SDK list and filter routes."""
         with self.lock:
             if not any(self.ethernet_endpoints):
                 return self.controllers[0].discover()
@@ -781,17 +913,88 @@ class ShutterHub:
                 with _sdk_lock:
                     for channel in self.controllers:
                         channel._sdk = sdk
+                    # Vendor Ethernet sequence: register manual entries, then
+                    # BuildDeviceList. Registration alone does not enumerate them.
+                    # This rebuild is needed for TCPIP too; it does not require
+                    # a USB-connected device and must not be skipped for LAN hubs.
                     for endpoint in dict.fromkeys(self.ethernet_endpoints):
                         if endpoint is not None:
                             sdk.manager.CreateManualDeviceEntry(endpoint)
                     sdk.manager.BuildDeviceList()
-                    return sorted(
-                        str(serial)
-                        for serial in sdk.manager.GetDeviceList(68)
-                        if any(c._matches_transport(str(serial)) for c in self.controllers)
+                    # TCPIP discovery completes asynchronously. Refresh its
+                    # connection-change results until each network route has an
+                    # identity or the controller discovery timeout expires.
+                    # Register/build once: rebuilding each poll can restart work.
+                    network_slots = [
+                        slot
+                        for slot, endpoint in enumerate(self.ethernet_endpoints)
+                        if endpoint is not None
+                    ]
+                    deadline = time.monotonic() + max(
+                        self.controllers[slot].timeout for slot in network_slots
                     )
+                    while True:
+                        sdk.manager.CheckForConnectionChanges()
+                        found = sorted(
+                            str(serial)
+                            for serial in sdk.manager.GetDeviceList(68)
+                            if any(c._matches_transport(str(serial)) for c in self.controllers)
+                        )
+                        if all(
+                            any(self._matches_endpoint(slot, serial) for serial in found)
+                            for slot in network_slots
+                        ):
+                            return found
+                        remaining = deadline - time.monotonic()
+                        if remaining <= 0:
+                            return found
+                        time.sleep(min(0.1, remaining))
             except Exception as exc:
                 raise ShutterError(f"Hub discovery failed: {exc}") from exc
+
+    def discover_available(self) -> tuple[dict[str, str | None], tuple[str, ...]]:
+        """Return serial -> detected LAN endpoint (None for USB), plus warnings.
+
+        This shared GUI discovery includes configured routes and a config-based
+        LAN scan. A failed/skipped transport does not hide successful results.
+        No slot route or device control handle is changed.
+        """
+        with self.lock:
+            found = {}
+            warnings = []
+            first = self.controllers[0]
+            usb = KCubeShutter(kinesis_dir=first.kinesis_dir)
+            usb._sdk = first._sdk
+            try:
+                for serial in usb.discover():
+                    found[serial] = None
+            except ShutterError as exc:
+                warnings.append(f"USB discovery: {exc}")
+            if any(self.ethernet_endpoints):
+                try:
+                    for slot, serials in enumerate(self.discover_by_slot()):
+                        for serial in serials:
+                            found[serial] = self.ethernet_endpoints[slot]
+                except ShutterError as exc:
+                    warnings.append(f"Configured route discovery: {exc}")
+            try:
+                for device in self.scan_lan().controllers:
+                    found[device.serial_number] = device.endpoint
+            except (ShutterError, ValueError) as exc:
+                warnings.append(f"LAN scan: {exc}")
+            return dict(sorted(found.items())), tuple(warnings)
+
+    def discover_by_slot(self) -> tuple[list[str], ...]:
+        """Discover once, then group serials by each slot's configured transport."""
+        with self.lock:
+            serials = self.discover()
+            if not any(self.ethernet_endpoints):
+                return tuple(list(serials) for _ in self.controllers)
+            with _sdk_lock:
+                return tuple(
+                    [serial for serial in serials if channel._matches_transport(serial)]
+                    for channel in self.controllers
+                )
 
     def _discover_slot(self, slot: int) -> list[str]:
         with self.lock:

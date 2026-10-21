@@ -21,6 +21,17 @@ def _enabled(value):
     return "unknown" if value is None else ("enabled" if value else "not enabled")
 
 
+def _route_label(endpoint):
+    return f"Ethernet LAN · {endpoint}" if endpoint else "USB"
+
+
+def _device_options(routes):
+    return [
+        {"label": f"{serial} · {_route_label(endpoint)}", "value": serial}
+        for serial, endpoint in routes.items()
+    ]
+
+
 def _open_ready(status):
     return (
         status.connection == "connected"
@@ -75,7 +86,7 @@ def _action_ready(status, config):
     )
 
 
-def _panel(slot, serial_number, serials, suffix):
+def _panel(slot, serial_number, serials, suffix, endpoint):
     return html.Section(
         [
             html.Div(
@@ -89,6 +100,11 @@ def _panel(slot, serial_number, serials, suffix):
                     html.Span("Disconnected", id=f"connection{suffix}", className="badge offline"),
                 ],
                 className="panel-heading",
+            ),
+            html.P(
+                _route_label(endpoint),
+                id=f"transport{suffix}",
+                className="device-identity",
             ),
             html.Div(
                 [
@@ -292,10 +308,9 @@ def create_app(
     count = len(hub.controllers)
     single = count == 1
     suffixes = [""] if single else [f"-{slot + 1}" for slot in range(count)]
-    serials = [c.serial_number for c in hub.controllers if c.serial_number]
-    transports = {"Ethernet" if endpoint else "USB" for endpoint in hub.ethernet_endpoints}
-    transport_label = " / ".join(sorted(transports))
     last_ttl_settings = [None] * count  # Display only; Arm always reads device settings.
+    discovered_routes = {}  # Only successful discovery supplies automatic routes.
+    discovery_attempted = False
     app = Dash(__name__)
     app.title = "Shutter control"
     app_class = "app" if single else "app multi-app"
@@ -307,7 +322,11 @@ def create_app(
                         [
                             html.P("INSTRUMENT CONTROL", className="eyebrow"),
                             html.H1("Shutter control"),
-                            html.P(f"KSC101 controllers · {transport_label}", className="subtitle"),
+                            html.P(
+                                "KSC101 controllers · USB / Ethernet LAN",
+                                className="subtitle",
+                                id="transport-summary",
+                            ),
                         ]
                     ),
                     html.Div(
@@ -315,7 +334,7 @@ def create_app(
                             html.Button(
                                 "Discover",
                                 id="discover",
-                                title="Find controllers on configured transports",
+                                title="Find USB and Ethernet controllers using config.py defaults",
                             ),
                             html.Button(
                                 "Close & disconnect all",
@@ -347,7 +366,13 @@ def create_app(
             _message("Discovery and connection start only when requested.", "hub-message"),
             html.Div(
                 [
-                    _panel(slot, shutter.serial_number, serials, suffixes[slot])
+                    _panel(
+                        slot,
+                        shutter.serial_number,
+                        [shutter.serial_number] if shutter.serial_number else [],
+                        suffixes[slot],
+                        hub.ethernet_endpoints[slot],
+                    )
                     for slot, shutter in enumerate(hub.controllers)
                 ],
                 className="shutter-grid",
@@ -406,6 +431,7 @@ def create_app(
         for mode, _ in MODES
         for prop in ("className", "disabled", "aria-pressed")
     ]
+    fields += [("transport", "children")]
     actions = {
         f"{action}{suffix}": (slot, action)
         for slot, suffix in enumerate(suffixes)
@@ -427,6 +453,7 @@ def create_app(
             Output("hub-message", "children"),
             Output("connection-summary", "children"),
             Output("hub-message", "className"),
+            Output("transport-summary", "children"),
         ]
         + [Output(f"{name}{suffix}", prop) for suffix in suffixes for name, prop in fields],
         inputs={
@@ -454,6 +481,7 @@ def create_app(
         ],
     )
     def update(_events, selections, ttl_drafts):
+        nonlocal discovered_routes, discovery_attempted
         with hub.lock:
             messages = [no_update] * count
             options = [no_update] * count
@@ -466,26 +494,29 @@ def create_app(
             hub_error = False
             try:
                 if action == "discover":
-                    serials = hub.discover()
+                    discovery_attempted = True
+                    discovered_routes = {}
+                    discovered_routes, warnings = hub.discover_available()
                     for index, shutter in enumerate(hub.controllers):
-                        options[index] = serials
-                        if shutter.get_operating_status().has_device:
-                            # A discovery snapshot may omit a retained/lost device. Keep
-                            # its identity visible until cleanup actually releases it.
+                        routes = dict(discovered_routes)
+                        if hub.get_operating_status(index).has_device:
+                            routes[shutter.serial_number] = hub.ethernet_endpoints[index]
                             selected[index] = shutter.serial_number
-                            options[index] = sorted(set(serials + [shutter.serial_number]))
-                            continue
-                        # Never assign the same sole device to multiple slots automatically.
-                        selected[index] = (
-                            selections[index]
-                            if selections[index] in serials
-                            else (serials[0] if single and len(serials) == 1 else None)
-                        )
-                    noun = "controller" if len(serials) == 1 else "controllers"
+                        else:
+                            selected[index] = (
+                                selections[index]
+                                if selections[index] in routes
+                                else (next(iter(routes)) if single and len(routes) == 1 else None)
+                            )
+                        options[index] = _device_options(routes)
+                    noun = "controller" if len(discovered_routes) == 1 else "controllers"
                     hub_message = (
-                        f"Found {len(serials)} {transport_label} {noun}. "
-                        "Select a serial, then Connect."
+                        f"Found {len(discovered_routes)} USB / Ethernet {noun}. "
+                        "Select a device, then Connect."
                     )
+                    if warnings:
+                        hub_message += " " + " ".join(warnings)
+                        hub_error = True
                 elif action == "stop-server" and on_shutdown is not None:
                     hub.safe_shutdown()
                     on_shutdown()
@@ -506,9 +537,19 @@ def create_app(
                     slot, command = actions[action]
                     shutter = hub.controllers[slot]
                     if command == "connect":
+                        serial = selections[slot]
+                        if discovery_attempted and serial not in discovered_routes:
+                            raise ShutterError("Discover and select a currently available device.")
+                        if serial in discovered_routes:
+                            endpoint = discovered_routes[serial]
+                            if endpoint != hub.ethernet_endpoints[slot]:
+                                hub.configure_slot(slot, ethernet_endpoint=endpoint)
+                                shutter = hub.controllers[slot]
+                                last_ttl_settings[slot] = None
+                                drafts[slot] = ["input", "high", "output", "high"]
                         status = (
                             shutter.connect(selections[slot])
-                            if isinstance(controller, KCubeShutter)
+                            if isinstance(controller, KCubeShutter) and controller is shutter
                             else hub.connect(slot, selections[slot])
                         )
                         selected[slot] = status.serial_number
@@ -609,6 +650,7 @@ def create_app(
                 "message message-error"
                 if hub_error
                 else ("message" if hub_message is not no_update else no_update),
+                "KSC101 controllers · USB / Ethernet LAN",
             ]
             for index, status in enumerate(statuses):
                 if status.error:
@@ -738,6 +780,11 @@ def create_app(
                             "true" if chosen else "false",
                         ]
                     )
+                serial = selected[index] if selected[index] is not no_update else selections[index]
+                endpoint = hub.ethernet_endpoints[index]
+                if not active and serial in discovered_routes:
+                    endpoint = discovered_routes[serial]
+                result.append(_route_label(endpoint))
             return result
 
     return app

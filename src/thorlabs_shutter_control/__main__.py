@@ -13,7 +13,12 @@ def main() -> int:
     try:
         if type(config.PORT) is not int or not 1 <= config.PORT <= 65535:
             raise ValueError("PORT must be an integer between 1 and 65535.")
-        hub = ShutterHub(config.SERIAL_NUMBERS, kinesis_dir=config.KINESIS_DIR, slots=config.SLOTS)
+        hub = ShutterHub(
+            config.SERIAL_NUMBERS,
+            kinesis_dir=config.KINESIS_DIR,
+            slots=config.SLOTS,
+            ethernet_endpoints=config.ETHERNET_ENDPOINTS,
+        )
     except ValueError as exc:
         print(f"Invalid project config: {exc}", file=sys.stderr)
         return 1

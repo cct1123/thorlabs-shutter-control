@@ -61,7 +61,7 @@ label, .label { display: block; font-size: 11px; color: #63728a; margin-bottom: 
  min-height: 32px; padding: 6px 8px; border: 1px solid #e2e7ef; border-radius: 5px;
  background: #f8f9fc; font-size: 11px; color: #596a81; }
 .mode-button.selected { background: #eaf2ff; border-color: #b2cdf1; color: #1f5caa; font-weight: 650; }
-.mode-button.selected::after { content: "✓"; font-size: 10px; color: #2765c4; }
+.mode-button.selected::after { content: "\2713"; font-size: 10px; color: #2765c4; }
 .mode-button:disabled { background: #f8f9fc; }
 .mode-button.selected:disabled { background: #eef3fb; border-color: #c9d9ee; color: #6683a8; }
 .shutter-actions { display: flex; gap: 6px; margin-top: 9px; }

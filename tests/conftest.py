@@ -152,6 +152,8 @@ def rig(monkeypatch):
     sdk = SimpleNamespace(
         manager=SimpleNamespace(
             BuildDeviceList=lambda: manager_calls.append("discover"),
+            CheckForConnectionChanges=lambda: {},
+            ScanEthernetRange=lambda *args: [],
             GetDeviceList=lambda type_id: serials if type_id == 68 else [],
             GetTransportInfo=lambda serial: SimpleNamespace(GetProvider=lambda: "FTDI"),
         ),
