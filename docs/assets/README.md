@@ -9,8 +9,9 @@
 
 Product photo [source page](https://www.thorlabs.com/optical-shutters) and
 [original image](https://thin01mstroc282prod.dxcloud.episerver.net/contentassets/3ba9d5dbc70a436fb4f30134096125c7/927_beamshutter_vn.webp?v=1202083916).
-Screenshots show the default three panels of the configurable-size GUI and were
-captured from a separate unconfigured application instance;
+Screenshots show the default three-panel layout, expanded trigger settings and
+an explicitly configured six-panel layout. Each was captured from a separate
+unconfigured application instance;
 no image editing, synthetic hardware state or actuation was used.
 
 Shareable documentation uses environment variables for live identities and

@@ -347,7 +347,7 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
                     if command == "connect":
                         status = (
                             shutter.connect(selections[slot])
-                            if single
+                            if isinstance(controller, KCubeShutter)
                             else hub.connect(slot, selections[slot])
                         )
                         selected[slot] = status.serial_number

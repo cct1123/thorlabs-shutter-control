@@ -137,6 +137,10 @@ hub.safe_shutdown attempts every controller despite ordinary errors/interrupts,
 then aggregates errors by slot/serial. A native hang can block later attempts.
 The hub lock serializes GUI actions/snapshots; each driver also serializes calls.
 
+A GUI built from `ShutterHub`, including a one-slot hub, requires a selected
+serial for Connect. The direct `create_app(KCubeShutter(...))` convenience form
+retains the driver's optional-serial connection behavior.
+
 ## Shutdown and faults
 
 Faults latch until successful release/reconnect. Close may succeed while the old

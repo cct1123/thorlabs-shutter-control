@@ -385,3 +385,16 @@ def test_many_panels_have_independent_commands_and_best_effort_cleanup(rig, coun
     assert "set_state" in result["hub-message"]["children"]
     assert all(result[f"connection-{n}"]["children"] == "Disconnected" for n in range(2, count + 1))
     assert all(d.state == "Closed" and not d.IsConnected for d in list(rig.devices.values())[1:])
+
+
+@pytest.mark.parametrize("preselected", [None, "68000001"])
+def test_single_slot_hub_requires_selection_before_sdk_access(rig, preselected):
+    hub = ShutterHub(controllers=[KCubeShutter(preselected, timeout=0.5)])
+    app = create_app(hub)
+    result = invoke(app, "connect", serial=None)
+    assert result["connection"]["children"] == "Disconnected"
+    assert "Select a KSC101 serial" in result["message"]["children"]
+    assert not rig.manager_calls and not rig.device.calls
+    result = invoke(app, "connect", serial="68000001")
+    assert result["connection"]["children"] == "Connected"
+    hub.safe_shutdown()

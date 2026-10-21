@@ -29,8 +29,7 @@
     "docs/assets/gui-six-slots.jpg": "f577ba02854b9ad22d94d1a62615b46cd38cdf86527680542f1a9d5efde837e5",
     "docs/assets/gui-startup.jpg": "aecd679b3ed80d291a62c84a6f1f32b88d795e05934d4b85d6fb730eb3df21be",
     "docs/assets/gui-trigger-settings.jpg": "5d0a86735cc7eb15ec45470768f5a17a1fba586d265df91efa3ce701c4486343",
-    "docs/assets/ksc101-sh05r.webp": "9d755e346e188816a8a77ae35a577d9a7a27850d969d8a1cbc7f6d09508bd5e6",
-    "docs/assets/README.md": "2b1370570308a88e9e38be97ca03102c01821c489c540084097d3f742cc2cebe"
+    "docs/assets/ksc101-sh05r.webp": "9d755e346e188816a8a77ae35a577d9a7a27850d969d8a1cbc7f6d09508bd5e6"
   },
   "scale": {
     "configurable": "Any positive software count; default at least3, growing to fit serials",
@@ -60,7 +59,7 @@
   "wheel": {
     "entries": 9,
     "sha256": "d6e1b9b3cf8d03d22b08c2d4fed740b8435fdb3d226f001d9174819737afb304",
-    "matches_current_production_files": true
+    "matches_reviewed_production_files": true
   },
   "publication": {
     "evidence": "E086 / TEST-095",
@@ -69,7 +68,42 @@
     "remote_verified": true,
     "verified_utc": "2026-10-21T02:34:47.370476+00:00",
     "method": "Normal git push; git ls-remote returned implementation hash; clean checkout before metadata update",
-    "metadata_checkpoint": "Final publication metadata follows; final Git refs are authoritative",
+    "metadata_checkpoint": "c9c45c21cf92cdd111686557831180c863070144 (verified baseline for follow-up E087)",
     "history_rewrite": false
+  },
+  "historical_asset_provenance_sha256": {
+    "docs/assets/README.md": "2b1370570308a88e9e38be97ca03102c01821c489c540084097d3f742cc2cebe"
+  },
+  "scope_note": "E084/E085 fields describe that reviewed revision; E087 follow-up is recorded separately below.",
+  "followup": {
+    "evidence": "E087 / TEST-096",
+    "requirement": "REQ-059",
+    "baseline_commit": "c9c45c21cf92cdd111686557831180c863070144",
+    "source_passed": 489,
+    "wheel_import_passed": 489,
+    "real_sdk_excluded": true,
+    "regression": "Missing selection in one-slot hub: two cases fail before fix, pass after; selected connection succeeds",
+    "ruff": "PASS: lint and formatting, 36 files",
+    "wheel": {
+      "entries": 9,
+      "sha256": "4e57e7ad543b007c5b4898345c5b25d98b0fd7aa30f5f15c72bc21585a6e23bd",
+      "production_bytes_match": true
+    },
+    "hardware_access": false,
+    "documentation_and_integrity": {
+      "markdown_files": 18,
+      "local_links_and_anchors": 91,
+      "python_snippets": 6,
+      "json_and_current_hashes": "PASS",
+      "privacy": "PASS: current files and wheel, known identifiers and credential prefixes; history excluded",
+      "private_preservation": {
+        "backup_files": 70,
+        "payload_files": 136,
+        "entries": 137
+      }
+    },
+    "checked_utc": "2026-10-21T02:38:28.027111+00:00",
+    "temporary_build_files_removed": 11,
+    "publication": "Pending E088"
   }
 }

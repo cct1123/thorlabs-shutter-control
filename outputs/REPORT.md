@@ -36,25 +36,22 @@ trigger drafts and an attributed manufacturer KSC101/SH05R photo. These images
 contain no selected device identities and do not claim connected-bench operation.
 [Asset provenance/privacy scope](../docs/assets/README.md) describes their origin.
 
-## Current review and privacy
+## Review and retained evidence
 
-The optional no-cable TTL diagnostic restores settings and closes/releases on
-failure. E084 rejects invalid Python duration/port arguments before any controller
-access, and retains fictional numeric identity cases in software tests. Driver
-behavior changes only in its illustrative error-message IP address; single-cube command
-logic is unchanged. Hub/CLI sizing is extended in E085, below. API examples Close only after verified connection.
+Private originals remain in ignored storage; public records use aliases and
+refreshed derivative hashes. Current-file checks exclude earlier Git history.
+The [evidence index](../records/RECORDS.md) preserves review and publication history.
+E084 tightened TTL-helper argument validation; valid-input command sequences and
+historical TTL results remain unchanged.
 
-Sanitized records use aliases; live examples use local environment variables.
-Unredacted archive, historical screenshot and originals remain in ignored private
-storage. Current public evidence is a labelled derivative with refreshed hashes.
-Redundant GUI widget payload was pruned without losing state/release observations.
-Old layout measurements are labelled separately from new startup captures.
-
-E083 [privacy validation](../records/privacy-validation.json) is historical;
-E084 review validation/publication is recorded in the
-[evidence index](../records/RECORDS.md) and [checkpoint](../STATE.md).
-No hardware operation is part of this review. Earlier Git history can retain
-previously committed identities; no history rewrite is included.
+E087 fixes one configurable-GUI inconsistency: a one-slot ShutterHub now requires
+an explicit dropdown selection for Connect, like larger hubs. The direct
+create_app(KCubeShutter(...)) convenience API retains optional-serial behavior.
+Two regression cases reproduced the defect before the fix. Current validation:
+489 source and489 extracted-wheel software tests, Ruff/format and package checks
+PASS. No SDK or physical hardware was accessed. Corrected the screenshot scope
+and stale publication wording; removed redundant report prose. See
+[review validation](../records/review-validation.json) for checks and hashes.
 
 ## Configurable count and KEH6 USB - E085
 
@@ -72,13 +69,6 @@ KEH6 Ethernet is not generalized from KEH3. The historical single-pair and TTL
 observations above are unchanged. Latest README privacy section is removed as
 requested; current documentation/evidence cleanup remains scoped to current files.
 
-Final E084/E085 software delivery validation:487 source/487 extracted-wheel tests,
-Ruff/format/diff,18 Markdown/92 local links/6 Python examples and9-entry package
-inspection PASS. Current-file privacy, asset/derivative hashes and private backup
-integrity verified.22 temporary files removed. records/review-validation.json
-records scope; publication is verified in E086. No new hardware run.
-
-E086 / TEST-095 publication PASS: implementation `a6b9e68` pushed to origin/main
-and exact remote hash verified, with a clean checkout. Final metadata checkpoint
-follows separately; final Git refs identify it. Current review/delivery is complete;
-physical qualification gaps remain unchanged.
+E086 records the prior implementation a6b9e68 and publication checkpoint c9c45c2.
+Follow-up publication is recorded in E088; physical qualification gaps above
+remain open.

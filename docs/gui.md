@@ -21,6 +21,8 @@ connection. Unknown states are startup feedback, not a bench observation.
 Panel count is configured at startup: `--slots N` accepts a positive integer.
 The default is three or enough to fit all preselected serials. Larger layouts
 wrap across rows; Discover does not resize the session or auto-connect devices.
+Every CLI panel, including `--slots 1`, requires a selected serial for Connect.
+For one panel, Discover selects a sole discovered device in the visible dropdown.
 
 ## Main controls
 

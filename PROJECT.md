@@ -134,3 +134,12 @@ Document USB compatibility as expected from per-cube SDK addressing, not a new
 physical qualification. Do not invent KEH6 Ethernet mappings or claim LAN works.
 REQ-058 covers software extension and documentation; actual KEH6/multi-pair bench
 qualification remains separate. Include reviewed implementation in commit/push.
+
+## Follow-up request: review and publish the current system
+
+User: "review fix inconsistency. clean up. prune. commit. push". Review the
+published configurable-count implementation, correct supported inconsistencies,
+prune only verified redundant/generated content, validate affected behavior and
+publish with a clean checkout and verified remote. Preserve private evidence,
+SDK/.venv, hardware ownership and unresolved physical qualification limits.
+REQ-059 tracks this follow-up; no hardware operation is needed.

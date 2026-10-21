@@ -1,24 +1,20 @@
 # Engineering state
 
-## Review/publication COMPLETE - E084/E085/E086
+## Follow-up review VALIDATED - E087 / REQ-059
 
-Latest user authorizes review/fix/prune/commit/push, then removal of the README
-privacy section and KEH6/configurable shutter support. README section removed.
-Added --slots N/ShutterHub(slots=N); default remains three and grows to fit more
-serials. Six/nine fake-device lifecycle tests and actual empty three/six-panel
-GUI captures PASS. KEH6 USB expected, not physically qualified; Ethernet unchanged.
+Baseline c9c45c2 matched origin/main and the checkout was clean. Fixed single-slot
+hub GUI Connect bypassing explicit selection; direct-controller convenience API
+retains optional selection. Two software regressions failed before and pass after.
+TEST-096:489 source/489 extracted-wheel tests, Ruff/format and package checks PASS.
+Corrected asset scope and stale publication wording; pruned redundant report prose.
+18 Markdown files/91 local links/6 Python snippets and evidence/privacy checks
+PASS.70 private backups/136 archive payload hashes preserved. Temporary build
+files removed. Normal commit/push pending E088.
+No hardware access; existing physical TTL/Ethernet/KEH6 limits remain unchanged.
+Human action required: none.
 
-TEST-093/094 PASS:487 source +487 extracted-wheel regression cases, Ruff/format,
-18 Markdown files/92 local links/6 compiled Python examples, current-file/wheel
-privacy and image metadata checks.70 private-original hashes and136 archived
-payload hashes verified (137 ZIP entries including manifest).22 temporary capture/
-build files removed; redundant handoff widgets and report prose pruned. Existing
-physical TTL low-position FAIL remains unchanged. No new hardware operation.
-
-Implementation a6b9e68b6da5613f2b044ebb78ea941abea14b3c committed/pushed normally to
-origin/main; git ls-remote verified the exact hash. E086 records publication. A
-small publication-metadata commit follows; final Git refs identify that checkpoint
-without a self-referential hash. No force push/history rewrite. Human action required: none.
+Prior implementation a6b9e68 and metadata checkpoint c9c45c2 were published and
+verified; E084/E085/E086 preserve their validation and publication scope.
 
 ## Bench and ownership
 
@@ -44,7 +40,7 @@ records/hardware-validation.json is the compact bench result index.
 records/current-hardware-tests.json captures stage scope/last observation.
 records/archive/README.md explains private retention of the raw evidence archive;
 private original PROJECT/STATE/REPORT and E001-E078 records preserve detailed lineage.
-records/RECORDS.md holds consequential summaries and E079-E084 evidence.
+records/RECORDS.md holds consequential summaries and E079-E088 evidence.
 records/ttl-summary.json indexes current no-cable TTL observations and raw hashes.
 
 Remaining: independent physical shutdown observation/calibration as required,
@@ -119,3 +115,4 @@ acceptance. No broader electrical/physical completion is inferred from no-cable 
 | REQ-056 | Illustrated docs and removal of real identifiers/credentials (derived, latest PROJECT.md request) | E083 / TEST-092; clean screenshots/photo, current-tree and wheel privacy,93 links,457 software cases | PASS (current shareable files; history excluded) |
 | REQ-057 | Review/fix/prune and publish accumulated changes (derived, latest PROJECT.md request) | E084/TEST-093, E085/TEST-094 PASS; E086/TEST-095 implementation a6b9e68 pushed/remote verified | PASS (review and publication) |
 | REQ-058 | KEH6 USB compatibility and configurable shutter count (derived, latest PROJECT.md steering) | E085/TEST-094;487 software regressions, six/nine lifecycle and passive GUI captures; physical scope separate | PASS (software; KEH6 hardware untested) |
+| REQ-059 | Follow-up consistency review, focused cleanup and publication (latest PROJECT.md request) | E087/TEST-096 software PASS; E088/TEST-097 publication pending | IN PROGRESS |
