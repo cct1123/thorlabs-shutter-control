@@ -1,6 +1,6 @@
 # Engineering state
 
-## Review validation PASS; publication pending - E084/E085
+## Review/publication COMPLETE - E084/E085/E086
 
 Latest user authorizes review/fix/prune/commit/push, then removal of the README
 privacy section and KEH6/configurable shutter support. README section removed.
@@ -15,8 +15,10 @@ payload hashes verified (137 ZIP entries including manifest).22 temporary captur
 build files removed; redundant handoff widgets and report prose pruned. Existing
 physical TTL low-position FAIL remains unchanged. No new hardware operation.
 
-Pending: reviewed allowlist commit, normal push and exact remote verification,
-recorded as E086. No force push/history rewrite. Human action required: none.
+Implementation a6b9e68b6da5613f2b044ebb78ea941abea14b3c committed/pushed normally to
+origin/main; git ls-remote verified the exact hash. E086 records publication. A
+small publication-metadata commit follows; final Git refs identify that checkpoint
+without a self-referential hash. No force push/history rewrite. Human action required: none.
 
 ## Bench and ownership
 
@@ -115,5 +117,5 @@ acceptance. No broader electrical/physical completion is inferred from no-cable 
 | REQ-054 | Summarize hardware lessons and simplify future test procedure (derived, latest PROJECT.md request) | E080 / TEST-089; three-stage reference, routine shortcut, aligned links and preserved evidence scope | PASS (reference only) |
 | REQ-055 | Autonomous actual single-pair TTL tests with IO1/IO2 disconnected (derived, latest PROJECT.md request) | E081/TEST-090;457 software cases PASS; E082/TEST-091 configuration/priming/cleanup PASS, low-position FAIL | PARTIAL (actual tests executed) |
 | REQ-056 | Illustrated docs and removal of real identifiers/credentials (derived, latest PROJECT.md request) | E083 / TEST-092; clean screenshots/photo, current-tree and wheel privacy,93 links,457 software cases | PASS (current shareable files; history excluded) |
-| REQ-057 | Review/fix/prune and publish accumulated changes (derived, latest PROJECT.md request) | E084 / TEST-093 validation, E086 publication | IN PROGRESS |
+| REQ-057 | Review/fix/prune and publish accumulated changes (derived, latest PROJECT.md request) | E084/TEST-093, E085/TEST-094 PASS; E086/TEST-095 implementation a6b9e68 pushed/remote verified | PASS (review and publication) |
 | REQ-058 | KEH6 USB compatibility and configurable shutter count (derived, latest PROJECT.md steering) | E085/TEST-094;487 software regressions, six/nine lifecycle and passive GUI captures; physical scope separate | PASS (software; KEH6 hardware untested) |

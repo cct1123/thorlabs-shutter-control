@@ -227,3 +227,14 @@ its manifest. Clarified earlier ambiguous archive-count metadata. Removed22
 verified temporary capture/build files, preserved private originals/.venv/SDK.
 records/review-validation.json contains final commands/counts/hashes and scope.
 Reviewed allowlist commit and normal push pending E086; no new hardware test.
+
+## E086 / TEST-095 - Reviewed commit and verified publication
+
+Staged only the explicit49-file reviewed allowlist, excluding private/runtime/
+build paths; cached diff check PASS. Implementation a6b9e68b6da5613f2b044ebb78ea941abea14b3c
+committed and pushed normally to origin/main. git ls-remote returned that exact
+hash; checkout clean immediately afterward. REQ-057 publication PASS.487 source/
+487 wheel regressions and E084/E085 evidence apply to this implementation.
+README privacy section removed; configurable-count feature included; physical
+TTL/KEH6/Ethernet limits retained. No force push, history rewrite or new hardware
+operation. This metadata checkpoint follows separately; final Git refs record it.

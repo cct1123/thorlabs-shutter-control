@@ -62,5 +62,14 @@
     "sha256": "d6e1b9b3cf8d03d22b08c2d4fed740b8435fdb3d226f001d9174819737afb304",
     "matches_current_production_files": true
   },
-  "publication": "PENDING normal commit/push and remote verification; no force push"
+  "publication": {
+    "evidence": "E086 / TEST-095",
+    "implementation_commit": "a6b9e68b6da5613f2b044ebb78ea941abea14b3c",
+    "target": "origin/main",
+    "remote_verified": true,
+    "verified_utc": "2026-10-21T02:34:47.370476+00:00",
+    "method": "Normal git push; git ls-remote returned implementation hash; clean checkout before metadata update",
+    "metadata_checkpoint": "Final publication metadata follows; final Git refs are authoritative",
+    "history_rewrite": false
+  }
 }

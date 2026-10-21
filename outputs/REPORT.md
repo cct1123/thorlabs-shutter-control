@@ -76,4 +76,9 @@ Final E084/E085 software delivery validation:487 source/487 extracted-wheel test
 Ruff/format/diff,18 Markdown/92 local links/6 Python examples and9-entry package
 inspection PASS. Current-file privacy, asset/derivative hashes and private backup
 integrity verified.22 temporary files removed. records/review-validation.json
-records scope; publication/remote identity follow in E086. No new hardware run.
+records scope; publication is verified in E086. No new hardware run.
+
+E086 / TEST-095 publication PASS: implementation `a6b9e68` pushed to origin/main
+and exact remote hash verified, with a clean checkout. Final metadata checkpoint
+follows separately; final Git refs identify it. Current review/delivery is complete;
+physical qualification gaps remain unchanged.
