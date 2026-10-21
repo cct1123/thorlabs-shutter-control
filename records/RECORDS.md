@@ -243,7 +243,7 @@ operation. This metadata checkpoint follows separately; final Git refs record it
 
 REQ-059: user again requests review/fix/prune/commit/push. Clean baseline
 c9c45c21cf92cdd111686557831180c863070144 matched origin/main after fetch.
-The new --slots1 path reused the direct-controller convenience branch, allowing
+The new --slots 1 path reused the direct-controller convenience branch, allowing
 Connect with no dropdown selection to enumerate and connect a sole device or
 fall back to a preselected identity. Larger ShutterHub panels reject that missing
 selection before SDK access. Two software reproductions failed before the fix.
@@ -251,16 +251,26 @@ Now every hub panel routes through hub.connect; direct KCubeShutter GUI behavior
 remains compatible. Discover may still visibly select a sole device in one panel.
 No native command, output guard, visual layout or hardware state was changed.
 
-489 source and489 extracted-wheel cases PASS, real SDK test excluded. Ruff/format
-PASS across36 Python files;9-entry wheel matches production bytes. Corrected
+489 source and 489 extracted-wheel cases PASS, real SDK test excluded. Ruff/format
+PASS across 36 Python files; 9-entry wheel matches production bytes. Corrected
 three/six-panel screenshot description and stale publication language. Condensed
 repeated report history; retain meaningful bench evidence and ignored originals.
 E084/E085 remain historical, with prior provenance/wheel hashes labelled accordingly.
 Additional documentation/hash/privacy validation and publication follow below.
 
-Final TEST-096 documentation/integrity PASS:18 Markdown files,91 local links/
-anchors,6 parsed Python snippets; current JSON/asset/TTL hashes verified. Current
-files and wheel have no known bench identifiers/credential-prefix matches. All70
-private-original and136 archive payload SHA256 values match. Removed only the
+Final TEST-096 documentation/integrity PASS: 18 Markdown files, 91 local links/
+anchors, 6 parsed Python snippets; current JSON/asset/TTL hashes verified. Current
+files and wheel have no known bench identifiers/credential-prefix matches. All 70
+private-original and 136 archive payload SHA256 values match. Removed only the
 verified wheel/extracted-package temporary files; .venv/SDK/private originals and
 hardware owner preserved. Commit/push pending E088.
+
+## E088 / TEST-097 - Follow-up publication
+
+Reviewed and staged the explicit 10-file allowlist; cached diff check PASS.
+Implementation 25bbe8e2cffefa3190a795a5a4e807b3f6cd684f committed and pushed
+normally to origin/main. git ls-remote returned the exact implementation hash;
+checkout clean afterward. REQ-059 PASS: E087 software/documentation/integrity
+validation plus this publication. This metadata checkpoint records the verified
+result; final Git refs identify metadata commits. No hardware operation,
+force push, history rewrite or private/runtime file publication.

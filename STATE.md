@@ -1,15 +1,17 @@
 # Engineering state
 
-## Follow-up review VALIDATED - E087 / REQ-059
+## Follow-up review/publication COMPLETE - E087/E088 / REQ-059
 
 Baseline c9c45c2 matched origin/main and the checkout was clean. Fixed single-slot
 hub GUI Connect bypassing explicit selection; direct-controller convenience API
 retains optional selection. Two software regressions failed before and pass after.
-TEST-096:489 source/489 extracted-wheel tests, Ruff/format and package checks PASS.
+TEST-096: 489 source / 489 extracted-wheel tests, Ruff/format and package checks PASS.
 Corrected asset scope and stale publication wording; pruned redundant report prose.
 18 Markdown files/91 local links/6 Python snippets and evidence/privacy checks
-PASS.70 private backups/136 archive payload hashes preserved. Temporary build
-files removed. Normal commit/push pending E088.
+PASS. 70 private backups/136 archive payload hashes preserved. Temporary build
+files removed. Implementation 25bbe8e committed/pushed normally to origin/main;
+exact remote hash verified and checkout clean. E088 records publication. This
+checkpoint records that verified result; final Git refs identify metadata commits.
 No hardware access; existing physical TTL/Ethernet/KEH6 limits remain unchanged.
 Human action required: none.
 
@@ -115,4 +117,4 @@ acceptance. No broader electrical/physical completion is inferred from no-cable 
 | REQ-056 | Illustrated docs and removal of real identifiers/credentials (derived, latest PROJECT.md request) | E083 / TEST-092; clean screenshots/photo, current-tree and wheel privacy,93 links,457 software cases | PASS (current shareable files; history excluded) |
 | REQ-057 | Review/fix/prune and publish accumulated changes (derived, latest PROJECT.md request) | E084/TEST-093, E085/TEST-094 PASS; E086/TEST-095 implementation a6b9e68 pushed/remote verified | PASS (review and publication) |
 | REQ-058 | KEH6 USB compatibility and configurable shutter count (derived, latest PROJECT.md steering) | E085/TEST-094;487 software regressions, six/nine lifecycle and passive GUI captures; physical scope separate | PASS (software; KEH6 hardware untested) |
-| REQ-059 | Follow-up consistency review, focused cleanup and publication (latest PROJECT.md request) | E087/TEST-096 software PASS; E088/TEST-097 publication pending | IN PROGRESS |
+| REQ-059 | Follow-up consistency review, focused cleanup and publication (latest PROJECT.md request) | E087/TEST-096 software PASS; E088/TEST-097 implementation 25bbe8e pushed and remote verified | PASS (review and publication) |

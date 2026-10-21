@@ -48,7 +48,7 @@ E087 fixes one configurable-GUI inconsistency: a one-slot ShutterHub now require
 an explicit dropdown selection for Connect, like larger hubs. The direct
 create_app(KCubeShutter(...)) convenience API retains optional-serial behavior.
 Two regression cases reproduced the defect before the fix. Current validation:
-489 source and489 extracted-wheel software tests, Ruff/format and package checks
+489 source and 489 extracted-wheel software tests, Ruff/format and package checks
 PASS. No SDK or physical hardware was accessed. Corrected the screenshot scope
 and stale publication wording; removed redundant report prose. See
 [review validation](../records/review-validation.json) for checks and hashes.
@@ -70,5 +70,6 @@ observations above are unchanged. Latest README privacy section is removed as
 requested; current documentation/evidence cleanup remains scoped to current files.
 
 E086 records the prior implementation a6b9e68 and publication checkpoint c9c45c2.
-Follow-up publication is recorded in E088; physical qualification gaps above
-remain open.
+E088 / TEST-097: follow-up implementation 25bbe8e pushed normally to origin/main,
+exact remote hash verified and checkout clean. Review/publication complete;
+physical qualification gaps above remain open.

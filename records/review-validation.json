@@ -104,6 +104,15 @@
     },
     "checked_utc": "2026-10-21T02:38:28.027111+00:00",
     "temporary_build_files_removed": 11,
-    "publication": "Pending E088"
+    "publication": {
+      "evidence": "E088 / TEST-097",
+      "implementation_commit": "25bbe8e2cffefa3190a795a5a4e807b3f6cd684f",
+      "target": "origin/main",
+      "remote_verified": true,
+      "verified_utc": "2026-10-21T02:39:02.080597+00:00",
+      "checkout_after_push": "clean",
+      "method": "Normal git push; git ls-remote exact implementation hash; final refs identify metadata commits",
+      "history_rewrite": false
+    }
   }
 }
