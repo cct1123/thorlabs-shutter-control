@@ -17,8 +17,9 @@ GUI coordinator shrinks 300 -> 101 lines. Total Python grows 1,952 -> 2,037 line
 with explicit maps and explanations; no net line-reduction claim. Current evidence:
 records/readability-validation.json; operation/handoff: outputs/REPORT.md.
 
-Software implementation and staged validation are complete. This checkpoint is
-part of the final delivery commit. No push requested. Hardware remains outside scope. An actual
+Software implementation and staged validation are complete. User subsequently
+requested push; E147 / TEST-157 records normal publication through 5d829c0 and
+independent origin/main equality verification. Hardware remains outside scope. An actual
 uncoached beginner handoff remains untested; no claim of measured novice independence.
 
 ## REQ-103 COMPLETE - holistic efficiency review

@@ -1,5 +1,15 @@
 # Baseline evidence and decisions
 
+## E147 / TEST-157 - Readability publication
+
+2026-10-21; user explicitly requested push. Expected: publish the committed
+readability delivery normally to its existing upstream and verify equality.
+Observed: clean main at 5d829c01a49f4dcea8489af22e9574c4fb7b9153; git push origin
+main succeeded from 3835d2c to 5d829c0. Independent git ls-remote origin
+refs/heads/main returned the same full hash; HEAD...origin/main was 0/0 and status
+was clean. PASS. This documentation-only checkpoint records publication; no
+runtime/test/config change, hardware action or force push.
+
 ## E146 / TEST-156 - Behavior-preserving readability delivery, REQ-104 stage 3
 
 Expected: readable named action/discovery/render boundaries, same application

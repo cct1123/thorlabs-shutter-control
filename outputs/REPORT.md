@@ -41,7 +41,8 @@ unchanged. These are software observations, not an exhaustive equivalence proof.
 
 The review was committed as 2498ee8, contracts/guide as 117ff78, and named GUI
 outputs/rendering as 568a408. The final action-coordination/delivery commit follows
-those validated stages. No push was requested for this work.
+those validated stages. The user subsequently requested publication; implementation
+5d829c0 was pushed normally and independently verified on origin/main (E147 / TEST-157).
 
 ## Operation and remaining limits
 
