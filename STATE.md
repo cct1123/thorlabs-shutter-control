@@ -2,14 +2,15 @@
 
 ## Current checkpoint - review and publication (REQ-082)
 
-Software review PASS; final publication in progress. User confirmed state-only
+Software review and implementation publication PASS (E114/E115). User confirmed state-only
 Open/Close and removal of all software interlock gates. Users manage the physical
 circuit. Optional Python interlock readings/confirmation remain informational;
 GUI, tutorials and diagnostic helpers do not gate on them.
 
-TEST-122 / E114: current source suite186 passed,1 skipped. Initial failures after
+TEST-122 / E114: source and extracted-wheel suites each186 passed,1 skipped. Initial failures after
 the concurrent edit were reconciled to the user's confirmed contract, preserving
-the state-only change. Lint/format and simulation PASS; publication follows. No hardware command or server launch during this review.
+the state-only change. Lint/format and simulation PASS. No hardware command or
+server launch during this review.
 
 Current architecture: KCubeShutter is USB-only; ShutterHub owns explicit per-slot
 Ethernet endpoints and dispatch. Setters write/return None; getters request
@@ -53,8 +54,9 @@ records/current-hardware-tests.json and records/ttl-summary.json. Private raw
 archive retention: records/archive/README.md. The illustrated supervisor notebook
 summarizes historical bench results; its launch examples now match current config.
 
-Next: inspect staged files, commit and push normally to origin/main, then verify
-remote hash and clean checkout. Preserve .venv, .git, private inputs and raw data.
+Implementation f2934c8 pushed normally to origin/main and exact remote hash
+verified (E115 / TEST-123). Publication checkpoint follows in a separate commit.
+No further implementation action. Preserve .venv, .git, private inputs and raw data.
 
 ## Requirements
 
@@ -143,4 +145,4 @@ acceptance. No broader electrical/physical completion is inferred from no-cable 
 | REQ-079 | GUI/controller readiness and retry consistency | E113/E114; real Dash callbacks with software devices | PASS (software; E110 historical passive USB connection) |
 | REQ-080 | Remove launcher interlock confirmation setting | E112/E114; passive launch and config tests | PASS |
 | REQ-081 | No software interlock gating anywhere | E114 / TEST-122; GUI None/False/True cases; tutorial/diagnostic metadata trap; source audit | PASS (software) |
-| REQ-082 | Review, fix, prune, commit and push | E114 / TEST-122; source/wheel PASS; publication pending | IN PROGRESS |
+| REQ-082 | Review, fix, prune, commit and push | E114/E115 / TEST-122/123; source/wheel PASS; f2934c8 pushed and remote verified | PASS (software publication) |

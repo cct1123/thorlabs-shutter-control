@@ -16,7 +16,14 @@
   "lint": "PASS",
   "format": "PASS",
   "simulation": "PASS: three software devices",
-  "publication": "Reviewed; commit/push pending",
+  "publication": {
+    "status": "PASS",
+    "implementation_commit": "f2934c8a100b2639de9ca06cbf47666323e861eb",
+    "remote": "origin/main",
+    "remote_hash_verified": "f2934c8a100b2639de9ca06cbf47666323e861eb",
+    "test": "TEST-123",
+    "evidence": "E115"
+  },
   "document_checks": {
     "json_files": 26,
     "python_files": 29,
@@ -29,5 +36,6 @@
   "wheel_source_parity": "PASS",
   "wheel_sha256": "8c6126e70fd82ea99b08a762fe64e1136a37b482bc51225f39713a76be6a1fce",
   "command_contract": "Open/Close: Active/Inactive only. Explicit enable_device setup. Disarm: Inactive/Manual. Arm: Enable/Triggered/Active.",
-  "hardware_access": false
+  "hardware_access": false,
+  "cleanup": "Generated tmp/dist/Ruff/source-bytecode directories removed; .venv/Git/private data preserved. Concurrent tools may recreate caches."
 }

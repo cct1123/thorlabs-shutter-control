@@ -56,5 +56,6 @@ bench results with current configuration examples. Its original preview and old
 Notion attachment validation remain historical; this review updates local files only.
 Rebuild its self-contained HTML with `python -B outputs/render_supervisor_notebook.py`.
 
-Publication: reviewed software prepared for commit/push to origin/main (REQ-082).
+Publication: implementation **f2934c8** pushed to origin/main; exact remote hash
+verified (E115 / TEST-123 / REQ-082).
 Physical qualification remains open; no overall hardware completion is claimed.
