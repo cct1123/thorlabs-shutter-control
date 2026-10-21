@@ -1,0 +1,461 @@
+{
+  "test": "TEST-091",
+  "serial": "CONTROLLER_A",
+  "ports_unconnected": "human-reported",
+  "added_armed_hold_s": 1.0,
+  "ports": [
+    2
+  ],
+  "physical_observation": "UNTESTED",
+  "external_edges_voltage_timing": "UNTESTED",
+  "result": "FAIL",
+  "events": [
+    {
+      "utc": "2026-10-21T02:01:43.899413+00:00",
+      "action": "connected",
+      "data": {
+        "identity": {
+          "serial_number": "CONTROLLER_A",
+          "description": "KSC101 Solenoid Controller      v3.1          1"
+        },
+        "status": {
+          "connection": "connected",
+          "has_device": true,
+          "serial_number": "CONTROLLER_A",
+          "description": "KSC101 Solenoid Controller      v3.1          1",
+          "shutter_state": "closed",
+          "operating_state": "inactive",
+          "operating_mode": "manual",
+          "key_enabled": true,
+          "interlock_enabled": null,
+          "trigger_config": {
+            "trig1_mode": "input",
+            "trig1_polarity": "high",
+            "trig2_mode": "output",
+            "trig2_polarity": "high"
+          },
+          "error": null,
+          "status_bits": 8192,
+          "operator_interlock_confirmed": true,
+          "ttl_armed": false
+        }
+      }
+    },
+    {
+      "utc": "2026-10-21T02:01:44.152640+00:00",
+      "action": "original_config",
+      "data": {
+        "trig1_mode": "input",
+        "trig1_polarity": "high",
+        "trig2_mode": "output",
+        "trig2_polarity": "high"
+      }
+    },
+    {
+      "utc": "2026-10-21T02:01:45.668383+00:00",
+      "action": "configuration_pass",
+      "data": {
+        "trig1_mode": "disabled",
+        "trig1_polarity": "high",
+        "trig2_mode": "disabled",
+        "trig2_polarity": "high"
+      }
+    },
+    {
+      "utc": "2026-10-21T02:01:46.421537+00:00",
+      "action": "configuration_pass",
+      "data": {
+        "trig1_mode": "output",
+        "trig1_polarity": "high",
+        "trig2_mode": "output",
+        "trig2_polarity": "high"
+      }
+    },
+    {
+      "utc": "2026-10-21T02:01:47.176181+00:00",
+      "action": "configuration_pass",
+      "data": {
+        "trig1_mode": "output",
+        "trig1_polarity": "low",
+        "trig2_mode": "output",
+        "trig2_polarity": "low"
+      }
+    },
+    {
+      "utc": "2026-10-21T02:01:47.680018+00:00",
+      "action": "input_start",
+      "data": {
+        "port": 2,
+        "polarity": "high",
+        "expected": "closed"
+      }
+    },
+    {
+      "utc": "2026-10-21T02:01:49.268914+00:00",
+      "action": "armed_feedback",
+      "data": {
+        "port": 2,
+        "polarity": "high",
+        "expected": "closed",
+        "status": {
+          "connection": "connected",
+          "has_device": true,
+          "serial_number": "CONTROLLER_A",
+          "description": "KSC101 Solenoid Controller      v3.1          1",
+          "shutter_state": "closed",
+          "operating_state": "active",
+          "operating_mode": "triggered",
+          "key_enabled": true,
+          "interlock_enabled": null,
+          "trigger_config": {
+            "trig1_mode": "disabled",
+            "trig1_polarity": "high",
+            "trig2_mode": "input",
+            "trig2_polarity": "high"
+          },
+          "error": null,
+          "status_bits": 8192,
+          "operator_interlock_confirmed": true,
+          "ttl_armed": true
+        }
+      }
+    },
+    {
+      "utc": "2026-10-21T02:01:49.622275+00:00",
+      "action": "settling_feedback",
+      "data": {
+        "port": 2,
+        "polarity": "high",
+        "expected": "closed",
+        "status": {
+          "connection": "connected",
+          "has_device": true,
+          "serial_number": "CONTROLLER_A",
+          "description": "KSC101 Solenoid Controller      v3.1          1",
+          "shutter_state": "closed",
+          "operating_state": "active",
+          "operating_mode": "triggered",
+          "key_enabled": true,
+          "interlock_enabled": null,
+          "trigger_config": {
+            "trig1_mode": "disabled",
+            "trig1_polarity": "high",
+            "trig2_mode": "input",
+            "trig2_polarity": "high"
+          },
+          "error": null,
+          "status_bits": 8192,
+          "operator_interlock_confirmed": true,
+          "ttl_armed": true
+        }
+      }
+    },
+    {
+      "utc": "2026-10-21T02:01:49.978250+00:00",
+      "action": "settling_feedback",
+      "data": {
+        "port": 2,
+        "polarity": "high",
+        "expected": "closed",
+        "status": {
+          "connection": "connected",
+          "has_device": true,
+          "serial_number": "CONTROLLER_A",
+          "description": "KSC101 Solenoid Controller      v3.1          1",
+          "shutter_state": "closed",
+          "operating_state": "active",
+          "operating_mode": "triggered",
+          "key_enabled": true,
+          "interlock_enabled": null,
+          "trigger_config": {
+            "trig1_mode": "disabled",
+            "trig1_polarity": "high",
+            "trig2_mode": "input",
+            "trig2_polarity": "high"
+          },
+          "error": null,
+          "status_bits": 8192,
+          "operator_interlock_confirmed": true,
+          "ttl_armed": true
+        }
+      }
+    },
+    {
+      "utc": "2026-10-21T02:01:50.331378+00:00",
+      "action": "settling_feedback",
+      "data": {
+        "port": 2,
+        "polarity": "high",
+        "expected": "closed",
+        "status": {
+          "connection": "connected",
+          "has_device": true,
+          "serial_number": "CONTROLLER_A",
+          "description": "KSC101 Solenoid Controller      v3.1          1",
+          "shutter_state": "closed",
+          "operating_state": "active",
+          "operating_mode": "triggered",
+          "key_enabled": true,
+          "interlock_enabled": null,
+          "trigger_config": {
+            "trig1_mode": "disabled",
+            "trig1_polarity": "high",
+            "trig2_mode": "input",
+            "trig2_polarity": "high"
+          },
+          "error": null,
+          "status_bits": 8192,
+          "operator_interlock_confirmed": true,
+          "ttl_armed": true
+        }
+      }
+    },
+    {
+      "utc": "2026-10-21T02:01:50.332585+00:00",
+      "action": "input_pass",
+      "data": {
+        "port": 2,
+        "polarity": "high",
+        "expected": "closed",
+        "elapsed_s": 1.062000000034459,
+        "status": {
+          "connection": "connected",
+          "has_device": true,
+          "serial_number": "CONTROLLER_A",
+          "description": "KSC101 Solenoid Controller      v3.1          1",
+          "shutter_state": "closed",
+          "operating_state": "active",
+          "operating_mode": "triggered",
+          "key_enabled": true,
+          "interlock_enabled": null,
+          "trigger_config": {
+            "trig1_mode": "disabled",
+            "trig1_polarity": "high",
+            "trig2_mode": "input",
+            "trig2_polarity": "high"
+          },
+          "error": null,
+          "status_bits": 8192,
+          "operator_interlock_confirmed": true,
+          "ttl_armed": true
+        }
+      }
+    },
+    {
+      "utc": "2026-10-21T02:01:50.949910+00:00",
+      "action": "disarmed_feedback",
+      "data": {
+        "port": 2,
+        "polarity": "high",
+        "expected": "closed",
+        "status": {
+          "connection": "connected",
+          "has_device": true,
+          "serial_number": "CONTROLLER_A",
+          "description": "KSC101 Solenoid Controller      v3.1          1",
+          "shutter_state": "closed",
+          "operating_state": "inactive",
+          "operating_mode": "manual",
+          "key_enabled": true,
+          "interlock_enabled": null,
+          "trigger_config": null,
+          "error": null,
+          "status_bits": 8192,
+          "operator_interlock_confirmed": true,
+          "ttl_armed": false
+        }
+      }
+    },
+    {
+      "utc": "2026-10-21T02:01:51.453293+00:00",
+      "action": "input_start",
+      "data": {
+        "port": 2,
+        "polarity": "low",
+        "expected": "open"
+      }
+    },
+    {
+      "utc": "2026-10-21T02:01:53.044447+00:00",
+      "action": "armed_feedback",
+      "data": {
+        "port": 2,
+        "polarity": "low",
+        "expected": "open",
+        "status": {
+          "connection": "connected",
+          "has_device": true,
+          "serial_number": "CONTROLLER_A",
+          "description": "KSC101 Solenoid Controller      v3.1          1",
+          "shutter_state": "closed",
+          "operating_state": "active",
+          "operating_mode": "triggered",
+          "key_enabled": true,
+          "interlock_enabled": null,
+          "trigger_config": {
+            "trig1_mode": "disabled",
+            "trig1_polarity": "high",
+            "trig2_mode": "input",
+            "trig2_polarity": "low"
+          },
+          "error": null,
+          "status_bits": 8192,
+          "operator_interlock_confirmed": true,
+          "ttl_armed": true
+        }
+      }
+    },
+    {
+      "utc": "2026-10-21T02:01:53.398659+00:00",
+      "action": "settling_feedback",
+      "data": {
+        "port": 2,
+        "polarity": "low",
+        "expected": "open",
+        "status": {
+          "connection": "connected",
+          "has_device": true,
+          "serial_number": "CONTROLLER_A",
+          "description": "KSC101 Solenoid Controller      v3.1          1",
+          "shutter_state": "closed",
+          "operating_state": "active",
+          "operating_mode": "triggered",
+          "key_enabled": true,
+          "interlock_enabled": null,
+          "trigger_config": {
+            "trig1_mode": "disabled",
+            "trig1_polarity": "high",
+            "trig2_mode": "input",
+            "trig2_polarity": "low"
+          },
+          "error": null,
+          "status_bits": 8192,
+          "operator_interlock_confirmed": true,
+          "ttl_armed": true
+        }
+      }
+    },
+    {
+      "utc": "2026-10-21T02:01:53.751013+00:00",
+      "action": "settling_feedback",
+      "data": {
+        "port": 2,
+        "polarity": "low",
+        "expected": "open",
+        "status": {
+          "connection": "connected",
+          "has_device": true,
+          "serial_number": "CONTROLLER_A",
+          "description": "KSC101 Solenoid Controller      v3.1          1",
+          "shutter_state": "closed",
+          "operating_state": "active",
+          "operating_mode": "triggered",
+          "key_enabled": true,
+          "interlock_enabled": null,
+          "trigger_config": {
+            "trig1_mode": "disabled",
+            "trig1_polarity": "high",
+            "trig2_mode": "input",
+            "trig2_polarity": "low"
+          },
+          "error": null,
+          "status_bits": 8192,
+          "operator_interlock_confirmed": true,
+          "ttl_armed": true
+        }
+      }
+    },
+    {
+      "utc": "2026-10-21T02:01:54.104146+00:00",
+      "action": "settling_feedback",
+      "data": {
+        "port": 2,
+        "polarity": "low",
+        "expected": "open",
+        "status": {
+          "connection": "connected",
+          "has_device": true,
+          "serial_number": "CONTROLLER_A",
+          "description": "KSC101 Solenoid Controller      v3.1          1",
+          "shutter_state": "closed",
+          "operating_state": "active",
+          "operating_mode": "triggered",
+          "key_enabled": true,
+          "interlock_enabled": null,
+          "trigger_config": {
+            "trig1_mode": "disabled",
+            "trig1_polarity": "high",
+            "trig2_mode": "input",
+            "trig2_polarity": "low"
+          },
+          "error": null,
+          "status_bits": 8192,
+          "operator_interlock_confirmed": true,
+          "ttl_armed": true
+        }
+      }
+    },
+    {
+      "utc": "2026-10-21T02:01:54.713643+00:00",
+      "action": "disarmed_feedback",
+      "data": {
+        "port": 2,
+        "polarity": "low",
+        "expected": "open",
+        "status": {
+          "connection": "connected",
+          "has_device": true,
+          "serial_number": "CONTROLLER_A",
+          "description": "KSC101 Solenoid Controller      v3.1          1",
+          "shutter_state": "closed",
+          "operating_state": "inactive",
+          "operating_mode": "manual",
+          "key_enabled": true,
+          "interlock_enabled": null,
+          "trigger_config": null,
+          "error": null,
+          "status_bits": 8192,
+          "operator_interlock_confirmed": true,
+          "ttl_armed": false
+        }
+      }
+    },
+    {
+      "utc": "2026-10-21T02:01:55.717608+00:00",
+      "action": "restored_config",
+      "data": {
+        "trig1_mode": "input",
+        "trig1_polarity": "high",
+        "trig2_mode": "output",
+        "trig2_polarity": "high"
+      }
+    },
+    {
+      "utc": "2026-10-21T02:01:56.223330+00:00",
+      "action": "final_closed",
+      "data": {
+        "connection": "connected",
+        "has_device": true,
+        "serial_number": "CONTROLLER_A",
+        "description": "KSC101 Solenoid Controller      v3.1          1",
+        "shutter_state": "closed",
+        "operating_state": "inactive",
+        "operating_mode": "manual",
+        "key_enabled": true,
+        "interlock_enabled": null,
+        "trigger_config": null,
+        "error": null,
+        "status_bits": 8192,
+        "operator_interlock_confirmed": true,
+        "ttl_armed": false
+      }
+    }
+  ],
+  "error": "ShutterError(\"Disconnected-input expectation failed: ShutterStatus(connection='connected', has_device=True, serial_number='CONTROLLER_A', description='KSC101 Solenoid Controller      v3.1          1', shutter_state='closed', operating_state='active', operating_mode='triggered', key_enabled=True, interlock_enabled=None, trigger_config=TriggerConfig(trig1_mode='disabled', trig1_polarity='high', trig2_mode='input', trig2_polarity='low'), error=None, status_bits=8192, operator_interlock_confirmed=True)\")",
+  "released": true,
+  "privacy": {
+    "kind": "sanitized_derivative",
+    "device_identities": "aliases, not usable hardware serials",
+    "original": "retained in ignored local private storage"
+  }
+}

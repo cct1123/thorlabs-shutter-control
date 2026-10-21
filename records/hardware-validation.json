@@ -2,13 +2,13 @@
   "record": "E079 / TEST-088 consolidation of E050, E068, E075, E077, E078",
   "bench_date_local": "2026-10-20",
   "archive": {
-    "path": "archive/hardware-2026-10-20.zip",
-    "sha256": "64df382ac5c946bec666f3cdf6a69aa5ad4799acd672536dee9b87354ca30f27",
-    "manifest": "manifest.json"
+    "availability": "PRIVATE_LOCAL_ONLY",
+    "reference": "archive/README.md",
+    "original_files": 136
   },
   "configuration": {
     "topology": "computer USB -> KEH3 left bay -> KSC101 -> SH05R",
-    "serial": "68800777",
+    "serial": "CONTROLLER_A",
     "cube_firmware": "1.0.7",
     "cube_hardware": 3,
     "sdk": "Kinesis1.14.60.27990",
@@ -65,7 +65,15 @@
       "three actual controller/shutter pairs",
       "electrical TTL behavior"
     ],
-    "stage7": "REMOVED_BY_USER; not a PASS"
+    "stage7": "REMOVED_BY_USER; not a PASS",
+    "ttl_unconnected": {
+      "evidence": "E082 / TEST-091",
+      "summary": "ttl-summary.json",
+      "configuration_arm_disarm_restore_release": "READBACK_PASS",
+      "input_high_closed": "READBACK_PASS on IO1/IO2",
+      "input_low_open": "FAIL: both remained reported Closed",
+      "external_signal_voltage_physical_observation": "UNTESTED"
+    }
   },
   "evidence_members": {
     "firmware": "records/firmware-post-usb-2026-10-20.json",
@@ -79,14 +87,42 @@
     "browser_motion": "records/gui-ux-browser-motion-2026-10-20.json",
     "source_hashes": "records/gui-ux-summary-2026-10-20.json"
   },
-  "screenshot": "gui-ux-final-2026-10-20.png",
-  "layout_verified": {
+  "screenshot": "../docs/assets/gui-startup.jpg",
+  "scope": "Historical/readback observations with identities removed; raw originals retained privately. Recheck device state before operation.",
+  "screenshot_scope": "Current unconfigured GUI capture; not the historical connected bench observation.",
+  "privacy": "Sanitized derivative: CONTROLLER_A/HUB_A are aliases, never live device identities. Private originals excluded.",
+  "historical_gui_layout_verified": {
     "viewport_px": [
       912,
       956
     ],
     "horizontal_overflow": false,
-    "manual_buttons_visible": true
+    "manual_buttons_visible": true,
+    "evidence": "E078; historical connected-GUI viewport, not E083 screenshot dimensions"
   },
-  "scope": "Historical measured/readback evidence; recheck transient state before operations. Cleanup changes tutorials/docs, not driver/GUI."
+  "documentation_screenshots": {
+    "evidence": "E085 current captures, superseding E083 hub label",
+    "startup": "../docs/assets/gui-startup.jpg",
+    "startup_px": [
+      1264,
+      957
+    ],
+    "trigger_settings": "../docs/assets/gui-trigger-settings.jpg",
+    "trigger_settings_px": [
+      1264,
+      1360
+    ],
+    "scope": "Unconfigured production GUI, not bench proof",
+    "six_slots": "../docs/assets/gui-six-slots.jpg"
+  },
+  "software_scale": {
+    "evidence": "E085 / TEST-094",
+    "count": "configurable positive N, default at least3",
+    "simulated_lifecycles": [
+      6,
+      9
+    ],
+    "physical_KEH6": "UNTESTED",
+    "ethernet_KEH6": "UNQUALIFIED"
+  }
 }

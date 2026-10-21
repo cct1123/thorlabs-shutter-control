@@ -30,7 +30,8 @@ Match discovery to the physical serial before connecting.
 
 ```powershell
 uv run --locked shutter-control --list
-uv run --locked shutter-control --serial 68800777 --verified-interlock 68800777
+$env:SHUTTER_SERIAL = Read-Host 'Controller serial from local discovery'
+uv run --locked shutter-control --serial $env:SHUTTER_SERIAL --verified-interlock $env:SHUTTER_SERIAL
 ```
 
 The flag records verified normal physical interlock/protection for that exact
@@ -40,7 +41,8 @@ passive. See [current hardware evidence](../records/hardware-validation.json).
 
 | CLI option | Meaning |
 | --- | --- |
-| `--serial SERIAL` | Preselect a panel; repeat up to three times with distinct identities |
+| `--slots N` | Positive panel count; default at least three, growing to fit preselected serials |
+| `--serial SERIAL` | Preselect a panel; repeat for distinct identities; default panel count grows to fit |
 | `--verified-interlock SERIAL` | Confirm normal interlock/protection for the same preselected serial; repeat per device |
 | `--kinesis-dir PATH` | Override `KINESIS_DIR` and the default SDK location |
 | `--list` | Load the SDK and enumerate USB identities only |
@@ -52,7 +54,7 @@ passive. See [current hardware evidence](../records/hardware-validation.json).
 | --- | --- |
 | SDK missing/load failure | Check x64 alignment, SDK folder, .NET Framework and vendor dependencies; restart Python after fixing installation |
 | No controllers discovered | Inspect the approved USB/power arrangement and driver installation; this FTDI device need not have a COM port |
-| Identity mismatch | Stop; preserve both selected and reported serials. Firmware1.0.7 repaired the historical mismatch on68800777; never alias serials in code |
+| Identity mismatch | Stop; preserve both selected and reported serials. Firmware1.0.7 repaired the historical mismatch onCONTROLLER_A; never alias serials in code |
 | Already owned | Release the existing panel/process. A failed SDK disconnect retains its ownership claim |
 | Open disabled | Read the readiness hint: connection fault, key, unverified interlock or Triggered mode. Disarm/Close before manual Open |
 | Unknown operating state0 | Do not interpret it as Inactive. Preserve the report and diagnose; Close/Manual commands require separate output authority |

@@ -1,0 +1,138 @@
+{
+  "test": "TEST-091",
+  "purpose": "Manual positive control after both disconnected active-low cases stayed Closed",
+  "events": [
+    {
+      "utc": "2026-10-21T02:02:13.290930+00:00",
+      "action": "connected",
+      "status": {
+        "connection": "connected",
+        "has_device": true,
+        "serial_number": "CONTROLLER_A",
+        "description": "KSC101 Solenoid Controller      v3.1          1",
+        "shutter_state": "closed",
+        "operating_state": "inactive",
+        "operating_mode": "manual",
+        "key_enabled": true,
+        "interlock_enabled": null,
+        "trigger_config": {
+          "trig1_mode": "input",
+          "trig1_polarity": "high",
+          "trig2_mode": "output",
+          "trig2_polarity": "high"
+        },
+        "error": null,
+        "status_bits": 8192,
+        "operator_interlock_confirmed": true
+      }
+    },
+    {
+      "utc": "2026-10-21T02:02:13.795465+00:00",
+      "action": "final_closed",
+      "status": {
+        "connection": "connected",
+        "has_device": true,
+        "serial_number": "CONTROLLER_A",
+        "description": "KSC101 Solenoid Controller      v3.1          1",
+        "shutter_state": "closed",
+        "operating_state": "inactive",
+        "operating_mode": "manual",
+        "key_enabled": true,
+        "interlock_enabled": null,
+        "trigger_config": null,
+        "error": null,
+        "status_bits": 8192,
+        "operator_interlock_confirmed": true
+      }
+    },
+    {
+      "utc": "2026-10-21T02:02:14.802419+00:00",
+      "action": "manual_open",
+      "status": {
+        "connection": "connected",
+        "has_device": true,
+        "serial_number": "CONTROLLER_A",
+        "description": "KSC101 Solenoid Controller      v3.1          1",
+        "shutter_state": "open",
+        "operating_state": "active",
+        "operating_mode": "manual",
+        "key_enabled": true,
+        "interlock_enabled": null,
+        "trigger_config": null,
+        "error": null,
+        "status_bits": 8193,
+        "operator_interlock_confirmed": true
+      }
+    },
+    {
+      "utc": "2026-10-21T02:02:16.054089+00:00",
+      "action": "after_1s_added_hold",
+      "status": {
+        "connection": "connected",
+        "has_device": true,
+        "serial_number": "CONTROLLER_A",
+        "description": "KSC101 Solenoid Controller      v3.1          1",
+        "shutter_state": "open",
+        "operating_state": "active",
+        "operating_mode": "manual",
+        "key_enabled": true,
+        "interlock_enabled": null,
+        "trigger_config": {
+          "trig1_mode": "input",
+          "trig1_polarity": "high",
+          "trig2_mode": "output",
+          "trig2_polarity": "high"
+        },
+        "error": null,
+        "status_bits": 8193,
+        "operator_interlock_confirmed": true
+      }
+    },
+    {
+      "utc": "2026-10-21T02:02:16.556607+00:00",
+      "action": "final_closed",
+      "status": {
+        "connection": "connected",
+        "has_device": true,
+        "serial_number": "CONTROLLER_A",
+        "description": "KSC101 Solenoid Controller      v3.1          1",
+        "shutter_state": "closed",
+        "operating_state": "inactive",
+        "operating_mode": "manual",
+        "key_enabled": true,
+        "interlock_enabled": null,
+        "trigger_config": null,
+        "error": null,
+        "status_bits": 8192,
+        "operator_interlock_confirmed": true
+      }
+    },
+    {
+      "utc": "2026-10-21T02:02:17.312826+00:00",
+      "action": "final_closed",
+      "status": {
+        "connection": "connected",
+        "has_device": true,
+        "serial_number": "CONTROLLER_A",
+        "description": "KSC101 Solenoid Controller      v3.1          1",
+        "shutter_state": "closed",
+        "operating_state": "inactive",
+        "operating_mode": "manual",
+        "key_enabled": true,
+        "interlock_enabled": null,
+        "trigger_config": null,
+        "error": null,
+        "status_bits": 8192,
+        "operator_interlock_confirmed": true
+      }
+    }
+  ],
+  "result": "READBACK_PASS",
+  "trigger_config_unchanged": true,
+  "released": true,
+  "privacy": {
+    "kind": "sanitized_derivative",
+    "device_identities": "aliases, not usable hardware serials",
+    "original": "retained in ignored local private storage"
+  }
+}

@@ -20,12 +20,14 @@
     ]
   },
   "archive": {
-    "path": "archive/hardware-2026-10-20.zip",
-    "entries_verified": 136,
+    "path": null,
     "all_member_sha256": "PASS",
     "zip_integrity": "PASS",
     "whole_zip_sha256": "PASS",
-    "secret_pattern_scan": "NO_MATCHES"
+    "secret_pattern_scan": "NO_MATCHES",
+    "availability": "Original verified archive moved to ignored private storage during E083 privacy review",
+    "payload_files_verified": 136,
+    "total_zip_entries": 137
   },
   "cleanup": {
     "removed_files_and_directories": [
@@ -174,5 +176,6 @@
     "docs/examples/04_three_shutters.py": "e9de879103bb71cb80510df39e40e2789ac130946879a4e2aa6c3e23995e2010",
     "docs/examples/05_ttl_control.py": "b3592a75ba38b5bc96797b5740e084dffefe2055163109081ac92c1d986d05d6"
   },
-  "line_endings": "Active reviewed text normalized to LF; original archive bytes preserved"
+  "line_endings": "Active reviewed text normalized to LF; original archive bytes preserved",
+  "privacy": "Sanitized derivative. Historical validation describes the original archived bytes."
 }

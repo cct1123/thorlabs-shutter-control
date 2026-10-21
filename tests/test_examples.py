@@ -243,7 +243,7 @@ def test_failed_identity_and_release_never_close_unverified_tutorial_target(
     monkeypatch.setattr(
         device,
         "GetDeviceInfo",
-        lambda: SimpleNamespace(SerialNumberText="26000000", Description="IDENTITY MISMATCH TEST"),
+        lambda: SimpleNamespace(SerialNumberText="68000099", Description="IDENTITY MISMATCH TEST"),
     )
     device.fail.add("disconnect")
     main, _ = tutorial(script, monkeypatch, *serials, flag, "0.1")

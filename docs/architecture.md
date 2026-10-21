@@ -4,12 +4,12 @@
 
 ```mermaid
 flowchart TD
-    User[Operator] --> GUI[Dash GUI: three independent panels]
+    User[Operator] --> GUI[Dash GUI: configured independent panels]
     Experiment[Experiment code] --> Hub[ShutterHub]
     GUI --> Hub
     Hub --> Driver[KCubeShutter: one selected serial]
     Driver --> SDK[Official Kinesis .NET through Python.NET]
-    SDK --> USB[KEH3 USB]
+    SDK --> USB[Direct USB or KEH3/KEH6 USB]
     USB --> Cube[KSC101]
     Cube --> Shutter[SH05R]
     Driver -. software tests replace SDK .-> Fake[Independent in-memory devices]
@@ -40,14 +40,16 @@ normalized status/configuration, one-controller behavior and all-slot cleanup.
   Open first establishes that baseline. TTL Arm uses device settings, not drafts;
   Close/Disarm/default cleanup do not restore the prior triggered/timed mode.
 
-The GUI uses one callback and fixed panels. Draft trigger edits survive ordinary
+The GUI uses one callback and a panel count fixed for that session, configured
+with `--slots N` or the number of preselected serials (default at least three). Draft trigger edits survive ordinary
 refresh; Read replaces drafts. Trigger settings are natively collapsible. Status,
 readiness hints and error styling derive from the same driver snapshots. A delayed
 busy cue avoids highlighting every brief poll, without disabling Close.
 
 Default polling is250ms and GUI refresh1s. A full status read waits one polling
-interval for trigger settings. Three connected panels add at least750ms of those
-waits plus SDK time. The5s feedback timeout applies per wait stage, not to total
+interval for trigger settings. For N connected panels, reads add at least N *250ms of those
+waits plus SDK time; six panels add at least1.5s. There is no app-defined count
+cap, but host/SDK resources and sequential polling/cleanup limit practical scale. The5s feedback timeout applies per wait stage, not to total
 shutdown or a blocking native call. No simultaneous/synchronized control claim.
 
 USB is the qualified single-pair branch. Explicit Python Ethernet endpoints are

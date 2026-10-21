@@ -83,9 +83,6 @@ def record_gaps(record):
         for field in fields:
             if not known_text(values.get(field)):
                 gaps.append(f"{section}.{field}: missing/unknown text")
-    hub = record.get("hub")
-    if isinstance(hub, dict) and hub.get("model") != "KEH3":
-        gaps.append("hub.model: this plan requires KEH3; review any changed topology")
     host = record.get("host")
     if isinstance(host, dict):
         if not known_text(host.get("os")) or "windows" not in host["os"].casefold():
@@ -97,8 +94,8 @@ def record_gaps(record):
     if not isinstance(bench, dict) or bench.get("one_owner_confirmed") is not True:
         gaps.append("bench.one_owner_confirmed: must be true")
     pairs = record.get("pairs")
-    if not isinstance(pairs, list) or not 1 <= len(pairs) <= 3:
-        gaps.append("pairs: record the actual one to three installed pairs; do not guess the count")
+    if not isinstance(pairs, list) or not pairs:
+        gaps.append("pairs: record the actual installed pairs; do not guess the count")
         return gaps
     identities = {field: set() for field in ("serial", "label", "bay_label", "shutter_cable_label")}
     for index, pair in enumerate(pairs):

@@ -6,7 +6,7 @@ before and during connection; the driver never silently falls back to USB.
 USB and Ethernet share serial ownership within the process.
 
 The official [KEH3 manual, section4.3](https://media.thorlabscms.cn/globalassets/items/k/ke/keh/keh3/doc-103012.pdf?v=0129060351)
-maps one IP address to separate endpoints:
+maps one IP address to separate endpoints for **KEH3**:
 
 | Endpoint | Function |
 | --- | --- |
@@ -17,13 +17,13 @@ maps one IP address to separate endpoints:
 | `IP:40307` | USB OUT |
 
 The manual requires USB IN disconnected for Ethernet operation. Do not move or
-redock a powered cube to diagnose routing. Historical tests used192.168.1.19;
-recheck the actual address before a later session rather than copying it blindly.
+redock a powered cube to diagnose routing. The actual bench IP is excluded from published files. Set `SHUTTER_HUB_IP`
+locally from hub discovery; documentation addresses are not live endpoints.
 
 ## Observed result
 
-Before the KSC101 update, the hub120100261/firmware1.1.2 responded over Ethernet,
-but left-bay KSC10168800777/firmware1.0.6 did not return an identity. Kinesis also
+Before the KSC101 update, the hub (alias HUB_A)/firmware1.1.2 responded over Ethernet,
+but left-bay KSC101 (alias CONTROLLER_A)/firmware1.0.6 did not return an identity. Kinesis also
 listed only the hub with USB absent. TCP acceptance on40304 was insufficient.
 
 The cube was later updated to1.0.7; USB identity mismatch was repaired and USB
@@ -37,9 +37,10 @@ Release all existing handles, close competing applications, and use an explicitl
 authorized LAN-only arrangement. Select the actual left-bay endpoint:
 
 ```python
+import os
 from thorlabs_shutter_control import KCubeShutter
 
-cube = KCubeShutter("68800777", ethernet_endpoint="192.168.1.19:40304")
+cube = KCubeShutter(os.environ["SHUTTER_SERIAL"], ethernet_endpoint=f"{os.environ['SHUTTER_HUB_IP']}:40304")
 try:
     print(cube.discover())
     print(cube.connect())
@@ -53,4 +54,8 @@ Require TCPIP transport, matching endpoint/serial, known operating feedback and
 successful passive release. Stop after a failed identity/read; preserve the same
 object if release fails. Do not run this alongside the live USB owner. Ethernet
 actuation, timing and recovery remain unvalidated. [Historical evidence](../records/archive/README.md)
-contains the raw responses and firmware investigation.
+describes private retention of the raw responses and firmware investigation.
+
+KEH6 USB/software slot support does not qualify its Ethernet route. This driver
+still accepts only the documented KEH3 cube range40304..40307; no KEH6 bay-port
+mapping or LAN success is inferred from removing the software slot cap.

@@ -4,11 +4,11 @@
 
 ## Device and transport
 
-The qualified USB branch is computer -> KEH3 left bay -> KSC10168800777 -> SH05R.
+The qualified USB branch is computer -> KEH3 left bay -> KSC101 (alias CONTROLLER_A) -> SH05R.
 Kinesis identifies the cube by its eight-digit serial beginning68 through FTDI;
 there is no COM-port dependency. Kinesis1.14.60.27990 .NET Framework assemblies
 are loaded lazily using Python.NET3.1 on Python3.12.7 x64. Cube firmware1.0.7
-repaired the old hardware-info serial26000000 versus descriptor68800777 mismatch.
+repaired the old hardware-info serialMISMATCHED_ID versus descriptorCONTROLLER_A mismatch.
 No software serial alias was added. Installed supply/wiring details not observed
 remain incomplete in the bench record.
 
@@ -83,5 +83,11 @@ device settings and needs at least one input. The hardware manual describes5V
 TTL and a disconnected input as LOW; active-low priming can open with no cable.
 The driver reports configuration/priming, not measured pin voltage or raw edges.
 No explicit PersistSettings/EEPROM call is made; power-cycle persistence has not
-been measured. Only passive settings reads have current electrical-bench scope;
-configuration/priming logic is software-tested, not physical TTL qualification.
+been measured. E082 tested configuration/priming/Disarm on actual USB hardware
+with both ports disconnected. Each input/high stayed Closed, but input/low also
+stayed reported Closed despite Triggered/Active and matching settings after a
+bounded read window. This fails the manual-based Open expectation; cause remains
+unknown. A separate Manual Open/Close control passed. Settings were restored and
+handles released. [Raw-result index](../records/ttl-summary.json). External edges,
+output voltage and independent physical/timing behavior remain unqualified;
+the active-low safety warning still applies.

@@ -187,7 +187,7 @@ class KCubeShutter:
             except (AttributeError, TypeError, ValueError) as exc:
                 raise ValueError(
                     "ethernet_endpoint must be an IPv4 KEH3 cube endpoint, "
-                    "for example 192.168.1.19:40304 (ports 40304..40307)."
+                    "for example 192.0.2.10:40304 (ports 40304..40307)."
                 ) from exc
         self._ethernet_endpoint = ethernet_endpoint
         if not math.isfinite(timeout) or not 0.5 <= timeout <= 60:
@@ -729,10 +729,11 @@ class KCubeShutter:
 
 
 class ShutterHub:
-    """Own fixed GUI slots and attempt shutdown of every controller.
+    """Own configured GUI slots and attempt shutdown of every controller.
 
-    Up to three serials preselect slots; omitted slots remain unselected. Existing
-    controllers can be injected instead. Construction never loads the SDK.
+    Serials preselect slots; omitted slots remain unselected. The default count
+    is at least three, growing to fit supplied serials. Existing controllers can
+    be injected instead. Construction never loads the SDK.
     The lock serializes GUI actions/status with shutdown; drivers also lock calls.
     """
 
@@ -741,21 +742,29 @@ class ShutterHub:
         serial_numbers: Sequence[str] = (),
         *,
         kinesis_dir: str | Path | None = None,
+        slots: int | None = None,
         controllers: Sequence[KCubeShutter] | None = None,
     ):
-        if controllers is not None and (serial_numbers or kinesis_dir is not None):
+        if slots is not None and (type(slots) is not int or slots < 1):
+            raise ValueError("slots must be a positive integer.")
+        if controllers is not None and (
+            serial_numbers or kinesis_dir is not None or slots is not None
+        ):
             raise ValueError("Configure injected controllers directly, without hub options.")
         if controllers is None:
             serials = tuple(serial_numbers)
-            if len(serials) > 3 or len(set(serials)) != len(serials):
-                raise ValueError("Supply at most three distinct serial numbers.")
+            if len(set(serials)) != len(serials):
+                raise ValueError("Supply distinct serial numbers.")
+            count = max(3, len(serials)) if slots is None else slots
+            if len(serials) > count:
+                raise ValueError("slots must fit all supplied serial numbers.")
             controllers = (
                 KCubeShutter(serial, kinesis_dir=kinesis_dir)
-                for serial in serials + (None,) * (3 - len(serials))
+                for serial in serials + (None,) * (count - len(serials))
             )
         self.controllers = tuple(controllers)
-        if not 1 <= len(self.controllers) <= 3:
-            raise ValueError("A shutter hub requires one to three controllers.")
+        if not self.controllers:
+            raise ValueError("A shutter hub requires at least one controller.")
         if len({id(controller) for controller in self.controllers}) != len(self.controllers):
             raise ValueError("Each shutter slot requires a distinct controller object.")
         self.lock = RLock()

@@ -1,4 +1,4 @@
-"""Local single-operator Dash UI for up to three independently owned shutters."""
+"""Local single-operator Dash UI for configured independently owned shutters."""
 
 from dash import Dash, Input, Output, State, ctx, dcc, html, no_update
 
@@ -156,7 +156,7 @@ def _panel(slot, serial_number, serials, suffix):
 
 
 def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
-    """Build a passive three-slot GUI, or use injected controller(s) for integration."""
+    """Build passive panels for the supplied hub, defaulting to three slots."""
     hub = (
         controller
         if isinstance(controller, ShutterHub)
@@ -177,7 +177,7 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
                         [
                             html.P("OPTICS / LAB CONTROL", className="eyebrow"),
                             html.H1("Shutter control"),
-                            html.P("KSC101 controllers · KEH3 USB", className="subtitle"),
+                            html.P("KSC101 controllers · USB", className="subtitle"),
                         ]
                     ),
                     html.Div(
@@ -323,7 +323,7 @@ def create_app(controller: KCubeShutter | ShutterHub | None = None) -> Dash:
                             selected[index] = shutter.serial_number
                             options[index] = sorted(set(serials + [shutter.serial_number]))
                             continue
-                        # Never assign the same sole device to all three slots automatically.
+                        # Never assign the same sole device to multiple slots automatically.
                         selected[index] = (
                             selections[index]
                             if selections[index] in serials

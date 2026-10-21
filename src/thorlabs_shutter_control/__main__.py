@@ -7,12 +7,15 @@ from .controller import ShutterError, ShutterHub
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Local control of up to three KSC101 shutters")
+    parser = argparse.ArgumentParser(description="Local control of KSC101 shutters")
     parser.add_argument(
         "--serial",
         action="append",
         default=[],
-        help="Preselect a serial; repeat up to three times in panel order",
+        help="Preselect a serial; repeat for distinct devices in panel order",
+    )
+    parser.add_argument(
+        "--slots", type=int, help="Number of panels (default: at least 3, growing to fit serials)"
     )
     parser.add_argument("--kinesis-dir", help="Kinesis SDK folder (or set KINESIS_DIR)")
     parser.add_argument(
@@ -30,7 +33,7 @@ def main() -> int:
     if not 1 <= args.port <= 65535:
         parser.error("port must be between 1 and 65535")
     try:
-        hub = ShutterHub(args.serial, kinesis_dir=args.kinesis_dir)
+        hub = ShutterHub(args.serial, kinesis_dir=args.kinesis_dir, slots=args.slots)
         for serial in args.verified_interlock:
             if serial not in args.serial:
                 raise ValueError("--verified-interlock requires the same explicit --serial.")
@@ -51,7 +54,7 @@ def main() -> int:
     result = 0
     try:
         app = create_app(hub)
-        # One process/operator owns all three slots. Reloaders must not duplicate handles.
+        # One process/operator owns all slots. Reloaders must not duplicate handles.
         app.run(host="127.0.0.1", port=args.port, debug=False, use_reloader=False, threaded=False)
     except KeyboardInterrupt:
         pass

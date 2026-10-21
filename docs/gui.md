@@ -2,8 +2,10 @@
 
 [README](../README.md) | [Setup](getting-started.md) | [API](python-api.md)
 
+Set `SHUTTER_SERIAL` locally as described in the [README](../README.md#launch-and-operate).
+
 ```powershell
-uv run --locked shutter-control --serial 68800777 --verified-interlock 68800777
+uv run --locked shutter-control --serial $env:SHUTTER_SERIAL --verified-interlock $env:SHUTTER_SERIAL
 ```
 
 The confirmation records verified normal physical interlock/protection for this
@@ -11,7 +13,14 @@ selected serial/session only. It changes no hardware interlock setting. Startup
 is passive. Visit [localhost:8050](http://127.0.0.1:8050/), then Discover/select
 and Connect. Close Kinesis and other controller owners first.
 
-![Actual USB controller reporting Closed](../records/gui-ux-final-2026-10-20.png)
+![Production GUI at startup with no device selected](assets/gui-startup.jpg)
+
+Privacy-safe capture of the real application: no controller selected, no hardware
+connection. Unknown states are startup feedback, not a bench observation.
+
+Panel count is configured at startup: `--slots N` accepts a positive integer.
+The default is three or enough to fit all preselected serials. Larger layouts
+wrap across rows; Discover does not resize the session or auto-connect devices.
 
 ## Main controls
 
@@ -37,6 +46,10 @@ SDK call can still delay later controls; Close is not an independent emergency s
 
 ## Trigger settings
 
+![Expanded TRIG1/TRIG2 settings in the unconfigured GUI](assets/gui-trigger-settings.jpg)
+
+The screenshot shows draft controls; its disconnected state has no device readback.
+
 Expand **Trigger settings** to read/edit TRIG1/TRIG2. Opening/collapsing the section
 issues no hardware command. Directions: disabled/input/output; polarity: high/low.
 
@@ -47,8 +60,10 @@ issues no hardware command. Directions: disabled/input/output; polarity: high/lo
 - Armed and Closed can coexist with an inactive input. Close/Disarm returns Manual/Inactive.
 
 Arm may open immediately. A disconnected input is documented LOW, so active-low
-can open without a cable. Physical electrical/TTL acceptance has not been performed.
-The latest real-browser run used Read only, not Apply or Arm.
+can open without a cable. Separate actual no-cable API tests applied/armed both
+ports: configuration and Disarm passed, but active-low remained reported Closed.
+[TTL results](../records/ttl-summary.json) retain that FAIL. External electrical
+response remains unqualified; the earlier connected-browser test used Read only.
 
 ## Ownership and finish
 
@@ -61,3 +76,10 @@ checks and actual single-pair browser tests are recorded in the
 Finish with Close & disconnect all, verify the reported result and physical
 closure as required by the bench procedure, then normal terminal Ctrl+C. Closing
 a tab or force-killing the process does not perform orderly shutdown.
+
+## Six-panel example
+
+![Unconfigured six-slot GUI](assets/gui-six-slots.jpg)
+
+Started with `--slots 6`; all panels remain unconnected. This is layout evidence,
+not a six-controller hardware test.

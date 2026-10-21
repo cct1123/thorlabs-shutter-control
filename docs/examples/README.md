@@ -17,8 +17,8 @@ have been verified:
 
 ```powershell
 uv run --locked python docs/examples/01_discover.py
-uv run --locked python docs/examples/02_connect_and_read_status.py 68800777
-uv run --locked python docs/examples/03_open_close.py 68800777 --open-seconds 2 --verified-interlock 68800777
+uv run --locked python docs/examples/02_connect_and_read_status.py $env:SHUTTER_SERIAL
+uv run --locked python docs/examples/03_open_close.py $env:SHUTTER_SERIAL --open-seconds 2 --verified-interlock $env:SHUTTER_SERIAL
 ```
 
 `--verified-interlock SERIAL` is the same explicit selected-serial/session
@@ -37,8 +37,10 @@ The actuation examples use ExitStack to register passive release before Connect,
 and Close only after identity/feedback verification succeeds. All registered
 callbacks are attempted despite failures, with normal Python exception chaining.
 A failed identity plus failed release never authorizes Close of the unverified
-target. Release alone does not prove closure. [The staged helpers](../hardware_tests/README.md)
-provide structured operation/release results for acceptance work.
+target. Release alone does not prove closure. Follow the
+[three-stage procedure](../HARDWARE_VALIDATION.md); the
+[optional diagnostic helpers](../hardware_tests/README.md) retain structured
+operation/release results for investigations, rather than a mandatory sequence.
 
 Developer-only simulation is separate: `uv run --locked python tests/simulated_demo.py --api`.
 It uses fictional software devices and cannot prove wiring, physical motion or timing.

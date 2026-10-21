@@ -1,33 +1,20 @@
-# Historical evidence archive
+# Historical evidence and privacy
 
-hardware-2026-10-20.zip preserves136 original files: dated diagnostic responses,
-firmware/interlock/sequence evidence, GUI/shutdown traces, earlier project/state/
-report checkpoints, superseded plans and acquisition scripts. Original bytes are
-preserved. manifest.json lists each member's size and SHA256; the adjacent
-.zip.sha256 file hashes the whole ZIP. No vendor installer or installed runtime
-is bundled. Historical files are reference data, not current operating authority.
+The original 136-file evidence archive and connected-bench screenshot contain
+real device identities and local configuration. They have been removed from the
+shareable working tree. Unmodified originals and checksums are retained locally
+under ignored `inputs/private/documentation-originals/`; they are not distributed
+with a fresh clone. This change preserves local evidence without publishing it.
 
-Verify before extraction:
+Current [hardware results](../hardware-validation.json), [TTL results](../ttl-summary.json)
+and [evidence index](../RECORDS.md) are sanitized derivatives. `CONTROLLER_A`,
+`HUB_A` and `MISMATCHED_ID` are aliases, not usable device serials. They preserve
+identity comparisons and test outcomes without identifying the bench.
 
-```powershell
-Get-FileHash records/archive/hardware-2026-10-20.zip -Algorithm SHA256
-Get-Content records/archive/hardware-2026-10-20.zip.sha256
-python -m zipfile -l records/archive/hardware-2026-10-20.zip
-```
+Historical stages, decisions and firmware/command investigations remain available
+in the private original archive for local review. Old files are reference data,
+not current operating authority. Public summaries preserve PASS/FAIL/UNTESTED
+scope, including unresolved active-low TTL and Ethernet observations.
 
-| Evidence | ZIP member |
-| --- | --- |
-| Full E001-E078/D records | records/RECORDS.md |
-| Firmware1.0.7/identity repair | records/firmware-post-usb-2026-10-20.json |
-| Four-state interlock/key matrix | records/interlock-four-state-comparison-2026-10-20.json |
-| Five-cycle raw/user observation | records/sdk-five-cycles-2s-2026-10-20.json and sdk-five-cycles-observation-2026-10-20.json |
-| Stage5 shutdown | records/stage5-confirmed-hardware-2026-10-20.json |
-| Stage6 Ctrl+C closure/release | records/stage6-confirmed-server-2026-10-20.json and stage6-post-shutdown-2026-10-20.json |
-| Redesigned GUI/browser run | records/gui-ux-summary-2026-10-20.json, gui-ux-hardware-2026-10-20.json and gui-ux-browser-motion-2026-10-20.json |
-| Original human criteria/checkpoints | PROJECT.md, STATE.md, outputs/REPORT.md |
-| Superseded command/firmware/development reviews | docs/COMMAND_REVIEW.md, docs/KSC101_FIRMWARE_UPDATE_REVIEW.md, docs/DEVELOPMENT_PLAN.md |
-
-Filename-only continuations above have the same records/ prefix. Inspect/extract
-historical material outside the active document tree; do not run old acquisition
-scripts as current procedures. Current interpretation is in
-[hardware-validation.json](../hardware-validation.json) and [STATE.md](../../STATE.md).
+Privacy removal here covers current shareable files. Earlier Git commits may
+still contain prior identities or assets; Git history has not been rewritten.

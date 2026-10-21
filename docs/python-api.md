@@ -8,11 +8,12 @@ Import/construction is passive. SDK loading occurs on explicit discovery/connect
 ## Construction and confirmation
 
 ```python
+import os
 from thorlabs_shutter_control import KCubeShutter
 
-c = KCubeShutter("68800777", timeout=5.0, polling_ms=250)
+c = KCubeShutter(os.environ["SHUTTER_SERIAL"], timeout=5.0, polling_ms=250)
 # Only after normal physical interlock and independent protection are verified:
-c.confirm_interlock("68800777")
+c.confirm_interlock(os.environ["SHUTTER_SERIAL"])
 ```
 
 | Argument | Contract |
@@ -33,12 +34,14 @@ identity and communication checks remain blocking.
 ## Connection and manual control
 
 ```python
+verified = False
 try:
     status = c.connect()
+    verified = True
     print(c.identify_device())
     print(c.close_shutter())
 finally:
-    c.safe_shutdown()
+    c.disconnect(close_shutter=verified)
 ```
 
 The example authorizes normal output cleanup for the selected bench. For a purely
@@ -123,9 +126,10 @@ hub = ShutterHub(["68000001", "68000002", "68000003"])  # Fictional example IDs.
 # Supply actual distinct identities and verify each physical interlock separately.
 ```
 
-ShutterHub creates three fixed slots, padding omitted serials with None.
-Explicit controllers= accepts one to three distinct objects; do not combine this
-with serial_numbers/kinesis_dir options. Python hub.connect uses zero-based slots
+ShutterHub accepts `slots=N` for any positive integer, padding omitted serials
+with None. Without it, the count is `max(3, len(serial_numbers))`. An explicit
+count must fit all supplied serials. `controllers=` accepts any nonempty sequence
+of distinct objects; do not combine it with serial_numbers/kinesis_dir/slots. Python hub.connect uses zero-based slots
 and explicit serials. discover uses the first controller's transport, so the normal
 hub/GUI is USB-focused; mixed experimental transports are not qualified.
 

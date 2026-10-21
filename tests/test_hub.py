@@ -48,16 +48,18 @@ def test_invalid_serial_configuration_is_rejected_without_device_access(rig, ser
     assert all(not d.calls for d in rig.devices.values())
 
 
-@pytest.mark.parametrize("options", [{"serial_numbers": ["68000001"]}, {"kinesis_dir": "sdk"}])
+@pytest.mark.parametrize(
+    "options", [{"serial_numbers": ["68000001"]}, {"kinesis_dir": "sdk"}, {"slots": 6}]
+)
 def test_injection_cannot_silently_ignore_hub_configuration(rig, options):
     with pytest.raises(ValueError, match="Configure injected controllers"):
         ShutterHub(controllers=[rig.controller], **options)
     assert rig.manager_calls == []
 
 
-@pytest.mark.parametrize("count", [0, 4])
+@pytest.mark.parametrize("count", [0])
 def test_invalid_hub_size_is_rejected(count):
-    with pytest.raises(ValueError, match="one to three"):
+    with pytest.raises(ValueError, match="at least one"):
         ShutterHub(controllers=[KCubeShutter() for _ in range(count)])
 
 
@@ -235,3 +237,30 @@ def test_release_interruption_in_one_armed_slot_never_skips_other_slots(
     assert all(not d.IsConnected for d in list(rig.devices.values())[1:])
     monkeypatch.setattr(rig.device, method, original)
     hub.safe_shutdown()
+
+
+@pytest.mark.parametrize("count", [1, 4, 6, 12])
+def test_configurable_size_is_passive_and_has_distinct_slots(rig, count):
+    hub = ShutterHub(slots=count)
+    assert len(hub.controllers) == count
+    assert len({id(c) for c in hub.controllers}) == count
+    assert all(c.serial_number is None for c in hub.controllers)
+    hub.safe_shutdown()
+    assert not rig.manager_calls and not rig.device.calls
+
+
+@pytest.mark.parametrize("slots", [0, -1, True, 1.5, "6"])
+def test_invalid_slot_count_never_accesses_sdk(rig, slots):
+    with pytest.raises(ValueError, match="positive integer"):
+        ShutterHub(slots=slots)
+    assert not rig.manager_calls and not rig.device.calls
+
+
+def test_serial_count_expands_default_and_explicit_count_must_fit(rig):
+    serials = [f"6800{n:04d}" for n in range(1, 10)]  # Fictional test identities.
+    hub = ShutterHub(serials)
+    assert [c.serial_number for c in hub.controllers] == serials
+    assert len(ShutterHub(controllers=hub.controllers).controllers) == 9
+    with pytest.raises(ValueError, match="fit all supplied"):
+        ShutterHub(serials, slots=6)
+    assert not rig.manager_calls and not rig.device.calls

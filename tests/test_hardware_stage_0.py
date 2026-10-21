@@ -83,7 +83,7 @@ def test_missing_or_timezone_free_observation_is_reported(checker, complete_reco
 @pytest.mark.parametrize(
     ("section", "field", "value"),
     [
-        ("hub", "model", "KCH301"),
+        ("hub", "model", None),
         ("host", "os", "Linux"),
         ("host", "python_bitness", "x86"),
         ("host", "kinesis_bitness", "x86"),
@@ -112,7 +112,11 @@ def test_serial_shape_is_checked(checker, complete_record, serial):
     )
 
 
-def test_three_distinct_pairs_are_supported(checker, complete_record):
+@pytest.mark.parametrize("count", [3, 6, 9])
+def test_distinct_pairs_are_supported_without_hub_model_or_count_cap(
+    checker, complete_record, count
+):
+    complete_record["hub"]["model"] = "KEH6" if count == 6 else "FICTIONAL USB HUB"
     pair = complete_record["pairs"][0]
     complete_record["pairs"] = [
         dict(
@@ -122,11 +126,9 @@ def test_three_distinct_pairs_are_supported(checker, complete_record):
             bay_label=f"BAY {i}",
             shutter_cable_label=f"CABLE {i}",
         )
-        for i in range(1, 4)
+        for i in range(1, count + 1)
     ]
     assert checker["record_gaps"](complete_record) == []
-    complete_record["pairs"].append(dict(pair, serial="68000004"))
-    assert any(gap.startswith("pairs:") for gap in checker["record_gaps"](complete_record))
 
 
 def test_cli_complete_record_never_claims_permission_or_writes_file(

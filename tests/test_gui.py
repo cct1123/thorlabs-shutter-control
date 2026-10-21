@@ -1,3 +1,5 @@
+import pytest
+
 from thorlabs_shutter_control import KCubeShutter, ShutterHub
 from thorlabs_shutter_control.gui import create_app
 
@@ -344,3 +346,42 @@ def test_fault_remains_visible_across_refresh_and_connected_count_drops(rig):
     assert refreshed["message"]["className"] == "message message-error"
     rig.device.CommsStatus = "OK"
     rig.controller.safe_shutdown()
+
+
+@pytest.mark.parametrize("count", [6, 9])
+def test_many_panels_have_independent_commands_and_best_effort_cleanup(rig, count):
+    for index in range(4, count + 1):
+        serial = f"6800{index:04d}"
+        rig.devices[serial] = type(rig.device)(serial)
+    serials = list(rig.devices)
+    rig.serials[:] = serials
+    hub = ShutterHub(serials)
+    app = create_app(hub)
+    result = invoke(app, "discover", serials=serials)
+    assert result[f"serial-{count}"]["options"] == serials
+    assert [result[f"serial-{n}"]["value"] for n in range(1, count + 1)] == serials
+    result = invoke(app, "discover", serials=[None] * count)
+    assert all(result[f"serial-{n}"]["value"] is None for n in range(1, count + 1))
+    for n in range(1, count + 1):
+        result = invoke(app, f"connect-{n}", serials=serials)
+    assert result["connection-summary"]["children"] == f"{count} of {count} connected"
+    invoke(app, f"open-{count}", serials=serials)
+    assert [d.state for d in rig.devices.values()] == ["Closed"] * (count - 1) + ["Open"]
+
+    def output_calls():
+        return {
+            s: [c for c in d.calls if c[0] in {"set_state", "set_mode", "enable", "set_triggers"}]
+            for s, d in rig.devices.items()
+        }
+
+    before_refresh = output_calls()
+    invoke(app, "refresh", serials=serials)
+    assert all(
+        d.state == ("Open" if s == serials[-1] else "Closed") for s, d in rig.devices.items()
+    )
+    assert output_calls() == before_refresh
+    rig.device.fail.add("set_state")  # A first-slot failure cannot skip the last slot.
+    result = invoke(app, "shutdown-all", serials=serials)
+    assert "set_state" in result["hub-message"]["children"]
+    assert all(result[f"connection-{n}"]["children"] == "Disconnected" for n in range(2, count + 1))
+    assert all(d.state == "Closed" and not d.IsConnected for d in list(rig.devices.values())[1:])

@@ -68,6 +68,8 @@ def test_gui_launch_has_three_passive_panels_with_requested_preselection(rig, mo
     [
         ["--serial", "68000001", "--serial", "68000001"],
         [
+            "--slots",
+            "3",
             "--serial",
             "68000001",
             "--serial",
@@ -81,7 +83,7 @@ def test_gui_launch_has_three_passive_panels_with_requested_preselection(rig, mo
         ["--port", "0"],
         ["--port", "65536"],
     ],
-    ids=["duplicate", "fourth", "invalid-serial", "low-port", "high-port"],
+    ids=["duplicate", "too-few-slots", "invalid-serial", "low-port", "high-port"],
 )
 def test_invalid_arguments_are_rejected_before_sdk_or_server_access(rig, monkeypatch, arguments):
     def forbidden(*args, **kwargs):
@@ -164,3 +166,43 @@ def test_server_exit_attempts_every_shutter_and_reports_shutdown_failures(
     if not shutdown_failure:
         assert all(device.state == "Closed" for device in rig.devices.values())
         assert all(not device.IsConnected for device in rig.devices.values())
+
+
+@pytest.mark.parametrize("slots,serial_count", [(1, 0), (6, 0), (9, 2), (None, 6)])
+def test_configurable_cli_layout_stays_passive(rig, monkeypatch, slots, serial_count):
+    serials = [f"6800{n:04d}" for n in range(1, serial_count + 1)]
+    count = max(3, serial_count) if slots is None else slots
+
+    def inspect_server(self, **kwargs):
+        components = layout_components(self)
+        suffixes = [""] if count == 1 else [f"-{n}" for n in range(1, count + 1)]
+        assert [components[f"serial{s}"]["value"] for s in suffixes] == (
+            serials + [None] * (count - len(serials))
+        )
+        assert all(components[f"open{s}"]["disabled"] for s in suffixes)
+
+    def forbidden_sdk(directory):
+        pytest.fail("Configuring more panels must remain passive")
+
+    args = ["shutter-control"]
+    if slots is not None:
+        args += ["--slots", str(slots)]
+    for serial in serials:
+        args += ["--serial", serial]
+    monkeypatch.setattr(module, "_load_sdk", forbidden_sdk)
+    monkeypatch.setattr(gui.Dash, "run", inspect_server)
+    monkeypatch.setattr(sys, "argv", args)
+    assert cli.main() == 0
+
+
+@pytest.mark.parametrize("slots", ["0", "-1", "1.5"])
+def test_invalid_cli_slot_counts_never_start_server(rig, monkeypatch, slots):
+    def forbidden(*args, **kwargs):
+        pytest.fail("Invalid panel count must not start a server/load SDK")
+
+    monkeypatch.setattr(module, "_load_sdk", forbidden)
+    monkeypatch.setattr(gui.Dash, "run", forbidden)
+    monkeypatch.setattr(sys, "argv", ["shutter-control", "--slots", slots])
+    with pytest.raises(SystemExit) as caught:
+        cli.main()
+    assert caught.value.code == 2

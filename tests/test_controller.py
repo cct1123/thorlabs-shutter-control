@@ -67,7 +67,7 @@ def test_owned_handle_cannot_be_relabelled_even_after_failed_release(rig, serial
     assert rig.controller.serial_number == serial
 
 
-@pytest.mark.parametrize("serial", ["26000000", "68invalid", 68000002])
+@pytest.mark.parametrize("serial", ["27000001", "68invalid", 68000002])
 def test_disconnected_selection_assignment_is_validated_without_sdk(rig, serial):
     with pytest.raises(ValueError, match="serial number"):
         rig.controller.serial_number = serial

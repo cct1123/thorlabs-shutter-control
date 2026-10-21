@@ -12,7 +12,7 @@ def ethernet(rig, monkeypatch):
     rig.controller.discover()
     manager = rig.controller._sdk.manager
     entries = []
-    transport = {"provider": "TCPIP", "endpoint": "192.168.1.19:40304"}
+    transport = {"provider": "TCPIP", "endpoint": "192.0.2.10:40304"}
     monkeypatch.setattr(manager, "CreateManualDeviceEntry", entries.append, raising=False)
     monkeypatch.setattr(
         manager,
@@ -30,13 +30,13 @@ def ethernet(rig, monkeypatch):
 @pytest.mark.parametrize(
     "endpoint",
     [
-        "192.168.1.19",
-        "192.168.1.19:40303",
-        "192.168.1.19:80",
+        "192.0.2.10",
+        "192.0.2.10:40303",
+        "192.0.2.10:80",
         "bad:40304",
         "::1:40304",
         1,
-        b"192.168.1.19:40304",
+        b"192.0.2.10:40304",
     ],
 )
 def test_invalid_endpoint_never_loads_sdk(endpoint, rig):
@@ -60,12 +60,12 @@ def test_ethernet_passive_connection_does_not_require_usb_or_write_output(ethern
         assert ethernet.controller.get_status().connection == "connected"
     finally:
         ethernet.controller.disconnect(close_shutter=False)
-    assert ethernet.entries == ["192.168.1.19:40304"]
+    assert ethernet.entries == ["192.0.2.10:40304"]
     assert d.calls[-2:] == [("stop_poll",), ("disconnect",)]
     assert not any(c[0] in {"set_state", "set_mode", "enable", "set_triggers"} for c in d.calls)
 
 
-@pytest.mark.parametrize("field, value", [("provider", "FTDI"), ("endpoint", "192.168.1.19:40305")])
+@pytest.mark.parametrize("field, value", [("provider", "FTDI"), ("endpoint", "192.0.2.10:40305")])
 def test_wrong_transport_is_not_discovered_or_connected(ethernet, field, value):
     ethernet.transport[field] = value
     assert ethernet.controller.discover() == []
@@ -99,7 +99,7 @@ def test_ethernet_health_failure_latches_fault_without_output(ethernet, monkeypa
     if failure == "provider":
         ethernet.transport["provider"] = "FTDI"
     elif failure == "endpoint":
-        ethernet.transport["endpoint"] = "192.168.1.19:40305"
+        ethernet.transport["endpoint"] = "192.0.2.10:40305"
     elif failure == "connection":
         d.IsConnected = False
     else:
@@ -125,7 +125,7 @@ def test_ethernet_identity_mismatch_keeps_existing_guard(ethernet, monkeypatch):
     monkeypatch.setattr(
         ethernet.rig.device,
         "GetDeviceInfo",
-        lambda: SimpleNamespace(SerialNumberText="26000000", Description="MISMATCH"),
+        lambda: SimpleNamespace(SerialNumberText="68000099", Description="MISMATCH"),
     )
     with pytest.raises(ShutterError, match="identity mismatch"):
         ethernet.controller.connect()

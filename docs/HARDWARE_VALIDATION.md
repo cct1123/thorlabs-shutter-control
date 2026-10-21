@@ -1,86 +1,113 @@
-# Hardware acceptance and remaining tests
+# Practical hardware test procedure
 
-[Current results](../records/hardware-validation.json) | [Interface](INTERFACE.md) |
-[Test tools](hardware_tests/README.md) | [Historical archive](../records/archive/README.md)
+[Bench evidence](../records/hardware-validation.json) | [Interface](INTERFACE.md) |
+[Examples](examples/README.md) | [Diagnostic helpers](hardware_tests/README.md)
 
-## Evidence already established
+## What the bench taught us
 
-USB computer -> KEH3 left bay -> KSC10168800777/firmware1.0.7 -> SH05R.
-Actual identity/status/reconnect and normal cleanup passed. The user confirmed the
-five-cycle SDK Open2s/Close2s sequence. Stage5 production shutdown from Closed and
-Open passed electronic readback. Stage6 actual GUI Open/Close, reconnect and normal
-Ctrl+C-from-Open cleanup passed, followed by a fresh passive Closed check. E078
-redesigned-GUI tests included browser Open,2.015s added visible hold, Close, read-only
-trigger settings, keyboard collapse, release/reconnect and global cleanup.
+The working configuration is **computer -> USB -> KEH3 left bay -> KSC101
+(alias CONTROLLER_A), firmware 1.0.7 -> SH05R**, using Kinesis 1.14.60.27990 on Windows x64.
+USB identity/status/reconnect, Open/Close, production shutdown and real GUI actions
+worked. The user confirmed five physical Open/2-second hold/Close/2-second hold
+cycles. Later GUI/shutdown runs established electronic feedback and cleanup;
+they did not independently measure blade motion or exposure timing.
 
-These are single-pair functional/readback results, not a new independent blade
-observation for each shutdown or calibrated exposure/shutdown timing. The source
-and dirty-file hashes, raw responses and exact exceptions remain in the archive.
-Hardware/GUI administrative holds were explicitly removed by the user. Historical
-holds and failures describe earlier configurations and are not current restrictions.
+| Experience | Use this lesson next time |
+| --- | --- |
+| Searching for a COM port led nowhere | This USB path uses Kinesis/FTDI; discover the controller serial instead. |
+| USB reported `Connecting` despite successful reads | Judge the combined identity, `IsConnected`, `CommsStatus` and responses. One SDK label is insufficient. |
+| Firmware 1.0.6 returned a mismatched hardware serial | The official 1.0.7 update repaired USB identity. Never conceal a mismatch with a software alias; firmware work is separate maintenance. |
+| Repeated interlock reads and jack/key changes did not resolve readiness | The jack matrix established no software continuity signal. Preserve unknown; key feedback is separate. Use serial-scoped confirmation after verifying the normal circuit/protection. |
+| Mode/status interpretation delayed useful tests | Auto is a valid mode. Undocumented operating value `0` does not mean Inactive. Use documented commands and verify the resulting state. |
+| Ethernet found only the hub in both our code and Kinesis | A responding hub/port does not prove cube communication. Those tests preceded the cube update; post-update Ethernet remains untested. |
+| Actual GUI actions exposed issues that helper stages missed | Exercise the production path early, including refresh, reconnect and cleanup. |
 
-## Operating contract
+The old process split related checks across too many stages, repeatedly asked for
+unchanged facts, and made a complete bench form a routine prerequisite. Replace
+that with three stages, one short result record, and intervention only for a
+specific unresolved dependency.
 
-Before a hardware session, match selected serial/physical shutter and actual
-transport, exclude competing owners, preserve normal physical interlock/source
-protection and establish recovery/operating limits. Recheck transient state before
-outputs. Unknown physical facts in hardware-bench.json remain unknown.
+## Three stages for commissioning or a relevant change
 
-The SDK bit did not independently distinguish interlock jack conditions. Preserve
-raw unknown indication; use explicit selected-serial session confirmation only
-with verified normal physical circuit/protection. Key/identity/comms faults still
-inhibit Open. Never infer Inactive from undefined operating0 or alias serials.
+Before starting, establish the target serial/shutter mapping, one controller owner,
+normal physical interlock, independently blocked/disabled source, approved hold
+and independent shutdown action. Reuse established authorization within its scope;
+recheck changed or transient conditions. Installation/firmware checks belong to
+configuration changes, not every session.
 
-On a failure, stop the sequence without automatic replay. Retain an object if its
-release failed. Output cleanup is authorized only after verified identity/status;
-before that, passive release avoids writing through an unverified target. Preserve
-both primary and cleanup failures and use independent physical recovery as needed.
+### 1. Connect and read
 
-## Stage mapping and expected evidence
+Discover once, select the intended serial, connect and read identity/status.
+**Pass:** identity matches; communication and requested reads succeed. Record raw
+unknown values honestly. Reading needs no mode/output change or complete old
+bench form. Stop on wrong identity or failed communication before motion.
 
-| Stage | Method / expected result | Current scope |
-| --- | --- | --- |
-| 0 | Record installed mapping, power, protection, observation/recovery and limits | Some independent bench fields remain incomplete |
-| 1 | Enumerate expected serials without Connect | USB68800777 demonstrated; no COM dependency |
-| 2 | Separate passive connect/identity/status/release cycles; stable, matching feedback | Actual USB communication/reconnect demonstrated; formal full bench-record/observation criteria remain distinct |
-| 3 | Status first; verified target Close/Inactive, then Manual; cleanup/release | SDK Close baseline passed; production preparation exercised in later tests |
-| 4 | Open -> approved added hold -> Close; compare feedback to independent observation | Five-cycle SDK/user confirmation; later production GUI readback |
-| 5 | Closed shutdown, Open -> hold -> safe_shutdown itself closes, reconnect | Production electronic readback PASS; independent closure timing unmeasured |
-| 6 | Passive GUI start, correct target, Open/Close, refresh/no replay, release/reconnect, Ctrl+C from Open | Actual browser/USB readback PASS; redesigned GUI E078 |
-| 7 | Dedicated cycle-count stage | Removed by user; not a PASS |
-| 8 | Separately authorized Closed-state communication-loss/recovery checks | Not executed on hardware |
-| 9 | Three actual pairs, distinct identities, independent/combined cleanup | Not executed; one-pair success does not satisfy three-pair acceptance |
-| 10 | Approved TTL wiring/config/readback/priming/response/disarm across actual pairs | Software tests and passive setting reads only; no electrical qualification |
+Use the GUI's Discover/Connect, or the passive tutorial:
 
-## Remaining physical criteria
+```powershell
+uv run --locked python docs/examples/02_connect_and_read_status.py $env:SHUTTER_SERIAL
+```
 
-REQ-005/007 require independent agreement/final closure evidence and any required
-physical shutdown timing. Record quantity, method, reference, result, uncertainty
-and validity conditions when calibration is required. Host sleeps and returned
-status do not establish those measurements.
+### 2. Close, then one Open/hold/Close
 
-REQ-006 stage8: perform loss injection only with explicit scope, shutters physically
-Closed and independently protected. Verify visible fault, Open refusal, error
-preservation and explicit recovery. Do not inject open-state USB/power loss as an
-incidental software test. No blind repeat after failed closure/release.
+Read status first. With verified identity and readiness, command Close and require
+Closed/Inactive/Manual. Command Open, require Open/Active/Manual, hold for the
+approved interval, then Close and require Closed/Inactive/Manual. The qualified
+bench used a **2-second added hold**; this is not a universal limit or calibrated
+exposure. One cycle is sufficient for this functional check.
 
-REQ-023 stage9: record three installed serial/panel/shutter mappings and per-device
-baseline/readback/physical agreement. Operate independently with unchanged
-neighbors, then all-slot cleanup. A hung native call is still an unresolved total
-shutdown bound. Fewer than three pairs yield partial acceptance only.
+**Pass scope:** matching feedback establishes the software/device path; independent
+blade observation establishes physical operation. Record which was obtained;
+without observation, physical agreement stays untested. No fixed cycle-count or
+soak stage is required. Repeat only to answer a specific question.
 
-REQ-031 stage10: verify manufacturer-approved TTL source/levels/polarity and actual
-inactive condition before Apply/Arm. Compare settings, priming and physical
-response, including disarm/cleanup on each pair. Active-low with an open LOW input
-can open immediately. Do not alter powered interlock/shutter wiring. Physical TTL
-requires its own operating authority and observations.
+### 3. Use the GUI and finish cleanly
 
-Ethernet is an independent passive branch, not a prerequisite for USB acceptance.
-Post-firmware cube Ethernet discovery remains unvalidated; follow the
-[endpoint qualification note](ethernet-assessment.md) without changing persistent
-IP, firmware or docking as a diagnostic shortcut.
+Check the selected controller/state, one Open/Close interaction, refresh without
+replay, and release/reconnect. Reuse Stage 2's cycle if it ran through the GUI.
+Unused slots should stay disconnected. Finish Closed with **Close & disconnect
+all**, then normal terminal **Ctrl+C**; verify release and server exit. For
+commissioning, reconnect once to check identity/Closed, then release.
+**Pass:** expected UI feedback, no replay/duplicate owner, closure feedback and
+successful cleanup; retain any physical-observation limit from Stage 2.
 
-Record each run by requirement/test ID, UTC time, exact source/configuration,
-identity/firmware/transport, reported and independent states, limits, errors and
-release. Never promote an unexecuted/inconclusive case to PASS. The staged helpers
-return readback evidence; software test doubles do not prove physical outcomes.
+Browser closure does not stop the controller. Test shutdown *from Open* only as a
+targeted shutdown regression with applicable authority/protection; it was already
+exercised on this bench, and is not a routine-session requirement.
+
+## Routine use of the unchanged, qualified bench
+
+**Connect/read -> Close baseline -> operate as needed -> Close and release.**
+
+No commissioning rerun, repeated passive-connect cycles, firmware check, complete
+bench form or approval between ordinary commands. A status-only task ends with
+passive release and needs no Open/Close cycle. Use the
+[normal GUI launcher](../README.md#launch-and-operate); serial confirmation records
+verified normal interlock/protection without changing the hardware circuit.
+
+On failure, stop the sequence; do not automatically replay commands. Attempt
+Close/cleanup on a verified target and use independent recovery if needed. After
+an unverified failed connection, use passive release. Failed release retains
+ownership: preserve the handle/error instead of creating another owner.
+
+## Separate tests, only when their capability is needed
+
+| Test | Question and current limit |
+| --- | --- |
+| Ethernet | Can the cube identify/read through its bay with USB IN disconnected? Hub 40303; left/middle/right bays 40304/40305/40306. Follow the [passive Ethernet note](ethernet-assessment.md); post-update cube communication is untested. |
+| Three controllers | Do three real mappings operate independently and all clean up? Single-pair success does not qualify this; REQ-023 remains open. |
+| TTL | Actual no-cable configuration/Arm/Disarm passed, but both active-low position checks failed (still reported Closed). See [E082 results](../records/ttl-summary.json). External signals/voltage remain untested; REQ-031 stays open. Arm can open immediately. |
+| Loss/recovery | Does a specifically authorized Closed-state communication-loss test fault and recover correctly? Physical injection remains untested, REQ-006. |
+| Physical timing/shutdown | Does independent observation/instrumentation establish blade state and any required timing? Host waits/readback are insufficient; remaining REQ-005/007 evidence is still needed. |
+
+These are separate acceptance gaps, not gates before routine single-pair USB use.
+Do not change firmware, wiring, network settings or triggers as an incidental test.
+Revalidate the affected path after relevant changes.
+
+Record only what makes the result reproducible: date/test purpose, code revision,
+serial/transport and changed configuration, action/hold, expected versus observed
+feedback, independent observation if any, errors and final release outcome.
+Label results PASS/FAIL/UNTESTED with their scope. Keep raw logs when useful for
+diagnosis. Historical records/helper filenames retain old stage numbers in the
+[archive](../records/archive/README.md); this procedure supersedes that sequence
+without altering its evidence.
