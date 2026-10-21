@@ -1,0 +1,34 @@
+{
+  "requirement": "REQ-083",
+  "evidence": "E116",
+  "test": "TEST-124",
+  "scope": "software-only follow-up review; no hardware operation",
+  "baseline": "b5278deb9833fb80e2332a3a880e61ffbad2f9d5",
+  "reproduction": "3 failed / 7 passed before sequence correction",
+  "source_suite": {
+    "passed": 188,
+    "skipped": 1,
+    "failed": 0
+  },
+  "wheel_suite": {
+    "passed": 188,
+    "skipped": 1,
+    "failed": 0
+  },
+  "lint": "PASS: 32 files",
+  "format": "PASS",
+  "simulation": "PASS: three software devices",
+  "document_checks": {
+    "python": 29,
+    "json": 27,
+    "snippets": 8,
+    "links": 95
+  },
+  "notebook_code_cells": 10,
+  "html": "PASS: unique anchors, internal links and SVG XML",
+  "privacy_issues": [],
+  "wheel_source_parity": "PASS",
+  "wheel_sha256": "1b2516a35efcda3a0ea26e6560a729eda5ad01f57aa071065e88a29c85e202b6",
+  "publication": "PENDING",
+  "cleanup": "PASS: generated wheel/extraction directories removed; no temp/cache paths outside protected .git/.venv"
+}

@@ -34,15 +34,13 @@ def main():
         cleanup.callback(shutter.close_shutter)  # Connect verified identity.
         print("Identity:", shutter.identify_device())
 
-        # Explicit channel enable and Disarm establish the manual baseline.
-        shutter.enable_device()  # Explicit one-time channel setup.
-        shutter.disarm_triggers()  # Explicit Inactive/Manual preparation.
-        print("Initial Close:", shutter.get_operating_status().shutter_state)
-
-        # Check readiness explicitly; setters only send commands.
+        # Establish Inactive/Manual before enabling a possibly retained Active state.
+        shutter.disarm_triggers()
         ready = shutter.get_operating_status()
+        print("Initial Close:", ready.shutter_state)
         if not ready.is_closed_manual or not ready.key_enabled:
             raise RuntimeError("Verify Closed/Manual and key before Open")
+        shutter.enable_device()  # Explicit setup only after the baseline read.
         shutter.open_shutter()
         print("Open:", shutter.get_operating_status().shutter_state)
         sleep(args.open_seconds)

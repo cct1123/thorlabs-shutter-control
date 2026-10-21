@@ -1,5 +1,12 @@
 # Project intent
 
+## Follow-up integrated review (REQ-083, derived)
+
+User repeats: review all changes, fix issues, ensure consistency, prune, commit
+and push. Review the published REQ-082 contract, fix supported regressions, retain
+state-only Open/Close and no software interlock gates, validate the final software
+and publish normally to origin/main. This is software-only; no device operation.
+
 ## Active delivery: review, simplify and publish
 
 User requests reviewing all accumulated changes, fixing issues, ensuring

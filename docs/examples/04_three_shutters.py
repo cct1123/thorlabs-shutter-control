@@ -37,7 +37,6 @@ def main():
             shutter = hub.controllers[slot]
             cleanup.callback(shutter.close_shutter)  # Only a verified connection.
             print(f"Shutter {slot + 1}:", shutter.identify_device())
-            shutter.enable_device()  # Explicit one-time channel setup.
             shutter.disarm_triggers()  # Establish Manual/Inactive before opening any.
 
         for number, shutter in enumerate(hub.controllers, start=1):
@@ -45,6 +44,7 @@ def main():
                 ready = shutter.get_operating_status()
                 if not ready.is_closed_manual or not ready.key_enabled:
                     raise RuntimeError("Verify Closed/Manual and key before Open")
+                shutter.enable_device()  # Only after the Inactive/Manual read.
                 shutter.open_shutter()
                 print(f"Opening shutter {number}:", shutter.get_operating_status().shutter_state)
                 sleep(args.open_seconds)

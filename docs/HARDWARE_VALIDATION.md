@@ -50,8 +50,9 @@ uv run --locked python docs/examples/02_connect_and_read_status.py $env:SHUTTER_
 
 ### 2. Close, then one Open/hold/Close
 
-Read status first. With verified identity and readiness, command Close and require
-Closed/Inactive/Manual using explicit Disarm; enable the channel once as needed.
+Read status first. With verified identity, send explicit Disarm and require
+Closed/Inactive/Manual before enabling the channel once as needed. This avoids
+enabling while a retained Active state is still selected.
 Command Open, require Open/Active/Manual, hold for the
 approved interval, then Close and require Closed/Inactive/Manual. The qualified
 bench used a **2-second added hold**; this is not a universal limit or calibrated

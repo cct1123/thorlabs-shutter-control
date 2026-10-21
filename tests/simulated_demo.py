@@ -51,6 +51,8 @@ def main():
                     hub.connect(slot, controller.serial_number)
                     print("Identity:", controller.identify_device())
                     print("Initial:", controller.get_status().shutter_state)
+                    controller.disarm_triggers()
+                    controller.enable_device()
                     controller.open_shutter()
                     print("Open:", controller.get_shutter_state())
                     controller.close_shutter()

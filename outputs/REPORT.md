@@ -26,7 +26,21 @@ has sequential cells, identity-gated error cleanup, explicit feedback reads and
 separate API timings. Published outputs are cleared and repeat is disabled.
 Successful Open leaves the shutter commanded Open until the Close cell runs.
 
-## Validation and pruning
+## Follow-up correction
+
+REQ-083 / E116 / TEST-124: manual tutorials/notebook now send Disarm and verify
+Inactive/Manual before enabling, so a retained Active state is deactivated first.
+Open/Close keep their state-only contract. The notebook repetition checks readiness
+once before its loop; its explanation now matches that behavior. Removed a duplicate
+repeat condition and a redundant lesson status read. Timeout documentation now
+matches settings initialization only; test instructions avoid bytecode caches.
+
+Current source and wheel: **188 passed, 1 skipped** each; lint/format, simulation,
+package parity and documentation checks PASS. Details:
+[follow-up-review-validation.json](../records/follow-up-review-validation.json).
+Hardware behavior of the revised sequence remains untested.
+
+## Prior integrated validation and pruning
 
 E114 / TEST-122: **186 passed, 1 skipped** against source and the extracted wheel.
 Ruff check and format PASS; three-device software simulation PASS. Notebook cells,

@@ -1105,3 +1105,35 @@ Concurrent tools recreated source bytecode after earlier cleanup; exact generate
 folder removed again without touching environment, Git or private data.
 This checkpoint records publication; no further runtime source change or device
 operation. A small documentation/evidence checkpoint commit follows.
+
+## E116 / TEST-124 - Follow-up review and manual initialization order
+
+REQ-083: repeated user request to review/fix/ensure consistency/prune/commit/push.
+Checkout initially clean at b5278de, so reviewed the previous implementation
+rather than inventing uncommitted work. Driver/GUI contracts remain unchanged.
+Manual lesson03/04 and notebook enabled before clearing a retained Active state.
+Risk is mode-dependent activation on enable; no real-hardware claim is made.
+
+Expected: from a fictional prior Triggered/Active state, Inactive/Manual precedes
+Enable; a failed baseline prevents enable. Added two script cases and strengthened
+the existing notebook success scenario. Before fixes, targeted run3 failed/7
+passed; all failures occurred because Enable observed Active. After correction,
+source and extracted-wheel suites each188 passed,1 skipped,0 failed. SDK test is
+opt-in and skipped. Explicit baseline feedback precedes Enable; manual Open/Close
+remain state-only. No software interlock gate, driver readback or implicit setup
+was introduced. Simulation now demonstrates explicit Disarm/Enable preparation.
+
+Pruned one redundant operating-status read in lesson03 and duplicate RUN_REPEAT
+branch in the notebook. Repeat explanation now states one readiness read before
+the loop and no reads inside it. Corrected timeout semantics and bytecode-free
+README/setup test commands. Updated hardware guide and regenerated historical
+supervisor HTML setup guidance; no external document modified.
+
+Commands: .venv/Scripts/python.exe -B -m pytest -q -p no:cacheprovider --tb=short;
+Ruff check --no-cache and format --check --no-cache across src/tests/examples/
+hardware_tests and renderer (32 files); python -B tests/simulated_demo.py --api.
+Fresh wheel build succeeded with declared build dependencies; extracted package
+matched all source/asset bytes and ran the same suite. Python/JSON/snippet/link,
+notebook compilation/output defaults, HTML anchor/SVG and shareable-file scans
+PASS. Evidence/hash/counts: records/follow-up-review-validation.json.
+No hardware access, server launch, wiring/firmware change or physical test.

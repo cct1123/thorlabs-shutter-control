@@ -1,6 +1,20 @@
 # Engineering state
 
-## Current checkpoint - review and publication (REQ-082)
+## Follow-up review validated; publication pending - REQ-083
+
+TEST-124 / E116: source and extracted-wheel suites each188 passed,1 skipped.
+Fixed manual tutorials/notebook to Disarm, read Inactive/Manual, then Enable.
+Three new sequence observations failed against b5278de before correction; all
+pass now. Open/Close remain state-only and software interlock gates remain absent.
+Removed a redundant status read and duplicate repeat branch; corrected timeout,
+repeat-loop and setup descriptions. Guides use bytecode-free test commands.
+Ruff check/format, simulation, snippets/links/JSON and package parity PASS.
+No hardware operation or GUI launch. Human action required: none.
+
+Next: stage the reviewed paths, commit/push to origin/main and verify its hash.
+Current evidence: records/follow-up-review-validation.json and E116.
+
+## Previous integrated review - REQ-082
 
 Software review and implementation publication PASS (E114/E115). User confirmed state-only
 Open/Close and removal of all software interlock gates. Users manage the physical
@@ -146,3 +160,5 @@ acceptance. No broader electrical/physical completion is inferred from no-cable 
 | REQ-080 | Remove launcher interlock confirmation setting | E112/E114; passive launch and config tests | PASS |
 | REQ-081 | No software interlock gating anywhere | E114 / TEST-122; GUI None/False/True cases; tutorial/diagnostic metadata trap; source audit | PASS (software) |
 | REQ-082 | Review, fix, prune, commit and push | E114/E115 / TEST-122/123; source/wheel PASS; f2934c8 pushed and remote verified | PASS (software publication) |
+
+| REQ-083 | Follow-up review, consistency fixes and publication | TEST-124 / E116; source/wheel each188 passed,1 skipped; publication pending | IN PROGRESS |

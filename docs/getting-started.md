@@ -11,7 +11,7 @@ alone does not install Kinesis or a USB driver.
 
 ```powershell
 uv sync --locked
-uv run --locked pytest -q -p no:cacheprovider --ignore=tests/test_sdk.py
+uv run --locked python -B -m pytest -q -p no:cacheprovider --ignore=tests/test_sdk.py
 ```
 
 These commands do not contact hardware.

@@ -19,7 +19,7 @@ c = KCubeShutter(config.SERIAL_NUMBERS[0], timeout=5.0, polling_ms=250)
 | --- | --- |
 | serial_number | Optional eight-digit KSC101 serial starting68, as str or int; normalized to str internally; changing an owned target is refused |
 | kinesis_dir | Optional SDK path; otherwise `config.KINESIS_DIR` (no environment lookup) |
-| timeout | Finite0.5..60s, at least two polling intervals; per feedback wait, not end-to-end deadline |
+| timeout | Finite0.5..60s, at least two polling intervals; settings initialization wait only, not an end-to-end deadline |
 | polling_ms | Integer100..1000ms; default250 |
 
 Confirmation requires the same explicitly selected serial and no retained handle.
@@ -81,8 +81,9 @@ then issue vendor writes. Repeated calls send repeated commands. Native SDK call
 can still block or raise. Successful return means only that the SDK call returned.
 
 ```python
-c.enable_device()                 # Explicit setup once when needed.
 c.disarm_triggers()               # Explicit Inactive/Manual preparation.
+print(c.get_operating_status())    # Establish the intended baseline first.
+c.enable_device()                 # Explicit setup once when needed.
 c.open_shutter()                  # Active only; returns None.
 print(c.get_shutter_state())       # Separate position request/read.
 c.close_shutter()                 # Write, returns None.

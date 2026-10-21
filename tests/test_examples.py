@@ -43,6 +43,17 @@ def test_notebook_uses_explicit_reads_and_preserves_cleanup(rig, monkeypatch, ca
     # Exercise source with the fake SDK; saved lab outputs are not a runtime contract.
     monkeypatch.setattr(time, "perf_counter", driver.time.monotonic)
 
+    if scenario == "success":
+        rig.device.mode = "Triggered"
+        rig.device.operation = "Active"
+        enable = rig.device.EnableDevice
+
+        def enable_after_inactive():
+            assert rig.device.operation == "Inactive" and rig.device.mode == "Manual"
+            enable()
+
+        monkeypatch.setattr(rig.device, "EnableDevice", enable_after_inactive)
+
     repeat_waits = []
 
     def sleep(seconds):
@@ -266,3 +277,23 @@ def test_failed_identity_and_release_never_close_unverified_tutorial_target(
     )
     device.fail.clear()
     module._device_owners[target].disconnect(close_shutter=False)
+
+
+@pytest.mark.parametrize("script", ["03_open_close.py", "04_three_shutters.py"])
+def test_manual_lessons_deactivate_retained_active_before_enabling(rig, monkeypatch, script):
+    serials = list(rig.devices) if script.startswith("04") else ["68000001"]
+    rig.serials[:] = serials
+    for serial in serials:
+        device = rig.devices[serial]
+        device.mode = "Triggered"
+        device.operation = "Active"
+        original = device.EnableDevice
+
+        def enable(current=device, send=original):
+            assert current.operation == "Inactive" and current.mode == "Manual"
+            send()
+
+        monkeypatch.setattr(device, "EnableDevice", enable)
+    main, _ = tutorial(script, monkeypatch, *serials, "--open-seconds", "0.1")
+    main()
+    assert all(not rig.devices[s].IsConnected for s in serials)
