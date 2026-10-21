@@ -1,5 +1,108 @@
 # Project intent
 
+## Review, prune and staged publication (REQ-100, derived)
+
+User: "review all changes. fix inconsistency. prune before commit. commit stage
+by stage. push". Review the complete pending diff, correct supported defects and
+documentation drift, preserve private inputs/results and durable evidence, prune
+verified disposable artifacts, validate source and package, commit in focused
+stages and push to configured origin/main. Preserve passive startup, explicit
+output actions and ownership/cleanup. No physical operation is needed. This
+request authorizes publication of the accumulated REQ-090..099 work; their earlier
+no-publication statements describe the scope of those historical requests.
+
+## Unified USB/Ethernet discovery (REQ-099, derived)
+
+User requests removing each shutter's connection/endpoint/apply controls and the
+global Find devices on the LAN block. Discover should find USB and Ethernet
+automatically using config.py LAN settings. Show detected routes with serials;
+Connect applies the selected detected route without manual transport selection.
+Preserve passive startup/discovery, explicit Connect/output commands, ownership,
+retained-handle cleanup and partial-discovery diagnostics. Broad LAN scanning
+still requires released process handles. Validate software and browser simulation;
+no real hardware operation, commit or push is requested.
+
+## Repository consistency and pruning (REQ-098, derived)
+
+User: "update repo. fix consistency. prune". Reconcile current code/config/API,
+operating guides and validation claims; remove redundant current-state/report
+history and verified disposable generated artifacts. Preserve human criteria,
+durable records, useful regression tests, notebooks with local inputs/results,
+private files and the environment. Validate the integrated source and package in
+software. No hardware operation or new remote publication is requested.
+
+## LAN discovery defaults in config.py (REQ-097, derived)
+
+User asks to use the LAN discovery parameters in config.py. Centralize default
+start/end IPv4 addresses, per-address open timeout and scan-size limit there.
+GUI initial values and omitted Python API arguments must use these settings;
+explicit GUI/API ranges remain available. Preserve the 256-address maximum and
+existing validation/ownership/passive behavior. Validate in software only.
+
+## Discover LAN devices without an exact IP (REQ-096, derived)
+
+User requests LAN discovery without knowing the device IP, default range
+192.168.1.0 through 192.168.1.255. Provide on-demand vendor SDK scanning, a bounded
+editable range and selectable KSC101 results with serial/endpoint. Selecting a
+result fills the released panel's LAN route; connection stays explicit. Preserve
+USB, exact-route validation, retained-handle protection and passive startup.
+Validate protocol/GUI behavior in software; no shutter actuation is authorized.
+
+## Choose USB or Ethernet in the GUI (REQ-095, derived)
+
+User: "users should be able to choose in the gui ethernet or usb". Provide a
+per-panel transport selector and LAN endpoint field, with an explicit passive
+Apply action. No configuration-file edit or server restart is needed to change
+a released panel's route. Preserve identity validation, USB/mixed operation and
+cleanup; refuse route changes while a device handle is retained, including after
+a failed release. Validate with software devices and a browser simulation, without
+operating real hardware. Preserve the user's notebook settings/results.
+
+## GUI Ethernet LAN support and notebook result (REQ-094, derived)
+
+User reports the LAN notebook ran successfully and asks to update the repository
+and GUI for Ethernet LAN communication. Record that success as human-reported
+procedure evidence; do not infer calibrated timing, independent optical sensing
+or an automated GUI bench test. Add per-panel Ethernet route configuration to the
+normal launcher, show each panel's route, filter discovery options to that route,
+retain USB/mixed support, passive startup, identity/ownership and cleanup. Validate
+with software devices; preserve local notebook inputs/results. No real GUI
+actuation/restart or new commit/push requested.
+
+## Match working Kinesis Ethernet connection (REQ-093, derived)
+
+User confirms Kinesis successfully connects to KSC101 and KEH3 over Ethernet and
+requests ShutterHub use that same connection. Resolve SDK discovery using the
+configured cube endpoint and real identity, preserve passive startup/no USB
+fallback, test asynchronous/error/timeout behavior, and verify real discovery,
+connection, identity and communication-only release. Do not actuate outputs,
+change mode/enable/TTL, firmware, wiring or network configuration. Preserve local
+notebook settings/results; no commit/push requested.
+
+## Correct Ethernet implementation from vendor examples (REQ-092, derived)
+
+User reports devices rebooted and Kinesis lists both KEH3 and KSC101, supplies
+its Connect screenshot, and requests studying the official Python examples at
+https://github.com/Thorlabs/Motion_Control_Examples/tree/main/Python and correcting
+Ethernet communication. Follow the actual vendor TCPIP discovery contract, keep
+no USB cable dependency, verify identity/route and use passive hardware checks
+only. Preserve notebook settings/results. Physical Open/Close is not authorized
+by this diagnostic request.
+
+## Diagnose empty LAN cube discovery (REQ-091, derived)
+
+User reports the LAN notebook returning an empty KSC101 list at the configured
+left-bay endpoint. Diagnose using passive identity/discovery only; distinguish
+network reachability, hub response, cube response and software filtering. Do not
+infer actuation authority or change wiring, firmware or network settings.
+
+## LAN-only ShutterHub discovery (REQ-090, derived)
+
+User: fix ShutterHub discovery via LAN; no USB is needed. Require no USB-connected
+device; retain vendor SDK list building for TCPIP. Avoid implicit USB slots; preserve
+explicit USB/mixed operation and identity/endpoint checks. Validate software-only;
+no output actuation, network configuration or firmware change is requested.
+
 ## Prune, commit and push (REQ-089, derived)
 
 User authorizes pruning redundant deliverables, reviewing the integrated pending

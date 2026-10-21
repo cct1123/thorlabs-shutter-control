@@ -1,0 +1,74 @@
+{
+  "date": "2026-10-21",
+  "requirement": "REQ-099",
+  "evidence": "E134",
+  "test": "TEST-144",
+  "scope": "software tests and rendered browser with fake SDK; no real LAN/device operation",
+  "result": {
+    "passed": 250,
+    "skipped": 1,
+    "ruff_lint": "PASS",
+    "ruff_format": "PASS (50 Python/Markdown files)",
+    "markdown_files": 18,
+    "local_links_and_anchors": 136,
+    "python_doc_snippets": 10,
+    "notebooks_preserved": 2
+  },
+  "removed_gui": [
+    "per-panel transport dropdown",
+    "manual endpoint input",
+    "Apply connection",
+    "separate discovered LAN/use controls",
+    "global LAN range/scan block"
+  ],
+  "validated": [
+    "Discover combines USB/configured routes/LAN scan",
+    "one LAN scan shared across cards",
+    "labelled serial and endpoint choices",
+    "explicit Connect applies detected route",
+    "retained handles prevent replacement",
+    "partial transport failures keep other results",
+    "failed/empty discovery clears stale routes",
+    "config defaults used without UI range fields",
+    "USB/LAN/TTL/cleanup/notebook regressions"
+  ],
+  "browser": {
+    "fake_sdk_entire_lifetime": true,
+    "fictional_devices_and_network": true,
+    "observed": [
+      "Discover returns USB and LAN",
+      "USB card1 Connect",
+      "LAN card2 Connect with automatic endpoint",
+      "selectors locked while retained",
+      "requested blocks absent",
+      "card3 combined list",
+      "mode checkmark correct",
+      "fake shutdown successful"
+    ],
+    "screenshot": "docs/assets/gui-unified-discovery.png",
+    "server_exit_code": 0,
+    "port_released": true,
+    "tab_closed": true,
+    "scratch_helper_removed": true
+  },
+  "limits": [
+    "No live LAN range scanning or GUI bench qualification",
+    "No new wheel validation claim",
+    "Prior physical explicit-endpoint evidence is E128",
+    "No actual user GUI restart, commit or push"
+  ],
+  "source_sha256": {
+    "src/thorlabs_shutter_control/controller.py": "332f4f0dc161385d0406f8d412e05c287d1f5750f79a0df5b00f9c97e2eae76c",
+    "src/thorlabs_shutter_control/gui.py": "721fc98e6ce5021e9011f4f0b45427dd763cb70c4a4e86c00fe330ed98d6a350",
+    "src/thorlabs_shutter_control/config.py": "62ca4da608f956123f0b3ae9161f65e3ba8dc82bf8a43ebdc9e50648a8fa3e47",
+    "src/thorlabs_shutter_control/assets/style.css": "54fbe35bc43bfad34f8bfbfa6026ef731a6b72a12ea2e96eb056b8c7482b0f47",
+    "tests/conftest.py": "7032ae5eac5326255d49f7b1c92fbc00291e6500ecb048f08c96918e6ed550a2",
+    "tests/test_gui.py": "448139a1a065052b1e2337cd8db359545e68b6581c631eefaf6022c10901ece0",
+    "tests/test_hub.py": "0f55a7600e251a83ecc2ea504a5bb14d935867bd5c76980eacb24b8c22838454",
+    "tests/test_lan_discovery.py": "642bfcfb4aa55ef5c2579aca9fb2be1c606026daad52cafd5a94f64267424633"
+  },
+  "notebook_sha256_preserved": {
+    "docs/examples/shutter_lan_tutorial.ipynb": "fc609ca6e6fcd9017f87abd4b62b978db7bae157eab90d2a49909d671159b1a9",
+    "docs/examples/shutter_open_close_tutorial.ipynb": "ef915d5ebcfc03f47c4d0a988afc913e70b76d8e2437915f37a9d3a19533d11d"
+  }
+}

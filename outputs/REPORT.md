@@ -1,68 +1,84 @@
 # Shutter controller report
 
-The current software provides a passive local Dash GUI, USB-only KCubeShutter
-and ShutterHub routing for USB or explicit experimental KEH3 Ethernet endpoints.
-Serials accept strings or integers. Setters send commands and return None; getters
-request feedback separately. Open/Close send Active/Inactive only, preserving mode
-and enable state. Explicit Enable sets up the channel; Disarm sends Inactive/Manual
-and Arm sends Enable/Triggered/Active. Users manage physical interlocks externally;
-software interlock feedback and confirmation are informational.
+## Result
 
-## GUI and operation
+REQ-100 / E135 reviews and validates the accumulated USB/LAN work, fixes stale
+route reconnection after a failed rescan, and separates private notebook results
+from the shared template. Publication is pending staged commits and remote verification.
 
-Compact modern panels retain the Kinesis control layout and four modes. Manual
-uses Open/Close; Single/Auto/Trigger use Start/Stop. Mode changes require fresh
-Inactive/Closed feedback. Trigger Start rereads actual input settings; Single/Auto
-use stored cycle settings. Ready describes application readiness; Error describes
-driver/communication faults. Reported position is not independent blade sensing.
+REQ-099 / E134: the normal GUI now has one **Discover** action for USB and KEH3
+Ethernet. Per-shutter connection type/endpoint/apply controls and the separate LAN
+range/scan block are removed. Historical changes remain in [records](../records/RECORDS.md).
 
-The launcher-owned shutdown button attempts Close/release on every device and
-exits after returning its HTTP response. Cleanup failures leave the server
-available. Embedded apps retain host ownership unless given a shutdown callback.
-Browser closure does not stop devices; native SDK calls can block cleanup.
+## Operation and configuration
 
-[Setup](../docs/getting-started.md), [GUI](../docs/gui.md),
-[API](../docs/python-api.md), [architecture](../docs/architecture.md) and
-[interface contract](../docs/INTERFACE.md) describe configuration and operation.
-The [tutorial index](../docs/examples/README.md) includes USB and LAN notebooks,
-explicit setup, feedback and cleanup. Published notebook outputs are clear.
+Run `uv run shutter-control`. Startup is passive. Click Discover, choose a device
+from a shutter's labelled serial/route list, then Connect. The detected route is
+applied automatically to the released panel. No manual transport or IP entry is
+needed. Connect/output commands stay explicit. Retained handles cannot be replaced;
+full broad scanning requires released process handles. Skipped/failed transports
+warn while other results remain selectable. Close competing owners for a full scan.
 
-## Current software validation
+[config.py](../src/thorlabs_shutter_control/config.py) provides startup defaults:
 
-REQ-084 through REQ-088: **204 passed, 1 skipped** (optional real SDK); lint and
-format PASS across32 source/test/example/helper files. Six current browser
-captures cover startup, all four modes across main/Auto views, expanded TTL, six
-empty panels and375px layout. Connected captures use fictional software devices.
-No real SDK/device operation or live GUI restart occurred during these changes.
-Preview servers exited normally and released listeners.
+| Parameter | Default |
+| --- | --- |
+| LAN_SCAN_START_IP | 192.168.1.0 |
+| LAN_SCAN_END_IP | 192.168.1.255 |
+| LAN_SCAN_MAX_ADDRESSES | 256 (integer1..256) |
+| LAN_SCAN_OPEN_TIMEOUT_MS | 100 ms (integer50..1000) |
 
-[Documentation validation](../records/documentation-review-validation.json),
-[modern styling validation](../records/gui-modern-validation.json),
-[four-mode validation](../records/gui-design-validation.json) and
-[evidence index](../records/RECORDS.md) distinguish current source checks from
-historical wheel/bench results. REQ-089 prunes superseded red-style screenshots
-and repeated reporting while retaining useful tests and bench evidence.
+GUI Discover uses these defaults directly. Explicit Python API scan
+arguments can override config defaults; the size limit still applies. Restart the
+GUI after file edits. Vendor scanning probes port40303 and enumerates documented
+KEH3 ports40304..40307, accepting type68 serials with matching TCPIP routes. Native
+calls have no hard host deadline. No KEH6 LAN mapping or USB fallback is assumed.
 
-![Modern panels in software simulation](../docs/assets/gui-modern-simulation.png)
+KCubeShutter is USB-only; ShutterHub owns routes and dispatch. Setters send commands
+and return None; getters read feedback separately. Manual Open/Close preserve mode
+and enable state. Mode, readiness and TTL preparation remain application checks.
+Users manage the physical interlock externally. Shutdown attempts Close/release
+for every retained handle; native hangs and browser closure do not guarantee
+physical shutdown. Guides: [GUI](../docs/gui.md), [API](../docs/python-api.md),
+[architecture](../docs/architecture.md), [tutorials](../docs/examples/README.md).
 
-All current screenshots and retained historical captures are indexed in
-[asset provenance](../docs/assets/README.md). The historical
-[supervisor notebook](supervisor-notebook.html) and its renderer preserve earlier
-bench reporting; they do not qualify current command/GUI paths.
+## Validation and cleanup
 
-## Physical qualification limits
+TEST-145: source and extracted-wheel suites each **251 passed, 1 skipped**
+(optional real SDK). Lint/format, package source/CSS parity, fake API simulation,
+notebook/doc/link/privacy checks PASS. The stale-selection regression failed
+before correction and passes afterward. E134 browser fake-SDK simulation verified combined
+USB/LAN discovery, automatic route on explicit Connect, mixed connections,
+retained-handle locking and cleanup. The removed controls are absent from actual
+Dash layout/callbacks. Partial USB/LAN failures preserve successful results and
+clear stale choices. Source hashes and methods:
+[current evidence](../records/lan-publication-review-validation.json),
+[prior browser evidence](../records/unified-discovery-validation.json).
 
-Historical single-pair USB/browser readback and user-observed motion remain
-recorded. Changed command/GUI paths need affected bench validation. Cube Ethernet,
-KEH6/multiple real pairs, electrical TTL, physical recovery and calibrated timing
-remain unqualified. The active-low no-cable expectation failed and is unresolved;
-see [TTL results](../records/ttl-summary.json) and
-[hardware procedure](../docs/HARDWARE_VALIDATION.md). Software simulation cannot
-resolve these physical gaps; no overall hardware completion is claimed.
+![Simplified discovery, software simulation](../docs/assets/gui-unified-discovery.png)
 
-## Publication
+No real network/device operation occurred. Local notebook results, environment,
+historical images/records and the [supervisor HTML](supervisor-notebook.html) remain
+preserved. Old screenshots of manual transport forms are historical E130/E131
+artifacts. The executed LAN notebook is preserved byte for byte in ignored
+`inputs/private/notebooks/`; its shared template has blank settings and cleared
+outputs. Verified generated caches, package scratch and the unreferenced supervisor
+preview are pruned. Restart GUI once to load this update.
 
-REQ-089 / E123-E124: implementation **a19c33c** pushed to origin/main; exact remote
-hash verified. The two superseded red-style previews and repeated reporting were
-pruned. Concurrent controller.py/test_hub.py edits were preserved outside this
-publication and are not qualified by its validation.
+## Physical evidence and remaining limits
+
+E128 / TEST-138 observed a real KEH3/KSC101 explicit-endpoint LAN discovery,
+identity, Connect and passive release: discovery0.844s, release0.953s outside the
+restricted sandbox. A restricted run hung in native Disconnect; the environment
+cause remains unproven. The user also reports successful LAN notebook execution;
+the preserved outputs report discovery, identity, Open/Close feedback and release.
+Independent blade observations and timing were not supplied.
+
+Live range scanning, current GUI bench paths, Ethernet actuation/timing,
+KEH6/multiple real pairs, external electrical TTL, physical loss recovery and
+calibrated exposure/shutdown remain untested. Historical USB evidence does not
+qualify changed paths. The active-low no-cable expectation failure remains
+unresolved. [LAN evidence](../docs/ethernet-assessment.md),
+[hardware procedure](../docs/HARDWARE_VALIDATION.md) and [TTL results](../records/ttl-summary.json)
+preserve these boundaries. Software completion does not establish physical or
+calibrated acceptance.

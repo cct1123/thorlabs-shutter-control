@@ -15,26 +15,70 @@ informational and does not gate Open or Arm; no GUI confirmation is required.
 
 ![Modern GUI with software devices](assets/gui-modern-simulation.png)
 
-Current GUI with three fictional software devices. Compact neutral panels,
+Mode/feedback layout with three fictional software devices, captured before the
+LAN selector/discovery controls were added. Compact neutral panels,
 flat action buttons and status lamps retain the supplied Kinesis control layout
 and its Manual, Single, Auto and Trigger modes. The screenshot is labelled
 simulation and is not hardware evidence.
 
 Panel count is configured in `config.py`: `SLOTS` accepts a positive integer.
-The default is three or enough to fit all preselected serials. Larger layouts
+The USB default is three or enough to fit all preselected serials. When Ethernet
+endpoints are supplied, it fits those endpoint/serial lists. Larger layouts
 wrap across rows; Discover does not resize the session or auto-connect devices.
 The [375px preview](assets/gui-modern-narrow.png) shows the single-column layout
 with expanded TTL settings.
 Every launcher panel, including `SLOTS = 1`, requires a selected serial for Connect.
 For one panel, Discover selects a sole discovered device in the visible dropdown.
 
+## Ethernet LAN configuration
+
+Click **Discover** to find USB and Ethernet controllers together. Choose a device
+in a shutter's **Device serial** dropdown, then **Connect**. Each result includes
+its detected transport; LAN results also show the endpoint. Connect applies that
+route automatically. Discovery and selection do not connect or actuate a shutter.
+There are no per-panel transport/endpoint controls or separate LAN scan block.
+
+![Unified USB/Ethernet discovery, software simulation](assets/gui-unified-discovery.png)
+
+The LAN range and timeout come from `LAN_SCAN_START_IP`, `LAN_SCAN_END_IP`,
+`LAN_SCAN_MAX_ADDRESSES` and `LAN_SCAN_OPEN_TIMEOUT_MS` in
+[config.py](../src/thorlabs_shutter_control/config.py). Defaults are
+192.168.1.0 through 192.168.1.255, inclusive, at most 256 addresses, 100 ms per
+address. Restart the GUI after editing config.py. No exact device IP is needed.
+Optional `SERIAL_NUMBERS`/`ETHERNET_ENDPOINTS` still supply startup selections and
+explicit routes; configured routes are also checked during discovery.
+
+Discover performs USB enumeration, configured-route discovery where applicable,
+and one shared LAN scan for all cards. Broad LAN scanning requires every process
+handle released. If a handle is retained or one transport fails, the GUI reports
+the limitation and keeps successful results. Connected/faulted identities remain
+visible and keep their cleanup path. Release controllers and close competing
+Kinesis/notebook owners for a full fresh scan. Native SDK calls may block; an
+empty result does not prove absence. Startup itself never discovers or connects.
+
+Selections last for the server session. Changing a released panel's selected
+device automatically configures the detected route on Connect; retained handles
+cannot be replaced. No fallback to another endpoint/transport occurs after a
+route is selected. Duplicate serial ownership remains refused. Multi-panel
+Discover does not assign the same sole device to every empty card.
+After any Discover attempt, Connect requires a result from that latest snapshot;
+a stale browser selection cannot reconnect an omitted target on an old route.
+Startup preselection can still connect before the first Discover.
+
+KEH3 uses port40303 for the hub,40304/40305/40306 for left/middle/right bays and
+40307 for USB OUT. Only matching type68 TCPIP identities are LAN controller
+results. Follow the [LAN setup guide](ethernet-assessment.md), including USB IN
+disconnected for Ethernet. KEH6 LAN mapping remains unsupported. The screenshot
+uses fictional software devices and is not hardware validation.
+
 ## Main controls
 
 | Control/readout | Behavior |
 | --- | --- |
 | Connection badge/count | Healthy connected panels; a fault can retain a handle even when excluded from the count |
-| Device serial | Explicit target; locked while a handle is retained |
-| Discover | USB enumeration without connection/output; preserves retained identities |
+| Transport label | Selected detected route before Connect; configured route while a handle is retained |
+| Device serial | Explicit target with detected USB/LAN route; locked while a handle is retained |
+| Discover | Shared USB/configured-route/LAN discovery using config.py; labelled results appear in each panel; partial failures and retained identities stay visible |
 | Connect | Verify serial, initialize communication/polling and read feedback; no explicit output/mode write |
 | Reported state | Open, Closed or Unknown; text/color reflect controller feedback, not optical proof |
 | Key/interlock | SDK indication plus optional operator evidence; a clear interlock bit stays unknown, and neither indication nor confirmation gates commands |

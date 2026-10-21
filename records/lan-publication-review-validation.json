@@ -1,0 +1,99 @@
+{
+  "date": "2026-10-21",
+  "requirement": "REQ-100",
+  "evidence": "E135",
+  "test": "TEST-145",
+  "scope": "software-only integrated source/wheel review; no real SDK/network/device operations",
+  "result": {
+    "source": {
+      "passed": 251,
+      "skipped": 1
+    },
+    "wheel": {
+      "passed": 251,
+      "skipped": 1
+    },
+    "ruff_lint": "PASS",
+    "ruff_format": "PASS",
+    "package_source_css_parity": "PASS (6 files)",
+    "three_device_api_simulation": "PASS; all released"
+  },
+  "checks": {
+    "markdown_files": 18,
+    "local_links_and_anchors": 137,
+    "python_doc_snippets": 10,
+    "json_files": 39,
+    "notebook_templates": 2,
+    "private_notebook_hash_verified": true,
+    "historical_requirement_ids_preserved": true,
+    "public_identity_scan": "PASS"
+  },
+  "fixes": [
+    "Refuse stale/omitted serials after any GUI discovery attempt, including previously configured LAN routes",
+    "Preserve exact executed LAN notebook privately; publish blank settings and cleared outputs",
+    "Correct API discovery snapshots versus GUI retained-handle visibility",
+    "Reconcile route labels, screenshot provenance, validation and publication status"
+  ],
+  "regression": {
+    "test": "test_failed_rescan_cannot_reconnect_a_previously_configured_lan_target",
+    "before": "FAIL: Connected instead of Disconnected",
+    "after": "PASS: rejected before any device call"
+  },
+  "package": {
+    "command": "uv build --wheel --offline --out-dir tmp/review-package",
+    "sha256": "7c5fffd002d585bce482d615613b60c3187abb46ee71fe33ea5e7776b25a9406",
+    "import_origin": "tmp/review-package/extracted/thorlabs_shutter_control/__init__.py",
+    "private_inputs_docs_records_excluded": true
+  },
+  "notebooks": {
+    "private_original": "inputs/private/notebooks/shutter_lan_tutorial-fc609ca6e6fc.ipynb",
+    "original_sha256": "fc609ca6e6fcd9017f87abd4b62b978db7bae157eab90d2a49909d671159b1a9",
+    "ignored_and_hash_verified": true,
+    "public_lan_sha256": "334378a476fd9fbdbfde0dae9d92c24be39156843a694772079b1112a4adb599",
+    "open_close_unchanged": true
+  },
+  "pruned": [
+    {
+      "path": ".ruff_cache",
+      "files": 4,
+      "bytes": 1070.0
+    },
+    {
+      "path": "src/thorlabs_shutter_control/__pycache__",
+      "files": 5,
+      "bytes": 105428.0
+    },
+    {
+      "path": "tmp/review-package",
+      "files": 12,
+      "bytes": 138311.0
+    }
+  ],
+  "prior_pruning": "E133: unreferenced outputs/supervisor-notebook-preview.jpg; deletion reviewed and retained",
+  "source_sha256": {
+    "src/thorlabs_shutter_control/config.py": "62ca4da608f956123f0b3ae9161f65e3ba8dc82bf8a43ebdc9e50648a8fa3e47",
+    "src/thorlabs_shutter_control/controller.py": "332f4f0dc161385d0406f8d412e05c287d1f5750f79a0df5b00f9c97e2eae76c",
+    "src/thorlabs_shutter_control/gui.py": "9d08032c214469256d5f0837a2d842342483c4bbeed4e90c4c44129191c95220",
+    "src/thorlabs_shutter_control/__init__.py": "9968bd00d5520f9de214c78c05892965134b9d8f5ff99c7f5d27bd28ab79e281",
+    "src/thorlabs_shutter_control/__main__.py": "6e6475b2913ee076784c8eb6b4ac73a119f745c3478ee0a8c5e9ac0201a218b5",
+    "src/thorlabs_shutter_control/assets/style.css": "54fbe35bc43bfad34f8bfbfa6026ef731a6b72a12ea2e96eb056b8c7482b0f47",
+    "tests/conftest.py": "7032ae5eac5326255d49f7b1c92fbc00291e6500ecb048f08c96918e6ed550a2",
+    "tests/simulated_demo.py": "96f82fe7e0af35bfffede0617bfd799050fdada780593602ab60e28c2fdec13c",
+    "tests/test_cli.py": "c9a923d766da9197f824e5410fc84e71a8080bfc5ae0d54abd93da08ea9e30bb",
+    "tests/test_controller.py": "c6c15f147087481a18b2aa212bf0114ad004bf2a8a948d423473e7c141dae1d5",
+    "tests/test_diagnostics.py": "31613eca99bb98bc8d9e2a6efad4804a475bf25752822dd01cfbba94f6376924",
+    "tests/test_examples.py": "658542eac8d6bcd938033405a4503131e2dbadbc93e884f524514f9f4f4f755e",
+    "tests/test_gui.py": "cbbd7dd359031c217bf34f3914d4aea0a7b30c47c79d66a0dedd77af9eb63d19",
+    "tests/test_hub.py": "0f55a7600e251a83ecc2ea504a5bb14d935867bd5c76980eacb24b8c22838454",
+    "tests/test_lan_discovery.py": "f34116665f40d975a3dd1cccd2781d7f86a447866be429cb6c23563b0376b95c",
+    "tests/test_sdk.py": "6cd2b5d072cfb340859863111d160474200b2d619d29a58873dfcd1aacffad67",
+    "tests/test_triggers.py": "e1144258003d3fbd420b937b19cf1c7d84936cd8032949df85bda1e5f4f6d89a"
+  },
+  "limits": [
+    "Optional real SDK test skipped",
+    "No fresh browser operation; E134 layout capture visually reviewed, changed Connect guard validated through actual Dash callback HTTP",
+    "Live range scanning/current GUI bench operation and Ethernet actuation/timing remain unqualified",
+    "Historical E125..E134 hashes/results retain their original revision scope"
+  ],
+  "publication": "pending staged commits and remote verification; tracked separately by E136 / TEST-146"
+}

@@ -31,7 +31,8 @@ or hub IP/firmware configuration is introduced.
 
 | Operation | SDK contract |
 | --- | --- |
-| Discovery | KCubeShutter filters FTDI USB entries; ShutterHub registers explicit network entries and filters TCPIP/comspec per slot |
+| Discovery | KCubeShutter filters FTDI USB entries; ShutterHub registers LAN entries, builds once, polls CheckForConnectionChanges for asynchronous identities, and filters TCPIP/comspec per slot |
+| LAN range discovery | ScanEthernetRange(start, end, 40303, open_timeout_ms) finds host addresses; register their KEH3 ports40304–40307 and poll matching type68 TCPIP identities. Default inclusive range192.168.1.0–255, maximum256 addresses; no retained process handles |
 | Connect | CreateKCubeSolenoid, Connect, settings initialization, StartPolling, identity check; no operating-feedback request |
 | USB health | IsConnected true, USBConnected Connected or Connecting, CommsStatus OK |
 | Ethernet health | ShutterHub owns endpoint/provider checks; its network channel requires IsConnected and CommsStatus OK |

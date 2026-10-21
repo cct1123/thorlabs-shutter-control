@@ -1,132 +1,104 @@
 # Engineering state
 
-## Pruning and publication COMPLETE - REQ-089
+## Current checkpoint - REQ-100 VALIDATED, publication pending
 
-TEST-131 / E123: superseded previews and repeated reporting pruned. Source suite
-204 passed,1 optional SDK skip; full lint/format/docs/privacy checks PASS.
-Implementation a19c33c pushed to origin/main and exact remote hash verified
-(E124 / TEST-132). Current software evidence and physical limitations remain in
-records/prune-publication-validation.json and outputs/REPORT.md.
+Source: PROJECT.md latest review/prune/staged commit/push request. E135 / TEST-145:
+final source and extracted-wheel suites each **251 passed, 1 optional SDK skip**;
+lint/format, package parity, simulation, docs/links/snippets/privacy PASS.
+Fixed stale LAN reconnection after failed rescan; its regression failed before
+the fix. Preserved the executed LAN notebook byte-for-byte in ignored
+inputs/private/notebooks; the shared notebook has blank settings/cleared outputs.
+Current evidence: records/lan-publication-review-validation.json. E134 browser evidence
+remains applicable to the unchanged layout; the Connect guard has callback tests.
+Screenshot: docs/assets/gui-unified-discovery.png. Earlier counts/hashes in records
+are historical. REQ-099 supersedes REQ-095's manual GUI form.
+Implementation/tests committed as 66ebe49. Plan: commit documentation/evidence/pruning; push and
+verify; commit/push the publication checkpoint. No hardware/network discovery or
+actual GUI restart performed or needed for this review.
 
-Concurrent uncommitted edits appeared in src/thorlabs_shutter_control/controller.py
-and tests/test_hub.py during publication. Preserved/excluded from this commit;
-validation here covers the published implementation, not those concurrent edits.
-No hardware operation or live GUI restart. No human action required for this
-publication. Final evidence checkpoint follows as a documentation-only commit.
+## Architecture and configuration
 
-## Documentation and screenshots COMPLETE (software) - REQ-088
+KCubeShutter is USB-only. ShutterHub owns USB/explicit KEH3 TCPIP routes,
+configurable slots, range discovery and command dispatch. One GUI Discover action
+returns USB and Ethernet serial/route choices. Connect automatically applies the
+selected detected route to a released panel. Per-panel transport/endpoint controls
+and the separate global LAN block are removed. Retained/failed-release handles
+keep ownership and cleanup available. Broad scan requires all process-owned
+handles released; skipped/failed transports warn without hiding other results.
+Connect verifies serial and route; output commands remain explicit. Setters write
+and return None; getters request feedback. Users manage the physical interlock.
 
-TEST-130 / E122: reviewed17 public Markdown documents and both tutorial notebooks
-against current source. Corrected mode/start readiness, explicit setup, Arm versus
-Trigger Start, shutdown ownership and historical hardware scope. Refreshed six
-modern screenshots: startup, main modes, Auto, expanded TTL, six panels and375px
-layout. Existing old captures retained as historical evidence.
+| Setting | Shared default / contract |
+| --- | --- |
+| KINESIS_DIR | C:/Program Files/Thorlabs/Kinesis |
+| SERIAL_NUMBERS / ETHERNET_ENDPOINTS | Empty tuples; no real identities in shared defaults |
+| SLOTS | None: USB defaults to at least 3; supplied endpoint/serial lists determine LAN count |
+| LAN_SCAN_START_IP / LAN_SCAN_END_IP | 192.168.1.0 through 192.168.1.255, inclusive |
+| LAN_SCAN_MAX_ADDRESSES | 256; configurable integer 1..256 |
+| LAN_SCAN_OPEN_TIMEOUT_MS | 100 ms; integer 50..1000 |
+| PORT | Localhost 8050 |
 
-Source suite204 passed,1 optional SDK skip; full source/tests/examples/hardware
-helper lint and format PASS (32 files). LAN notebook formatting drift resolved.
-Local links/anchors and Python snippets validated; notebook outputs remain clear.
-Evidence: records/documentation-review-validation.json. All isolated preview
-servers exited0, listeners released, viewport reset and temporary tab closed.
-No real SDK/device operation, live GUI restart, commit or push. Hardware timing,
-current mode controls and Ethernet remain unqualified physically. No human action
-required for documentation delivery.
+Launch: `uv run shutter-control`, then Discover -> select device -> Connect.
+LAN range/timeout are config.py settings; no on-screen range/transport entry is
+needed. Configured explicit routes remain supported by Python and startup config.
+SDK scan probes port40303, registers KEH3 ports40304..40307, refreshes asynchronous
+type68 identities and validates exact TCPIP endpoints. Native calls may block.
 
-## Current feature validation - REQ-084 through REQ-088
 
-Launcher shutdown closes/releases devices and exits after its response; failures
-keep the server available (E118 / TEST-126). Four-mode controls preserve state-only
-commands; Trigger Start reads actual input settings (E119 / TEST-127). Modern flat
-styling supersedes the red Kinesis aesthetic (E121 / TEST-129). Current captures
-are in docs/assets/gui-modern-*.png; superseded red preview files were pruned.
-LAN tutorial routes through ShutterHub with passive and explicit actuation paths
-(E120 / TEST-128). Current integrated suite204 passed,1 optional SDK skip; full
-lint/format PASS. Detailed historical evidence remains in records/RECORDS.md and
-validation JSON. Physical mode/timing/TTL/Ethernet qualification remains open.
+## Evidence and physical limits
 
-## Follow-up review and publication complete - REQ-083
+E128 / TEST-138 observed one actual KEH3/KSC101 explicit-endpoint LAN discovery,
+matching identity, Connect and communication-only release. Discovery took0.844s,
+release0.953s outside the restricted sandbox. A restricted run hung in native
+Disconnect; its helper exited after interruption. The environment cause is not
+established. This evidence does not qualify range scanning or blade motion.
 
-TEST-124 / E116: source and extracted-wheel suites each188 passed,1 skipped.
-Fixed manual tutorials/notebook to Disarm, read Inactive/Manual, then Enable.
-Three new sequence observations failed against b5278de before correction; all
-pass now. Open/Close remain state-only and software interlock gates remain absent.
-Removed a redundant status read and duplicate repeat branch; corrected timeout,
-repeat-loop and setup descriptions. Guides use bytecode-free test commands.
-Ruff check/format, simulation, snippets/links/JSON and package parity PASS.
-No hardware operation or GUI launch. Human action required: none.
+The user reports a successful LAN notebook run; independent timing/optical
+observations were not supplied. Its executed copy is preserved byte for byte in
+ignored inputs/private/notebooks; shared notebook settings/outputs are cleared.
+The Open/Close notebook remains unchanged. Historical USB motion/readback and TTL evidence remain in
+records/hardware-validation.json and records/ttl-summary.json. Current GUI bench
+operation, LAN range scanning, Ethernet actuation, KEH6/multiple actual pairs,
+electrical TTL, physical loss recovery and calibrated timing remain unqualified.
+Active-low no-cable expectation E082 remains unresolved. Overall physical project
+acceptance is incomplete; this cleanup's software requirements pass.
 
-Implementation fd70b46 pushed normally to origin/main and exact remote hash
-verified (E117 / TEST-125). No further implementation work for this request.
-Current evidence: records/follow-up-review-validation.json and E116/E117.
+## Pruning and continuity
 
-## Previous integrated review - REQ-082
+Repeated progress/checkpoint/report prose is consolidated here and in
+outputs/REPORT.md. Append-only records and historical requirement mappings below
+retain the chronology. Removed only the unreferenced generated supervisor HTML
+preview image, verified cache files and this review's disposable package scratch.
+The HTML report/renderer, historical bench/GUI images, validation records, private
+inputs and .venv remain. E135 also removed verified generated Ruff/bytecode caches
+and its wheel-validation scratch. No pending helper/process or physical action.
 
-Software review and implementation publication PASS (E114/E115). User confirmed state-only
-Open/Close and removal of all software interlock gates. Users manage the physical
-circuit. Optional Python interlock readings/confirmation remain informational;
-GUI, tutorials and diagnostic helpers do not gate on them.
-
-TEST-122 / E114: source and extracted-wheel suites each186 passed,1 skipped. Initial failures after
-the concurrent edit were reconciled to the user's confirmed contract, preserving
-the state-only change. Lint/format and simulation PASS. No hardware command or
-server launch during this review.
-
-Current architecture: KCubeShutter is USB-only; ShutterHub owns explicit per-slot
-Ethernet endpoints and dispatch. Setters write/return None; getters request
-feedback. Connect verifies identity without requesting operating feedback. Zero
-state is unknown. Writes clear cached observations; Close/release remain available
-after faults. Open/Close send Active/Inactive only. Explicit enable_device()
-provides channel setup; Disarm selects Inactive/Manual. Arm remains the compound
-Enable/Triggered/Active operation. GUI manual Open requires Manual and assumes an
-enabled controller. Native calls may block; successful writes do not prove closure.
-
-Launch: edit src/thorlabs_shutter_control/config.py, then uv run shutter-control.
-Published SERIAL_NUMBERS is empty; choose actual identities locally. Default is
-three passive panels. Notebook outputs are cleared and optional repeat is false.
-No CLI/environment hardware configuration or interlock confirmation flag.
-
-Tests retain eight modules with representative contracts, error/interrupt/cleanup,
-routing, GUI, examples and diagnostic workflows. E108 documents the substantial
-reduction and cache cleanup; older exhaustive counts are historical. Source and
-wheel validation apply to the current reduced suite.
-
-## Bench state and remaining qualification
-
-Historical topology: Windows USB -> KEH3 -> KSC101 firmware1.0.7 -> SH05R;
-Kinesis1.14.60.27990, Python3.12.7 x64/pythonnet3.1. E110 observed passive current-GUI
-USB connection. E111 later observed all GUIs stopped and no port8050 listener;
-that is the last process observation, not a current ownership/closure guarantee.
-Recheck transient hardware state before any authorized bench work.
-
-Changed direct command/GUI paths require physical revalidation. Cube Ethernet,
-actual KEH6/multiple real pairs, physical communication-loss recovery, calibrated
-shutdown/exposure and electrical TTL remain unqualified. E082 preserves the
-unresolved active-low no-cable expectation failure. Stage7 was removed, not passed.
-The project is not physically COMPLETE. No hardware test is required for this
-software publication request. Human action required: none.
-
-## Evidence and next action
-
-Current review: records/review-publication-validation.json and records/RECORDS.md
-E114. Historical bench indexes: records/hardware-validation.json,
-records/current-hardware-tests.json and records/ttl-summary.json. Private raw
-archive retention: records/archive/README.md. The illustrated supervisor notebook
-summarizes historical bench results; its launch examples now match current config.
-
-Implementation f2934c8 pushed normally to origin/main and exact remote hash
-verified (E115 / TEST-123); prior publication checkpoint is b5278de.
-No further implementation action. Preserve .venv, .git, private inputs and raw data.
+Human action required: none for software delivery. Next operator step: restart the
+GUI to load changed source, release competing owners and use the documented
+USB/LAN flow. Bench qualification remains a separate authorized activity.
 
 ## Requirements
 
-Full current criteria: PROJECT.md; historical detailed criteria/evidence: archive.
-Earlier IDs are retained; scope labels distinguish software, readback and physical
-acceptance. No broader electrical/physical completion is inferred from no-cable readback.
+Full criteria remain in PROJECT.md. E135 revalidates current software paths;
+older rows below retain historical task evidence and its original scope, not a
+claim that old test totals or physical measurements describe this revision.
 
 | ID | Short criterion | Validation / evidence | Status |
 | --- | --- | --- | --- |
+| REQ-100 | Full review, consistency/pruning, staged commits and push | E135 / TEST-145 software PASS; remote verification pending | IN PROGRESS (publication) |
+| REQ-099 | Unified USB/Ethernet Discover; remove manual GUI forms | E134 / TEST-144; software/browser PASS | PASS (software) |
+| REQ-098 | Repository consistency and pruning | E133 / TEST-143; source/wheel 249 PASS, 1 SDK skip; docs/package/pruning checks | PASS (software) |
+| REQ-097 | LAN defaults in config.py | E132; E133 current config/GUI/API regression | PASS (software) |
+| REQ-096 | LAN discovery without exact IP | E131; E133 range/identity/ownership/GUI regression | PASS (software; live range scan UNTESTED) |
+| REQ-095 | USB/Ethernet choice in GUI | E130 historical form; REQ-099 replaces manual selection with automatic detected routes | SUPERSEDED (GUI controls) |
+| REQ-094 | Launcher/GUI LAN routing and notebook result (derived) | E129 / TEST-139; 213 software PASS; human notebook success reported | PASS (GUI software scope) |
+| REQ-093 | Match working Kinesis Ethernet connection (derived) | E128 / TEST-137/138; 207 software PASS; actual passive LAN PASS | PASS (connection only) |
+| REQ-092 | Vendor-example Ethernet correction | E128 / TEST-137/138; register/build plus connection-change refresh | PASS (passive connection scope) |
+| REQ-091 | Diagnose empty LAN cube list | E128; missing asynchronous SDK refresh reproduced and corrected | PASS (discovery defect; earlier transient timeouts not fully explained) |
+| REQ-090 | LAN discovery without USB device dependency | E128 / TEST-137/138; async refresh regression and real passive LAN connection | PASS (passive Ethernet; output actuation untested) |
 | REQ-086 | LAN ShutterHub-to-cube tutorial (derived, PROJECT.md) | TEST-128 / E120; seven notebook scenarios, 74 affected tests | PASS (notebook/software only) |
 | REQ-044 | Firmware update procedure preparation | E048 / TEST-058, update later completed E050 | PASS (preparation) |
-| REQ-043 | Resolve KSC101 through KEH3 Ethernet with minimal code and passive tests (derived, latest PROJECT.md request) | TEST-055 / E045 software path PASS; TEST-056 / E046 hub PASS, confirmed left cube bay silent; human vendor-GUI comparison also hub only | BLOCKED (physical communication) |
+| REQ-043 | Resolve KSC101 through KEH3 Ethernet with passive tests | E128 / TEST-138; real discovery, identity, TCPIP endpoint, Connect and release | PASS (one-pair passive LAN; output actuation separate) |
 | REQ-042 | Revise actual-hardware acceptance procedure (derived, latest PROJECT.md request) | TEST-054 / E044; current evidence reconciliation, snippet compilation and 8 software-device cases | PASS (plan only) |
 | REQ-041 | Minimal controller hardware-handling revision (derived, latest PROJECT.md request) | TEST-053 / E043; 346 offline tests and scoped lint/format; actual SDK/bench revalidation pending | PASS (software only) |
 | REQ-040 | Holistic review and comprehensive package development plan (derived, latest review request in PROJECT.md) | TEST-045 / E035; source/docs review, two software reproductions, 279-test baseline and prioritized roadmap | PASS (review/planning only) |

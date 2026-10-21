@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-21",
+  "requirement": "REQ-097",
+  "evidence": "E132",
+  "test": "TEST-142",
+  "scope": "software-only fake SDK and real Dash layout/callback; no network/hardware/browser",
+  "result": {
+    "passed": 246,
+    "skipped": 1,
+    "python_lint": "PASS",
+    "python_format": "PASS (30 files)",
+    "diff_check": "PASS",
+    "python_doc_snippets": 11,
+    "local_file_links": "PASS"
+  },
+  "defaults": {
+    "LAN_SCAN_START_IP": "192.168.1.0",
+    "LAN_SCAN_END_IP": "192.168.1.255",
+    "LAN_SCAN_MAX_ADDRESSES": 256,
+    "LAN_SCAN_OPEN_TIMEOUT_MS": 100
+  },
+  "validated": [
+    "custom config feeds API and actual Dash layout/callback scan",
+    "explicit API arguments override configured defaults",
+    "bad config bounds/timeout/limit rejected before SDK",
+    "configured smaller limit enforced on GUI overrides",
+    "USB/LAN/discovery/lifecycle regressions"
+  ],
+  "limits": [
+    "No live LAN range scan or new physical evidence",
+    "Native SDK calls have no hard host deadline",
+    "Notebook settings/results retained",
+    "No actual GUI restart, commit or push"
+  ],
+  "source_sha256": {
+    "src/thorlabs_shutter_control/config.py": "2a71fc0d08cabe127ce659c9076e0e87056aa584a7e8e88e9fabfd5351ede28b",
+    "src/thorlabs_shutter_control/controller.py": "f3c3702572a55bf9ed35783ef16402332796870ca7b52f69b10ac410e13fb580",
+    "src/thorlabs_shutter_control/gui.py": "a3993041bde000df3ca0371d3473b1fe196138e8bae5255a41819d68e974f940",
+    "tests/test_lan_discovery.py": "ac768c3c4aed0cf0d8ff549049005f7acf7e40c16fbcd8fb1fb648fea2b6a58a"
+  }
+}

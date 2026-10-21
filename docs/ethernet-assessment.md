@@ -8,8 +8,39 @@ connection selection, slot command dispatch and transport checks through the
 Kinesis API. Its `ethernet_endpoints` sequence selects explicit per-slot routes;
 None selects USB. Network slots never fall back to USB. USB/network channels
 share process-wide serial ownership. Construction is passive. The normal launcher
-uses USB; a GUI explicitly constructed with `create_app(hub)` can use network slots.
-This implementation has software tests; physical Ethernet qualification is open.
+uses `config.py`'s `ETHERNET_ENDPOINTS` (empty defaults to USB); an embedded GUI
+can also use `create_app(hub)` with configured network slots.
+The GUI Discover action combines USB and LAN discovery; no per-card transport
+controls or separate LAN block remain. LAN_SCAN_* settings in config.py supply
+range/timeout defaults. Select a labelled serial and Connect to apply its detected
+route automatically. One shared scan serves all panels. Retained handles block
+broad scanning; partial results and diagnostics remain available. Range scanning
+is software/browser tested only; E128 physical evidence is explicit-endpoint scope.
+One real KEH3/KSC101 LAN discovery, identity, connection and passive release check
+now passes (E128 / TEST-138). Ethernet actuation, timing and recovery remain open.
+
+With network endpoints supplied and `slots` omitted, the hub creates only enough
+slots for those endpoints/serials; it does not add implicit USB slots. LAN-only
+discovery registers the explicit TCPIP endpoints, calls `BuildDeviceList`, then
+polls `CheckForConnectionChanges` and reads matching KSC101 entries. TCPIP identity
+discovery is asynchronous; one immediate list read can be empty. Polling stops
+when all configured network endpoints have identities or the controllers' discovery
+deadline expires (default 5 s, 100 ms poll interval). Registration/rebuild occurs
+once per discovery, not on every poll. Native SDK calls may exceed that deadline.
+The rebuild is required for Ethernet too; it does
+not mean a USB cable/device is required. Explicit `None` routes select USB.
+No USB cable or USB-discovered cube is required for the LAN-only software path.
+The GUI uses `discover_available()` for a unified list; `discover_by_slot()`
+remains the explicit-route API. See [GUI LAN configuration](gui.md#ethernet-lan-configuration).
+
+The [official Python KSC101 example](https://github.com/Thorlabs/Motion_Control_Examples/blob/main/Python/Kinesis/KCube/KSC101/KSC101_pythonnet.py)
+shows the cube's creation/connection API with normal device-list discovery.
+The repository's [Ethernet-specific .NET example](https://github.com/Thorlabs/Motion_Control_Examples/blob/main/C%23/Benchtop/BBD30X/BBD30X_Ethernet/Program.cs)
+uses ScanEthernetRange, manual registration, BuildDeviceList, then typed serial
+enumeration. Our optional bounded range scan finds hub addresses before deriving
+the documented KEH3 cube endpoints. It is a BBD example, not
+proof that a KEH3 cube route works. Skipping BuildDeviceList was an incorrect
+interpretation of the no-USB requirement and has been corrected.
 
 The official [KEH3 manual, section4.3](https://media.thorlabscms.cn/globalassets/items/k/ke/keh/keh3/doc-103012.pdf?v=0129060351)
 maps one IP address to separate endpoints for **KEH3**:
@@ -33,9 +64,19 @@ but left-bay KSC101 (alias CONTROLLER_A)/firmware1.0.6 did not return an identit
 listed only the hub with USB absent. TCP acceptance on40304 was insufficient.
 
 The cube was later updated to1.0.7; USB identity mismatch was repaired and USB
-control passed. No post-update Ethernet cube PASS is recorded. Firmware support
-was investigated in the archived official-document review; this does not by itself
-establish the cause of the old discovery failure or a working current endpoint.
+control passed. After reboot, Kinesis displayed both devices; subsequent Python
+investigation isolated missing asynchronous connection-change refreshes.
+
+E128 / TEST-138: corrected ShutterHub discovered the selected cube in 0.844 s,
+connected, verified its serial and TCPIP endpoint, then released communication
+without Close in 0.953 s. This live check ran outside the restricted agent sandbox.
+A restricted comparison connected/read successfully but blocked in native TCPIP
+Disconnect and its helper was interrupted. That environment difference is an
+observation, not proof of the underlying native cleanup cause. The restricted
+readback was closed/unknown operating state/triggered; no mode/output was changed.
+Passive communication PASS does not establish readiness for Open/Arm or physical
+blade/optical sensing. Firmware support was investigated in the archive; no old
+failure is retrospectively assigned a firmware or hardware root cause.
 
 ## Next passive check
 

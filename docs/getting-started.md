@@ -28,13 +28,25 @@ uv run shutter-control
 | --- | --- |
 | `KINESIS_DIR` | SDK folder; default `C:\Program Files\Thorlabs\Kinesis` |
 | `SERIAL_NUMBERS` | Tuple of distinct serial strings or integers in panel order; empty means select in GUI |
-| `SLOTS` | Positive panel count; `None` means at least three, growing to fit serials |
+| `ETHERNET_ENDPOINTS` | Per-panel KEH3 IPv4 cube endpoints (`IP:40304`..`IP:40307`); `None` selects USB; empty tuple defaults to USB |
+| `LAN_SCAN_START_IP` / `LAN_SCAN_END_IP` | Inclusive default discovery range; `192.168.1.0` through `192.168.1.255`; used by the shared Discover action |
+| `LAN_SCAN_MAX_ADDRESSES` | Maximum addresses per scan, integer 1..256; default 256 |
+| `LAN_SCAN_OPEN_TIMEOUT_MS` | Vendor per-address connection timeout, integer 50..1000 ms; default 100 ms |
+| `SLOTS` | Positive panel count; `None` fits endpoint/serial lists when endpoints are supplied, otherwise at least three |
 | `PORT` | Localhost port, integer 1..65535; default 8050 |
 
 For six empty panels, set `SLOTS = 6`. To preselect a controller, put its actual
 serial in `SERIAL_NUMBERS = ("your serial",)`; keep live identities out of shared
 commits. No launcher argument parsing or environment configuration is used.
 The Python API still accepts explicit constructor settings.
+For LAN-only or mixed operation, follow [GUI Ethernet configuration](gui.md#ethernet-lan-configuration).
+Startup stays passive; entering an endpoint never discovers or connects a device.
+Discover finds USB and Ethernet automatically using the configured LAN range.
+Choose a result and Connect; the detected endpoint is applied automatically.
+There are no per-panel transport controls or separate LAN scan form. File settings
+are optional startup defaults. Release all controllers and close competing owners
+for a fresh full scan; skipped/failed transports report a warning while successful
+results remain selectable.
 
 Preserve manufacturer-approved power, docking and shutter wiring. Keep the source
 independently blocked and only one application owning each controller. Startup is

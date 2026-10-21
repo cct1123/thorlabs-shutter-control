@@ -1345,3 +1345,536 @@ identity/scope scan PASS (fictional device identities only; no private inputs).
 Two concurrent uncommitted edits appeared during publication: controller.py and
 tests/test_hub.py. Preserved/excluded; no validation claim for these new edits.
 No hardware operation or live GUI restart. Final checkpoint is documentation only.
+
+## E125 / TEST-133 - Remove USB dependency from LAN-only discovery
+
+REQ-090. Inspection found network discovery always called BuildDeviceList after
+CreateManualDeviceEntry, and an omitted slots argument padded a single LAN route
+with two USB channels. Changed network-specified default count to fit the supplied
+serial/endpoint lists. LAN-only discovery now uses manual endpoint registration
+and filtered GetDeviceList without BuildDeviceList. Mixed hubs build their USB
+list first, then register network entries. No broad exception suppression, USB
+fallback, fabricated serial or endpoint/identity relaxation was added.
+
+Installed DeviceManagerCLI reflection confirmed manual registration, transport and
+list signatures. Reflection also exposed ScanEthernetRange(startIPAddress,
+endIPAddress, portNo, openTimeout); it returns addresses, not cube serials, per
+the installed Benchtop.BrushlessMotor.h lines 971-978. No subnet scan is needed for
+explicit endpoints. CHM extraction attempts yielded no files; the empty project
+scratch directory was removed. No real discovery/connection or actuation occurred.
+
+Expected: no USB enumeration for all-network discover/connect/release; default
+one-endpoint hub has one channel; explicit mixed slots still enumerate USB before
+LAN registration. Wrong identity/route and no-output passive behavior preserved.
+Observed full software suite 205 passed, 1 optional SDK check skipped. New LAN
+regression forbids BuildDeviceList and verifies discovery/connection/release;
+mixed test models a rebuild clearing manual entries to verify ordering. Existing
+notebook, hub, GUI and controller tests PASS. Physical LAN discovery, delivery and
+motion remain unverified, so REQ-043 is not promoted.
+
+Commands: .venv/Scripts/python.exe -B -m pytest -q -p no:cacheprovider --tb=short;
+Ruff format/check --no-cache on controller.py and test_hub.py; git diff --check.
+PASS software scope. Updated API/Ethernet guides and checkpoint. No commit/push.
+
+## E126 / TEST-134 - Actual empty LAN discovery investigation
+
+REQ-091, affects REQ-090/043. Human-reported notebook returns [] for the selected
+cube at the left-bay endpoint. Identifiers/address omitted from public evidence.
+Authorized scope inferred from active troubleshooting: passive LAN identity and
+SDK discovery of the supplied hub only. No actuation or physical configuration.
+
+Method/expected: hardware-info request MGMSG_HW_REQ_INFO, bytes
+05 00 00 00 50 01, sent on a fresh TCP socket to each documented KEH3 port.
+Socket connect/read timeout 2 s. Expected responsive identity starts 06 00 and
+contains the selected model/serial. Observed port 40303 returned 90 bytes,
+header 06 00 54 00 81 50, model KEH3; ports 40304/40305/40306/40307 each connected
+but recv timed out at 2 s. A timeout is not proof of permanent absence or a
+physical defect. It is a failed identity check under these test conditions.
+
+SDK comparison in fresh Python: CreateManualDeviceEntry(left endpoint) succeeds;
+GetDeviceList() empty before and after successful BuildDeviceList(). Separate
+hub-port registration similarly yields no enumerated identity. GetManualDeviceEntries
+contains TCPIP bay endpoints. ScanEthernetRange on the one supplied IP/40303 with
+2000 ms openTimeout returns the hub address; GetDeviceList remains empty. Explicit
+hub-port diagnostic entry was deleted afterward; existing bay entries retained.
+No controller object connected/enabled or mode/output command executed.
+
+Conclusions: current hub reachable over LAN; no cube hardware identity obtained
+from any documented bay endpoint. This is below ShutterHub's serial/route filter,
+but does not identify its cause. E125's assumption that manual registration alone
+identifies a cube is not physically established. Rebuilding did not resolve this
+bench failure. Do not mark physical LAN functional from the fake tests.
+
+Human replied yes to powered/seated left-bay cube and USB IN disconnected.
+That reply does not specify the requested Kinesis enumeration result; a focused
+hub-only versus cube-also comparison is pending. No firmware/wiring/actuation
+trial is authorized by this diagnosis. Existing user notebook edits preserved.
+REQ-090 now PARTIAL, REQ-091 BLOCKED pending vendor comparison. Historical software
+suite evidence retained; no runtime source change in this diagnostic session.
+
+## E127 / TEST-135, TEST-136 - Vendor Ethernet sequence and post-reboot evidence
+
+REQ-092, updates REQ-090/091/043. User reports reboot followed by Kinesis detecting
+both KEH3 and KSC101 and supplies a Connect screenshot with the selected cube on
+left-bay endpoint. Treat as human/UI evidence, not Python success. Identifiers
+and actual address omitted from public records. Direct passive HW_REQ_INFO to the
+selected bay returned 90 bytes, header 06 00 54 00 81 50, model KSC101, matching
+selected serial; hub returned KEH3. Later same cube request timed out at 2 s while
+hub remained responsive. Thus E126's silent-bay observation is superseded as a
+current invariant, but its historical measurement remains valid. No causal claim
+about firmware, network configuration or physical seating is established.
+
+Sources read (data, not grants of authority):
+https://github.com/Thorlabs/Motion_Control_Examples/blob/main/Python/Kinesis/KCube/KSC101/KSC101_pythonnet.py
+https://github.com/Thorlabs/Motion_Control_Examples/blob/main/C%23/Benchtop/BBD30X/BBD30X_Ethernet/Program.cs
+Official repository recursive file index located no Ethernet-named Python example;
+the Ethernet-specific example is C# BBD30X and uses the same DeviceManagerCLI.
+Sequence: ScanEthernetRange for finding IPs, CreateManualDeviceEntry, BuildDeviceList,
+then GetDeviceList(type). The Python KSC101 example shows its creation/Connect API
+with normal BuildDeviceList. Scanning is unnecessary for our already explicit
+addresses; the BBD example does not prove KEH3 bay compatibility.
+
+D: the earlier interpretation that no USB means never call BuildDeviceList was
+unsupported and wrong. Restore registration-before-build for LAN-only and mixed
+hubs. Preserve explicit endpoint identity validation, no USB fallback, passive
+construction, no implicit USB slots, and no writes during discovery. Update the
+regression to withhold serials until registration+rebuild; delete the fabricated
+assumption that rebuild erases manual entries. User notebook outputs/settings
+were preserved; runtime tests now do not assert a local notebook stays unexecuted.
+
+TEST-135 expected: vendor order and representative source/GUI/notebook contracts.
+Observed .venv/Scripts/python.exe -B -m pytest -q -p no:cacheprovider --tb=short:
+205 passed, 1 optional real SDK skip. Ruff check/format scoped source/tests PASS;
+git diff --check PASS. An initial test run correctly exposed the previous test
+assumptions and local saved-output assertion; these were corrected. No physical
+Open/Close, enable, mode, TTL, power, firmware or network setting command sent.
+
+TEST-136 expected: selected cube appears in real SDK list, then passive connection
+and matching identity. Observed SDK list remained empty before/after registration
+and rebuild, including a bounded 16 s rebuild diagnostic. Native build returned0.
+Single-host ScanEthernetRange on hub port returned the hub address; scanning selected
+cube port returned no address. Alternate SDK initialization/registration/loading,
+working directory, COM initialization, list overload, and sandbox-free comparison
+did not establish a working cube enumeration. Direct passive SDK Connect attempts
+did not connect and were released without Close. Do not promote this test to PASS.
+Temporary hub/loopback manual-entry diagnostics and socket-only localhost probe
+were used; loopback entry removed, established bay entries retained. No persistent
+firmware/network/device change intended or observed. Temporary analysis package
+and scratch files kept isolated under ignored tmp and cleaned after inspection.
+
+Pending already-issued human action: reboot under established safe conditions,
+leave Kinesis/notebook disconnected, report ready. Next action is one corrected
+ShutterHub passive discovery check before other probes. No automatic actuation,
+reboot or firmware change inferred. No commit/push. E125 software-only conclusion
+is superseded where it asserted skipping SDK rebuilding; physical gaps remain.
+
+## E128 / TEST-137, TEST-138 - Working asynchronous ShutterHub LAN discovery
+
+REQ-093, resolves passive Ethernet criteria in REQ-090/092/043 and the discovery
+software defect in REQ-091. User reconfirms Kinesis connects to both KEH3 and
+KSC101; authority covers fixing/validating the same passive connection, not output
+actuation or firmware/network/power changes. Earlier reboot was human-reported.
+No new physical action was requested or performed in this run.
+
+Supported cause/evidence: manual endpoint registration + BuildDeviceList + immediate
+GetDeviceList can be empty while network identity completion is asynchronous.
+CheckForConnectionChanges refreshes those identities. A bounded diagnostic using
+that check returned hub/cube changes and the correct TCPIP/comspec; a repeated
+run found the selected cube after four polls/about 0.422 s. A single refresh was
+too early in an intervening test. Temporary process-local tracing observed SDK
+hardware-info queries only, including fragmented TCP receives; packet fragmentation
+is not asserted as a vendor defect. No injected hooks remain in project runtime.
+
+Implementation: register selected endpoints and build once, then loop
+CheckForConnectionChanges -> GetDeviceList(68) -> TCPIP/comspec filter until each
+configured network route has an identity or the controller deadline expires.
+Default deadline 5 s and poll interval 100 ms. Native calls may exceed this host
+loop deadline. On expiry return the discovered subset; do not invent a missing
+identity, fall back to USB, reconnect, or write outputs. USB-only discovery is
+unchanged. Network-specified default count still avoids implicit USB slots.
+
+TEST-137 expected: asynchronous identity appears after refresh, missing endpoint
+times out with [], no repeated registration/build, identity/ownership/error/GUI/
+notebook regressions preserved. Observed full source suite207 passed,1 optional
+SDK skip. Fake clock proves 0.3 s delayed completion and 5 s timeout; no Connect/
+output call during discovery. Source/test lint and format PASS. Local notebook
+settings/results retained; only instructional Markdown updated for current scope.
+Commands: .venv/Scripts/python.exe -B -m pytest -q -p no:cacheprovider --tb=short;
+Ruff check/format --check --no-cache on controller.py, test_hub.py, conftest.py and
+test_examples.py; git diff --check. No publication or GUI restart.
+
+TEST-138 expected: actual selected KSC101 appears on configured KEH3 left-bay
+TCPIP endpoint, matching identity, passive Connect and successful release without
+Close. Observed outside restricted sandbox: discovery selected match True in
+0.844 s, Connect connected, matching serial True, release success True in0.953 s.
+Provider/comspec were separately verified TCPIP/exact configured endpoint in the
+preceding restricted run, which discovered in0.843 s and connected/read identity.
+That readback was closed/unknown operating state/triggered; no action was taken.
+
+The restricted comparison hung in native Disconnect after polling had stopped.
+Read-only py-spy inspection of the owned helper showed CTcpIpDeviceController.Close
+waiting on native thread join during settings/storage cleanup. The helper was
+interrupted via its own exec session, and its two known OS processes were verified
+gone. The outside-sandbox run of the same driver then released normally. This
+comparison establishes an environment difference, not its underlying cause.
+No timeout/cancellation shim or global vendor setting change was introduced.
+
+Machine evidence: records/ethernet-discovery-validation.json, sanitized selected
+identities/address with stable aliases. Python3.12.7, pythonnet version captured
+there, Kinesis1.14.60.27990. Topology Windows LAN -> KEH3 left bay -> KSC101;
+USB IN absent is human-reported, route is SDK-verified TCPIP. No Open, Close,
+Enable, mode, TTL, firmware, network or power command sent. Passive release is
+not physical closure. Ethernet actuation/timing/fault recovery remain untested.
+Earlier E126/127 observations remain historical; their hardware-root-cause and
+missing-enumeration hypotheses are not promoted. Reboot comparison requests are
+resolved; no pending helper or human action for this connection fix.
+
+## E129 / TEST-139 - GUI LAN support and human-reported notebook success
+
+REQ-094. Human reports "ran the LAN notebook. successful" and requests repository
+and GUI LAN updates. Record as human-reported procedure success; exact executed
+cells, independent motion observations, calibration and timing results were not
+specified. It is not a new automated physical GUI test or independent blade proof.
+Preserve the user's current notebook configuration, output and execution counts.
+
+Added ETHERNET_ENDPOINTS tuple to config.py, passed through the normal launcher.
+Default empty means USB; an IPv4 KEH3 cube endpoint chooses LAN, None chooses USB.
+Existing validation rejects unsupported/malformed endpoint and slot configurations
+before SDK/server startup. Endpoint-specified default panel count fits the supplied
+route/serial lists. Each card now shows its configured transport/destination and
+only its own preselected serial at passive startup.
+
+ShutterHub.discover_by_slot performs one shared discovery then groups candidates
+by slot transport metadata. USB-only grouping returns independent USB option lists;
+mixed/LAN filters exact TCPIP/comspec. GUI Discover uses these lists, preserves a
+retained identity after route loss, checks retained handle feedback, and keeps its
+cleanup action available. No extra discovery per panel, automatic connection,
+USB fallback, mode/enable change or software interlock gate. Existing controls
+continue dispatching through ShutterHub for LAN devices.
+
+Expected: LAN-only/mixed launch stays passive with visible correct routes; invalid
+settings fail before SDK/server access; dropdowns cannot advertise another bay's
+cube; one hub discovery serves all cards; retained faults remain releasable.
+Observed .venv/Scripts/python.exe -B -m pytest -q -p no:cacheprovider --tb=short:
+213 passed,1 optional real SDK skip. Tests use actual Dash layout/callback HTTP
+requests with the fake SDK. New launcher tests forbid SDK loading at startup.
+Mixed-route discovery test asserts separate USB/left/right candidate lists and
+only one added build across panels. Route-loss test verifies retained identity,
+fault and disconnect availability, without output writes. Prior command dispatch,
+shutdown, TTL, notebook and controller regressions pass.
+
+Initial failures: the no-hold notebook test inherited the user's approved hold
+instead of supplying None; it now sets its own scenario input. A new route-loss
+check caught a stale cached status in the proposed Discover path; retained-device
+feedback reads were preserved via hub.get_operating_status. Neither failure was
+resolved by altering notebook user inputs or weakening output readiness checks.
+
+Ruff check and format --check --no-cache on src/tests/examples/hardware helpers/
+renderer PASS (33 files). Ten Python snippets compiled and changed Markdown local
+file links PASS; git diff --check PASS. Updated README, setup, GUI, API, architecture
+and Ethernet docs with fictional endpoint examples. Machine evidence/source hashes
+in records/gui-lan-validation.json. No new runtime dependency or actual shared
+serial/address. No real device read/write, live GUI restart, visual browser claim,
+commit or push for this request. Hardware GUI actuation/calibration remains separate.
+
+## E130 / TEST-140 - GUI USB/Ethernet selection
+
+REQ-095. User explicitly requests choosing Ethernet or USB in the GUI. Each card
+now exposes Connection (USB/Ethernet LAN), endpoint and Apply connection. The
+driver's configure_slot validates the endpoint, refuses a retained handle,
+preserves timing/SDK configuration and replaces only a released channel. Apply
+does not load/call the SDK, connect or write outputs. Changed routes clear serial
+and TTL UI drafts. Connection controls lock while a handle exists, including
+failed release; the server enforces the same rule. Unapplied connection edits
+block Discover/Connect. Optional file defaults still apply on server startup;
+GUI choices are session-only. No new dependency or USB fallback.
+
+Expected: USB -> LAN -> USB switches without restarting, invalid input preserves
+the existing route, connected/failed-release routes cannot be replaced, and
+existing driver/GUI regressions pass. Observed full suite: 217 passed, 1 optional
+real SDK skip. Command: .venv/Scripts/python.exe -B -m pytest -q -p no:cacheprovider
+--tb=short. New fake-SDK Dash callback tests exercise unapplied drafts, passive
+Apply, route labels, discovery, connection locking, forged active Apply rejection,
+failed release/retry and switching back to USB. Invalid/empty/hub-port endpoint
+tests retain the original route with zero SDK/device calls. Full Ruff check and
+format --check --no-cache PASS (33 files); git diff --check PASS.
+
+Browser expected: selectors work in the rendered GUI and controls reflect the
+applied route/ownership. Observed in in-app browser at isolated localhost preview:
+USB -> Ethernet LAN -> fictional endpoint -> Apply -> Discover -> Connect ->
+locked controls -> Close & disconnect (fake device) -> editable controls -> USB
+-> Apply. Header/card labels and cleared serial selection verified. Screenshot
+docs/assets/gui-connection-selector.png shows both dropdown choices, with a visible
+simulation banner and fictional identity/address. Preview injected the fake SDK
+for its full lifetime; no real SDK/hardware access. Shut down through its GUI;
+exec session 67698 exited 0 and browser tab closed. Scratch helper removed after
+verification. Documentation covers operator workflow, session persistence and API.
+
+Machine evidence/source hashes: records/gui-connection-selector-validation.json.
+E129 remains historical for the preceding config-only revision; this record
+supersedes its route immutability/restart instructions. Prior passive physical
+LAN evidence E128 and human-reported notebook success remain separate from this
+software/browser validation. No hardware command, actual user GUI restart,
+commit or push performed; local notebook inputs/outputs preserved.
+
+## E131 / TEST-141 - Bounded vendor LAN range discovery
+
+REQ-096. User requests discovering LAN devices without knowing exact IP, default
+192.168.1.0..192.168.1.255. Added ShutterHub.scan_lan and GUI range scan/selection.
+Installed Kinesis1.14.60.27990 DeviceManagerCLI reflection (no SDK method invocation)
+verified List[String] ScanEthernetRange(String startIPAddress, String endIPAddress,
+Int32 portNo, Int32 openTimeout). Vendor installed header
+C:/Program Files/Thorlabs/Kinesis/Thorlabs.MotionControl.Benchtop.BrushlessMotor.h,
+lines970–978 documents scanning for Thorlabs addresses and usual port40303.
+KEH3 manual section4.3 provides cube ports40304..40307 (existing reference).
+Online vendor example fetches were unavailable; implementation uses verified local
+vendor interface/header rather than guessing a broadcast or raw socket protocol.
+
+Scan validates ascending IPv4 range <=256 addresses and integer50..1000ms open
+timeout (default100ms). Default inclusive bounds include .0 and .255 as requested.
+With all process handles released, scan hub port40303 once; normalize/deduplicate
+valid returned hosts inside the range; register each host's four documented cube
+ports, BuildDeviceList once, then poll CheckForConnectionChanges/GetDeviceList(68)
+for the controller timeout. Waiting through the window permits late/other bays to
+appear. Only final snapshot type68 serials with TCPIP/exact candidate route return.
+No automatic connection, settings/output writes, IP reconfiguration or USB fallback.
+Current slot routes stay unchanged until explicit selection. SDK manual entries
+remain registered. Native calls can exceed the host polling deadline; the default
+scan's real elapsed time is unmeasured. An empty result is not proof of absence.
+
+GUI Find LAN devices shows separate hub/controller counts. Each panel offers
+discovered serial+endpoint and Use LAN controller, which applies the route and
+preselects serial; Connect is separate. Only current server-held results are valid;
+empty/failed rescans clear old choices. Existing manual USB/LAN controls remain.
+Retained/failed-release process handles prevent scanning; server guards supplement
+UI disabling. No route replacement around a retained handle.
+
+Expected TEST-141: correct vendor call arguments/order; delayed multi-hub/bay
+results filtered to exact KSC101 TCPIP identities; invalid/oversized ranges rejected
+before SDK; empty, hub-only, error and stale-result behavior; retained handles
+including another hub/failed release block scans; multi-panel selection isolation;
+USB/LAN/lifecycle regression pass. Observed235 passed,1 optional real SDK skip.
+Command: .venv/Scripts/python.exe -B -m pytest -q -p no:cacheprovider --tb=short.
+Two initial test defects were corrected: the retained-owner fixture had not made
+its USB identity discoverable; the multi-panel assertion mistook unchanged serial
+disabled output for a changed selection. No product behavior was weakened.
+Final review removed a potential channel/SDK lock-order inversion in the scan
+ownership guard; regression coverage verifies no channel status lock is acquired
+inside the SDK lock. The final full suite includes that correction.
+
+Browser simulation expected explicit scan->selection->connection with no IP entry.
+Observed in isolated localhost fake-SDK preview: edited bounds to fictional
+192.0.2.0..255, Find LAN devices returned one hub/KSC101, selected labelled serial/
+endpoint, Use LAN controller filled route and serial, explicit Connect succeeded,
+scan/connection controls locked, Close & disconnect (fake) unlocked controls.
+Screenshot docs/assets/gui-lan-discovery.png shows scan result with simulation
+banner. Default production bounds verified in initial browser state and unit test.
+Shut down through GUI; owned exec session52165 exited0, tab closed. No real SDK or
+network/device access in preview; no actual hardware GUI restart. Scratch removed.
+
+Full Ruff lint and Python format (30 files), Python doc snippets/local links and
+diff whitespace checks PASS; details and source hashes in
+records/lan-range-discovery-validation.json. Repository-wide Markdown format check
+also detected pre-existing alignment/wrapping in three python-api.md examples;
+those existing snippet styles were preserved. Python snippets parse successfully.
+Live range scan, native scan duration and bench compatibility remain UNTESTED.
+Prior E128 proves explicit-endpoint passive LAN communication only. No actuation,
+commit or push; user's notebook configuration/execution output preserved.
+
+## E132 / TEST-142 - LAN discovery defaults in config.py
+
+REQ-097. User requests the LAN discovery parameters in config.py. Added
+LAN_SCAN_START_IP="192.168.1.0", LAN_SCAN_END_IP="192.168.1.255",
+LAN_SCAN_MAX_ADDRESSES=256 and LAN_SCAN_OPEN_TIMEOUT_MS=100. GUI range fields read
+config; scan_lan resolves omitted/None arguments at call time. Explicit start/end/
+timeout arguments override defaults. Scan limit is validated as integer1..256 and
+applies even to explicit ranges; timeout remains integer50..1000ms. KEH3 protocol
+ports remain fixed. Startup remains passive; file changes require GUI restart,
+on-screen range changes do not. Removed the fixed30-second hint because configured
+range/timeout affect duration; native calls still have no hard host deadline.
+
+Expected TEST-142: custom config range/timeout reaches API and GUI vendor call;
+explicit API values override defaults; bad bounds, limit and timeout reject before
+SDK; configured smaller limit constrains edited GUI range; prior regressions pass.
+Observed full suite246 passed,1 optional SDK skip with fake SDK only. Actual Dash
+layout supplies callback State values in the config test; no browser/network or
+hardware operation. Command: .venv/Scripts/python.exe -B -m pytest -q -p
+no:cacheprovider --tb=short. Python lint/format PASS (30 files); doc snippets and
+local file links PASS. Evidence/source hashes: records/lan-config-validation.json.
+Existing notebook inputs/results preserved; no actual GUI restart, commit/push or
+pending process. Live range discovery remains untested, as recorded in E131.
+
+## E133 / TEST-143 - Integrated repository consistency and pruning
+
+REQ-098. User requests repository update, consistency fixes and pruning. Expected:
+current code/config/GUI/API and guides agree; current checkpoint/report do not
+present old totals or procedures as current; cleanup removes only verified
+redundancy; notebooks/private/environment/evidence preserved; integrated source
+and packaged software pass without hardware operations.
+
+Corrected USB-only launcher claims, startup defaults, timeout scope (settings plus
+asynchronous LAN identity polling; native calls remain unbounded), notebook output
+claims and stale Ethernet qualification wording. E128 passive explicit-endpoint
+LAN discovery/identity/Connect/release and the human-reported successful notebook
+run remain distinct from untested live range scanning, current GUI bench paths,
+actuation, independent blade observation and calibration. Labelled mode screenshots
+as preceding LAN controls. API Python snippets now follow the formatter.
+
+Found one input-contract gap: Python ipaddress accepts integers/packed bytes as
+IPv4 values. LAN scanning now requires address strings; three regressions reject
+numeric/boolean/packed-byte values before SDK access. Existing range/config/
+ownership/selection/lifecycle coverage remains. No broad driver refactoring.
+
+Observed source suite249 passed,1 optional real-SDK skip; extracted-wheel suite
+also249 passed,1 skipped. Built offline with uv; initial restricted uv-cache write
+failed, the same offline build passed after approved escalation. Wheel import
+origin verified in the extracted directory; packaged Python/CSS matched source;
+notebooks/private inputs/records absent from wheel. Wheel hash retained in machine
+evidence before removing disposable build scratch. Fake API simulation exercised
+three controller manual/TTL lifecycles and released every device.
+
+Consolidated STATE.md354->177 lines and outputs/REPORT.md169->77 lines, retaining
+the complete historical requirement ID/evidence table and human criteria in
+PROJECT.md. Prior source hashes/totals remain historical in these append-only
+records and incremental JSON; E133 covers the integrated revision. Removed only
+outputs/supervisor-notebook-preview.jpg (95,025 bytes; unreferenced cropped preview
+of retained HTML, inspected before removal), .ruff_cache (4 generated files,
+1,070 bytes), and this review's tmp/repo-consistency-package (12 generated files,
+146,466 bytes). Exact targets were inventoried, resolved inside the checkout and
+checked for symlinks/tracked data before native PowerShell deletion.
+
+Preserved supervisor HTML/renderer, all historical bench/GUI images, durable JSON
+and records, private input/archive, .venv and both notebooks byte for byte. LAN
+notebook retains six outputs across seven executed cells; no execution evidence
+or local settings were rewritten. Machine evidence records notebook and deleted
+preview hashes, package hash, source hashes and final checks.
+
+Commands: .venv/Scripts/python.exe -B -m pytest -q -p no:cacheprovider --tb=short;
+uv build --wheel --offline --out-dir tmp/repo-consistency-package; isolated
+PYTHONPATH wheel-origin check plus pytest; tests/simulated_demo.py --api; Ruff
+check/format --check --no-cache; doc/link/notebook/JSON checks; git diff --check.
+Evidence: records/repository-consistency-validation.json. No real SDK/device/LAN
+operation, browser or actual user GUI restart. No new commit/push; changes remain
+local. Human action required: none for this software review. Physical limitations
+and the unresolved active-low TTL result remain open; no hardware completion claim.
+
+## E134 / TEST-144 - Unified Discover and removed manual GUI forms
+
+REQ-099. User requests removing per-shutter connection/endpoint/apply controls,
+then explicitly removes the complete global LAN range/Find LAN devices block.
+Discover must find USB and Ethernet automatically. This supersedes REQ-095's
+manual GUI selector and REQ-096/097's editable GUI range; config.py/API settings
+and passive/ownership criteria remain.
+
+ShutterHub.discover_available returns a serial->endpoint map (None for USB) and
+warnings. It combines USB discovery, configured-route discovery when applicable,
+and one config-based LAN scan per action, shared across cards. A failed/skipped
+transport does not hide other successful results. Configured routes remain useful
+outside the scan range. Broad scanning retains the all-process-handles-released
+guard; current connected/faulted identities and cleanup remain visible.
+
+The GUI removes all transport/endpoint/apply, separate LAN result/use, global
+range/scan widgets, associated callback state/actions and unused CSS. One Discover
+populates each serial dropdown with transport/endpoint labels. Explicit Connect
+applies only the selected discovered route to a released panel, clears old TTL
+draft/cache when changing route, and performs normal identity/transport validation.
+No automatic Connect/output, USB fallback or replacement of a retained handle.
+Empty/failed discovery invalidates stale automatic-route choices; startup stays
+passive. Python configure_slot, scan_lan and discover_by_slot remain available.
+
+Expected TEST-144: removed elements absent in actual Dash layout/callback; combined
+USB/LAN choices, no route change during Discover, detected route on Connect,
+multi-panel isolation, retained/failed-release ownership and cleanup, partial
+USB/LAN errors, stale-result handling and config defaults; existing modes/TTL/
+notebook regressions pass. Observed source250 passed,1 optional SDK skip. Old UI
+selector tests were replaced with equivalent driver route-guard tests; range/
+config tests now drive unified Discover. Initial failures were expected old-widget
+assertions and fixture timing; an intermediate edit also required correcting file
+encoding/indentation before collection. Final lint/format and all tests pass.
+
+Browser software simulation: isolated preview with fake SDK for its entire
+lifetime, fictional documentation network/serials. Observed one Discover returns
+USB and two LAN identities; selected USB on card1 and LAN on card2; both explicit
+Connect actions succeed with detected routes and retained selectors lock. Card3's
+dropdown shows both transports with the requested forms absent. Browser caught a
+mode-marker encoding defect during CSS cleanup; corrected to CSS Unicode escape,
+reloaded and verified the checkmark. Screenshot docs/assets/gui-unified-discovery.png
+records the final view. GUI shutdown released fake handles; owned exec session35058
+exited0 and its tab closed. No native SDK or real network/device operation.
+
+Updated README/setup/GUI/API/architecture/Ethernet guides and canonical STATE/report.
+Older form screenshots/validation records retained as historical evidence. Machine
+evidence/source hashes: records/unified-discovery-validation.json. Notebooks and
+local results preserved; prior real explicit-endpoint LAN evidence remains E128.
+Live range scan and current GUI physical operation remain untested. No actual
+user GUI restart, new wheel/bench claim, commit or push. Human action required:
+none for software delivery; restart GUI to load this update.
+
+## D037 / E135 / TEST-145 - Full review, consistency and publication preparation
+
+REQ-100. User authorizes review of all pending changes, fixes, pruning before
+commits, focused staged commits and push to configured origin/main. This supersedes
+earlier no-publication task scopes only; no incidental hardware action is needed.
+Reviewed the full accumulated REQ-090..099 source/test/docs/evidence diff and
+visually inspected all three new software-simulation screenshots. Historical
+records retain their original conclusions/revisions, including the corrected
+E125 vendor-sequence assumption; E128 remains explicit-endpoint passive LAN only.
+
+Expected: current integrated source/package pass; omitted/stale discovery choices
+cannot reconnect through an old LAN route; shared files exclude private notebook
+identifiers/results; local evidence is preserved; guides describe current APIs
+and scope correctly; pruning excludes private inputs/environment/durable records.
+
+Reproduced a GUI defect: connect a detected LAN cube, release it, fail both LAN
+discovery paths, then submit the old browser serial. The configured endpoint
+remained usable and Connect succeeded despite the target being omitted from the
+new snapshot. New regression failed before the fix (Connected vs Disconnected).
+After any Discover attempt, the GUI now requires that serial in the latest
+successful subset before Connect. Startup preselection before the first Discover
+is unchanged. The corrected regression proves rejection before any device call;
+existing retained-handle cleanup and partial-success tests remain green.
+
+D: preserve the executed LAN notebook verbatim in ignored
+inputs/private/notebooks/shutter_lan_tutorial-fc609ca6e6fc.ipynb, verify its SHA256
+against E134, then publish the portable blank-settings/cleared-output template.
+This reconciles local-results preservation with PROJECT.md's existing public
+privacy boundary. Only the new instructional Markdown differs from HEAD in the
+shared notebook. The other notebook is unchanged. Restored the shared-template
+empty-output assertion; notebook control flow remains tested with fake settings.
+The private copy has seven executed cells and six saved outputs reporting
+discovery, identity, Open/Close feedback and release. This is retained notebook
+evidence, not independently observed optical motion or calibrated timing.
+Corrected API wording that conflated discovery snapshots with GUI retained-handle
+visibility, route readout descriptions, historical form screenshot provenance and
+current validation/publication status.
+
+Observed source251 passed,1 optional SDK skip; extracted-wheel251 passed,1 skipped.
+Package import origin confirmed under extracted wheel; all six packaged Python/CSS
+files match source bytes. The wheel excludes docs/tests/private inputs/records.
+Offline uv build required approved access to its existing cache after restricted
+uv run failed cache initialization; no new dependency or hardware access.
+Ruff lint/format PASS; 18 Markdown files,137 local links/anchors,10 Python snippets,
+both cleared notebooks and38 pre-existing JSON records parse/check PASS. Final
+checks also include this evidence JSON. Public text scans exclude the preserved
+notebook's actual serial/address and common private-key/token patterns. All old
+STATE requirement IDs remain. Fake three-device API simulation exercises Manual,
+TTL and cleanup; every handle released. E134 browser capture/layout evidence is
+retained; the changed Connect guard is validated via real Dash callback HTTP,
+not a new browser/bench run.
+
+Before commits, resolved and checked exact generated prune targets inside the
+workspace, rejected reparse points/tracked contents, then removed .ruff_cache
+(4 files,1070 bytes), src/thorlabs_shutter_control/__pycache__ (5 files,105428 bytes)
+and this review's tmp/review-package (12 files,138311 bytes). Reviewed/retained the
+pending E133 unreferenced supervisor preview deletion. Preserved HTML/renderer,
+all historical images, notebooks/private backup, durable records and .venv.
+Disposable review checker/result scratch is also removed after final checks.
+
+Commands: .venv/Scripts/python.exe -B -m pytest -q -p no:cacheprovider --tb=short;
+Ruff check/format --check --no-cache .; uv build --wheel --offline --out-dir
+tmp/review-package; PYTHONPATH=extracted wheel import-origin check plus full pytest;
+python -B tests/simulated_demo.py --api; local link/anchor/snippet/notebook/JSON/
+identity scan; git diff --check. Evidence/source/wheel/notebook hashes and prune
+inventory: records/lan-publication-review-validation.json. No SDK/device/LAN discovery,
+actuation or actual user GUI restart. Physical qualification remains incomplete.
+Software review PASS; staged commits/push verification follows under E136/TEST-146.

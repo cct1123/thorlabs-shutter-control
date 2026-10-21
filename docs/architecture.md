@@ -25,6 +25,16 @@ normalized status/configuration, one-controller behavior and all-slot cleanup.
 KCubeShutter handles USB only. ShutterHub owns network endpoints, discovery/filtering
 and command dispatch. Private shared Kinesis code avoids duplicating get/set,
 identity, ownership and cleanup behavior across transports.
+ShutterHub.scan_lan performs bounded vendor host discovery, then enumerates exact
+KEH3 cube routes into LanDiscovery/LanDevice results without changing slot routes.
+ShutterHub.discover_available combines USB, configured-route discovery and one
+config-based LAN scan into serial-to-endpoint results plus partial-failure warnings.
+The GUI caches that snapshot, labels device choices and automatically configures
+the selected route on Connect. No per-panel endpoint/transport form or separate
+LAN scan block remains. Broad scans require all process-owned handles released;
+retained handles preserve identity/cleanup and cannot be replaced. Startup remains
+passive. configure_slot still validates/replaces only released channels without
+contacting the SDK; discover_by_slot remains available for explicit-route API use.
 `__main__.py` owns one local Werkzeug WSGI server and cleanup on normal exit.
 Its single-request loop exits cooperatively after the GUI sends Close/releases
 all devices and signals `on_shutdown`; the response finishes before the listener
@@ -73,8 +83,9 @@ and result reads (0.50s programmed waits), Close adds a result read (0.25s).
 Trigger Start additionally reads actual TTL settings (another 0.25s wait).
 Periodic refresh still takes N * 250ms for N connected panels; a refresh in
 progress can delay a click. There is no app-defined count cap or synchronization
-guarantee. `timeout` applies to SDK settings initialization; setters do not have
-feedback timeout loops. It does not bound a blocking native call.
+guarantee. `timeout` applies to SDK settings initialization and ShutterHub's
+asynchronous LAN identity polling window; setters have no feedback timeout loop.
+It does not bound a blocking native call or the vendor address-range scan.
 
 USB has historical single-pair evidence. The changed command paths require new
 bench qualification. Hub Ethernet endpoints remain experimental;

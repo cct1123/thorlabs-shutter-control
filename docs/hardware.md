@@ -19,9 +19,11 @@ software-only validation; changed command paths require bench requalification. R
 separate evidence. See [results](../records/hardware-validation.json).
 
 Three-pair operation, electrical TTL response, physical fault injection and
-calibrated exposure/shutdown timing remain unvalidated. Historical Ethernet tests
-found only the hub, with no responding left-bay cube before
-the cube firmware update; post-update cube Ethernet qualification is still open.
+calibrated exposure/shutdown timing remain unvalidated. Later E128 / TEST-138
+passed one KEH3/KSC101 explicit-endpoint LAN discovery, identity, Connect and
+communication-only release. Historical hub-only results preceded the corrected
+asynchronous SDK discovery path. Live range scanning, current LAN GUI operation,
+Ethernet actuation and timing remain untested. See [LAN evidence](ethernet-assessment.md).
 
 Use manufacturer-approved supply, docking, cabling and shutter compatibility.
 Power down before changing interlock/shutter wiring. Do not infer installed

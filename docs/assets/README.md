@@ -2,6 +2,9 @@
 
 | File | Provenance |
 | --- | --- |
+| [Unified USB/Ethernet discovery](gui-unified-discovery.png) | E134 software-only browser capture: one Discover, combined labelled choices, automatic routes; removed manual transport and separate LAN forms; fictional devices/network |
+| [Historical GUI LAN form](gui-lan-discovery.png) | E131 fake-SDK range-scan form, replaced by unified Discover in E134; fictional network/identity |
+| [Historical GUI transport selector](gui-connection-selector.png) | E130 software-only USB/Ethernet selector, removed in E134; fictional address/serial |
 | [Current modern panels](gui-modern-simulation.png) | Software-only browser capture with fictional Manual/Single/Trigger devices and simulation banner; no hardware |
 | [Current Trigger settings](gui-modern-trigger-settings.png) | Same modern preview with TTL settings expanded |
 | [Current passive startup](gui-modern-startup.png) | Three empty panels before discovery/connection in an isolated software preview |
@@ -15,7 +18,10 @@
 
 Product photo [source page](https://www.thorlabs.com/optical-shutters) and
 [original image](https://thin01mstroc282prod.dxcloud.episerver.net/contentassets/3ba9d5dbc70a436fb4f30134096125c7/927_beamshutter_vn.webp?v=1202083916).
-Current PNGs were refreshed for E122 / TEST-130. Startup and six-panel captures
+Mode/layout PNGs were captured for E122 / TEST-130, before LAN selectors and range
+scanning were added. They illustrate those mode/TTL/layout features; the E134
+unified capture shows current connection controls. E130/E131 forms are historical.
+Startup and six-panel captures
 are unconnected; connected mode/TTL captures use fictional software devices and
 simulated state. Superseded red Kinesis-style PNGs were pruned under REQ-089; their software
 validation is retained in E119. Historical JPGs show separate unconfigured application instances,
@@ -32,8 +38,9 @@ original evidence archive and image remain there; sanitized JSON is a derivative
 not the original byte stream. Derived evidence hashes are recomputed after
 sanitization. No credentials belong in docs, screenshots or diagnostic exports.
 
-Current captures contain fictional serials only. Earlier package privacy checks
-are recorded in the evidence index; no new wheel was built for this doc revision.
+Current captures contain fictional serials only. E135 / TEST-145 verifies package
+contents and the public/private boundary for this publication. The executed LAN
+notebook is preserved in ignored private storage; its shared template is cleared.
 Earlier Git history was not rewritten and can retain previously committed data.
 
 The original startup/TTL/six-slot JPG captures show the earlier GUI styling and

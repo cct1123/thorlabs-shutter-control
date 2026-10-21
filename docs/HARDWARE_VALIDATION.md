@@ -20,7 +20,7 @@ they did not independently measure blade motion or exposure timing.
 | Firmware 1.0.6 returned a mismatched hardware serial | The official 1.0.7 update repaired USB identity. Never conceal a mismatch with a software alias; firmware work is separate maintenance. |
 | Repeated interlock reads and jack/key changes did not resolve readiness | The jack matrix established no software continuity signal. Preserve unknown; key feedback is separate. Users manage the physical circuit externally; no software interlock gate. |
 | Mode/status interpretation delayed useful tests | Auto is a valid mode. Undocumented operating value `0` does not mean Inactive. Use documented commands and verify the resulting state. |
-| Ethernet found only the hub in both our code and Kinesis | A responding hub/port does not prove cube communication. Those tests preceded the cube update; post-update Ethernet remains untested. |
+| Ethernet initially found only the hub | A responding hub/port does not prove cube communication. E128 now validates one KEH3/KSC101 passive LAN connection after asynchronous SDK refresh was fixed; actuation/timing remain untested. |
 | Actual GUI actions exposed issues that helper stages missed | Exercise the production path early, including refresh, reconnect and cleanup. |
 
 The old process split related checks across too many stages, repeatedly asked for

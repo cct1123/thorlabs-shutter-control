@@ -1,0 +1,59 @@
+{
+  "date": "2026-10-21",
+  "requirement": "REQ-093",
+  "evidence": "E128",
+  "software": {
+    "test": "TEST-137",
+    "passed": 207,
+    "skipped": 1,
+    "scope": "fake SDK, source and notebook control flow",
+    "lint": "PASS"
+  },
+  "environment": {
+    "python": "3.12.7",
+    "pythonnet": "3.1.0",
+    "Kinesis": "1.14.60.27990",
+    "topology": "Windows LAN -> KEH3 left bay -> KSC101 (CONTROLLER_A)",
+    "USB_IN": "disconnected, human-reported"
+  },
+  "live": {
+    "test": "TEST-138",
+    "context": "outside restricted sandbox",
+    "discovery": {
+      "selected_serial_match": true,
+      "seconds": 0.844
+    },
+    "connection": "connected",
+    "identity_match": true,
+    "provider": "TCPIP",
+    "configured_endpoint_match": true,
+    "communication_only_release": {
+      "success": true,
+      "seconds": 0.953
+    },
+    "output_commands_sent": false
+  },
+  "restricted_comparison": {
+    "discovery_seconds": 0.843,
+    "identity_match": true,
+    "provider": "TCPIP",
+    "readback": {
+      "shutter": "closed",
+      "operating_state": "unknown",
+      "mode": "triggered"
+    },
+    "disconnect": "native CTcpIpDeviceController.Close blocked; helper interrupted and OS processes exited"
+  },
+  "limits": [
+    "No Open/Close/Enable/mode/TTL commands",
+    "No firmware or network settings changed",
+    "No independent blade/optical validation",
+    "Native calls are not bounded by Python discovery deadline",
+    "TCPIP disconnect hang observed in restricted execution; root cause not established"
+  ],
+  "source_sha256": {
+    "src/thorlabs_shutter_control/controller.py": "4eca2a27fa6bb2fbc2097cc90e284a92200c118e84f65199b5231a98ab044298",
+    "tests/test_hub.py": "bc1774b313b111ad052e50317df8c6efe3ab7a5df7524f95ff1a58e087d6f501",
+    "tests/conftest.py": "50c156ab15a7e8a9242449a57545f6636fc33f4b5e3021e61db996a9a02d3af3"
+  }
+}

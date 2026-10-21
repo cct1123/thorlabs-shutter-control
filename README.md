@@ -2,7 +2,8 @@
 
 A local Dash GUI and reusable Python API for a configurable number of **KSC101** solenoid
 controllers. Control an **SH05R** optical shutter through the official Kinesis
-SDK, directly by USB or through a **KEH3/KEH6** hub in USB mode. Each panel has explicit device
+SDK, directly by USB, through a **KEH3/KEH6** USB hub, or over **KEH3 Ethernet LAN**.
+Each panel has explicit device
 selection, four operating modes, state controls, trigger settings and cleanup.
 Startup is passive.
 
@@ -44,7 +45,11 @@ to the serial found locally.
 uv run shutter-control
 ```
 
-Use Discover in the GUI to find serials, or preselect them in `config.py`.
+Click **Discover** to find USB and Ethernet controllers together, then choose a
+device and **Connect**. Results show serial and detected route; no manual USB/LAN
+choice or exact IP entry is needed. Full LAN scanning requires released handles.
+Set the default LAN range (192.168.1.0–192.168.1.255), timeout and scan-size limit
+with `LAN_SCAN_*` in [config.py](src/thorlabs_shutter_control/config.py).
 Users set and verify the physical interlock externally. GUI interlock feedback is
 informational and does not gate Open or Arm; connection, key, operating feedback
 and TTL prerequisites still apply.
@@ -63,7 +68,21 @@ Open [localhost:8050](http://127.0.0.1:8050/):
 Set `SLOTS = 6` in `config.py` for six panels, or any positive count.
 See the [current six-panel preview](docs/gui.md#six-panel-layout).
 `SERIAL_NUMBERS` preselects distinct devices in panel order. With `SLOTS = None`,
-the default is three panels, growing to fit the configured serials. Unused panels
+the USB default is three panels, growing to fit the configured serials. With
+`ETHERNET_ENDPOINTS` configured, the default fits the endpoint/serial lists.
+For optional one-panel LAN startup defaults, use this in `config.py`
+(replace the fictional values):
+
+```python
+SERIAL_NUMBERS = (68000001,)
+ETHERNET_ENDPOINTS = ("192.0.2.10:40304",)  # KEH3 left bay; None selects USB.
+SLOTS = None
+```
+
+Each result displays its detected connection route. Connect automatically applies
+the selected route to a released panel; it never falls back to another transport.
+See [GUI discovery](docs/gui.md#ethernet-lan-configuration). No per-panel endpoint
+or connection-type controls are needed. Restart after config.py edits. Unused panels
 stay disconnected. Closing the browser does not shut down hardware. Cleanup is
 best effort and cannot bound a hung SDK call; use independent bench recovery on
 uncertainty. Reported states and software holds are not optical/timing measurements.
@@ -103,8 +122,8 @@ USB hubs. KEH6 hardware has not been qualified here. Hub/power/USB limits still
 apply; an arbitrary software count does not imply unlimited physical capacity or
 simultaneous operation. Refresh and cleanup run sequentially, so latency grows
 with the connected count. Ethernet remains experimental and belongs to
-`ShutterHub(ethernet_endpoints=...)`; `KCubeShutter` is USB-only. The default
-launcher uses USB; an explicitly configured hub can be passed to `create_app`.
+`ShutterHub`; `KCubeShutter` is USB-only. The launcher starts with USB defaults
+and supports automatic USB/Ethernet discovery, detected routes and mixed panels.
 
 ## What has been tested
 
@@ -117,7 +136,8 @@ with no COM-port dependency. Published records use device aliases.
 | Historical USB identity, status, reconnect, Open/Close and shutdown | Controller readback passed; user confirmed the five-cycle physical sequence |
 | Historical GUI controls, refresh, reconnect and cleanup | Actual browser and USB readback passed for the recorded revision |
 | TTL, both ports disconnected | Configuration/Arm/Disarm passed; active-low Open expectation failed on both ports |
-| Ethernet cube communication, three real pairs, external TTL signals/voltage, fault injection, calibrated timing | Not qualified |
+| One KEH3/KSC101 explicit-endpoint LAN discovery, identity, Connect and passive release | E128 / TEST-138 passed; user also reports successful LAN notebook execution |
+| LAN range scanning, current GUI hardware paths, Ethernet actuation/timing, multiple real pairs, external TTL, physical fault recovery, calibration | Not qualified on the current software |
 
 Current modern GUI, mode selection and launcher shutdown have software-only
 validation; historical bench results do not qualify these changed paths.
