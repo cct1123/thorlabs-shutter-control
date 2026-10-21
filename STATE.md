@@ -1,6 +1,6 @@
 # Engineering state
 
-## Current checkpoint - REQ-100 VALIDATED, publication pending
+## Current checkpoint - REQ-100 COMPLETE (software review/publication)
 
 Source: PROJECT.md latest review/prune/staged commit/push request. E135 / TEST-145:
 final source and extracted-wheel suites each **251 passed, 1 optional SDK skip**;
@@ -12,9 +12,11 @@ Current evidence: records/lan-publication-review-validation.json. E134 browser e
 remains applicable to the unchanged layout; the Connect guard has callback tests.
 Screenshot: docs/assets/gui-unified-discovery.png. Earlier counts/hashes in records
 are historical. REQ-099 supersedes REQ-095's manual GUI form.
-Implementation/tests committed as 66ebe49. Plan: commit documentation/evidence/pruning; push and
-verify; commit/push the publication checkpoint. No hardware/network discovery or
-actual GUI restart performed or needed for this review.
+Implementation/tests committed as 66ebe49; documentation/evidence/pruning as
+5bae2a4. Both pushed to origin/main; exact remote hash verified (E136 / TEST-146).
+This final checkpoint records that publication. No remaining software action or
+pending helper. No hardware/network discovery or actual GUI restart performed.
+Physical project acceptance remains incomplete, as detailed below.
 
 ## Architecture and configuration
 
@@ -85,7 +87,7 @@ claim that old test totals or physical measurements describe this revision.
 
 | ID | Short criterion | Validation / evidence | Status |
 | --- | --- | --- | --- |
-| REQ-100 | Full review, consistency/pruning, staged commits and push | E135 / TEST-145 software PASS; remote verification pending | IN PROGRESS (publication) |
+| REQ-100 | Full review, consistency/pruning, staged commits and push | E135 / TEST-145 software PASS; E136 / TEST-146 exact remote hash | PASS (software publication) |
 | REQ-099 | Unified USB/Ethernet Discover; remove manual GUI forms | E134 / TEST-144; software/browser PASS | PASS (software) |
 | REQ-098 | Repository consistency and pruning | E133 / TEST-143; source/wheel 249 PASS, 1 SDK skip; docs/package/pruning checks | PASS (software) |
 | REQ-097 | LAN defaults in config.py | E132; E133 current config/GUI/API regression | PASS (software) |

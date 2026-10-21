@@ -95,5 +95,15 @@
     "Live range scanning/current GUI bench operation and Ethernet actuation/timing remain unqualified",
     "Historical E125..E134 hashes/results retain their original revision scope"
   ],
-  "publication": "pending staged commits and remote verification; tracked separately by E136 / TEST-146"
+  "publication": {
+    "status": "PASS",
+    "evidence": "E136",
+    "test": "TEST-146",
+    "implementation_commit": "66ebe49d1603514a2b65ceec94c3eb4b729f59dc",
+    "documentation_commit": "5bae2a46fa209f9ae3bd487d91e4f94f5b76b57a",
+    "remote": "origin/main",
+    "remote_hash_verified": "5bae2a46fa209f9ae3bd487d91e4f94f5b76b57a",
+    "method": "normal git push; independent git ls-remote equality; clean git status",
+    "final_checkpoint": "documentation-only commit records verified publication"
+  }
 }

@@ -4,7 +4,8 @@
 
 REQ-100 / E135 reviews and validates the accumulated USB/LAN work, fixes stale
 route reconnection after a failed rescan, and separates private notebook results
-from the shared template. Publication is pending staged commits and remote verification.
+from the shared template. Published in focused implementation and documentation
+commits, 66ebe49 and 5bae2a4; origin/main's exact hash was verified (E136 / TEST-146).
 
 REQ-099 / E134: the normal GUI now has one **Discover** action for USB and KEH3
 Ethernet. Per-shutter connection type/endpoint/apply controls and the separate LAN

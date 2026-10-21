@@ -1878,3 +1878,24 @@ identity scan; git diff --check. Evidence/source/wheel/notebook hashes and prune
 inventory: records/lan-publication-review-validation.json. No SDK/device/LAN discovery,
 actuation or actual user GUI restart. Physical qualification remains incomplete.
 Software review PASS; staged commits/push verification follows under E136/TEST-146.
+
+## E136 / TEST-146 - Staged commits and verified remote publication
+
+REQ-100. Expected: separately reviewable commits, normal push to configured
+origin/main, exact remote hash equality, clean tracked checkout, private notebook
+backup still ignored and intact. No physical operation.
+
+Observed: stage1 66ebe49 (unified USB/LAN implementation and regression tests);
+stage2 5bae2a4 (consistent guides, portable notebook, pruning and evidence).
+Explicit path allowlists were staged; cached filenames/diffs/whitespace reviewed
+before each commit. No unrelated edits, private backup or build scratch staged.
+Normal git push origin main succeeded, advancing 65023b4..5bae2a4. Independent
+git ls-remote origin refs/heads/main returned
+5bae2a46fa209f9ae3bd487d91e4f94f5b76b57a, exactly matching local HEAD. git status
+showed clean main synchronized with origin/main. PASS.
+
+The final documentation-only checkpoint updates STATE/report and this evidence
+with verified publication. Its commit/push is followed by another exact remote
+comparison; it introduces no source/package change and needs no repeated software
+suite. E135's source/wheel251 passed,1 optional SDK skip remains current. All
+physical limitations and local private notebook preservation remain unchanged.
