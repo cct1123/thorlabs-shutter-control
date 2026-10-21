@@ -156,7 +156,11 @@
     "target": "origin/main",
     "pre_review_head": "0833e84",
     "fetch": "HEAD and origin/main equal before commit",
-    "status": "PENDING_COMMIT_AND_PUSH"
+    "status": "IMPLEMENTATION_PUSH_VERIFIED",
+    "implementation_commit": "5445fec4a3fb6d3a9a39c63d74509d5bbc1419a3",
+    "remote_main_verified": "5445fec4a3fb6d3a9a39c63d74509d5bbc1419a3",
+    "verified_utc": "2026-10-21T01:50:54.849953+00:00",
+    "checkpoint": "Publication metadata committed separately; final branch identity is recorded by Git refs"
   },
   "source_sha256": {
     "src/thorlabs_shutter_control/controller.py": "3155a7c02f9a5a54c4e3234d4b4d98b761cc2aea83ff55c98a76cd015dad747c",

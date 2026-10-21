@@ -31,9 +31,11 @@ exception chains. Driver/GUI/CLI behavior is unchanged from the bench-tested ver
 archive integrity/136 member checksums,17 active Markdown files/67 local targets,
 Ruff/format and diff checks PASS.100 verified cleanup targets removed; no scratch
 build/cache folder remains. .venv, installed Kinesis and the intentional GUI owner
-were preserved. No new hardware operation in this review. Publication verification
-is pending; [validation details](../records/cleanup-validation.json) record the
-commands, source/wheel hashes and removal allowlist.
+were preserved. No new hardware operation in this review. Implementation [5445fec](https://github.com/cct1123/thorlabs-shutter-control/commit/5445fec4a3fb6d3a9a39c63d74509d5bbc1419a3)
+was pushed to origin/main and the remote hash verified. A separate publication
+metadata checkpoint follows. [Validation details](../records/cleanup-validation.json)
+record commands, source/wheel hashes and the removal allowlist. The cleanup and
+publication request is complete; broader physical acceptance remains partial.
 
 [Bench results](../records/hardware-validation.json),
 [evidence index](../records/RECORDS.md), [archive](../records/archive/README.md),

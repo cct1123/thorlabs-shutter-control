@@ -1,6 +1,6 @@
 # Engineering state
 
-## Cleanup checkpoint - E079 / TEST-088, 2026-10-20
+## Cleanup COMPLETE - E079 / TEST-088, 2026-10-20
 
 Latest user requests holistic review, pruning, consistency fixes, commit and push.
 Historical evidence was preserved in a verified136-file ZIP before pruning.
@@ -20,8 +20,12 @@ scratch SDK extraction/installer copies, caches, old build outputs and obsolete
 active logs/assets. Source449 tests and wheel449 tests PASS; wheel9 entries,
 no vendor binaries/records/tests. Archive136 members verified;17 Markdown files/
 67 local targets checked, Ruff/format/diff checks PASS. Active text normalized LF.
-Next: reviewed allowlist commit and push origin/main, then remote identity check.
-No new hardware operation. Installed vendor runtime/.venv/GUI owner preserved.
+Implementation committed as5445fec4a3fb6d3a9a39c63d74509d5bbc1419a3 and pushed
+to origin/main; ls-remote verified that exact remote identity. This metadata
+checkpoint follows the implementation; current final publication is represented
+by Git refs rather than a self-referential commit hash. No new hardware operation.
+Installed vendor runtime/.venv/GUI owner preserved. Cleanup request complete;
+broader physical acceptance below remains PARTIAL.
 
 ## Bench and ownership
 
@@ -114,4 +118,4 @@ acceptance. No broader completion is inferred from this cleanup.
 | REQ-050 | Implement/test Stage5/6 autonomously (derived, PROJECT.md) | E076/E077 / TEST-085/086;437 offline tests, actual USB shutdown/GUI/Ctrl+C | PASS (electronic scope; physical criteria REQ-007 separate) |
 | REQ-051 | Enable GUI/hardware; remove holds (derived, PROJECT.md request) | E076/E077; session serial-specific confirmation, live flags/GUI tested | PASS |
 | REQ-052 | Actual GUI/hardware user experience and focused GUI design (derived, latest PROJECT.md request) | E078 / TEST-087;440 software tests, real browser actions and USB readback, final layout/reload proof | PASS (electronic/browser scope) |
-| REQ-053 | Holistic review, prune, consistency, commit/push (derived, latest PROJECT.md request) | E079 / TEST-088;449 source +449 wheel tests, archive/link/lint checks PASS; publication pending | VALIDATED; COMMIT/PUSH PENDING |
+| REQ-053 | Holistic review, prune, consistency, commit/push (derived, latest PROJECT.md request) | E079 / TEST-088;449 source +449 wheel tests, archive/link/lint checks PASS; implementation5445fec pushed/remote verified | PASS (cleanup/publication) |
