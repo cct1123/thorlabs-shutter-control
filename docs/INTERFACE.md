@@ -22,14 +22,18 @@ Official references: [Kinesis](https://www.thorlabs.com/software-pages/Motion_Co
 | Connect | CreateKCubeSolenoid, Connect, settings initialization, StartPolling, GetDeviceInfo identity validation; no output/mode writes |
 | USB health | IsConnected plus USBConnected Connected/Connecting and CommsStatus OK |
 | LAN health | IsConnected, CommsStatus OK and exact TCPIP endpoint/provider |
-| Feedback | RequestStatus/OperatingMode/OperatingState, optional trigger request/wait, then named getters |
+| Feedback | RequestStatus/OperatingMode/OperatingState, optional trigger request, then named getters without added sleeps |
 | Identity | GetDeviceInfo; no display-flashing IdentifyDevice call |
 | Release | Attempt StopPolling and Disconnect even if stopping polling fails |
 
 Connecting alone is insufficient readiness. Undefined operation0 is unknown.
 Operating modes normalize Manual/SingleToggle/AutoToggle/Triggered to
-manual/single/auto/triggered. A request/wait does not establish cache age.
-Cached snapshots are for display, not output authorization.
+manual/single/auto/triggered. A request/getter pair does not establish cache age;
+the returned value may precede the request. SDK polling remains enabled.
+Cached snapshots support display and selection of read breadth, not output
+authorization. The GUI always requests feedback before checking readiness.
+Its settings comparison uses the SDK getter; write acknowledgement/freshness is
+not established by that comparison.
 
 ## Commands and physical interlock
 

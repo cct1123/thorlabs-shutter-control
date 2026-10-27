@@ -54,6 +54,8 @@ def test_gui_discovers_and_connects_the_selected_lan_route(bench, panels):
     hub = ShutterHub(slots=panels)
     app = gui.create_app(hub)
     assert not bench.loads
+    refresh = next(c for c in app.layout.children if getattr(c, "id", None) == "refresh")
+    assert refresh.interval == 100
     found = click(app, "discover")
     assert len(found[f"serial{suffix}"]["options"]) == 2
     assert not bench.lan.IsConnected
@@ -116,7 +118,7 @@ def test_gui_connect_reads_one_combined_feedback_batch(bench, transport):
 
     start = controller.time.monotonic()
     result = click(app, "connect", selections)
-    assert controller.time.monotonic() - start == pytest.approx(0.25)
+    assert controller.time.monotonic() - start == 0
     assert [call[0] for call in device.calls] == [
         "connect",
         "poll",
@@ -159,7 +161,7 @@ def test_gui_apply_ttl_batches_readback_with_operating_feedback(bench, transport
 
     start = controller.time.monotonic()
     result = click(app, "apply-ttl", selections)
-    assert controller.time.monotonic() - start == pytest.approx(0.5)
+    assert controller.time.monotonic() - start == 0
     assert [call[0] for call in device.calls] == [
         "status",
         "mode_read",
@@ -217,6 +219,127 @@ def test_gui_apply_ttl_keeps_fault_and_cleanup_after_readback_failure(bench):
     assert result["serial"]["disabled"] and not result["close"]["disabled"]
     click(app, "disconnect", selections)
     assert not bench.usb.IsConnected
+
+
+@pytest.mark.parametrize("retained_fault", [False, True])
+def test_gui_discover_checks_ownership_without_device_reads(bench, retained_fault):
+    app = gui.create_app(ShutterHub(slots=1))
+    selections = {"serial": bench.usb.serial}
+    click(app, "connect", selections)
+    if retained_fault:
+        bench.usb.fail = "disconnect"
+        click(app, "disconnect", selections)
+    bench.usb.calls.clear()
+
+    result = click(app, "discover", selections)
+    assert not bench.usb.calls
+    assert result["serial"]["value"] == bench.usb.serial
+    assert result["serial"]["disabled"]
+    assert result["connection"]["children"] == ("Fault" if retained_fault else "Connected")
+    bench.usb.fail = None
+    click(app, "disconnect", selections)
+
+
+@pytest.mark.parametrize("transport", ["usb", "lan"])
+def test_gui_read_ttl_uses_one_full_snapshot(bench, transport):
+    device = bench.usb if transport == "usb" else bench.lan
+    endpoints = [None] if transport == "usb" else [bench.endpoint]
+    app = gui.create_app(ShutterHub(slots=1, ethernet_endpoints=endpoints))
+    selections = {"serial": device.serial}
+    click(app, "connect", selections)
+    device.settings.Trigger1Polarity = "TriggerLow"
+    device.calls.clear()
+
+    result = click(app, "read-ttl", selections)
+    assert [c[0] for c in device.calls] == ["status", "mode_read", "operation", "ttl_read"]
+    assert result["trig1-polarity"]["value"] == "low"
+    assert "TRIG1 input/low" in result["ttl-status"]["children"]
+    click(app, "disconnect", selections)
+
+
+def test_gui_read_ttl_failure_keeps_fault_and_cleanup(bench):
+    app = gui.create_app(ShutterHub(slots=1))
+    selections = {"serial": bench.usb.serial}
+    click(app, "connect", selections)
+    bench.usb.fail = "ttl_read"
+    result = click(app, "read-ttl", selections)
+    assert result["connection"]["children"] == "Fault"
+    assert "ttl_read failed" in result["message"]["children"]
+    assert result["open"]["disabled"] and not result["close"]["disabled"]
+    assert "value" not in result.get("trig1-mode", {})
+    click(app, "disconnect", selections)
+    assert not bench.usb.IsConnected
+
+
+@pytest.mark.parametrize("transport", ["usb", "lan"])
+def test_gui_trigger_start_combines_prerequisites_and_reads_result(bench, monkeypatch, transport):
+    device = bench.usb if transport == "usb" else bench.lan
+    endpoints = [None] if transport == "usb" else [bench.endpoint]
+    hub = ShutterHub(slots=1, ethernet_endpoints=endpoints)
+    app = gui.create_app(hub)
+    selections = {"serial": device.serial}
+    click(app, "connect", selections)
+    click(app, "mode-triggered", selections)
+
+    def separate_ttl_read(slot):
+        pytest.fail("Known Trigger mode should include TTL in its prerequisite snapshot")
+
+    monkeypatch.setattr(hub, "get_trigger_config", separate_ttl_read)
+    device.calls.clear()
+    result = click(app, "open", selections)
+    assert [c[0] for c in device.calls] == [
+        "status",
+        "mode_read",
+        "operation",
+        "ttl_read",
+        "state",
+        "status",
+        "mode_read",
+        "operation",
+    ]
+    assert result["lamp-active"]["children"]["props"]["title"] == "On"
+    click(app, "disconnect", selections)
+
+
+@pytest.mark.parametrize("issue", ["key", "no_input", "active", "unknown", "read_failure"])
+def test_gui_combined_trigger_read_still_refuses_unsafe_start(bench, issue):
+    app = gui.create_app(ShutterHub(slots=1))
+    selections = {"serial": bench.usb.serial}
+    click(app, "connect", selections)
+    click(app, "mode-triggered", selections)
+    if issue == "key":
+        bench.usb.Status.KeyEnabled = False
+    elif issue == "no_input":
+        bench.usb.settings.Trigger1Mode = "TrigOUT_GPO"
+    elif issue == "active":
+        bench.usb.operation, bench.usb.position = "Active", "Open"
+    elif issue == "unknown":
+        bench.usb.operation = "0"
+    else:
+        bench.usb.fail = "ttl_read"
+    bench.usb.calls.clear()
+
+    result = click(app, "open", selections)
+    assert not any(c[0] in ("state", "mode", "enable", "ttl_write") for c in bench.usb.calls)
+    assert result["open"]["disabled"]
+    click(app, "disconnect", selections)
+    assert not bench.usb.IsConnected
+
+
+def test_gui_changed_mode_reads_actual_trigger_inputs_before_start(bench):
+    app = gui.create_app(ShutterHub(slots=1))
+    selections = {"serial": bench.usb.serial}
+    click(app, "connect", selections)  # Display cache still says Manual.
+    bench.usb.mode = "Triggered"
+    bench.usb.settings.Trigger1Mode = "TrigOUT_GPO"
+    bench.usb.calls.clear()
+
+    result = click(app, "open", selections)
+    assert ("ttl_read",) in bench.usb.calls
+    assert not any(c[0] == "state" for c in bench.usb.calls)
+    assert "Open refused" in result["message"]["children"]
+    assert result["open"]["disabled"]
+    click(app, "disconnect", selections)
 
 
 def test_launcher_builds_passive_panels_and_exits_normally(bench, monkeypatch):

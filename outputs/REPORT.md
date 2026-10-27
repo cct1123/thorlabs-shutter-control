@@ -1,59 +1,74 @@
-# Simple GUI latency delivery
+# Current system and delivery
 
-## Result - REQ-105
+The pending delivery includes uppercase LAN discovery types, removal of fixed
+Python feedback sleeps, reduced GUI feedback work and a 100 ms background refresh
+interval. Source and a newly built wheel each pass 40 software tests. This is
+software validation; current hardware feedback freshness and physical timing
+remain unqualified.
 
-GUI Connect and Apply TTL now use the existing combined operating/TTL snapshot
-and pass that current action's result back to the callback for display. The
-callback avoids an extra operating read when a completed snapshot is returned.
-Other actions keep their existing feedback path. No worker, persistent cache or
-new dependency was added.
+## Public API and feedback
 
-| Action | Prior programmed waits | Current programmed waits | Reduction |
-| --- | ---: | ---: | ---: |
-| Connect | 500 ms | 250 ms | 50% |
-| Apply TTL | 750 ms | 500 ms | 33% |
+The exported discovery classes are LANDevice and LANDiscovery. Their constructors,
+annotations and documentation use uppercase LAN; mixed-case aliases are absent.
+KCubeShutter remains the direct USB API, while ShutterHub owns slots and LAN routes.
+Startup and construction remain passive.
 
-Values use the default 250 ms poll interval and a virtual-clock fake SDK. Native
-calls, discovery, HTTP queuing, transport and mechanical time are additional;
-these are not measured physical response times or maximum latency guarantees.
+Snapshot, TTL and scalar feedback getters request values and sample the SDK without
+an added Python sleep. SDK-returned values may precede the request. Neither an
+immediate state value nor a settings match acknowledges a particular request/write.
+Setters still write without implicit feedback; Close/disconnect remain available
+for retained faulted handles. Ownership, identity, route checks and all-slot cleanup
+remain in place. No hardware action was performed for this delivery.
 
-## Safety and readability
+## GUI behavior
 
-Connect still validates identity, route and exclusive ownership, with no Enable,
-mode, output or TTL write. A failed full read remains a fault with activation
-blocked and its retained handle available for cleanup. Apply still requires
-Closed/Inactive/Manual before its write, rejects read failures, and compares actual
-TTL feedback with the requested draft before reporting success.
+| Path | Current behavior |
+| --- | --- |
+| Discover | Enumerates routes; uses cached handle ownership to retain selections without device status requests |
+| Connect | Verifies identity/route and reuses one full operating/TTL result for display; no output write |
+| Read TTL | One full snapshot supplies draft replacement and display; errors preserve the draft |
+| Known Trigger Start | One full prerequisite snapshot includes operating/input settings; result feedback follows the Active command |
+| Changed mode | Cached mode only chooses read breadth; reported Trigger mode still requires SDK input settings before readiness passes |
+| Ordinary Manual/Single/Auto Start | Operating-only prerequisite; no additional TTL request on the normal path |
+| Apply TTL | Reported Closed/Inactive/Manual prerequisite, settings write and SDK-returned settings comparison |
+| Background refresh | Requested every 100 ms and disabled during callbacks; SDK work remains serialized |
 
-The action helper returns either its completed snapshot or None. The callback
-uses that result only for the selected panel during the current event. Driver
-contracts, polling intervals, discovery, other action paths, layout, normal workflow messages and
-cleanup policy are retained. The existing [developer walkthrough](../docs/architecture.md#developer-walkthrough)
-explains the flow; the new comments explain why feedback is shared.
+Automatic SDK polling remains 250 ms by default. Explicit GUI requests also occur;
+these intervals do not guarantee fresh samples or 10 Hz physical updates. The two
+bounded discovery retry sleeps, SDK initialization wait, native scan parameters,
+hub serialization and single-request launcher remain. Native calls and discovery
+can delay clicks; Close is not an independent emergency stop.
 
-## Validation and delivery
+## Validation and review
 
-E148 / TEST-158 validates Connect, committed separately as 448b6b4. E149 / TEST-159
-records Apply and final integrated validation in the second implementation commit.
-The focused timing tests first failed with the old waits, then passed with the
-intended reductions. The essential suite covers USB/LAN, one/three-panel GUI,
-four modes, TTL, identity/ownership, failure/cleanup and both notebook workflows.
-Final source and extracted wheel each pass **26 tests**. Package/source bytes,
-README/import origin, lint/format and local documentation checks pass.
+E155 / TEST-165 validates the integrated working tree: 40 source tests and 40 tests
+against the newly built/extracted wheel, passive uppercase exports/construction,
+six package files matching source, README metadata parity, lint/format and current
+documentation/evidence checks. The documentation pass changes no runtime/test files.
+[Integrated review](CHANGE_REVIEW.md) records the findings and limits;
+[current review evidence](../records/change-review-validation.json) identifies the
+final source, package and document hashes.
 
-A 59-callback comparison preserves all browser responses, discovery calls and
-non-target device-call sequences. Request sets for Connect/Apply are unchanged;
-only their batched order and one fewer programmed wait are intentional differences.
-See [current machine evidence](../records/latency-validation.json) and
-[stage records](../records/RECORDS.md) for source/package results and configuration.
+E154 / TEST-164's source hashes still match. Its 81 before/after scenarios preserve
+48 normal callback responses, with 71 unchanged SDK sequences and 10 intended
+batching/read reductions. Read TTL saves two transport lookups; known Trigger Start
+saves two; Discover removes three device requests and two transport lookups per
+healthy held panel. See [GUI evidence](../records/gui-feedback-validation.json).
+No measured millisecond saving is attributed to those lookups.
 
-No real SDK, network discovery, hardware operation or physical qualification was
-performed. Prior physical limits, including the active-low TTL issue, remain open.
-No beginner handoff study was performed. The earlier readability delivery and its
-publication are historical in [readability evidence](../records/readability-validation.json).
-The user subsequently requested updated documentation and publication. README,
-operator timing, setup, API and developer guidance now explain the combined reads,
-retained safety checks and software-only timing scope. Documentation/publication
-validation is recorded as E150 / TEST-160. The README now starts with installation
-and first use; overview and trigger screenshots were refreshed from a fake-only
-browser preview. No production source or styling changed in this documentation step.
+The earlier [sleep-removal evidence](../records/delay-removal-validation.json),
+[delay audit](DELAY_AUDIT.md) and [staged records](../records/RECORDS.md) retain their
+revision-specific results. Earlier 250/500/750 ms wait values and 1 s GUI cadence
+are historical. The user subsequently requested commit/push; the reviewed delivery
+is being published normally to existing origin/main. Publication records follow
+in [records](../records/RECORDS.md). The document hashes in TEST-165 identify the
+review checkpoint before these publication-only notes; runtime/test hashes remain current.
+
+## Remaining qualification
+
+The software fake returns responses immediately. It cannot establish real SDK
+cache age, acknowledgement of a TTL write, transport throughput, optical timing,
+electrical TTL behavior or bench safety. Removal of sleeps did not supply a response
+acknowledgement mechanism. Existing active-low no-cable TTL observations remain
+unresolved. Follow the separately authorized [commissioning procedure](../docs/HARDWARE_VALIDATION.md)
+for physical qualification, with current configuration and independent observations.

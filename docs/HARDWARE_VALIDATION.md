@@ -16,6 +16,14 @@ Pass requires matching identity and successful communication/reads. Preserve
 unknown values; operating state0 is not Inactive. Stop on wrong identity or errors.
 For a passive LAN check, skip all output/mode cells and release without Close.
 
+The current getters add no Python settling sleep and may expose values received
+before the request. Qualify request-to-response age and settings readback on the
+intended USB/LAN topology under the approved bench conditions. Record whether a
+response can be associated with its request/write; an SDK value or a 100 ms GUI
+refresh alone does not establish that association. Until demonstrated, record
+freshness and write acknowledgement as UNTESTED rather than infer them from the
+software checks. Do not use the GUI cadence as an exposure or shutdown bound.
+
 ## One functional cycle
 
 Proceed only within approved operating conditions. Explicitly Disarm to

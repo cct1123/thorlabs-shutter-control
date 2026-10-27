@@ -1,0 +1,107 @@
+{
+  "date": "2026-10-27",
+  "requirement": "REQ-110",
+  "evidence": "E155 / TEST-165",
+  "reviewed_requirements": [
+    "REQ-106",
+    "REQ-107",
+    "REQ-108",
+    "REQ-109"
+  ],
+  "base_revision": "e01054c431bc128a1ac1543e809569e26fcb1919",
+  "scope": "complete pending diff, current docs, software-only source and extracted wheel; no runtime/test changes in this pass",
+  "source_tests": {
+    "passed": 40,
+    "seconds": 0.69,
+    "command": ".venv/Scripts/python.exe -B -m pytest -q -p no:cacheprovider --tb=short"
+  },
+  "wheel_tests": {
+    "passed": 40,
+    "seconds": 0.62,
+    "import_origin_verified": true,
+    "PYTHONPATH": "tmp/final-review/wheel"
+  },
+  "package": {
+    "wheel": "tmp\\final-review\\thorlabs_shutter_control-0.1.0-py3-none-any.whl",
+    "sha256": "d116539be93472bb36ff2042fb0722feaa449dcc6bd3de7e14fa1fb5663305e1",
+    "package_files": [
+      "thorlabs_shutter_control/__init__.py",
+      "thorlabs_shutter_control/__main__.py",
+      "thorlabs_shutter_control/config.py",
+      "thorlabs_shutter_control/controller.py",
+      "thorlabs_shutter_control/gui.py",
+      "thorlabs_shutter_control/assets/style.css"
+    ],
+    "source_parity": "PASS",
+    "readme_metadata": "PASS",
+    "backend": "cached hatchling 1.32.4 via build_wheel; offline, no build isolation"
+  },
+  "exports": {
+    "uppercase_names": "PASS",
+    "mixed_case_aliases": "absent",
+    "construction": "PASS",
+    "passive_import": "PASS; SDK not loaded, no owners"
+  },
+  "lint_format": "PASS: Ruff check and format --check --no-cache src tests; nine files",
+  "unchanged_since_TEST_164": {
+    "result": "PASS",
+    "source_sha256": {
+      "docs/examples/shutter_lan_tutorial.ipynb": "5dde8381b3ecf6ff80152adfb1b077c86b82911f4415c729f1decdb6dde436d8",
+      "docs/examples/shutter_open_close_tutorial.ipynb": "4b3a806248f47b79e7d6596e90d1695272cbb90a1e648df7466876661ab998dc",
+      "src/thorlabs_shutter_control/__init__.py": "9a7f3b415fabfbb8036827228a94e477e50bd0bc97ed7849924a92e003bf84ef",
+      "src/thorlabs_shutter_control/__main__.py": "6e6475b2913ee076784c8eb6b4ac73a119f745c3478ee0a8c5e9ac0201a218b5",
+      "src/thorlabs_shutter_control/assets/style.css": "54fbe35bc43bfad34f8bfbfa6026ef731a6b72a12ea2e96eb056b8c7482b0f47",
+      "src/thorlabs_shutter_control/config.py": "62ca4da608f956123f0b3ae9161f65e3ba8dc82bf8a43ebdc9e50648a8fa3e47",
+      "src/thorlabs_shutter_control/controller.py": "babe52ffd6acfad8e4ab4234234881a40fce238e7fa6d7be58b02abea9a4f6d6",
+      "src/thorlabs_shutter_control/gui.py": "7101b8228174b317ef35968f9febf2fc33383c5f760a98ce51aaa8537dff103b",
+      "tests/conftest.py": "8b92a89f5640615c803ba6e6d39b0c987270f5388f36771bc70f100003585d3e",
+      "tests/test_application.py": "a4aa0be2db18f5378032977bb446f233f86a5056b6fed8149e8802214b8a7515",
+      "tests/test_core.py": "3f288cf52ca8bc0983ced3ca297a58ba63cdf8c76478f84f00ca3fd9fb41efc8",
+      "tests/test_notebooks.py": "d358e35ea86135213f22657b6a0dfd60f448550b337273dd1fed89cdd75e4241"
+    }
+  },
+  "documentation": {
+    "markdown_files": 17,
+    "local_links_checked": 93,
+    "local_fragments_checked": 10,
+    "python_snippets_parsed": 4,
+    "notebook_code_cells_parsed": 15,
+    "documentation_sha256": {
+      "docs/architecture.md": "65c60123433fc4c3ee50334bbdc2674327a98d99af9356cb17b56ad7c3986065",
+      "docs/assets/README.md": "e08c19d4d0e7299efc48ee8f7a2b8f4a9b5257affc9c08b55b2bc61a3ba47d4c",
+      "docs/ethernet-assessment.md": "02c826730f5a1206b5146fec11749274c967dd295a26e41c926155c73d6de9fe",
+      "docs/examples/README.md": "b2ae36354b9141f76155b0aa64b2b221429bc3b3f62553537f0d56aaddd45f03",
+      "docs/getting-started.md": "4593097d83adb950f4c8e45009067946a394d1bd17540bd6d39450c9db0dd231",
+      "docs/gui.md": "a7871d11ed0cfe652078d2b05e18fb94f344a2d18e574823b0a8f96d811afa33",
+      "docs/hardware.md": "6006e35944c43714efb84d0ad8fae307c1e37eaadef51f4b78741f437753ce61",
+      "docs/HARDWARE_VALIDATION.md": "e049325f9830d0693cfe9298c09edebd170d937fbdb7b4271e8297b2b47f9005",
+      "docs/INTERFACE.md": "dbc866baecfc70d521ed9e6e3c959c9dc470a29c7301cdc4abc75090f2cd47a1",
+      "docs/python-api.md": "db9119e8dfb7f024c529374814debaae32d2a90940f0016708f35ffa0c01b09a",
+      "outputs/CHANGE_REVIEW.md": "7831ede760493abd0da3a2fb576034047b47fa318b0349d1d888be9f2c7b2b5f",
+      "outputs/DELAY_AUDIT.md": "32eefd6d3679bbd00c5ce4d05379e761e99b6f42404edb34e5e8415cd8f07a6e",
+      "outputs/REPORT.md": "36cd5cda99132eb926e8921750840149260cbe336c9209a96d3ed1581d87d7da",
+      "outputs/REVIEW.md": "449630180ef820f9e97ef2743b56ecdb1c40b72ab5d63f6a7e6d43354d28335d",
+      "PROJECT.md": "7119fdb1d6a42d3dc377d83b8833b2089a5d01e49088dabc4be5fec8541a24c0",
+      "README.md": "ff52d3a035c61f6bfd7506ad9dd53f594def7e5841cb155c18e22b60a65397d9",
+      "STATE.md": "0f4c8edd83e418c04c8eb209e57e1bdd6c45475a15f134bcbd13cf92dfe2ce2f"
+    }
+  },
+  "review": {
+    "additional_confirmed_code_defects": 0,
+    "documentation_defects_corrected": [
+      "unsupported fresh-feedback wording",
+      "0 ms action table could be mistaken for latency promise",
+      "mixed current and historical delivery descriptions",
+      "missing explicit API rename and automatic-poll versus GUI-cadence explanation"
+    ],
+    "open_qualification": [
+      "No real response-age or write-acknowledgement evidence after removing feedback sleeps",
+      "100 ms callback interval does not establish 10 Hz hardware response",
+      "Native SDK blocking and serialized queue latency remain unmeasured",
+      "Electrical TTL and optical timing qualification remain open"
+    ]
+  },
+  "build_recovery": "isolated offline uv build lacked hatchling in empty selected cache; built with cached hatchling 1.32.4/pathspec/trove_classifiers through hatchling.build.build_wheel without a download",
+  "working_tree_status": " M PROJECT.md\n M README.md\n M STATE.md\n M docs/HARDWARE_VALIDATION.md\n M docs/INTERFACE.md\n M docs/architecture.md\n M docs/assets/README.md\n M docs/getting-started.md\n M docs/gui.md\n M docs/python-api.md\n M outputs/REPORT.md\n M outputs/REVIEW.md\n M records/RECORDS.md\n M src/thorlabs_shutter_control/__init__.py\n M src/thorlabs_shutter_control/controller.py\n M src/thorlabs_shutter_control/gui.py\n M tests/test_application.py\n M tests/test_core.py\n?? outputs/CHANGE_REVIEW.md\n?? outputs/DELAY_AUDIT.md\n?? records/change-review-validation.json\n?? records/delay-audit.json\n?? records/delay-removal-validation.json\n?? records/gui-feedback-validation.json\n",
+  "publication": "not requested; no commit or push"
+}

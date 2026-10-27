@@ -3,8 +3,9 @@
 [README](../README.md) | [Architecture](architecture.md) | [Interface](INTERFACE.md)
 
 Exports: KCubeShutter, ShutterHub, ShutterStatus, TriggerConfig, ShutterError,
-LanDevice and LanDiscovery. Imports/construction are passive. KCubeShutter is USB
+LANDevice and LANDiscovery. Imports/construction are passive. KCubeShutter is USB
 only; ShutterHub owns slots and Ethernet. Use hub methods for owned network channels.
+The discovery type names use uppercase LAN; no mixed-case aliases are exported.
 
 ## Construction
 
@@ -80,10 +81,14 @@ block. A returned command does not establish physical state.
 
 Snapshot getters report failed reads in `connection` and `error`; inspect those
 fields before using the values. Narrow getters such as `get_trigger_config()`
-raise `ShutterError` on read failure. Requested feedback uses a fixed wait followed
-by SDK getters; it does not guarantee a known response age. `has_device` means a
+raise `ShutterError` on read failure. Requested feedback calls the SDK request and
+getter without an added sleep; the getter may return a value received before that
+request. Neither completion nor cache age is guaranteed. `has_device` means a
 driver handle is retained, including after failed disconnect, rather than healthy
 communication or demonstrated shutter motion.
+An immediate post-write settings match is a comparison with SDK-returned values,
+not proof that the device acknowledged that write. Physical qualification of the
+current immediate-read paths remains open.
 
 The context manager connects on entry and attempts safe_shutdown on exit. Failed
 entry performs passive connection cleanup; failed release retains the object/claim.
@@ -127,8 +132,8 @@ config.LAN_SCAN_START_IP/END_IP/OPEN_TIMEOUT_MS when omitted. Explicit arguments
 override those defaults; LAN_SCAN_MAX_ADDRESSES limits every scan to1..256.
 Bounds must be IPv4 strings in ascending order; timeout is an integer50..1000ms.
 The SDK scans hub port40303, registers hosts' KEH3 ports40304..40307, builds once
-and refreshes asynchronous TCPIP identities. Result: LanDiscovery(hub_addresses,
-controllers), with LanDevice(serial_number, endpoint). No device Connect/output
+and refreshes asynchronous TCPIP identities. Result: LANDiscovery(hub_addresses,
+controllers), with LANDevice(serial_number, endpoint). No device Connect/output
 occurs. Release all process-owned handles before broad scanning.
 
 configure_slot(slot, ethernet_endpoint=endpoint) passively selects a LAN route;
@@ -157,6 +162,12 @@ full operating/TTL snapshot. GUI Apply TTL reads the operating prerequisite,
 writes settings, then checks one full snapshot for read errors and actual TTL
 agreement. Each action returns that snapshot to the GUI callback for display,
 avoiding a second result read. See [GUI feedback timing](gui.md#feedback-timing).
+Read TTL likewise uses one full snapshot for its draft and display. Known Trigger
+mode batches operating/input prerequisites; cached mode only selects read breadth,
+and a reported change to Triggered still causes an actual input-settings read.
+Background refresh is requested every 100 ms, paused while the callback runs.
+Automatic SDK polling remains 250 ms by default; explicit refresh requests also
+occur. Neither interval guarantees a fresh sample or a maximum command latency.
 
 Direct Python `connect()` still returns connection metadata only; it does not
 automatically request operating or TTL feedback. Setters still return None and

@@ -1,5 +1,59 @@
 # Project intent
 
+## Documentation refresh and integrated review - REQ-110
+
+User: "update docs and readme. review all these changes."
+Review the complete pending LAN rename, controller feedback-sleep removal,
+GUI feedback batching and 100 ms background interval. Reconcile current operating/
+API/developer guidance and delivery report; distinguish requested feedback from
+acknowledged fresh responses and software checks from physical qualification.
+Validate source, a newly built wheel, public exports, documentation and evidence
+hashes. Review findings do not authorize hardware operations or publication.
+Publication follow-up: user subsequently requested "commit and push". Commit the
+reviewed pending REQ-106..110 delivery and publish normally to the existing
+origin/main, then independently verify the remote. Hardware remains outside scope.
+
+## GUI feedback improvements and 100 ms refresh - REQ-109
+
+User: "implement the gui.py improvements. remove unnecessary SDK reads, combine
+feedback where possible, keep safety checks. validate."
+Follow-up: "use 100ms background update".
+Use local handle state for Discover ownership checks; combine Read TTL operating/
+trigger feedback and reuse that event's result; combine known Trigger mode's
+prerequisite feedback without adding TTL requests to ordinary Manual/Single/Auto
+Start. Cached mode may select read breadth only: always check requested feedback
+and obtain actual inputs if a changed mode requires them. Preserve pre-command
+readiness, post-command feedback, route/fault/cleanup checks and serialization.
+Set the GUI interval to 100 ms and retain its callback-running pause. Validate
+software only; no hardware actuation or publication requested.
+
+## Remove arbitrary feedback delays - REQ-108
+
+User: "remove arbitrary waiting in controller.py eliminate fixed sleeps that are
+not explicitly required by the hardware or sdk".
+Remove unconditional polling-interval sleeps between feedback requests and SDK
+getters. Preserve request/getter calls, route/connection/readiness checks, faults,
+cleanup and the SDK's initialization wait. Keep bounded asynchronous discovery
+retry pacing distinct from a hardware settling requirement; do not replace it
+with busy polling or silently reduce discovery completeness. Validate software
+only and document latest-available feedback and unmeasured physical timing.
+
+## Software delay audit - REQ-107
+
+User requested an entire-repository audit of sleeps/fixed delays blocking status
+reads, unnecessary polling and repeated SDK calls, particularly controller.py.
+Inspect maintained source, launcher/GUI, tests, notebooks and current evidence;
+quantify programmed waits and call counts with the existing software fake.
+Separate measured software scheduling from unknown native/physical timing.
+The follow-up REQ-108 authorizes removing the fixed feedback sleeps.
+
+## LAN class capitalization - REQ-106
+
+User: "LanDevice LanDiscovery rename the Lan should be in all capital LAN".
+Rename the public classes to LANDevice and LANDiscovery, including exports,
+type annotations, constructors and API documentation. No compatibility aliases.
+Validate with software-only tests; no hardware operation is authorized.
+
 ## Simple GUI latency improvements - REQ-105
 
 User: "now implement the simple latency improvements for Connect and Apply TTL.

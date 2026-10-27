@@ -17,3 +17,7 @@ they are not hardware evidence. The loopback-only preview was shut down through
 its GUI and reported fictional handles released. The temporary launcher is ignored
 under tmp/docs-preview. Prior captures are recoverable from Git; these three assets
 are maintained.
+
+The screenshots illustrate the unchanged control layout. Their original capture
+revision predates the current feedback/read scheduling; they do not validate the
+100 ms refresh interval or current response freshness.

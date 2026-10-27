@@ -1,5 +1,91 @@
 # Engineering state
 
+## Publication follow-up - in progress
+
+Source: user's subsequent "commit and push" instruction, covering the reviewed
+REQ-106..110 delivery. Current branch main; origin is the existing
+git@github.com:cct1123/thorlabs-shutter-control.git. Independent origin/main read
+matches local base e01054c431bc128a1ac1543e809569e26fcb1919. TEST-165 runtime/test/
+notebook and document hashes matched before these publication-only notes; 40 source
+and 40 wheel test results remain applicable. Stage only the 24 reviewed delivery
+paths, inspect the index, commit and push normally, then verify remote equality.
+No force push, hardware action or unrelated file change is authorized.
+TEST-165 document hashes retain their pre-publication review-checkpoint scope.
+
+## REQ-110 COMPLETE software - documentation and integrated change review
+
+Source: PROJECT.md current request. E155 / TEST-165 reviews all pending REQ-106..109
+changes together and validates 40 source tests plus 40 extracted-wheel tests.
+Six package files and README metadata match source; uppercase exports and passive
+import/construction pass. Lint/format and documentation/evidence checks pass.
+README, GUI/API/setup/interface/developer guidance, commissioning, historical
+review pointers and the delivery report now distinguish requested SDK values from
+fresh-response/write acknowledgement. No runtime or test edits in this pass;
+TEST-164 source hashes still match. No additional confirmed code defect found in
+static/software review. SDK response freshness, physical timing and 10 Hz feedback
+remain UNTESTED. No physical operation, commit or push performed.
+Current integrated evidence: records/change-review-validation.json; review:
+outputs/CHANGE_REVIEW.md; delivery: outputs/REPORT.md. The stage snapshots below
+retain their original scope/hashes; older wait values and suite sizes are historical.
+No action remains for this documentation/review request. Physical acceptance still
+requires separately authorized bench qualification under the limits below.
+
+## REQ-109 COMPLETE software - combined GUI feedback, 100 ms refresh
+
+Source: PROJECT.md current GUI request and explicit 100 ms update instruction.
+Derived criteria: cached handle ownership for Discover; one full Read TTL result;
+combined known-Trigger prerequisites with fallback for changed mode; no added
+TTL requests on normal Manual/Single/Auto Start; readiness and post-write reads
+retained; refresh interval 100 ms, paused during callbacks. E154 / TEST-164:
+40 source tests pass, including USB/LAN batching, retained ownership, actual input/
+key/state/fault refusals and changed-mode fallback. Before/after probes cover 81
+scenarios; normal browser responses match. Read TTL and known Trigger Start save
+two transport lookups each; Discover drops three device requests and two transport
+lookups per healthy held panel. No fixed feedback waits added. Driver/config/
+launcher/fixture/notebook bytes remain unchanged from the prior working tree.
+Evidence: records/gui-feedback-validation.json; delivery: outputs/REPORT.md.
+Prior source hashes remain historical where GUI/tests changed. SDK freshness and
+physical 10 Hz feedback are UNTESTED: 100 ms is the requested browser interval,
+not a response-time guarantee. Hub serialization/discovery policy remain.
+No action remains for this software request; no commit/push requested.
+
+## REQ-108 COMPLETE software - remove fixed feedback sleeps
+
+Source: PROJECT.md current delay-removal request. Derived criterion: no added
+polling-interval sleep in snapshot, TTL or scalar feedback reads; preserve SDK
+calls and failure/readiness/route/ownership/cleanup checks. E153 / TEST-163 records
+27 passing source tests and before/after probes. All 81 scenarios retain the same
+recorded SDK method calls; feedback sleeps are removed. Direct seven-getter
+regression first failed at 1.75 s, then passed at 0 s added virtual time.
+Actual SDK/physical response freshness remains UNTESTED; getters expose latest
+available values and do not acknowledge a specific request or command completion.
+SDK initialization wait/polling, bounded LAN discovery retry pacing and GUI refresh
+are retained. This changes the timing assumptions of REQ-105/TEST-159; its hashes
+and 250/500 ms wait claims are historical. Current evidence:
+records/delay-removal-validation.json; audit and remaining gaps:
+outputs/DELAY_AUDIT.md. No commit/push or hardware action requested.
+
+## REQ-107 COMPLETE - repository delay audit
+
+Source: PROJECT.md audit request. E152 / TEST-162: inspected all maintained Python,
+GUI CSS and both notebooks; traced five controller sleep sites and other timing
+mechanisms. 81 fake-clock observations cover USB/LAN actions, scalar reads,
+multi-panel refresh, discovery and notebooks. Pre-change suite: 26 passed.
+Findings include serialized status work, repeated TTL/operating reads, full-window
+LAN identity collection, unrelated-route Connect waits and repeated discovery
+metadata calls. Evidence: records/delay-audit.json. REQ-108 implements only the
+fixed feedback sleep removal; the audit documents remaining opportunities.
+
+## REQ-106 COMPLETE - LAN class capitalization
+
+Source: PROJECT.md LAN class capitalization; current user request.
+Derived criterion: LANDevice and LANDiscovery are the public class names in
+definitions, exports, annotations, constructors and current API documentation.
+E151 / TEST-161 PASS: 26 software tests, direct public import/construction checks,
+Ruff lint/format and diff whitespace checks. No compatibility aliases or hardware
+operations. Earlier source/package hashes describe their historical revisions;
+this change was validated from source only. No action remains for this request.
+
 ## REQ-105 COMPLETE - simple Connect / Apply TTL latency
 
 Source: PROJECT.md current user request. Derived criteria: Connect uses one full
@@ -133,6 +219,11 @@ Kinesis folder defaults to C:/Program Files/Thorlabs/Kinesis. Native calls may b
 
 | ID | Current criterion | Method | Status |
 | --- | --- | --- | --- |
+| REQ-110 | Current docs and integrated review of pending changes | TEST-165; 40 source + 40 wheel tests, exports/package/docs/hash checks | PASS software review; physical qualification open |
+| REQ-109 | Reduce GUI SDK work; preserve checks; 100 ms background interval | TEST-164; 40 source cases and 81 before/after probes | PASS software; physical timing UNTESTED |
+| REQ-108 | Remove fixed feedback sleeps; retain checks and SDK operations | TEST-163; 27 source cases and 81 before/after probes | PASS software; actual feedback timing UNTESTED |
+| REQ-107 | Audit delays, polling and repeated SDK calls | TEST-162; full source inspection and 81 fake-clock probes | PASS audit |
+| REQ-106 | Capitalize LAN in discovery class names | TEST-161; source suite and public imports | PASS software |
 | REQ-105 | Simple Connect/Apply batching with safety checks | TEST-158/159; 26 source/wheel cases; virtual waits and 59 callback comparison | PASS software; physical latency unmeasured |
 | REQ-104 | Beginner readability, less positional scaffolding, unchanged behavior | TEST-154/155 stages; TEST-156 source/wheel and 59 behavior comparisons | PASS software; novice study untested |
 | REQ-102 | Rewrite all tests as a small essential suite | TEST-151 source/wheel,15 cases,405 lines | PASS software |
@@ -154,7 +245,7 @@ No hardware/network discovery or actuation is performed during baseline cleanup.
 
 ## Next action and human action required
 
-No human action needed for software delivery. Baseline provenance marker:
-baseline-2026-10-21; current latency delivery is REQ-105. Physical acceptance
+No human action needed for the requested software change. Baseline provenance marker:
+baseline-2026-10-21; current integrated review is REQ-110 over REQ-106..109. Physical acceptance
 requires a separately authorized bench session with the intended topology,
 independent source protection and observations recorded under the current revision.

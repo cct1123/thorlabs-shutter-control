@@ -2,7 +2,13 @@
 
 import pytest
 
-from thorlabs_shutter_control import KCubeShutter, ShutterError, ShutterHub, TriggerConfig
+from thorlabs_shutter_control import (
+    KCubeShutter,
+    ShutterError,
+    ShutterHub,
+    TriggerConfig,
+    controller,
+)
 
 
 def test_construction_is_passive(bench):
@@ -38,6 +44,21 @@ def test_ttl_round_trip_arm_and_disarm(bench):
     assert c.get_operating_status().ttl_armed
     c.disarm_triggers()
     assert c.get_operating_status().is_closed_manual
+    c.safe_shutdown()
+
+
+def test_feedback_reads_do_not_add_polling_delays(bench):
+    c = KCubeShutter(bench.usb.serial)
+    c.connect()
+    start = controller.time.monotonic()
+    assert c.get_status().is_closed_manual
+    assert c.get_operating_status().is_closed_manual
+    assert c.get_trigger_config() == TriggerConfig()
+    assert c.get_shutter_state() == "closed"
+    assert c.get_operating_state() == "inactive"
+    assert c.get_operating_mode() == "manual"
+    assert c.get_status_bits() == 0x2000
+    assert controller.time.monotonic() == start
     c.safe_shutdown()
 
 

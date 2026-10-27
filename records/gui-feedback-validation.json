@@ -1,0 +1,688 @@
+{
+  "date": "2026-10-27",
+  "requirement": "REQ-109",
+  "evidence": "E154 / TEST-164",
+  "scope": "working tree; fake SDK and virtual clock; no native device/network operations",
+  "source_sha256": {
+    "docs/examples/shutter_lan_tutorial.ipynb": "5dde8381b3ecf6ff80152adfb1b077c86b82911f4415c729f1decdb6dde436d8",
+    "docs/examples/shutter_open_close_tutorial.ipynb": "4b3a806248f47b79e7d6596e90d1695272cbb90a1e648df7466876661ab998dc",
+    "src/thorlabs_shutter_control/__init__.py": "9a7f3b415fabfbb8036827228a94e477e50bd0bc97ed7849924a92e003bf84ef",
+    "src/thorlabs_shutter_control/__main__.py": "6e6475b2913ee076784c8eb6b4ac73a119f745c3478ee0a8c5e9ac0201a218b5",
+    "src/thorlabs_shutter_control/assets/style.css": "54fbe35bc43bfad34f8bfbfa6026ef731a6b72a12ea2e96eb056b8c7482b0f47",
+    "src/thorlabs_shutter_control/config.py": "62ca4da608f956123f0b3ae9161f65e3ba8dc82bf8a43ebdc9e50648a8fa3e47",
+    "src/thorlabs_shutter_control/controller.py": "babe52ffd6acfad8e4ab4234234881a40fce238e7fa6d7be58b02abea9a4f6d6",
+    "src/thorlabs_shutter_control/gui.py": "7101b8228174b317ef35968f9febf2fc33383c5f760a98ce51aaa8537dff103b",
+    "tests/conftest.py": "8b92a89f5640615c803ba6e6d39b0c987270f5388f36771bc70f100003585d3e",
+    "tests/test_application.py": "a4aa0be2db18f5378032977bb446f233f86a5056b6fed8149e8802214b8a7515",
+    "tests/test_core.py": "3f288cf52ca8bc0983ced3ca297a58ba63cdf8c76478f84f00ca3fd9fb41efc8",
+    "tests/test_notebooks.py": "d358e35ea86135213f22657b6a0dfd60f448550b337273dd1fed89cdd75e4241"
+  },
+  "changed_runtime_test_notebook_files": [
+    "src/thorlabs_shutter_control/gui.py",
+    "tests/test_application.py"
+  ],
+  "source_tests": {
+    "passed": 40,
+    "seconds": 0.61,
+    "command": ".venv/Scripts/python.exe -B -m pytest -q -p no:cacheprovider --tb=short"
+  },
+  "focused_before": {
+    "failed": 7,
+    "passed": 1,
+    "expected": "interval, ownership reads, combined Read TTL and Trigger prerequisites"
+  },
+  "lint_format": "PASS: Ruff check and format --check --no-cache src tests; 9 files",
+  "comparison": {
+    "scenarios": 81,
+    "identical_browser_responses": 48,
+    "unchanged_sdk_sequences": 71,
+    "intentionally_changed_scenarios": 10,
+    "programmed_waits": "unchanged; no feedback sleeps"
+  },
+  "changes": [
+    {
+      "label": "GUI USB 10 open",
+      "call_count_delta": {
+        "manager.GetTransportInfo": -2
+      },
+      "before_transport_reads": 6,
+      "after_transport_reads": 4
+    },
+    {
+      "label": "GUI USB 16 read-ttl",
+      "call_count_delta": {
+        "manager.GetTransportInfo": -2
+      },
+      "before_transport_reads": 4,
+      "after_transport_reads": 2
+    },
+    {
+      "label": "GUI USB 18 discover",
+      "call_count_delta": {
+        "device.GetOperatingState": -1,
+        "device.RequestOperatingState": -1,
+        "manager.GetTransportInfo": -2,
+        "device.GetOperatingMode": -1,
+        "device.GetSolenoidState": -1,
+        "device.RequestStatus": -1,
+        "device.RequestOperatingMode": -1,
+        "device.GetStatusBits": -1
+      },
+      "before_transport_reads": 3,
+      "after_transport_reads": 1
+    },
+    {
+      "label": "GUI LAN 10 open",
+      "call_count_delta": {
+        "manager.GetTransportInfo": -2
+      },
+      "before_transport_reads": 7,
+      "after_transport_reads": 5
+    },
+    {
+      "label": "GUI LAN 16 read-ttl",
+      "call_count_delta": {
+        "manager.GetTransportInfo": -2
+      },
+      "before_transport_reads": 4,
+      "after_transport_reads": 2
+    },
+    {
+      "label": "GUI LAN 18 discover",
+      "call_count_delta": {
+        "device.GetOperatingState": -1,
+        "device.RequestOperatingState": -1,
+        "manager.GetTransportInfo": -2,
+        "device.GetOperatingMode": -1,
+        "device.GetSolenoidState": -1,
+        "device.RequestStatus": -1,
+        "device.RequestOperatingMode": -1,
+        "device.GetStatusBits": -1
+      },
+      "before_transport_reads": 7,
+      "after_transport_reads": 5
+    },
+    {
+      "label": "GUI Discover 1 connected panels",
+      "call_count_delta": {
+        "device.GetOperatingState": -1,
+        "device.RequestOperatingState": -1,
+        "manager.GetTransportInfo": -2,
+        "device.GetOperatingMode": -1,
+        "device.GetSolenoidState": -1,
+        "device.RequestStatus": -1,
+        "device.RequestOperatingMode": -1,
+        "device.GetStatusBits": -1
+      },
+      "before_transport_reads": 3,
+      "after_transport_reads": 1
+    },
+    {
+      "label": "GUI Discover 2 connected panels",
+      "call_count_delta": {
+        "device.GetOperatingState": -2,
+        "device.RequestOperatingState": -2,
+        "manager.GetTransportInfo": -4,
+        "device.GetOperatingMode": -2,
+        "device.GetSolenoidState": -2,
+        "device.RequestStatus": -2,
+        "device.RequestOperatingMode": -2,
+        "device.GetStatusBits": -2
+      },
+      "before_transport_reads": 6,
+      "after_transport_reads": 2
+    },
+    {
+      "label": "GUI Discover 3 connected panels",
+      "call_count_delta": {
+        "device.GetOperatingState": -3,
+        "device.RequestOperatingState": -3,
+        "manager.GetTransportInfo": -6,
+        "device.GetOperatingMode": -3,
+        "device.GetSolenoidState": -3,
+        "device.RequestStatus": -3,
+        "device.RequestOperatingMode": -3,
+        "device.GetStatusBits": -3
+      },
+      "before_transport_reads": 9,
+      "after_transport_reads": 3
+    },
+    {
+      "label": "GUI Discover 6 connected panels",
+      "call_count_delta": {
+        "device.GetOperatingState": -6,
+        "device.RequestOperatingState": -6,
+        "manager.GetTransportInfo": -12,
+        "device.GetOperatingMode": -6,
+        "device.GetSolenoidState": -6,
+        "device.RequestStatus": -6,
+        "device.RequestOperatingMode": -6,
+        "device.GetStatusBits": -6
+      },
+      "before_transport_reads": 18,
+      "after_transport_reads": 6
+    }
+  ],
+  "observations": [
+    {
+      "label": "GUI USB 00 connect",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI USB 01 open",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI USB 02 close",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI USB 03 mode-single",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI USB 04 open",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI USB 05 close",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI USB 06 mode-auto",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI USB 07 open",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI USB 08 close",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI USB 09 mode-triggered",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI USB 10 open",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "intentional batching or removal",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI USB 11 close",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI USB 12 mode-manual",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI USB 13 apply-ttl",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI USB 14 arm-ttl",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI USB 15 disarm-ttl",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI USB 16 read-ttl",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "intentional batching or removal",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI USB 17 refresh",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI USB 18 discover",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "intentional batching or removal",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI USB 19 disconnect",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI LAN 00 connect",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI LAN 01 open",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI LAN 02 close",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI LAN 03 mode-single",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI LAN 04 open",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI LAN 05 close",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI LAN 06 mode-auto",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI LAN 07 open",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI LAN 08 close",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI LAN 09 mode-triggered",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI LAN 10 open",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "intentional batching or removal",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI LAN 11 close",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI LAN 12 mode-manual",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI LAN 13 apply-ttl",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI LAN 14 arm-ttl",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI LAN 15 disarm-ttl",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI LAN 16 read-ttl",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "intentional batching or removal",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI LAN 17 refresh",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI LAN 18 discover",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "intentional batching or removal",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI LAN 19 disconnect",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "direct USB open_shutter",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "direct USB close_shutter",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "direct USB get_cached_status",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "direct USB get_status",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "direct USB get_operating_status",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "direct USB get_trigger_config",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "direct USB get_shutter_state",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "direct USB get_operating_state",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "direct USB get_operating_mode",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "direct USB get_status_bits",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "direct USB four scalar getters",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "GUI refresh 1 connected panels",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI Discover 1 connected panels",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "intentional batching or removal",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI refresh 2 connected panels",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI Discover 2 connected panels",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "intentional batching or removal",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI refresh 3 connected panels",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI Discover 3 connected panels",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "intentional batching or removal",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI refresh 6 connected panels",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "GUI Discover 6 connected panels",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "intentional batching or removal",
+      "browser_response": "unchanged"
+    },
+    {
+      "label": "LAN Connect selected only",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "LAN Connect unrelated absent route",
+      "programmed_wait_s": 5.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "LAN scan immediate identity",
+      "programmed_wait_s": 5.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "unified Discover no configured routes",
+      "programmed_wait_s": 5.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "unified Discover present configured route",
+      "programmed_wait_s": 5.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "unified Discover absent configured route",
+      "programmed_wait_s": 10.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "LAN scan no hosts",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "notebook shutter_lan_tutorial settings",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "notebook shutter_lan_tutorial construct",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "notebook shutter_lan_tutorial discover",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "notebook shutter_lan_tutorial connect",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "notebook shutter_lan_tutorial prepare",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "notebook shutter_lan_tutorial cycle",
+      "programmed_wait_s": 0.1,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "notebook shutter_lan_tutorial release",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "notebook shutter_open_close_tutorial settings",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "notebook shutter_open_close_tutorial validation",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "notebook shutter_open_close_tutorial controller",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "notebook shutter_open_close_tutorial connect",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "notebook shutter_open_close_tutorial initial-close",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "notebook shutter_open_close_tutorial open",
+      "programmed_wait_s": 0.1,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "notebook shutter_open_close_tutorial close",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    },
+    {
+      "label": "notebook shutter_open_close_tutorial disconnect",
+      "programmed_wait_s": 0.0,
+      "sdk_sequence": "unchanged",
+      "browser_response": "not a GUI callback"
+    }
+  ],
+  "refresh": {
+    "interval_ms": 100,
+    "callback_running_configuration": "unchanged; refresh disabled during callback",
+    "sdk_polling_ms": 250,
+    "physical_10Hz": "UNTESTED"
+  },
+  "safety_checks": [
+    "key disabled refuses Trigger Start",
+    "no actual trigger input refuses Start",
+    "Active/Open refuses Trigger Start",
+    "unknown operating state refuses Start",
+    "TTL read failure refuses Start and retains cleanup",
+    "changed mode from cached Manual still reads actual inputs",
+    "Read TTL failure preserves draft and leaves Close/disconnect available",
+    "Discover retains selection and ownership after disconnect failure",
+    "USB/LAN actual result reads remain after Trigger Start",
+    "Manual/Single/Auto Start device call counts and sequences unchanged"
+  ],
+  "raw_diagnostics": [
+    "tmp/gui-feedback/probe_before.py",
+    "tmp/gui-feedback/probe_after.py",
+    "tmp/gui-feedback/before.json",
+    "tmp/gui-feedback/after.json"
+  ],
+  "limits": [
+    "Fake responses are immediate; no response freshness, native timing or optical timing established",
+    "Hub serialization and whole-hub discovery waits remain",
+    "No new wheel validation"
+  ],
+  "documentation": {
+    "local_link_paths_checked": 91,
+    "python_snippets_parsed": 4,
+    "result": "PASS"
+  }
+}

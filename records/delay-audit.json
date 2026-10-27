@@ -1,0 +1,1342 @@
+{
+  "date": "2026-10-27",
+  "requirement": "REQ-107",
+  "evidence": "E152 / TEST-162",
+  "revision": "e01054c431bc128a1ac1543e809569e26fcb1919",
+  "scope": "working-tree source; fake SDK and virtual time only; no native calls or physical timing",
+  "method": "tmp/delay-audit/probe.py; existing fixture plus method-call timestamps and callback HTTP",
+  "limits": [
+    "Counts omit .NET property accesses and provider/comspec lambdas.",
+    "Every fake SDK call takes zero virtual time.",
+    "Browser scheduling, HTTP queuing and real asynchronous responses are not measured.",
+    "Immediate fake responses cannot validate removing waits or SDK polling."
+  ],
+  "source_sha256": {
+    "docs/examples/shutter_lan_tutorial.ipynb": "5dde8381b3ecf6ff80152adfb1b077c86b82911f4415c729f1decdb6dde436d8",
+    "docs/examples/shutter_open_close_tutorial.ipynb": "4b3a806248f47b79e7d6596e90d1695272cbb90a1e648df7466876661ab998dc",
+    "src/thorlabs_shutter_control/__init__.py": "9a7f3b415fabfbb8036827228a94e477e50bd0bc97ed7849924a92e003bf84ef",
+    "src/thorlabs_shutter_control/__main__.py": "6e6475b2913ee076784c8eb6b4ac73a119f745c3478ee0a8c5e9ac0201a218b5",
+    "src/thorlabs_shutter_control/assets/style.css": "54fbe35bc43bfad34f8bfbfa6026ef731a6b72a12ea2e96eb056b8c7482b0f47",
+    "src/thorlabs_shutter_control/config.py": "62ca4da608f956123f0b3ae9161f65e3ba8dc82bf8a43ebdc9e50648a8fa3e47",
+    "src/thorlabs_shutter_control/controller.py": "22c02aa14852d05753b4a05005c6714282e9c81e593fd008067427c2f789faf8",
+    "src/thorlabs_shutter_control/gui.py": "2c02455b4b663cea30c63fd7505ef03e6f46b2a7a9e9262667bf3e955d3b9f7a",
+    "tests/conftest.py": "8b92a89f5640615c803ba6e6d39b0c987270f5388f36771bc70f100003585d3e",
+    "tests/test_application.py": "9a43351f2ec83ac41ca41e478995a5a8cf2fc393f11d40b558380c776f57dfd4",
+    "tests/test_core.py": "76014b4fa3409f50c36d79f60787f4044ffa0f2dab5d94893c79e341487333ba",
+    "tests/test_notebooks.py": "d358e35ea86135213f22657b6a0dfd60f448550b337273dd1fed89cdd75e4241"
+  },
+  "inventory": [
+    {
+      "path": "src/thorlabs_shutter_control/controller.py",
+      "line": 374,
+      "call": "time.sleep(self.polling_ms / 1000)"
+    },
+    {
+      "path": "src/thorlabs_shutter_control/controller.py",
+      "line": 344,
+      "call": "time.sleep(self.polling_ms / 1000)"
+    },
+    {
+      "path": "src/thorlabs_shutter_control/controller.py",
+      "line": 479,
+      "call": "time.sleep(self.polling_ms / 1000)"
+    },
+    {
+      "path": "src/thorlabs_shutter_control/controller.py",
+      "line": 285,
+      "call": "self._device.StartPolling(self.polling_ms)"
+    },
+    {
+      "path": "src/thorlabs_shutter_control/controller.py",
+      "line": 282,
+      "call": "self._device.WaitForSettingsInitialized(int(self.timeout * 1000))"
+    },
+    {
+      "path": "src/thorlabs_shutter_control/controller.py",
+      "line": 905,
+      "call": "time.sleep(min(0.1, remaining))"
+    },
+    {
+      "path": "src/thorlabs_shutter_control/controller.py",
+      "line": 956,
+      "call": "time.sleep(min(0.1, remaining))"
+    },
+    {
+      "path": "src/thorlabs_shutter_control/gui.py",
+      "line": 532,
+      "call": "dcc.Interval(id='refresh', interval=1000)"
+    }
+  ],
+  "observations": [
+    {
+      "label": "GUI USB 00 connect",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.Connect": 1,
+        "device.GetDeviceInfo": 1,
+        "device.GetOperatingMode": 1,
+        "device.GetOperatingState": 1,
+        "device.GetSolenoidState": 1,
+        "device.GetStatusBits": 1,
+        "device.GetTriggerConfigParams": 1,
+        "device.IsSettingsInitialized": 2,
+        "device.PollingDuration": 1,
+        "device.RequestOperatingMode": 1,
+        "device.RequestOperatingState": 1,
+        "device.RequestStatus": 1,
+        "device.RequestTriggerConfigParams": 1,
+        "device.StartPolling": 1,
+        "manager.BuildDeviceList": 1,
+        "manager.GetDeviceList": 1,
+        "manager.GetTransportInfo": 5
+      }
+    },
+    {
+      "label": "GUI USB 01 open",
+      "programmed_wait_s": 0.5,
+      "sleep_count": 2,
+      "call_counts": {
+        "device.GetOperatingMode": 2,
+        "device.GetOperatingState": 2,
+        "device.GetSolenoidState": 2,
+        "device.GetStatusBits": 2,
+        "device.RequestOperatingMode": 2,
+        "device.RequestOperatingState": 2,
+        "device.RequestStatus": 2,
+        "device.SetOperatingState": 1,
+        "manager.GetTransportInfo": 4
+      },
+      "wait_before_first_write_s": 0.25,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI USB 02 close",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.GetOperatingMode": 1,
+        "device.GetOperatingState": 1,
+        "device.GetSolenoidState": 1,
+        "device.GetStatusBits": 1,
+        "device.RequestOperatingMode": 1,
+        "device.RequestOperatingState": 1,
+        "device.RequestStatus": 1,
+        "device.SetOperatingState": 1,
+        "manager.GetTransportInfo": 2
+      },
+      "wait_before_first_write_s": 0.0,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI USB 03 mode-single",
+      "programmed_wait_s": 0.5,
+      "sleep_count": 2,
+      "call_counts": {
+        "device.GetOperatingMode": 2,
+        "device.GetOperatingState": 2,
+        "device.GetSolenoidState": 2,
+        "device.GetStatusBits": 2,
+        "device.RequestOperatingMode": 2,
+        "device.RequestOperatingState": 2,
+        "device.RequestStatus": 2,
+        "device.SetOperatingMode": 1,
+        "manager.GetTransportInfo": 4
+      },
+      "wait_before_first_write_s": 0.25,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI USB 04 open",
+      "programmed_wait_s": 0.5,
+      "sleep_count": 2,
+      "call_counts": {
+        "device.GetOperatingMode": 2,
+        "device.GetOperatingState": 2,
+        "device.GetSolenoidState": 2,
+        "device.GetStatusBits": 2,
+        "device.RequestOperatingMode": 2,
+        "device.RequestOperatingState": 2,
+        "device.RequestStatus": 2,
+        "device.SetOperatingState": 1,
+        "manager.GetTransportInfo": 4
+      },
+      "wait_before_first_write_s": 0.25,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI USB 05 close",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.GetOperatingMode": 1,
+        "device.GetOperatingState": 1,
+        "device.GetSolenoidState": 1,
+        "device.GetStatusBits": 1,
+        "device.RequestOperatingMode": 1,
+        "device.RequestOperatingState": 1,
+        "device.RequestStatus": 1,
+        "device.SetOperatingState": 1,
+        "manager.GetTransportInfo": 2
+      },
+      "wait_before_first_write_s": 0.0,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI USB 06 mode-auto",
+      "programmed_wait_s": 0.5,
+      "sleep_count": 2,
+      "call_counts": {
+        "device.GetOperatingMode": 2,
+        "device.GetOperatingState": 2,
+        "device.GetSolenoidState": 2,
+        "device.GetStatusBits": 2,
+        "device.RequestOperatingMode": 2,
+        "device.RequestOperatingState": 2,
+        "device.RequestStatus": 2,
+        "device.SetOperatingMode": 1,
+        "manager.GetTransportInfo": 4
+      },
+      "wait_before_first_write_s": 0.25,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI USB 07 open",
+      "programmed_wait_s": 0.5,
+      "sleep_count": 2,
+      "call_counts": {
+        "device.GetOperatingMode": 2,
+        "device.GetOperatingState": 2,
+        "device.GetSolenoidState": 2,
+        "device.GetStatusBits": 2,
+        "device.RequestOperatingMode": 2,
+        "device.RequestOperatingState": 2,
+        "device.RequestStatus": 2,
+        "device.SetOperatingState": 1,
+        "manager.GetTransportInfo": 4
+      },
+      "wait_before_first_write_s": 0.25,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI USB 08 close",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.GetOperatingMode": 1,
+        "device.GetOperatingState": 1,
+        "device.GetSolenoidState": 1,
+        "device.GetStatusBits": 1,
+        "device.RequestOperatingMode": 1,
+        "device.RequestOperatingState": 1,
+        "device.RequestStatus": 1,
+        "device.SetOperatingState": 1,
+        "manager.GetTransportInfo": 2
+      },
+      "wait_before_first_write_s": 0.0,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI USB 09 mode-triggered",
+      "programmed_wait_s": 0.5,
+      "sleep_count": 2,
+      "call_counts": {
+        "device.GetOperatingMode": 2,
+        "device.GetOperatingState": 2,
+        "device.GetSolenoidState": 2,
+        "device.GetStatusBits": 2,
+        "device.RequestOperatingMode": 2,
+        "device.RequestOperatingState": 2,
+        "device.RequestStatus": 2,
+        "device.SetOperatingMode": 1,
+        "manager.GetTransportInfo": 4
+      },
+      "wait_before_first_write_s": 0.25,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI USB 10 open",
+      "programmed_wait_s": 0.75,
+      "sleep_count": 3,
+      "call_counts": {
+        "device.GetOperatingMode": 2,
+        "device.GetOperatingState": 2,
+        "device.GetSolenoidState": 2,
+        "device.GetStatusBits": 2,
+        "device.GetTriggerConfigParams": 1,
+        "device.RequestOperatingMode": 2,
+        "device.RequestOperatingState": 2,
+        "device.RequestStatus": 2,
+        "device.RequestTriggerConfigParams": 1,
+        "device.SetOperatingState": 1,
+        "manager.GetTransportInfo": 6
+      },
+      "wait_before_first_write_s": 0.5,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI USB 11 close",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.GetOperatingMode": 1,
+        "device.GetOperatingState": 1,
+        "device.GetSolenoidState": 1,
+        "device.GetStatusBits": 1,
+        "device.RequestOperatingMode": 1,
+        "device.RequestOperatingState": 1,
+        "device.RequestStatus": 1,
+        "device.SetOperatingState": 1,
+        "manager.GetTransportInfo": 2
+      },
+      "wait_before_first_write_s": 0.0,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI USB 12 mode-manual",
+      "programmed_wait_s": 0.5,
+      "sleep_count": 2,
+      "call_counts": {
+        "device.GetOperatingMode": 2,
+        "device.GetOperatingState": 2,
+        "device.GetSolenoidState": 2,
+        "device.GetStatusBits": 2,
+        "device.RequestOperatingMode": 2,
+        "device.RequestOperatingState": 2,
+        "device.RequestStatus": 2,
+        "device.SetOperatingMode": 1,
+        "manager.GetTransportInfo": 4
+      },
+      "wait_before_first_write_s": 0.25,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI USB 13 apply-ttl",
+      "programmed_wait_s": 0.5,
+      "sleep_count": 2,
+      "call_counts": {
+        "device.GetOperatingMode": 2,
+        "device.GetOperatingState": 2,
+        "device.GetSolenoidState": 2,
+        "device.GetStatusBits": 2,
+        "device.GetTriggerConfigParams": 1,
+        "device.RequestOperatingMode": 2,
+        "device.RequestOperatingState": 2,
+        "device.RequestStatus": 2,
+        "device.RequestTriggerConfigParams": 1,
+        "device.SetTriggerConfigParams": 1,
+        "manager.GetTransportInfo": 4
+      },
+      "wait_before_first_write_s": 0.25,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI USB 14 arm-ttl",
+      "programmed_wait_s": 0.5,
+      "sleep_count": 2,
+      "call_counts": {
+        "device.EnableDevice": 1,
+        "device.GetOperatingMode": 2,
+        "device.GetOperatingState": 2,
+        "device.GetSolenoidState": 2,
+        "device.GetStatusBits": 2,
+        "device.GetTriggerConfigParams": 1,
+        "device.RequestOperatingMode": 2,
+        "device.RequestOperatingState": 2,
+        "device.RequestStatus": 2,
+        "device.RequestTriggerConfigParams": 1,
+        "device.SetOperatingMode": 1,
+        "device.SetOperatingState": 1,
+        "manager.GetTransportInfo": 4
+      },
+      "wait_before_first_write_s": 0.25,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI USB 15 disarm-ttl",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.GetOperatingMode": 1,
+        "device.GetOperatingState": 1,
+        "device.GetSolenoidState": 1,
+        "device.GetStatusBits": 1,
+        "device.RequestOperatingMode": 1,
+        "device.RequestOperatingState": 1,
+        "device.RequestStatus": 1,
+        "device.SetOperatingMode": 1,
+        "device.SetOperatingState": 1,
+        "manager.GetTransportInfo": 2
+      },
+      "wait_before_first_write_s": 0.0,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI USB 16 read-ttl",
+      "programmed_wait_s": 0.5,
+      "sleep_count": 2,
+      "call_counts": {
+        "device.GetOperatingMode": 1,
+        "device.GetOperatingState": 1,
+        "device.GetSolenoidState": 1,
+        "device.GetStatusBits": 1,
+        "device.GetTriggerConfigParams": 1,
+        "device.RequestOperatingMode": 1,
+        "device.RequestOperatingState": 1,
+        "device.RequestStatus": 1,
+        "device.RequestTriggerConfigParams": 1,
+        "manager.GetTransportInfo": 4
+      }
+    },
+    {
+      "label": "GUI USB 17 refresh",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.GetOperatingMode": 1,
+        "device.GetOperatingState": 1,
+        "device.GetSolenoidState": 1,
+        "device.GetStatusBits": 1,
+        "device.RequestOperatingMode": 1,
+        "device.RequestOperatingState": 1,
+        "device.RequestStatus": 1,
+        "manager.GetTransportInfo": 2
+      }
+    },
+    {
+      "label": "GUI USB 18 discover",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.GetOperatingMode": 1,
+        "device.GetOperatingState": 1,
+        "device.GetSolenoidState": 1,
+        "device.GetStatusBits": 1,
+        "device.RequestOperatingMode": 1,
+        "device.RequestOperatingState": 1,
+        "device.RequestStatus": 1,
+        "manager.BuildDeviceList": 1,
+        "manager.GetDeviceList": 1,
+        "manager.GetTransportInfo": 3
+      }
+    },
+    {
+      "label": "GUI USB 19 disconnect",
+      "programmed_wait_s": 0.0,
+      "sleep_count": 0,
+      "call_counts": {
+        "device.Disconnect": 1,
+        "device.SetOperatingState": 1,
+        "device.StopPolling": 1
+      },
+      "wait_before_first_write_s": 0.0,
+      "wait_after_last_write_s": 0.0
+    },
+    {
+      "label": "GUI LAN 00 connect",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.Connect": 1,
+        "device.GetDeviceInfo": 1,
+        "device.GetOperatingMode": 1,
+        "device.GetOperatingState": 1,
+        "device.GetSolenoidState": 1,
+        "device.GetStatusBits": 1,
+        "device.GetTriggerConfigParams": 1,
+        "device.IsSettingsInitialized": 2,
+        "device.PollingDuration": 1,
+        "device.RequestOperatingMode": 1,
+        "device.RequestOperatingState": 1,
+        "device.RequestStatus": 1,
+        "device.RequestTriggerConfigParams": 1,
+        "device.StartPolling": 1,
+        "manager.BuildDeviceList": 1,
+        "manager.CheckForConnectionChanges": 1,
+        "manager.CreateManualDeviceEntry": 1,
+        "manager.GetDeviceList": 1,
+        "manager.GetTransportInfo": 8
+      }
+    },
+    {
+      "label": "GUI LAN 01 open",
+      "programmed_wait_s": 0.5,
+      "sleep_count": 2,
+      "call_counts": {
+        "device.GetOperatingMode": 2,
+        "device.GetOperatingState": 2,
+        "device.GetSolenoidState": 2,
+        "device.GetStatusBits": 2,
+        "device.RequestOperatingMode": 2,
+        "device.RequestOperatingState": 2,
+        "device.RequestStatus": 2,
+        "device.SetOperatingState": 1,
+        "manager.GetTransportInfo": 5
+      },
+      "wait_before_first_write_s": 0.25,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI LAN 02 close",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.GetOperatingMode": 1,
+        "device.GetOperatingState": 1,
+        "device.GetSolenoidState": 1,
+        "device.GetStatusBits": 1,
+        "device.RequestOperatingMode": 1,
+        "device.RequestOperatingState": 1,
+        "device.RequestStatus": 1,
+        "device.SetOperatingState": 1,
+        "manager.GetTransportInfo": 2
+      },
+      "wait_before_first_write_s": 0.0,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI LAN 03 mode-single",
+      "programmed_wait_s": 0.5,
+      "sleep_count": 2,
+      "call_counts": {
+        "device.GetOperatingMode": 2,
+        "device.GetOperatingState": 2,
+        "device.GetSolenoidState": 2,
+        "device.GetStatusBits": 2,
+        "device.RequestOperatingMode": 2,
+        "device.RequestOperatingState": 2,
+        "device.RequestStatus": 2,
+        "device.SetOperatingMode": 1,
+        "manager.GetTransportInfo": 5
+      },
+      "wait_before_first_write_s": 0.25,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI LAN 04 open",
+      "programmed_wait_s": 0.5,
+      "sleep_count": 2,
+      "call_counts": {
+        "device.GetOperatingMode": 2,
+        "device.GetOperatingState": 2,
+        "device.GetSolenoidState": 2,
+        "device.GetStatusBits": 2,
+        "device.RequestOperatingMode": 2,
+        "device.RequestOperatingState": 2,
+        "device.RequestStatus": 2,
+        "device.SetOperatingState": 1,
+        "manager.GetTransportInfo": 5
+      },
+      "wait_before_first_write_s": 0.25,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI LAN 05 close",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.GetOperatingMode": 1,
+        "device.GetOperatingState": 1,
+        "device.GetSolenoidState": 1,
+        "device.GetStatusBits": 1,
+        "device.RequestOperatingMode": 1,
+        "device.RequestOperatingState": 1,
+        "device.RequestStatus": 1,
+        "device.SetOperatingState": 1,
+        "manager.GetTransportInfo": 2
+      },
+      "wait_before_first_write_s": 0.0,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI LAN 06 mode-auto",
+      "programmed_wait_s": 0.5,
+      "sleep_count": 2,
+      "call_counts": {
+        "device.GetOperatingMode": 2,
+        "device.GetOperatingState": 2,
+        "device.GetSolenoidState": 2,
+        "device.GetStatusBits": 2,
+        "device.RequestOperatingMode": 2,
+        "device.RequestOperatingState": 2,
+        "device.RequestStatus": 2,
+        "device.SetOperatingMode": 1,
+        "manager.GetTransportInfo": 5
+      },
+      "wait_before_first_write_s": 0.25,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI LAN 07 open",
+      "programmed_wait_s": 0.5,
+      "sleep_count": 2,
+      "call_counts": {
+        "device.GetOperatingMode": 2,
+        "device.GetOperatingState": 2,
+        "device.GetSolenoidState": 2,
+        "device.GetStatusBits": 2,
+        "device.RequestOperatingMode": 2,
+        "device.RequestOperatingState": 2,
+        "device.RequestStatus": 2,
+        "device.SetOperatingState": 1,
+        "manager.GetTransportInfo": 5
+      },
+      "wait_before_first_write_s": 0.25,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI LAN 08 close",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.GetOperatingMode": 1,
+        "device.GetOperatingState": 1,
+        "device.GetSolenoidState": 1,
+        "device.GetStatusBits": 1,
+        "device.RequestOperatingMode": 1,
+        "device.RequestOperatingState": 1,
+        "device.RequestStatus": 1,
+        "device.SetOperatingState": 1,
+        "manager.GetTransportInfo": 2
+      },
+      "wait_before_first_write_s": 0.0,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI LAN 09 mode-triggered",
+      "programmed_wait_s": 0.5,
+      "sleep_count": 2,
+      "call_counts": {
+        "device.GetOperatingMode": 2,
+        "device.GetOperatingState": 2,
+        "device.GetSolenoidState": 2,
+        "device.GetStatusBits": 2,
+        "device.RequestOperatingMode": 2,
+        "device.RequestOperatingState": 2,
+        "device.RequestStatus": 2,
+        "device.SetOperatingMode": 1,
+        "manager.GetTransportInfo": 5
+      },
+      "wait_before_first_write_s": 0.25,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI LAN 10 open",
+      "programmed_wait_s": 0.75,
+      "sleep_count": 3,
+      "call_counts": {
+        "device.GetOperatingMode": 2,
+        "device.GetOperatingState": 2,
+        "device.GetSolenoidState": 2,
+        "device.GetStatusBits": 2,
+        "device.GetTriggerConfigParams": 1,
+        "device.RequestOperatingMode": 2,
+        "device.RequestOperatingState": 2,
+        "device.RequestStatus": 2,
+        "device.RequestTriggerConfigParams": 1,
+        "device.SetOperatingState": 1,
+        "manager.GetTransportInfo": 7
+      },
+      "wait_before_first_write_s": 0.5,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI LAN 11 close",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.GetOperatingMode": 1,
+        "device.GetOperatingState": 1,
+        "device.GetSolenoidState": 1,
+        "device.GetStatusBits": 1,
+        "device.RequestOperatingMode": 1,
+        "device.RequestOperatingState": 1,
+        "device.RequestStatus": 1,
+        "device.SetOperatingState": 1,
+        "manager.GetTransportInfo": 2
+      },
+      "wait_before_first_write_s": 0.0,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI LAN 12 mode-manual",
+      "programmed_wait_s": 0.5,
+      "sleep_count": 2,
+      "call_counts": {
+        "device.GetOperatingMode": 2,
+        "device.GetOperatingState": 2,
+        "device.GetSolenoidState": 2,
+        "device.GetStatusBits": 2,
+        "device.RequestOperatingMode": 2,
+        "device.RequestOperatingState": 2,
+        "device.RequestStatus": 2,
+        "device.SetOperatingMode": 1,
+        "manager.GetTransportInfo": 5
+      },
+      "wait_before_first_write_s": 0.25,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI LAN 13 apply-ttl",
+      "programmed_wait_s": 0.5,
+      "sleep_count": 2,
+      "call_counts": {
+        "device.GetOperatingMode": 2,
+        "device.GetOperatingState": 2,
+        "device.GetSolenoidState": 2,
+        "device.GetStatusBits": 2,
+        "device.GetTriggerConfigParams": 1,
+        "device.RequestOperatingMode": 2,
+        "device.RequestOperatingState": 2,
+        "device.RequestStatus": 2,
+        "device.RequestTriggerConfigParams": 1,
+        "device.SetTriggerConfigParams": 1,
+        "manager.GetTransportInfo": 5
+      },
+      "wait_before_first_write_s": 0.25,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI LAN 14 arm-ttl",
+      "programmed_wait_s": 0.5,
+      "sleep_count": 2,
+      "call_counts": {
+        "device.EnableDevice": 1,
+        "device.GetOperatingMode": 2,
+        "device.GetOperatingState": 2,
+        "device.GetSolenoidState": 2,
+        "device.GetStatusBits": 2,
+        "device.GetTriggerConfigParams": 1,
+        "device.RequestOperatingMode": 2,
+        "device.RequestOperatingState": 2,
+        "device.RequestStatus": 2,
+        "device.RequestTriggerConfigParams": 1,
+        "device.SetOperatingMode": 1,
+        "device.SetOperatingState": 1,
+        "manager.GetTransportInfo": 5
+      },
+      "wait_before_first_write_s": 0.25,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI LAN 15 disarm-ttl",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.GetOperatingMode": 1,
+        "device.GetOperatingState": 1,
+        "device.GetSolenoidState": 1,
+        "device.GetStatusBits": 1,
+        "device.RequestOperatingMode": 1,
+        "device.RequestOperatingState": 1,
+        "device.RequestStatus": 1,
+        "device.SetOperatingMode": 1,
+        "device.SetOperatingState": 1,
+        "manager.GetTransportInfo": 2
+      },
+      "wait_before_first_write_s": 0.0,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "GUI LAN 16 read-ttl",
+      "programmed_wait_s": 0.5,
+      "sleep_count": 2,
+      "call_counts": {
+        "device.GetOperatingMode": 1,
+        "device.GetOperatingState": 1,
+        "device.GetSolenoidState": 1,
+        "device.GetStatusBits": 1,
+        "device.GetTriggerConfigParams": 1,
+        "device.RequestOperatingMode": 1,
+        "device.RequestOperatingState": 1,
+        "device.RequestStatus": 1,
+        "device.RequestTriggerConfigParams": 1,
+        "manager.GetTransportInfo": 4
+      }
+    },
+    {
+      "label": "GUI LAN 17 refresh",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.GetOperatingMode": 1,
+        "device.GetOperatingState": 1,
+        "device.GetSolenoidState": 1,
+        "device.GetStatusBits": 1,
+        "device.RequestOperatingMode": 1,
+        "device.RequestOperatingState": 1,
+        "device.RequestStatus": 1,
+        "manager.GetTransportInfo": 2
+      }
+    },
+    {
+      "label": "GUI LAN 18 discover",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.GetOperatingMode": 1,
+        "device.GetOperatingState": 1,
+        "device.GetSolenoidState": 1,
+        "device.GetStatusBits": 1,
+        "device.RequestOperatingMode": 1,
+        "device.RequestOperatingState": 1,
+        "device.RequestStatus": 1,
+        "manager.BuildDeviceList": 2,
+        "manager.CheckForConnectionChanges": 1,
+        "manager.CreateManualDeviceEntry": 1,
+        "manager.GetDeviceList": 2,
+        "manager.GetTransportInfo": 7
+      }
+    },
+    {
+      "label": "GUI LAN 19 disconnect",
+      "programmed_wait_s": 0.0,
+      "sleep_count": 0,
+      "call_counts": {
+        "device.Disconnect": 1,
+        "device.SetOperatingState": 1,
+        "device.StopPolling": 1
+      },
+      "wait_before_first_write_s": 0.0,
+      "wait_after_last_write_s": 0.0
+    },
+    {
+      "label": "direct USB open_shutter",
+      "programmed_wait_s": 0.0,
+      "sleep_count": 0,
+      "call_counts": {
+        "device.SetOperatingState": 1
+      },
+      "wait_before_first_write_s": 0.0,
+      "wait_after_last_write_s": 0.0
+    },
+    {
+      "label": "direct USB close_shutter",
+      "programmed_wait_s": 0.0,
+      "sleep_count": 0,
+      "call_counts": {
+        "device.SetOperatingState": 1
+      },
+      "wait_before_first_write_s": 0.0,
+      "wait_after_last_write_s": 0.0
+    },
+    {
+      "label": "direct USB get_cached_status",
+      "programmed_wait_s": 0.0,
+      "sleep_count": 0,
+      "call_counts": {}
+    },
+    {
+      "label": "direct USB get_status",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.GetOperatingMode": 1,
+        "device.GetOperatingState": 1,
+        "device.GetSolenoidState": 1,
+        "device.GetStatusBits": 1,
+        "device.GetTriggerConfigParams": 1,
+        "device.RequestOperatingMode": 1,
+        "device.RequestOperatingState": 1,
+        "device.RequestStatus": 1,
+        "device.RequestTriggerConfigParams": 1,
+        "manager.GetTransportInfo": 2
+      }
+    },
+    {
+      "label": "direct USB get_operating_status",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.GetOperatingMode": 1,
+        "device.GetOperatingState": 1,
+        "device.GetSolenoidState": 1,
+        "device.GetStatusBits": 1,
+        "device.RequestOperatingMode": 1,
+        "device.RequestOperatingState": 1,
+        "device.RequestStatus": 1,
+        "manager.GetTransportInfo": 2
+      }
+    },
+    {
+      "label": "direct USB get_trigger_config",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.GetTriggerConfigParams": 1,
+        "device.RequestTriggerConfigParams": 1,
+        "manager.GetTransportInfo": 2
+      }
+    },
+    {
+      "label": "direct USB get_shutter_state",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.GetSolenoidState": 1,
+        "device.RequestStatus": 1,
+        "manager.GetTransportInfo": 2
+      }
+    },
+    {
+      "label": "direct USB get_operating_state",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.GetOperatingState": 1,
+        "device.RequestOperatingState": 1,
+        "manager.GetTransportInfo": 2
+      }
+    },
+    {
+      "label": "direct USB get_operating_mode",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.GetOperatingMode": 1,
+        "device.RequestOperatingMode": 1,
+        "manager.GetTransportInfo": 2
+      }
+    },
+    {
+      "label": "direct USB get_status_bits",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.GetStatusBits": 1,
+        "device.RequestStatus": 1,
+        "manager.GetTransportInfo": 2
+      }
+    },
+    {
+      "label": "direct USB four scalar getters",
+      "programmed_wait_s": 1.0,
+      "sleep_count": 4,
+      "call_counts": {
+        "device.GetOperatingMode": 1,
+        "device.GetOperatingState": 1,
+        "device.GetSolenoidState": 1,
+        "device.GetStatusBits": 1,
+        "device.RequestOperatingMode": 1,
+        "device.RequestOperatingState": 1,
+        "device.RequestStatus": 2,
+        "manager.GetTransportInfo": 8
+      }
+    },
+    {
+      "label": "GUI refresh 1 connected panels",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.GetOperatingMode": 1,
+        "device.GetOperatingState": 1,
+        "device.GetSolenoidState": 1,
+        "device.GetStatusBits": 1,
+        "device.RequestOperatingMode": 1,
+        "device.RequestOperatingState": 1,
+        "device.RequestStatus": 1,
+        "manager.GetTransportInfo": 2
+      }
+    },
+    {
+      "label": "GUI Discover 1 connected panels",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.GetOperatingMode": 1,
+        "device.GetOperatingState": 1,
+        "device.GetSolenoidState": 1,
+        "device.GetStatusBits": 1,
+        "device.RequestOperatingMode": 1,
+        "device.RequestOperatingState": 1,
+        "device.RequestStatus": 1,
+        "manager.BuildDeviceList": 1,
+        "manager.GetDeviceList": 1,
+        "manager.GetTransportInfo": 3
+      }
+    },
+    {
+      "label": "GUI refresh 2 connected panels",
+      "programmed_wait_s": 0.5,
+      "sleep_count": 2,
+      "call_counts": {
+        "device.GetOperatingMode": 2,
+        "device.GetOperatingState": 2,
+        "device.GetSolenoidState": 2,
+        "device.GetStatusBits": 2,
+        "device.RequestOperatingMode": 2,
+        "device.RequestOperatingState": 2,
+        "device.RequestStatus": 2,
+        "manager.GetTransportInfo": 4
+      }
+    },
+    {
+      "label": "GUI Discover 2 connected panels",
+      "programmed_wait_s": 0.5,
+      "sleep_count": 2,
+      "call_counts": {
+        "device.GetOperatingMode": 2,
+        "device.GetOperatingState": 2,
+        "device.GetSolenoidState": 2,
+        "device.GetStatusBits": 2,
+        "device.RequestOperatingMode": 2,
+        "device.RequestOperatingState": 2,
+        "device.RequestStatus": 2,
+        "manager.BuildDeviceList": 1,
+        "manager.GetDeviceList": 1,
+        "manager.GetTransportInfo": 6
+      }
+    },
+    {
+      "label": "GUI refresh 3 connected panels",
+      "programmed_wait_s": 0.75,
+      "sleep_count": 3,
+      "call_counts": {
+        "device.GetOperatingMode": 3,
+        "device.GetOperatingState": 3,
+        "device.GetSolenoidState": 3,
+        "device.GetStatusBits": 3,
+        "device.RequestOperatingMode": 3,
+        "device.RequestOperatingState": 3,
+        "device.RequestStatus": 3,
+        "manager.GetTransportInfo": 6
+      }
+    },
+    {
+      "label": "GUI Discover 3 connected panels",
+      "programmed_wait_s": 0.75,
+      "sleep_count": 3,
+      "call_counts": {
+        "device.GetOperatingMode": 3,
+        "device.GetOperatingState": 3,
+        "device.GetSolenoidState": 3,
+        "device.GetStatusBits": 3,
+        "device.RequestOperatingMode": 3,
+        "device.RequestOperatingState": 3,
+        "device.RequestStatus": 3,
+        "manager.BuildDeviceList": 1,
+        "manager.GetDeviceList": 1,
+        "manager.GetTransportInfo": 9
+      }
+    },
+    {
+      "label": "GUI refresh 6 connected panels",
+      "programmed_wait_s": 1.5,
+      "sleep_count": 6,
+      "call_counts": {
+        "device.GetOperatingMode": 6,
+        "device.GetOperatingState": 6,
+        "device.GetSolenoidState": 6,
+        "device.GetStatusBits": 6,
+        "device.RequestOperatingMode": 6,
+        "device.RequestOperatingState": 6,
+        "device.RequestStatus": 6,
+        "manager.GetTransportInfo": 12
+      }
+    },
+    {
+      "label": "GUI Discover 6 connected panels",
+      "programmed_wait_s": 1.5,
+      "sleep_count": 6,
+      "call_counts": {
+        "device.GetOperatingMode": 6,
+        "device.GetOperatingState": 6,
+        "device.GetSolenoidState": 6,
+        "device.GetStatusBits": 6,
+        "device.RequestOperatingMode": 6,
+        "device.RequestOperatingState": 6,
+        "device.RequestStatus": 6,
+        "manager.BuildDeviceList": 1,
+        "manager.GetDeviceList": 1,
+        "manager.GetTransportInfo": 18
+      }
+    },
+    {
+      "label": "LAN Connect selected only",
+      "programmed_wait_s": 0.0,
+      "sleep_count": 0,
+      "call_counts": {
+        "device.Connect": 1,
+        "device.GetDeviceInfo": 1,
+        "device.IsSettingsInitialized": 2,
+        "device.PollingDuration": 1,
+        "device.StartPolling": 1,
+        "manager.BuildDeviceList": 1,
+        "manager.CheckForConnectionChanges": 1,
+        "manager.CreateManualDeviceEntry": 1,
+        "manager.GetDeviceList": 1,
+        "manager.GetTransportInfo": 6
+      }
+    },
+    {
+      "label": "LAN Connect unrelated absent route",
+      "programmed_wait_s": 5.0,
+      "sleep_count": 51,
+      "call_counts": {
+        "device.Connect": 1,
+        "device.GetDeviceInfo": 1,
+        "device.IsSettingsInitialized": 2,
+        "device.PollingDuration": 1,
+        "device.StartPolling": 1,
+        "manager.BuildDeviceList": 1,
+        "manager.CheckForConnectionChanges": 52,
+        "manager.CreateManualDeviceEntry": 2,
+        "manager.GetDeviceList": 52,
+        "manager.GetTransportInfo": 263
+      }
+    },
+    {
+      "label": "LAN scan immediate identity",
+      "programmed_wait_s": 5.0,
+      "sleep_count": 51,
+      "call_counts": {
+        "manager.BuildDeviceList": 1,
+        "manager.CheckForConnectionChanges": 52,
+        "manager.CreateManualDeviceEntry": 4,
+        "manager.GetDeviceList": 52,
+        "manager.GetTransportInfo": 104,
+        "manager.ScanEthernetRange": 1
+      }
+    },
+    {
+      "label": "unified Discover no configured routes",
+      "programmed_wait_s": 5.0,
+      "sleep_count": 51,
+      "call_counts": {
+        "manager.BuildDeviceList": 2,
+        "manager.CheckForConnectionChanges": 52,
+        "manager.CreateManualDeviceEntry": 4,
+        "manager.GetDeviceList": 53,
+        "manager.GetTransportInfo": 105,
+        "manager.ScanEthernetRange": 1
+      }
+    },
+    {
+      "label": "unified Discover present configured route",
+      "programmed_wait_s": 5.0,
+      "sleep_count": 51,
+      "call_counts": {
+        "manager.BuildDeviceList": 3,
+        "manager.CheckForConnectionChanges": 53,
+        "manager.CreateManualDeviceEntry": 5,
+        "manager.GetDeviceList": 54,
+        "manager.GetTransportInfo": 109,
+        "manager.ScanEthernetRange": 1
+      }
+    },
+    {
+      "label": "unified Discover absent configured route",
+      "programmed_wait_s": 10.0,
+      "sleep_count": 102,
+      "call_counts": {
+        "manager.BuildDeviceList": 3,
+        "manager.CheckForConnectionChanges": 104,
+        "manager.CreateManualDeviceEntry": 6,
+        "manager.GetDeviceList": 105,
+        "manager.GetTransportInfo": 367,
+        "manager.ScanEthernetRange": 1
+      }
+    },
+    {
+      "label": "LAN scan no hosts",
+      "programmed_wait_s": 0.0,
+      "sleep_count": 0,
+      "call_counts": {}
+    },
+    {
+      "label": "notebook shutter_lan_tutorial settings",
+      "programmed_wait_s": 0.0,
+      "sleep_count": 0,
+      "call_counts": {}
+    },
+    {
+      "label": "notebook shutter_lan_tutorial construct",
+      "programmed_wait_s": 0.0,
+      "sleep_count": 0,
+      "call_counts": {}
+    },
+    {
+      "label": "notebook shutter_lan_tutorial discover",
+      "programmed_wait_s": 0.0,
+      "sleep_count": 0,
+      "call_counts": {
+        "manager.BuildDeviceList": 1,
+        "manager.CheckForConnectionChanges": 1,
+        "manager.CreateManualDeviceEntry": 1,
+        "manager.GetDeviceList": 1,
+        "manager.GetTransportInfo": 3
+      }
+    },
+    {
+      "label": "notebook shutter_lan_tutorial connect",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.Connect": 1,
+        "device.GetDeviceInfo": 2,
+        "device.GetOperatingMode": 1,
+        "device.GetOperatingState": 1,
+        "device.GetSolenoidState": 1,
+        "device.GetStatusBits": 1,
+        "device.IsSettingsInitialized": 2,
+        "device.PollingDuration": 1,
+        "device.RequestOperatingMode": 1,
+        "device.RequestOperatingState": 1,
+        "device.RequestStatus": 1,
+        "device.StartPolling": 1,
+        "manager.BuildDeviceList": 1,
+        "manager.CheckForConnectionChanges": 1,
+        "manager.CreateManualDeviceEntry": 1,
+        "manager.GetDeviceList": 1,
+        "manager.GetTransportInfo": 9
+      }
+    },
+    {
+      "label": "notebook shutter_lan_tutorial prepare",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.EnableDevice": 1,
+        "device.GetOperatingMode": 1,
+        "device.GetOperatingState": 1,
+        "device.GetSolenoidState": 1,
+        "device.GetStatusBits": 1,
+        "device.RequestOperatingMode": 1,
+        "device.RequestOperatingState": 1,
+        "device.RequestStatus": 1,
+        "device.SetOperatingMode": 1,
+        "device.SetOperatingState": 1,
+        "manager.GetTransportInfo": 3
+      },
+      "wait_before_first_write_s": 0.0,
+      "wait_after_last_write_s": 0.0
+    },
+    {
+      "label": "notebook shutter_lan_tutorial cycle",
+      "programmed_wait_s": 0.85,
+      "sleep_count": 4,
+      "call_counts": {
+        "device.GetOperatingMode": 1,
+        "device.GetOperatingState": 1,
+        "device.GetSolenoidState": 3,
+        "device.GetStatusBits": 1,
+        "device.RequestOperatingMode": 1,
+        "device.RequestOperatingState": 1,
+        "device.RequestStatus": 3,
+        "device.SetOperatingState": 2,
+        "manager.GetTransportInfo": 7
+      },
+      "wait_before_first_write_s": 0.25,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "notebook shutter_lan_tutorial release",
+      "programmed_wait_s": 0.0,
+      "sleep_count": 0,
+      "call_counts": {
+        "device.Disconnect": 1,
+        "device.SetOperatingState": 1,
+        "device.StopPolling": 1
+      },
+      "wait_before_first_write_s": 0.0,
+      "wait_after_last_write_s": 0.0
+    },
+    {
+      "label": "notebook shutter_open_close_tutorial settings",
+      "programmed_wait_s": 0.0,
+      "sleep_count": 0,
+      "call_counts": {}
+    },
+    {
+      "label": "notebook shutter_open_close_tutorial validation",
+      "programmed_wait_s": 0.0,
+      "sleep_count": 0,
+      "call_counts": {}
+    },
+    {
+      "label": "notebook shutter_open_close_tutorial controller",
+      "programmed_wait_s": 0.0,
+      "sleep_count": 0,
+      "call_counts": {}
+    },
+    {
+      "label": "notebook shutter_open_close_tutorial connect",
+      "programmed_wait_s": 0.0,
+      "sleep_count": 0,
+      "call_counts": {
+        "device.Connect": 1,
+        "device.GetDeviceInfo": 1,
+        "device.IsSettingsInitialized": 2,
+        "device.PollingDuration": 1,
+        "device.StartPolling": 1,
+        "manager.BuildDeviceList": 1,
+        "manager.GetDeviceList": 1,
+        "manager.GetTransportInfo": 3
+      }
+    },
+    {
+      "label": "notebook shutter_open_close_tutorial initial-close",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.EnableDevice": 1,
+        "device.GetOperatingMode": 1,
+        "device.GetOperatingState": 1,
+        "device.GetSolenoidState": 1,
+        "device.GetStatusBits": 1,
+        "device.RequestOperatingMode": 1,
+        "device.RequestOperatingState": 1,
+        "device.RequestStatus": 1,
+        "device.SetOperatingMode": 1,
+        "device.SetOperatingState": 1,
+        "manager.GetTransportInfo": 2
+      },
+      "wait_before_first_write_s": 0.0,
+      "wait_after_last_write_s": 0.0
+    },
+    {
+      "label": "notebook shutter_open_close_tutorial open",
+      "programmed_wait_s": 0.6,
+      "sleep_count": 3,
+      "call_counts": {
+        "device.GetOperatingMode": 1,
+        "device.GetOperatingState": 1,
+        "device.GetSolenoidState": 2,
+        "device.GetStatusBits": 1,
+        "device.RequestOperatingMode": 1,
+        "device.RequestOperatingState": 1,
+        "device.RequestStatus": 2,
+        "device.SetOperatingState": 1,
+        "manager.GetTransportInfo": 4
+      },
+      "wait_before_first_write_s": 0.25,
+      "wait_after_last_write_s": 0.35
+    },
+    {
+      "label": "notebook shutter_open_close_tutorial close",
+      "programmed_wait_s": 0.25,
+      "sleep_count": 1,
+      "call_counts": {
+        "device.GetSolenoidState": 1,
+        "device.RequestStatus": 1,
+        "device.SetOperatingState": 1,
+        "manager.GetTransportInfo": 2
+      },
+      "wait_before_first_write_s": 0.0,
+      "wait_after_last_write_s": 0.25
+    },
+    {
+      "label": "notebook shutter_open_close_tutorial disconnect",
+      "programmed_wait_s": 0.0,
+      "sleep_count": 0,
+      "call_counts": {
+        "device.Disconnect": 1,
+        "device.SetOperatingState": 1,
+        "device.StopPolling": 1
+      },
+      "wait_before_first_write_s": 0.0,
+      "wait_after_last_write_s": 0.0
+    }
+  ],
+  "raw_trace": "tmp/delay-audit/before-raw.json (ignored local diagnostic)"
+}

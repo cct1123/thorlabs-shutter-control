@@ -56,7 +56,7 @@ class TriggerConfig:
 
 
 @dataclass(frozen=True)
-class LanDevice:
+class LANDevice:
     """One discovered cube and its exact IPv4:port Ethernet route."""
 
     serial_number: str
@@ -64,11 +64,11 @@ class LanDevice:
 
 
 @dataclass(frozen=True)
-class LanDiscovery:
+class LANDiscovery:
     """Responding hub addresses and cube identities; neither implies a connection."""
 
     hub_addresses: tuple[str, ...]
-    controllers: tuple[LanDevice, ...]
+    controllers: tuple[LANDevice, ...]
 
 
 @dataclass(frozen=True)
@@ -328,20 +328,16 @@ class _KinesisShutter:
             raise ShutterError(f"Kinesis communication status: {comms_status}.")
 
     def _read_status(self, *, include_triggers: bool = True) -> ShutterStatus:
-        """Request feedback, wait one poll interval, then sample the SDK's values.
+        """Request feedback, then sample the SDK's latest available values.
 
-        include_triggers shares that wait with a TTL settings request. The fixed
-        wait is not a response acknowledgement or a guarantee of feedback age.
+        The SDK owns response timing. A polling interval is not a required settling
+        delay or an acknowledgement; these values do not guarantee feedback age.
         """
         self._check_connection()
         self._device.RequestStatus()
         self._device.RequestOperatingMode()
         self._device.RequestOperatingState()
-        # Read operating feedback after the settings wait, rather than holding
-        # key/interlock/state values sampled before that delay.
         config = self._read_trigger_config() if include_triggers else None
-        if not include_triggers:
-            time.sleep(self.polling_ms / 1000)
         bits = int(self._device.GetStatusBits())
         state = str(self._device.GetSolenoidState()).lower()
         operation = str(self._device.GetOperatingState()).lower()
@@ -371,7 +367,6 @@ class _KinesisShutter:
 
     def _read_trigger_config(self) -> TriggerConfig:
         self._device.RequestTriggerConfigParams()
-        time.sleep(self.polling_ms / 1000)
         settings = self._device.GetTriggerConfigParams()
         modes = {"Disabled": "disabled", "TrigIN_GPI": "input", "TrigOUT_GPO": "output"}
         polarities = {"TriggerHigh": "high", "TriggerLow": "low"}
@@ -472,11 +467,10 @@ class _KinesisShutter:
         return self._refresh_status(include_triggers=False)
 
     def _get_value(self, request: str, getter: str):
-        """Pair one SDK request with its getter after the configured wait; errors raise."""
+        """Request feedback and read the SDK value without an added delay; errors raise."""
         with self._lock, self._command("Read feedback", reading=True):
             self._check_connection()
             getattr(self._device, request)()
-            time.sleep(self.polling_ms / 1000)
             value = getattr(self._device, getter)()
             self._check_connection()
             return value
@@ -828,7 +822,7 @@ class ShutterHub:
         end_address: str | None = None,
         *,
         open_timeout_ms: int | None = None,
-    ) -> LanDiscovery:
+    ) -> LANDiscovery:
         """Find KEH3 hosts and KSC101 bay identities without connecting a cube.
 
         Vendor scanning probes port 40303, then SDK registration enumerates the
@@ -878,7 +872,7 @@ class ShutterHub:
                         hosts.add(ip)
                 ordered_hosts = tuple(str(ip) for ip in sorted(hosts))
                 if not hosts:
-                    return LanDiscovery((), ())
+                    return LANDiscovery((), ())
                 candidates = {
                     f"{host}:{port}" for host in ordered_hosts for port in range(40304, 40308)
                 }
@@ -898,12 +892,14 @@ class ShutterHub:
                             continue
                         endpoint = str(info.GetComSpec())
                         if endpoint in candidates:
-                            found[serial] = LanDevice(serial, endpoint)
+                            found[serial] = LANDevice(serial, endpoint)
                     remaining = deadline - time.monotonic()
                     if remaining <= 0:
                         break
+                    # Pace asynchronous identity checks; this is not a settling
+                    # delay before reading a connected shutter's status.
                     time.sleep(min(0.1, remaining))
-                return LanDiscovery(ordered_hosts, tuple(found[s] for s in sorted(found)))
+                return LANDiscovery(ordered_hosts, tuple(found[s] for s in sorted(found)))
             except Exception as exc:
                 raise ShutterError(f"LAN discovery failed: {exc}") from exc
 
@@ -953,6 +949,8 @@ class ShutterHub:
                         remaining = deadline - time.monotonic()
                         if remaining <= 0:
                             return found
+                        # Yield between incomplete discovery attempts, without
+                        # imposing this interval on connected-device feedback.
                         time.sleep(min(0.1, remaining))
             except Exception as exc:
                 raise ShutterError(f"Hub discovery failed: {exc}") from exc

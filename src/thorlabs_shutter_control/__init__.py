@@ -2,8 +2,8 @@
 
 from .controller import (
     KCubeShutter,
-    LanDevice,
-    LanDiscovery,
+    LANDevice,
+    LANDiscovery,
     ShutterError,
     ShutterHub,
     ShutterStatus,
@@ -16,6 +16,6 @@ __all__ = [
     "ShutterError",
     "ShutterStatus",
     "TriggerConfig",
-    "LanDevice",
-    "LanDiscovery",
+    "LANDevice",
+    "LANDiscovery",
 ]

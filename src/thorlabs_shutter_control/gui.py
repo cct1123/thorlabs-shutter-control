@@ -529,7 +529,7 @@ def create_app(
                 "verify physical closure independently.",
                 className="note footer-note",
             ),
-            dcc.Interval(id="refresh", interval=1000),
+            dcc.Interval(id="refresh", interval=100),
         ],
         id="shutter-app",
         className=app_class,
@@ -561,7 +561,8 @@ def create_app(
         discovered_routes, warnings = hub.discover_available()
         for index, shutter in enumerate(hub.controllers):
             routes = dict(discovered_routes)
-            if hub.get_operating_status(index).has_device:
+            # Ownership is local handle state; discovery does not need feedback.
+            if shutter.get_cached_status().has_device:
                 routes[shutter.serial_number] = hub.ethernet_endpoints[index]
                 panel_updates[index]["selected"] = shutter.serial_number
             elif selections[index] in routes:
@@ -599,7 +600,7 @@ def create_app(
                     updates["draft"] = ["input", "high", "output", "high"]
             status = hub.connect(slot, serial)
             updates["selected"] = status.serial_number
-            # One full snapshot shares the operating and TTL feedback wait.
+            # Read operating and TTL feedback together, then reuse it for display.
             status = hub.get_status(slot)
             if status.error:
                 raise ShutterError(status.error)
@@ -619,10 +620,17 @@ def create_app(
         elif command in ("open", "close"):
             shutter = hub.controllers[slot]
             if command == "open":
-                status = hub.get_operating_status(slot)
-                config = None
+                # Cached mode only chooses what to request, never authorizes Open.
+                # Known Trigger mode can include TTL in the same prerequisite read.
+                if shutter.get_cached_status().operating_mode == "triggered":
+                    status = hub.get_status(slot)
+                else:
+                    status = hub.get_operating_status(slot)
+                config = status.trigger_config
                 if status.operating_mode == "triggered":
-                    config = hub.get_trigger_config(slot)
+                    # Mode may have changed since display: still read actual inputs.
+                    if config is None:
+                        config = hub.get_trigger_config(slot)
                     last_ttl_settings[slot] = config
                 if not _action_ready(status, config):
                     raise ShutterError(
@@ -657,7 +665,10 @@ def create_app(
             updates["message"] = "TTL settings applied and read back; disarmed."
             return status
         elif command == "read-ttl":
-            config = hub.get_trigger_config(slot)
+            status = hub.get_status(slot)
+            if status.error or status.trigger_config is None:
+                raise ShutterError(status.error or "No trigger settings available.")
+            config = status.trigger_config
             last_ttl_settings[slot] = config
             updates["draft"] = [
                 config.trig1_mode,
@@ -666,6 +677,7 @@ def create_app(
                 config.trig2_polarity,
             ]
             updates["message"] = "TTL settings read; draft selections replaced."
+            return status
         elif command == "arm-ttl":
             status = hub.get_status(slot)
             config = status.trigger_config

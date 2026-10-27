@@ -38,8 +38,8 @@ See [KEH3 setup](ethernet-assessment.md).
 | --- | --- |
 | Device serial/transport | Selected detected route before Connect; retained route while owned; selector locks with a handle |
 | Connect | Validate identity/route, initialize communication/polling, then read one combined operating/TTL snapshot; no output/mode write |
-| Mode | Manual, Single, Auto, Trigger; requires fresh Inactive/Closed before changing mode |
-| Open / Start | Manual requests Active as Open; other modes request Active as Start after fresh readiness reads |
+| Mode | Manual, Single, Auto, Trigger; requests feedback and requires reported Inactive/Closed before changing mode |
+| Open / Start | Manual requests Active as Open; other modes request Active as Start after requested feedback passes readiness checks |
 | Close / Stop | Request Inactive while preserving mode; remains available with a retained faulted handle |
 | Lamps | Key, application readiness, communication fault, Active and reported Open; unknown is grey |
 | Readouts | Controller feedback, not independent blade/optical proof; interlock indication is informational |
@@ -55,33 +55,48 @@ Start primes the current input behavior and may open immediately.
 
 GUI actions read the selected panel's prerequisites and result. Other panels keep
 their previous observation until refresh. Unknown mode/state/position prevents
-activation. Refresh is requested every1s; serialized reads may delay clicks.
+activation. Refresh is requested every 100 ms and pauses during callbacks;
+serialized SDK reads may delay clicks or reduce the achieved update rate.
 Close is not an independent emergency stop and native calls may block.
 
 ## Feedback timing
 
-The GUI uses one combined operating/TTL snapshot after Connect. Apply first reads
-Closed/Inactive/Manual prerequisites, writes the draft, then reads one combined
-snapshot for both actual TTL comparison and display. The callback reuses only
+Feedback reads add no fixed sleeps. The GUI uses one combined operating/TTL
+snapshot after Connect. Apply first requests Closed/Inactive/Manual prerequisites,
+writes the draft, then reads one combined snapshot for both SDK-returned TTL
+comparison and display. The callback reuses only
 feedback completed during that same action; it does not substitute an older
 display snapshot for a new result.
 
-| Action | Programmed waits with the default 250 ms poll interval |
-| --- | ---: |
-| Connect | 250 ms |
-| Apply TTL | 500 ms |
-| Manual Open | 500 ms |
-| Close / Stop | 250 ms after the command |
-| Trigger Start | 750 ms |
-| Refresh | 250 ms per connected panel, read sequentially |
+Read TTL likewise returns one combined result for draft replacement and display.
+Known Trigger Start combines operating and input-settings prerequisites, then
+still reads operating feedback after the output command. Cached mode only selects
+which feedback to request; a changed mode still requires actual input settings.
+Discover checks retained handle ownership without requesting device feedback.
 
-These are software waits validated with fictional devices and a virtual clock.
-Discovery, native SDK calls, other queued actions, network/USB communication and
-blade motion add time. A request and fixed wait do not establish feedback age.
-The polling interval and discovery policy have not been shortened. A failed
+| Action | Added fixed feedback waits |
+| --- | ---: |
+| Connect | 0 ms |
+| Apply TTL | 0 ms |
+| Manual Open | 0 ms |
+| Close / Stop | 0 ms |
+| Trigger Start | 0 ms |
+| Refresh | 0 ms; SDK calls still run sequentially |
+
+These values count only added Python feedback sleeps, validated with fictional
+devices and a virtual clock. Native SDK calls, other queued actions, network/USB
+communication and blade motion still take time. Getters may expose values received
+before the latest request; immediate reads do not prove command completion or
+acknowledge the write being compared. The fake tests establish the checks and
+command order, not the freshness of real SDK responses.
+The SDK polling interval remains 250 ms; the GUI requests refresh every 100 ms
+and disables its interval while a callback runs. Bounded discovery retry pacing,
+readiness checks, post-command reads and the TTL comparison remain;
+actual response timing needs bench validation. A failed
 combined read remains a fault, blocks activation and leaves the retained handle
 available for Close/disconnect. Apply readback mismatch reports failure instead
-of successful application. See [validation evidence](../records/latency-validation.json).
+of successful application. See the [delay audit](../outputs/DELAY_AUDIT.md) and
+[current validation](../records/gui-feedback-validation.json).
 
 ## Trigger settings
 
@@ -94,9 +109,9 @@ This capture shows a disarmed Manual controller with one input and one output.
 It uses the same fictional devices as the overview and is not electrical or
 physical validation.
 
-- Read replaces drafts with fresh settings. Routine refresh keeps drafts and the
+- Read replaces drafts with SDK-returned settings. Routine refresh keeps drafts and the
   explicitly labelled last-read settings summary.
-- Apply requires Closed/Inactive/Manual, writes settings and checks actual readback.
+- Apply requires reported Closed/Inactive/Manual, writes settings and compares the SDK readback.
   The same result snapshot supplies the display; it is not requested again.
 - Arm requires that baseline, key enabled and an actual configured input, then
   explicitly enables, selects Triggered and requests Active.

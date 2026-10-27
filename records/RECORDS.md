@@ -327,3 +327,211 @@ PYTHONPATH import-origin check and pytest. Current commands/docs updated; native
 operations and physical qualification are outside this test rewrite.
 [Machine evidence](tests-validation.json) records scope and hashes. PASS means
 the15 essential cases pass; it does not retain the removed suite's coverage claims.
+
+
+## E151 / TEST-161 - LAN class capitalization
+
+2026-10-27; REQ-106. Expected: public discovery classes, exports, annotations,
+constructors and API docs consistently capitalize LAN, with unchanged behavior.
+Observed: both classes renamed; no compatibility aliases. Source validation:
+`.venv/Scripts/python.exe -B -m pytest -q -p no:cacheprovider --tb=short`
+reports 26 passed. Direct imports from the package and controller agree, and
+construction of a discovery result containing a device succeeds. Ruff check
+and format --check --no-cache pass for both changed Python files; git diff
+--check passes. Current source/API guide contain no former mixed-case names.
+PASS software only. No real SDK/network/hardware operation; no new wheel test.
+Prior artifact hashes retain historical scope. No commit or push requested.
+
+
+## E152 / TEST-162 - Entire-repository delay audit, REQ-107
+
+2026-10-27. Expected: identify every maintained controller sleep, other application
+wait/cadence, command/read path and repeated SDK work; quantify software waits
+without device access. Inspected all five production Python files, CSS, tests,
+both notebooks and operating docs. Existing source suite: 26 passed in 0.41 s.
+81 virtual-clock/fake-SDK observations record USB/LAN GUI modes/TTL, scalar reads,
+1/2/3/6-panel refresh, discovery and notebook cells. Pre-change waits: scalar or
+snapshot 250 ms; Manual Open 500 ms; Trigger Start 750 ms; Close 250 ms; Read TTL
+500 ms. Selected LAN Connect with an unrelated absent route: 5 s; immediate-identity
+scan: 5 s; unified discovery with absent route plus scan: 10 s. Native durations
+are excluded. PASS audit; these are not physical latency measurements.
+
+Method: run tmp/delay-audit/probe.py with .venv/Scripts/python.exe -B; installs the
+existing bench.__wrapped__(pytest.MonkeyPatch) fixture and timestamps device/manager
+calls around actual Dash Flask callback HTTP. Source hashes, call counts and
+observed virtual waits: [delay-audit.json](delay-audit.json). Full findings and
+remaining opportunities: [audit](../outputs/DELAY_AUDIT.md). Raw traces and probe
+are ignored local diagnostics. The following authorized change supersedes only
+feedback-wait values, not discovery policy or physical qualification.
+
+## D043 - Remove settling assumptions, retain paced discovery, REQ-108
+
+User explicitly requested removal of fixed waits not prescribed by hardware/SDK.
+Remove the three unconditional polling_ms/1000 sleeps in feedback reads rather
+than assume an SDK polling period acknowledges a request. Keep request/getter
+order, health/route checks, faults, cleanup, readiness checks and TTL comparison.
+WaitForSettingsInitialized remains the SDK readiness wait. Two discovery loops
+retain at-most-100 ms retry pacing until identity condition/deadline: this is
+application backoff, not a documented hardware minimum. Deleting it would busy
+poll; changing collection completeness or introducing event infrastructure is a
+separate change. Do not claim all controller sleeps have been removed.
+
+Primary local evidence: installed Kinesis 1,14,60,27990 header request/get sections
+and reflection-only .NET API metadata. No device methods invoked. No prescribed
+Python polling-period settling wait was identified. Native response completion
+was not proven synchronous; GetStatusBits is documented as latest-received state.
+Immediate getters can expose older SDK values. Software validation therefore
+establishes preserved calls/checks and removal of Python waits, not fresh-response
+acknowledgement, real TTL write confirmation latency or physical safety/timing.
+These limits must remain visible in the API/operator guidance and checkpoint.
+
+## E153 / TEST-163 - Fixed feedback sleep removal, REQ-108
+
+Expected: no unconditional polling-period delays in snapshot, TTL or scalar reads;
+unchanged SDK method sequences and checks; essential regressions pass; current docs
+state latest-available semantics and retained waits. The new seven-getter regression
+first FAILed at 1.75 s versus required zero added wait. After removing the three
+sleep sites, 27 source tests PASS in 0.42 s using:
+`.venv/Scripts/python.exe -B -m pytest -q -p no:cacheprovider --tb=short`.
+Connect/Apply tests now require zero virtual wait and retain exact request ordering,
+active-state refusal, actual getter/readback mismatch, faults and cleanup checks.
+
+The final 81-scenario probe (tmp/delay-audit/probe_final.py) preserves every recorded
+SDK method-call sequence/count against TEST-162; Python object addresses are
+normalized for argument comparison. All feedback sleep totals become zero;
+discovery timing is unchanged and explicit notebook holds remain. Compared source
+hashes change only controller.py and the two affected test modules; GUI, launcher,
+configuration, CSS, fixture and notebook bytes are unchanged. Ruff check and format
+--check --no-cache src tests PASS (9 files); git diff --check PASS. 87 local Markdown
+link paths, four Python snippets and both notebook code sources validate.
+
+[Current machine evidence](delay-removal-validation.json) includes source hashes,
+81 before/after results, call counts, retained timing mechanisms and scope limits.
+README/API/operator/architecture/interface/setup guidance and delivery report are
+updated; earlier timing evidence remains historical. PASS software only; no wheel
+revalidation, real SDK device operation, network discovery, hardware actuation,
+optical timing or response-freshness qualification. No commit or push requested.
+
+
+## D044 - Batch GUI feedback without cached readiness, REQ-109
+
+2026-10-27; user authorized GUI read reduction/combining with safety checks and
+explicitly requested 100 ms background updates. Use cached has_device for local
+Discover ownership. Read TTL requests one full snapshot, checks errors/settings,
+updates the draft and returns that same event's snapshot for display. Known
+Trigger mode requests one full prerequisite snapshot. Cached mode only selects
+read breadth; if requested feedback instead reveals Triggered, obtain actual TTL
+settings before evaluating readiness. Ordinary Manual/Single/Auto Start remains
+operating-only; no added TTL traffic on its normal path. Keep post-command result
+reads and hub serialization. Do not reuse the prerequisite as the command result.
+
+Set dcc.Interval to 100 ms; keep the callback-running pause. SDK polling remains
+250 ms. Faster browser scheduling neither guarantees a new SDK sample on every
+refresh nor establishes 10 Hz physical feedback or maximum command latency.
+No driver, launcher, discovery completion, native polling or hardware changes.
+
+## E154 / TEST-164 - GUI read reductions and 100 ms refresh, REQ-109
+
+Expected: no device feedback for Discover ownership, including retained faulted
+handles; combined Read TTL and known-Trigger prerequisites; actual readiness/input
+checks and post-write results retained; 100 ms interval with callback pause.
+Before implementation, focused checks observed seven expected failures and one
+pass: the old 1000 ms interval, connected Discover reads, split TTL read ordering
+and separate known-Trigger TTL access failed; retained fault ownership already
+avoided reads. After implementation the full source suite reports 40 passed in
+0.61 s using .venv/Scripts/python.exe -B -m pytest -q -p no:cacheprovider --tb=short.
+
+Focused coverage includes both USB/LAN batching paths, retained disconnect-failure
+ownership, Read TTL fault/draft preservation/cleanup, disabled key, no input,
+Active/Open, unknown state and read-failure Start refusal. A mode changed from
+cached Manual to actual Triggered still reads actual input settings and refuses
+Start when no input exists. Successful Trigger Start retains operating feedback
+after the Active write. Layout checks confirm 100 ms in one/three-panel apps.
+
+Reused the 81-scenario instrumentation from TEST-163 before/after the GUI change.
+All 48 normal callback responses match. 71 recorded SDK sequences are unchanged;
+10 scenarios have only the expected batching/removals. Read TTL transport lookups
+4->2; known Trigger Start USB6->4/LAN7->5. Discover drops three requests, four SDK
+getters and two transport lookups per healthy held panel; e.g. six-panel Discover
+transport lookups18->6. Discovery enumeration itself is unchanged. No added wait;
+Manual/Single/Auto Start request/getter sequences and TTL counts are unchanged.
+
+Only gui.py and tests/test_application.py differ in runtime/test/notebook hashes
+from the preceding working tree, preserving the pending controller/naming changes.
+Ruff check and format --check --no-cache src tests PASS (9 files); git diff --check
+PASS. 91 local Markdown link paths and four Python snippets validate. The callback
+running configuration matches the original AST, including its refresh-disable pause.
+Current guidance and report explain combined feedback, mode fallback and 100 ms
+scheduling. [Machine evidence](gui-feedback-validation.json) stores source hashes,
+81 scenario results and exact call deltas. Raw probes remain in tmp/gui-feedback.
+
+PASS software only. No native device calls, network scan, hardware actuation,
+response-freshness qualification, physical 10 Hz claim or new wheel validation.
+No commit or push requested; prior source hashes remain historical where changed.
+
+
+## E155 / TEST-165 - Documentation and integrated pending-change review, REQ-110
+
+2026-10-27; user requested README/docs updates and review of all pending changes.
+Expected: review REQ-106..109 source/tests together; truthful current API/timing/
+readiness guidance; final source/package validation; no hardware or publication.
+Inspected the full pending production/test diff, current guides, relevant evidence
+and packaging. No additional confirmed code defect found in static/software review.
+No runtime or test files changed in this pass; every TEST-164 source/test/notebook
+hash remains exact. No assumption of hardware freshness is promoted to PASS.
+
+Corrected current GUI claims of fresh feedback/settings, clarified latest SDK
+values versus request/write acknowledgement, documented the uppercase LAN API
+break without aliases, and separated 100 ms GUI scheduling, 250 ms automatic SDK
+polling and discovery retry pacing. Replaced the README's 0 ms action table with
+mechanisms to avoid implying instantaneous response. Clarified that explicit GUI
+requests also run, with nominal 30 status/mode/state requests/s/panel at ten refreshes
+per second as a calculation, not measured throughput. Updated commissioning's
+remaining response-age/readback qualification, historical review pointers and
+screenshot scope. Rewrote outputs/REPORT.md around the final system; the staged
+records/evidence retain historical results. Review: outputs/CHANGE_REVIEW.md.
+
+Observed source suite: 40 passed in 0.69 s. Newly built/extracted-wheel suite:
+40 passed in 0.62 s with PYTHONPATH pointing at tmp/final-review/wheel; import origin
+verified before tests. Passive wheel import leaves the SDK unloaded and no owners;
+LANDevice/LANDiscovery exports and construction pass; mixed-case aliases are absent
+from package and controller. All six packaged application files match source bytes;
+wheel metadata matches the final README. Ruff check/format --check --no-cache src
+tests PASS (nine files); final git diff --check PASS. 17 Markdown files validate:
+93 local links, ten local heading fragments, four Python snippets and 15 notebook
+code cells. Snippets are parsed, not executed against hardware.
+
+The first isolated offline uv build failed because its selected empty workspace
+cache lacked hatchling. Existing default-cache hatchling 1.32.4, pathspec and
+trove_classifiers were then imported read-only under python -B; calling the
+hatchling.build.build_wheel backend built the wheel successfully without download
+or dependency changes. Independent package inspection and wheel tests followed.
+
+Current machine evidence: records/change-review-validation.json stores final
+runtime/test/notebook and current document hashes, package hash/parity, commands,
+results and review scope. Stage TEST-164's 81-scenario/48-browser-response comparison
+retains current source applicability. Prior 250/500/750 ms waits and 1 s GUI cadence
+are historical; prior physical observations do not qualify this revision.
+
+PASS software documentation/review/package validation. The significant open gap
+is real SDK response freshness/write acknowledgement after sleep removal; current
+fakes respond immediately and cannot establish it. Native/queued latency, 10 Hz
+physical updates, optical timing and electrical TTL qualification remain UNTESTED.
+No real SDK device calls, network scan, hardware action, commit or push performed.
+
+
+## E156 / TEST-166 - Publication preparation
+
+2026-10-27; subsequent explicit user instruction: "commit and push". Expected:
+commit only the reviewed REQ-106..110 delivery; normal push to existing origin/main;
+verify exact remote equality. Preflight: branch main, origin
+git@github.com:cct1123/thorlabs-shutter-control.git; local HEAD and independent
+origin/main read both e01054c431bc128a1ac1543e809569e26fcb1919. TEST-165 source/test/
+notebook and document hashes all match the reviewed checkpoint before these
+publication notes. Therefore 40 source + 40 extracted-wheel results retain their
+scope; no new source validation needed for publication-only documentation.
+
+The sandboxed Git SSH helper initially failed Windows CreateFileMapping access;
+the same read succeeded under the authorized elevated execution. This was an
+execution-environment issue, not evidence of a remote divergence. No hardware,
+force push or unrelated paths. PASS preflight only; publication result follows.

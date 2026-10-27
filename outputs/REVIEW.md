@@ -1,5 +1,8 @@
 # Communication, latency and simplicity review
 
+Historical review of the revision below. For the current pending LAN naming,
+feedback-delay and GUI changes, see the [integrated review](CHANGE_REVIEW.md).
+
 REQ-103; 2026-10-21; inspected revision `3835d2c`. Review only: no production
 source, dependencies, configuration, tests or hardware changed.
 

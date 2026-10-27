@@ -47,17 +47,24 @@ before listener closure. Cleanup failures keep it running. No reloader is used.
 
 ## Timing and validation
 
-Default getter wait/polling is 250 ms. GUI Manual Open requests prerequisite and
-result reads (0.50 s programmed waits); Close requests a result read (0.25 s).
-Connect requests one combined operating/TTL snapshot (0.25s programmed wait) and
-uses it for the display instead of requesting the result a second time.
+SDK polling defaults to 250 ms; feedback getters add no fixed sleeps. GUI Manual
+Open requests prerequisite and result reads; Close requests a result read.
+Connect requests one combined operating/TTL snapshot and uses it for the display
+instead of requesting the result a second time.
 Apply TTL keeps the prerequisite operating read, then shares one full snapshot
-between actual TTL readback comparison and display (0.50s total programmed waits).
-Trigger Start adds an actual input-settings read. Refresh is requested every 1 s
-and serial reads scale with connected count. Native calls may block; timeout
+between actual TTL readback comparison and display.
+Known Trigger Start includes input settings in its prerequisite snapshot; if mode
+has changed, it obtains the required input settings before allowing Start.
+Refresh is requested every 100 ms and paused during callbacks.
+Serial reads scale with connected count. Native calls may block; timeout
 limits settings initialization/asynchronous discovery polling, not total native
-duration. These are software waits, not calibrated optical timing. The operator
-table is in [GUI feedback timing](gui.md#feedback-timing); direct Python getter
+duration. SDK getters expose latest available values, which may precede the
+request; no response-age or calibrated optical timing guarantee is established.
+A settings comparison does not acknowledge a particular write. At a nominal ten
+refreshes per second, each healthy connected panel would issue 30 explicit status/
+mode/state request calls per second in addition to SDK polling. This is a call-rate
+calculation, not measured transport throughput; callback duration reduces the
+achieved rate. The operator table is in [GUI feedback timing](gui.md#feedback-timing); direct Python getter
 contracts remain documented in the [API guide](python-api.md).
 
 Tests replace the SDK and use virtual waits, independent fake devices and real
@@ -88,14 +95,16 @@ Ethernet provider names. TTL means the controller's electrical trigger interface
 Read the normal command path before SDK loading or error cleanup. A slot is a
 zero-based panel index. An Ethernet endpoint is one exact IPv4:port route. Polling
 means the SDK updates feedback periodically; an explicit getter also requests
-feedback and waits. Neither a successful setter nor a sleep proves blade motion.
+feedback without an added Python sleep. Neither a successful setter nor a sleep
+proves blade motion.
 
 ### Trace one Open and one LAN Connect
 
 GUI Open enters `update()` in create_app, which calls `run_panel_action()`. That
-helper requests operating feedback through hub.get_operating_status(slot), checks
-readiness, and additionally reads actual TTL
-settings in Trigger mode. It calls hub.open_shutter(slot), which dispatches to the
+helper uses cached mode only to choose between operating feedback and a full
+operating/TTL prerequisite snapshot. Readiness always uses requested feedback;
+if the reported mode changed to Triggered, it separately obtains actual TTL input
+settings before checking readiness. It calls hub.open_shutter(slot), which dispatches to the
 channel's open_shutter(). That sends SDK SetOperatingState(Active). The callback
 then reads the selected panel's operating feedback and updates its display. The
 setter itself contains no readiness reads or sleeps. Close sends Inactive without
@@ -106,7 +115,7 @@ when needed. hub.connect() calls the selected channel's shared connect() method.
 For USB, KCubeShutter.discover() enumerates USB identities. For LAN,
 _HubChannel.discover() asks its hub's _discover_slot() for configured-route
 identities. Current LAN discovery waits for all configured endpoints or its
-deadline; this readability change does not alter that behavior. Base connect()
+deadline; the GUI feedback reductions do not alter that behavior. Base connect()
 claims exclusive serial ownership, creates/connects the SDK handle, initializes
 settings/polling and verifies identity/transport. GUI Connect then reads one full
 operating/TTL snapshot and returns it to `update()` for display. A snapshot error
@@ -134,12 +143,16 @@ without triggering it. Named `Output` groups describe where returned values go.
 shared by its nested functions. Each call to `update()` creates one small dictionary
 of changes per panel, handles the action, reads feedback, then calls `_panel_view()`.
 An action can return its completed feedback snapshot so `update()` can reuse that
-event's result. None requests the usual result read; previous events' snapshots
-are never reused as new action feedback.
+event's result. Read TTL also returns its full operating/trigger snapshot after
+checking for errors and replacing the draft. None requests the usual result read;
+previous events' snapshots are never reused as new action feedback.
 Apply TTL still checks Closed/Inactive/Manual before writing. Its returned snapshot
 is used only after checking for read errors and comparing actual TTL settings with
 the requested draft. A failed read or mismatch cannot report successful Apply.
 It keeps the existing hub lock throughout that sequence so commands cannot overlap.
+Discover uses get_cached_status().has_device for local handle ownership; it does
+not request operating feedback just to retain a selection. Periodic refresh
+remains responsible for updating held channels' displayed feedback.
 
 ### Develop without hardware
 
@@ -160,5 +173,6 @@ contain the bits. Reuse the small HTTP helper in tests/test_application.py; it p
 the same Dash callback request as the browser without opening a server socket.
 
 For configuration changes, trace the chosen setting from config.py to its consumer.
-LAN bounds change the scan scope; timeouts/poll intervals change waits. Startup
+LAN bounds change the scan scope; timeouts bound discovery/initialization, while
+polling_ms controls SDK polling rather than a Python feedback delay. Startup
 must remain passive. Validate with the fake SDK, without executing a live scan.

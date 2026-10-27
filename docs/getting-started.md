@@ -32,9 +32,11 @@ and Connect; the detected route is applied automatically. Startup never discover
 connects or writes outputs. Release process handles for a fresh broad scan and
 close competing GUI/notebook/Kinesis owners.
 
-GUI Connect and Apply TTL use combined feedback to avoid a duplicate result wait.
-See [feedback timing](gui.md#feedback-timing) for the default software waits and
-their scope. Long discovery or native SDK calls are separate from those waits.
+GUI Connect and Apply TTL reuse their combined feedback result for display.
+Read TTL also returns one combined result. The GUI refresh interval is 100 ms,
+paused during callbacks; SDK automatic polling remains 250 ms by default.
+Feedback reads add no fixed sleeps; asynchronous discovery retains retry pacing.
+See [feedback timing](gui.md#feedback-timing) for response-age and timing limits.
 
 ## Troubleshooting
 

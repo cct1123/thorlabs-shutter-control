@@ -71,20 +71,25 @@ See [setup and troubleshooting](docs/getting-started.md) for exact settings.
 
 ## Feedback and timing
 
-Feedback means the state reported by the controller. Connect reads operating and
-trigger settings together. Apply TTL checks Closed/Inactive/Manual, writes the
-trigger settings, and compares the actual readback. Both actions reuse their
-result for the display.
+Feedback means the latest values available from the SDK. Connect reads operating
+and trigger settings together. Apply TTL checks reported Closed/Inactive/Manual,
+writes settings, and compares the SDK-returned settings with the draft. Read TTL
+also uses one combined result. Each action reuses its result for display.
+
 TTL refers to the electrical trigger signals configured under **Trigger settings**;
 see the [trigger guide](docs/gui.md#trigger-settings) before changing them.
 
-| Action | Software waits at the default 250 ms feedback interval |
-| --- | ---: |
-| Connect | 250 ms |
-| Apply TTL | 500 ms |
+| Timing mechanism | Current behavior |
+| --- | --- |
+| Background GUI refresh | Requested every 100 ms; paused during callbacks |
+| Automatic SDK polling | 250 ms by default; refresh also issues explicit requests |
+| Added Python feedback sleeps | None in snapshot, TTL or scalar reads |
+| LAN discovery retries | Paced at up to 100 ms until the identity condition or deadline |
 
-These are intentional software waits, not total response times. Discovery, native
-calls, queuing, USB/LAN communication and blade motion add time. See
+An SDK getter can return a value received before its latest request. A returned
+state or settings match does not acknowledge that request or prove command
+completion. The 100 ms interval does not guarantee 10 Hz hardware updates.
+Discovery, native calls, queuing, USB/LAN communication and blade motion add time. See
 [GUI feedback timing](docs/gui.md#feedback-timing) for details and limits.
 
 ## Common questions
@@ -94,7 +99,7 @@ calls, queuing, USB/LAN communication and blade motion add time. See
 | Discover finds nothing | Read the USB/LAN warning; check power, drivers or the configured LAN range |
 | Open / Start is disabled | Read the panel hint and check the key and reported operating state |
 | A controller is already owned | Release its other GUI/notebook/Kinesis connection; resolve a failed disconnect before reconnecting |
-| Connect or Discover takes longer than the timing table | Discovery and native SDK calls are additional; read the diagnostic message |
+| Connect or Discover is slow | Discovery and native SDK calls take additional time; read the diagnostic message and narrow the configured LAN range where appropriate |
 | The browser was closed | The server can still be running; reopen it and shut down normally, or use terminal Ctrl+C for cleanup |
 
 ## Python use and development
@@ -103,6 +108,8 @@ Start with the [USB or LAN notebook](docs/examples/README.md) for an explicit
 workflow, or the [Python API guide](docs/python-api.md) for scripting. New developers
 should read the [developer walkthrough](docs/architecture.md#developer-walkthrough):
 it maps the source files, traces a command and describes a first software-only edit.
+The public discovery types are `LANDevice` and `LANDiscovery`, with uppercase LAN
+and no mixed-case compatibility aliases.
 
 ```powershell
 .venv\Scripts\python.exe -B -m pytest -q -p no:cacheprovider
@@ -110,7 +117,7 @@ uv run --locked ruff check --no-cache src tests
 uv build --wheel
 ```
 
-The 26 essential tests use fictional devices, virtual waits and actual Dash
+The 40 software tests use fictional devices, virtual waits and actual Dash
 callback HTTP. They cover USB/LAN, modes/TTL, identity/ownership, cleanup, one/three
 panels, the launcher and both notebooks. They do not contact real hardware or prove
 physical timing. Current USB/GUI, live LAN scanning, Ethernet actuation/recovery,
@@ -119,5 +126,6 @@ active-low no-cable TTL issue remains unresolved.
 
 More detail: [GUI](docs/gui.md), [API](docs/python-api.md),
 [hardware and commissioning](docs/HARDWARE_VALIDATION.md),
-[delivery report](outputs/REPORT.md), [validation evidence](records/latency-validation.json).
+[delivery report](outputs/REPORT.md), [integrated review](outputs/CHANGE_REVIEW.md),
+[delay audit](outputs/DELAY_AUDIT.md).
 The older baseline tag `baseline-2026-10-21` is provenance, not a new bench result.
