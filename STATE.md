@@ -1,16 +1,17 @@
 # Engineering state
 
-## Publication follow-up - in progress
+## Publication follow-up COMPLETE
 
 Source: user's subsequent "commit and push" instruction, covering the reviewed
-REQ-106..110 delivery. Current branch main; origin is the existing
-git@github.com:cct1123/thorlabs-shutter-control.git. Independent origin/main read
-matches local base e01054c431bc128a1ac1543e809569e26fcb1919. TEST-165 runtime/test/
-notebook and document hashes matched before these publication-only notes; 40 source
-and 40 wheel test results remain applicable. Stage only the 24 reviewed delivery
-paths, inspect the index, commit and push normally, then verify remote equality.
-No force push, hardware action or unrelated file change is authorized.
-TEST-165 document hashes retain their pre-publication review-checkpoint scope.
+REQ-106..110 delivery. Main implementation commit:
+54619a01361998ff7edf08063fa01f90125ca71d. All 24 reviewed paths were staged explicitly,
+the index/whitespace/evidence were checked, and the commit pushed normally to
+git@github.com:cct1123/thorlabs-shutter-control.git origin/main. Independent remote
+readback matched that exact commit and the checkout was clean. E157 / TEST-167
+records publication; this documentation-only checkpoint accompanies the delivery.
+TEST-165 runtime/test/notebook hashes remain exact, so 40 source and 40 wheel test
+results retain their scope. Its document hashes identify the review checkpoint
+before publication notes. No force push, hardware operation or unrelated change.
 
 ## REQ-110 COMPLETE software - documentation and integrated change review
 

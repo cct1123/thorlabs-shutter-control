@@ -535,3 +535,23 @@ The sandboxed Git SSH helper initially failed Windows CreateFileMapping access;
 the same read succeeded under the authorized elevated execution. This was an
 execution-environment issue, not evidence of a remote divergence. No hardware,
 force push or unrelated paths. PASS preflight only; publication result follows.
+
+
+## E157 / TEST-167 - Verified delivery publication
+
+2026-10-27; explicit user commit/push instruction. Expected: reviewed paths only,
+normal push to existing origin/main, independent exact remote equality and clean
+checkout. Observed: 24 delivery paths explicitly staged; cached diff/whitespace,
+evidence JSON and TEST-165 source hashes checked. No scratch/private/environment
+paths were staged. Commit 54619a01361998ff7edf08063fa01f90125ca71d, "Remove fixed
+feedback waits and streamline GUI updates", pushed normally from main to existing
+origin/main. git ls-remote --heads origin main independently returned exactly
+54619a01361998ff7edf08063fa01f90125ca71d, matching HEAD; git status --short was empty.
+PASS publication of the reviewed delivery.
+
+Only STATE.md, outputs/REPORT.md and this record change in the accompanying final
+publication checkpoint. Runtime/test/notebook hashes remain identical to TEST-165,
+retaining its 40 source/40 wheel validation. Review document hashes are historical
+for the pre-publication notes. The checkpoint is committed/pushed normally to the
+same branch and remote equality/clean status are checked again before handoff.
+No hardware operation, force push or unrelated file change.

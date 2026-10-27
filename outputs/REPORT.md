@@ -59,10 +59,12 @@ No measured millisecond saving is attributed to those lookups.
 The earlier [sleep-removal evidence](../records/delay-removal-validation.json),
 [delay audit](DELAY_AUDIT.md) and [staged records](../records/RECORDS.md) retain their
 revision-specific results. Earlier 250/500/750 ms wait values and 1 s GUI cadence
-are historical. The user subsequently requested commit/push; the reviewed delivery
-is being published normally to existing origin/main. Publication records follow
-in [records](../records/RECORDS.md). The document hashes in TEST-165 identify the
-review checkpoint before these publication-only notes; runtime/test hashes remain current.
+are historical. The user subsequently requested commit/push. Delivery commit
+54619a01361998ff7edf08063fa01f90125ca71d was pushed normally to existing origin/main;
+independent remote readback matched, with a clean checkout. This documentation-only
+publication checkpoint accompanies it. E157 / TEST-167 in
+[records](../records/RECORDS.md) records verification. TEST-165 document hashes
+identify the review checkpoint before publication notes; runtime/test hashes remain current.
 
 ## Remaining qualification
 
