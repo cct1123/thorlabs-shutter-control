@@ -1,0 +1,45 @@
+{
+  "timestamp_utc": "2026-11-04T19:54:50.261964+00:00",
+  "scope": "offline/software only",
+  "status": "PASS documentation and software audit; BLOCKED engineering acceptance",
+  "os": "Windows-11-10.0.26100-SP0",
+  "monotonic_clock": {
+    "implementation": "GetTickCount64()",
+    "resolution_s": 0.015625
+  },
+  "base_git_revision": "8f324a6cfec98b73b4b32c6f4e5035db6c3b53c6",
+  "tests": {
+    "offline-tests.xml": 59,
+    "wheel-tests.xml": 59,
+    "diamondgui-tests.xml": 29
+  },
+  "local_links_checked": 29,
+  "wheel_sha256": "770e3ef4240e6b9c8355046db654d191b47e684418060244ab924f4ac1c0ae1a",
+  "source_evidence_hashes_match": true,
+  "wheel_python_files_match_source": true,
+  "sha256": {
+    "README.md": "3af7811a645e912ee02545354b49e4edab945c29c3f412c0973fa4d777265411",
+    "PROJECT.md": "51703836eb5580e11974dc2cfbefec4b1bff2b1752f62be99fc758da5581ce37",
+    "STATE.md": "9cf258861ec0fd6c983b1aaa737537d2b7fe55f3c4eff228071c36b86672a223",
+    "outputs\\REPORT.md": "1c9b0f322b1813631f9a1ed5112f484eaaa7e407dfd6ebc3b2af6bb97ae20b0e",
+    "docs\\architecture.md": "5262dd6fcf29b859e842d72d3eb8cb226e05b7c7668f0db6337eea524054ed15",
+    "docs\\assets\\README.md": "0a1d9f59826be16027e971a2bfb29fcdc36a656b2ef1c2d88b09d9e1da3bf9fe",
+    "docs\\cutover.md": "ce29abfed4819b3bdd7bcc70249fcb584f0f73f4d465de8dfb3a3d93e0b66521",
+    "docs\\diamondgui.md": "8fba502279d40c0fbabe883b35a194414ca9e21fd671f59662581bc2ced00ecf",
+    "docs\\ethernet-assessment.md": "9cb1ac3fab202f983b598d16987d39ffd2c2699b712bf825ce411bec6ab76288",
+    "docs\\examples\\README.md": "8eb94ae3f31c07e446cc9f8bac5576ba9bd163be0faa4a60d0350e55b548849e",
+    "docs\\getting-started.md": "e0136f59783a60168f60d0d3e9e137633eae13471683c518bdb9ec99bdc25543",
+    "docs\\gui.md": "0a120c0147e56bcddb0444a154805bc72d2ead712452efc78cb9e39dfe50b30b",
+    "docs\\hardware.md": "28722e4629f3ff1c7918d5161c5c107e8c94591151e15bf7ae812f199f36ecba",
+    "docs\\HARDWARE_VALIDATION.md": "67bee3cb23a8bf83e933960960b9bcab0c347ea2eada632f43122a6f8514068c",
+    "docs\\INTERFACE.md": "8508a90377792b1db0d080ecc09f58de00ecbb14c11f322904d2e7fdb3b7483e",
+    "docs\\python-api.md": "a79ee986ca8a184681b7f5d1def1b086ce9136dca2299a6ae4a9995b3bdbb98c",
+    "docs\\sources.md": "7a8bb120d3739b7b4a1ac7061afebe361a9b1e5bb736462c0460deb21ba80330",
+    "records\\RECORDS.md": "9fe6447cefc2a6397c03dfdebc98a69dfb737b1f0c68dcb4ab71b9d7035a2d20",
+    "records\\direct-validation.json": "98427872b3743f6aedbb41e5b2de27b7be6ab5273205c97c8977529f6514ec9c",
+    "records\\diamondgui-migration.json": "633a3d33bb3e1ba01b0283d11b6b9aee4765b5d4f39a5ac4bb3c5b4e7006455d",
+    "records\\offline-tests.xml": "f311e908cfe4e3e704623ba40f9548225e1dd2582985b385a1dd6ff9ec3d9b11",
+    "records\\wheel-tests.xml": "a6511b53e0281560a7fe9c0ee44611c4a1432cd8ea395821a8e360ba23e32a17",
+    "records\\diamondgui-tests.xml": "bba840a37f6ec4c5e6b2034fc179037d2f303c02bd2726b903a1bd74c690bf39"
+  }
+}

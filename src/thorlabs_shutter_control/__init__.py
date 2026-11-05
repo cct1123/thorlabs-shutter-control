@@ -1,21 +1,17 @@
-"""Manual KSC101 shutter control. Importing this package never connects hardware."""
+"""Direct KSC101 control. Imports and construction never access hardware."""
 
-from .controller import (
-    KCubeShutter,
-    LANDevice,
-    LANDiscovery,
-    ShutterError,
-    ShutterHub,
-    ShutterStatus,
-    TriggerConfig,
-)
+from .config import ControllerConfig, Policy, Route, load_config
+from .controller import ShutterFeedback, ShutterHub, ShutterStatus
+from .errors import ShutterError, UnsupportedRoute
 
 __all__ = [
-    "KCubeShutter",
+    "ControllerConfig",
+    "Policy",
+    "Route",
+    "load_config",
     "ShutterHub",
-    "ShutterError",
+    "ShutterFeedback",
     "ShutterStatus",
-    "TriggerConfig",
-    "LANDevice",
-    "LANDiscovery",
+    "ShutterError",
+    "UnsupportedRoute",
 ]

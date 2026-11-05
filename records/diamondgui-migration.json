@@ -1,0 +1,79 @@
+{
+  "scope": "shutter-only integration; unrelated dirty files preserved; no hardware launch",
+  "source_root": "C:\\Users\\HFNV\\diamondgui",
+  "paths": {
+    "hardware/optics/beampath/shutter.py": {
+      "before_sha256": "65e0be1b3bbb90d506774546f58198d01fcae84bca6dff02d59cc03a38735c53",
+      "after_sha256": "8442ac089717366f84758addee218dcee200ff93ea84faaa9f28266afd926960"
+    },
+    "pyproject.toml": {
+      "before_sha256": "247d27e0de46867b2fae0853da74e74163e52537d3a33ad124a1103e45cfff94",
+      "after_sha256": "1f109bb104a85cb86970506bf1ea84d73f6db51b8fde59224fe812ec0ede1fdd"
+    },
+    "hardware/config.py": {
+      "before_sha256": "2a1bd880cfbd3ddfaf8f81509d2a636e8216ccac4640de689c20f2d296410b3e",
+      "after_sha256": "9a58b50c31937110347a2e01eeeb7292b68f59ddb08312368da20a82eb599f2c"
+    },
+    "hardware/hardwaremanager.py": {
+      "before_sha256": "00c4da5ad524ddd6f14c290ceb65b6a7656882e493d935d8f2fce44de862191b",
+      "after_sha256": "3957bb0edb1b66315bfd90e092e67bbb855076ad6bde62601b3638dd4b3fdd17"
+    },
+    "gui/pages/hardware_pages/shutter_control.py": {
+      "before_sha256": "784dc6f6423c27982f952571b49222782677e63caf15130df4b74962c83e102b",
+      "after_sha256": "7f267d2e31516c82ec1e8e8e03a51340ef04c8a647f151f38bfd160fddc9144d"
+    },
+    "docs/hardware.md": {
+      "before_sha256": "caf37bfa57261257ef87b4100203dc9f8e7da013ee76a8bc1a6df707be231cf4",
+      "after_sha256": "911543940956688b1c87dcef5fabaa343a158df471e933eabcfabdca4b21b327"
+    },
+    "docs/gui.md": {
+      "before_sha256": "6123b0477501137dd78ec37514d59f69f201b11c8f885c832159d9b1e0237cac",
+      "after_sha256": "99bc78df96dea48dbbaf48014c1228992cf4540d421260bbca2d16c90fc36652"
+    },
+    "hardware/optics/beampath/shutters.example.toml": {
+      "before_sha256": null,
+      "after_sha256": "724dfc311602b04ca23fd573874b274186830e145fe6e21a66db049d5132e15b"
+    },
+    ".gitignore": {
+      "before_sha256": "565a18ddf135ce7dfd79715353efe210b7351504ba8150b29cbc400a0cb21a56",
+      "after_sha256": "b7d30b30e025e10554e3490449317d7963e3e726426d64cb958fc9b446bf5f7b"
+    },
+    "hardware/optics/beampath/tutorial_shutter.ipynb": {
+      "before_sha256": "a2cee71b2a8bf1dba1c9480f41a2a6b36c23cdcfd7f366d88effaa482545f4d6",
+      "after_sha256": "dabea4d3f82ddd2f232e7aa2ac36e46f1b3af579cf83c325ec170150bf90a89e"
+    },
+    "gui/tests/test_shutter_control_page.py": {
+      "before_sha256": "5b4ef0b47c8b7eb05f8431b4e68d5afec6150f7f8a6996f7e87e7a4969fc761d",
+      "after_sha256": "b90faab350b4fe8342dc13bd0757b908c7b185112dff18172bc469f5a10ec47b"
+    },
+    "hardware/optics/tests/test_shutter.py": {
+      "before_sha256": "03777464c3c6e5435291c7d4855485f64b302d2afa0d74c53624f408a6786a69",
+      "after_sha256": "582841fa1374e5a4fcef269ab9d616521a4bd8952fc2f2866854977d25ea03d7"
+    },
+    "uv.lock": {
+      "before_sha256": null,
+      "after_sha256": "1273f00c5852f543f7fa2a25256a889baf248f15f1ba7adf624d4b63580a571b",
+      "note": "Already dirty initially; initial bytes not captured. uv reported only ftd2xx and local package additions; no existing version updates.",
+      "reference_followup": {
+        "before_sha256": "7b747a5901036080bcd7602b0f270c20b432077bb1bc4300ad7d9fcf750c3868",
+        "after_sha256": "1273f00c5852f543f7fa2a25256a889baf248f15f1ba7adf624d4b63580a571b",
+        "change": "Metadata for an already concurrent optional notebooks dependency group only; package identities/versions/sources unchanged."
+      }
+    }
+  },
+  "style_limits": {
+    "hardware/hardwaremanager.py": "Pre-existing unused rotator MotionLimits import; original formatting retained",
+    "hardware/config.py": "Pre-existing formatting retained",
+    "gui/pages/hardware_pages/shutter_control.py": "Pre-existing dash import and trailing pass/whitespace formatting retained"
+  },
+  "concurrent_external_changes": {
+    "docs/hardware.md": {
+      "recorded_sha256": "911543940956688b1c87dcef5fabaa343a158df471e933eabcfabdca4b21b327",
+      "current_sha256": "bda222e95786f5f24d8a6019a712cb5f8c248c5b203557ac594fbd5383d25f13"
+    },
+    "docs/gui.md": {
+      "recorded_sha256": "99bc78df96dea48dbbaf48014c1228992cf4540d421260bbca2d16c90fc36652",
+      "current_sha256": "1ac7e1e8b3644a6dc48a51243eb11595d2708d292dd455ccdd3dea8b407fb089"
+    }
+  }
+}

@@ -1,3 +1,6 @@
+> Historical Kinesis implementation review. Superseded by the direct-protocol
+> rewrite; not current validation. See REPORT.md and ../STATE.md.
+
 # Integrated change review
 
 2026-10-27; REQ-110; complete pending diff against HEAD

@@ -555,3 +555,409 @@ retaining its 40 source/40 wheel validation. Review document hashes are historic
 for the pre-publication notes. The checkpoint is committed/pushed normally to the
 same branch and remote equality/clean status are checked again before handoff.
 No hardware operation, force push or unrelated file change.
+
+
+## D045 - Direct protocol clean break, REQ-201..212
+
+2026-11-04; current user explicitly requests a complete rewrite with no Kinesis,
+Thorlabs software/SDK dependency or compatibility. PROJECT.md now contains the
+full supplied engineering task. Replace the SDK implementation/API/GUI/templates,
+not adapt it. Retain historical records and physical evidence under their original
+scope. Use one canonical direct-protocol owner, reused by DiamondGUI. Preserve its
+target methods and logical identities while intentionally replacing the constructor
+and enforcing qualification/readback/fault policy. No commit or publication authority
+is inferred from old requests. No hardware authorization window exists now.
+
+## D046 - Unsupported routes and physical contracts stay unavailable
+
+Manufacturer SRC-001 Issue 36 establishes direct USB framing and KSC101 solenoid
+commands; SRC-002 HA0368T Rev D describes KSC101-specific physical/trigger behavior.
+SRC-003 DOC-103012 Rev E establishes KEH3 ports and USB/Ethernet restrictions, but
+does not establish the direct framing/management identity/firmware contract.
+QMI revision 7b02875043985abd6366d902c1cf32af240a6881 is a reference only, not evidence
+of KSC101/KEH3 support. No code was copied; licensing notice retained.
+
+Do not guess unwrapped APT-over-TCP or hub addresses. Reject unresolved routes at
+the owner boundary, including injected transports. Keep VCP read-only until its
+bridge-reset equivalence qualifies; keep TTL/cycles and finite exposure/duty loads
+unavailable. Only documented, qualified continuous-duty manual loads can write.
+These restrictions are unmet engineering scope, not waived acceptance criteria.
+APT lacks transaction IDs: quarantine known ambiguous/late responses and document
+the remaining arbitrary same-type ordering limitation without claiming an ACK.
+
+## E158 / TEST-201..207 - Direct implementation and final offline verification
+
+2026-11-04. Expected: hardware-free imports/help/verification; no old SDK loader or
+compatibility API; exact identities/routes; validated framing; pre-output policy;
+single-flight freshness/deadlines; priority cancellation; ambiguity and cleanup.
+Observed on final hashes in records/direct-validation.json: 59 source tests and
+the same 59 installed-wheel tests PASS, zero failures/errors/skips. The clean uv
+environment contains no pythonnet/clr/ftd2xx/serial module and requires no Thorlabs
+application or SDK DLL. Main Ruff lint/format PASS. The locked dev build backend
+produces a wheel whose Python files match source byte-for-byte. Missing and stale
+lockfiles are separately rejected; locked dependencies install with hash checks.
+
+Command: uv run --locked python scripts/verify.py (with UV_CACHE_DIR pointing at
+the project-local cache in this sandbox). It performs offline resolution checks,
+source tests, locked-backend wheel build, clean uv environment/dependency install,
+clean import/help and exact wheel tests. One-time download of already-locked
+hash-verified dependencies populated the cache; final verification runs offline.
+
+Byte-level fakes exercise all frame split boundaries/coalescing, wrong addresses,
+channels/payloads, interleaved messages/faults, stale and delayed responses, partial
+output writes, changed identities, duplicate routes, cross-process ownership,
+concurrent controllers, active-query/hold cancellation, total deadlines, separately
+bounded cleanup, persistent uncertainty, original-plus-cleanup errors, and retained
+obligations after passive release. No output replay or wrong-route cleanup passes.
+Electrical results never assert optical closure. Simulated protective dispatch
+meets 250 ms; reported hold dispatch 0 ms reflects GetTickCount64's 15.625 ms clock
+resolution. No native/physical dispatch or shutter timing was measured.
+
+Initial filesystem-sandbox pytest temp ACL failures required running the inspected
+offline suite outside that restriction. A nonfinite-input diagnostic assertion,
+uv pip sync argument and uncached locked wheels were corrected. Final results
+above supersede those failed intermediate attempts. No instrument was opened,
+enumerated, commanded, reset or reconfigured; no driver package/binding changed.
+
+## E159 / TEST-211 - DiamondGUI integration, software only
+
+2026-11-04. Expected: reuse its existing manager-owned shutter interface, retain
+logical names/CH/serial/routes, prevent a competing SDK owner and make protective
+Close reach active owner work. Observed: 29 focused tests PASS, zero skips/errors.
+Command from the DiamondGUI root: uv run --locked --group dev python -m pytest
+hardware/optics/tests/test_shutter.py gui/tests/test_shutter_control_page.py
+-m "unit and not hardware" -q -p no:cacheprovider, with an isolated temporary
+basetemp and XML output records/diamondgui-tests.xml in the control project.
+Inspected root/test fixtures isolate device access and runtime paths; gui.main
+was not imported and no application was launched.
+
+Canonical owner import, passive factory matching page metadata to new TOML,
+public status schema, command-result reuse, passive rendering and protective
+Close-before-page-lock pass. The unexecuted notebook remains gated/off with zero
+outputs. Shutter registration remains disabled. Other native dependencies remain
+for other instruments. Integration changes only the allowlisted paths/hashes in
+records/diamondgui-migration.json; unrelated dirty work is retained. Existing
+style drift in shared config/manager/page was verified against saved preimages;
+unused rotator MotionLimits and unrelated formatting are not changed. New shutter
+owner/tests pass lint/format; scoped page lint passes.
+
+## E160 / TEST-212 - Delivery checkpoint and blocked handoff
+
+2026-11-04. Expected: complete operator/source/traceability/matrix/cutover documents,
+current evidence links and honest separate route/physical/driver results. Observed:
+records/delivery-validation.json audits current local links, source/evidence hashes,
+wheel parity and integration hashes. README, STATE.md and outputs/REPORT.md describe
+the direct-protocol system. Former review reports are labelled historical; removed
+tutorial templates had zero outputs/execution counts, and old GUI images/CSS were
+specific to the removed implementation. Private inputs, datasets, old physical
+records and other instruments are retained.
+
+PASS software documentation delivery; BLOCKED engineering acceptance. Required
+KEH3 direct contracts/routes, actual shutter specification/mapping/optical behavior,
+native driver arrangement and reconnect/reboot/endurance remain unverified. Supply
+the deployment evidence package in STATE.md to resume. Bench actuation and any
+driver cutover require their precise authorized window/conditions before execution.
+No source approval, SDK readback, process exit or communication release is treated
+as evidence of physical closure. No commit or push performed.
+
+## E163 / TEST-214 - QMI discovery and communication source investigation
+
+2026-11-05. REQ-214 derives from the current user request to investigate QMI.
+Expected: distinguish device enumeration, configured selection, identity checks,
+transport dependencies and wire protocols, including relevance to KSC101/KEH3.
+Observed: GitHub commits/main API returned SRC-005 revision
+7b02875043985abd6366d902c1cf32af240a6881; recursive tree inventory and 17 downloaded
+source files inspected. APT controllers use configured pyserial VCP ports;
+USBTMC/HID enumeration applies to other families. No KSC101/KEH3 driver found.
+PASS source investigation only. docs/qmi-discovery-review.md records methods,
+limitations and pinned upstream links. No hardware was enumerated, opened or
+commanded; no runtime code, driver binding, existing acceptance or authority changed.
+
+## E164 / TEST-215 - Beginner tutorial notebooks, software only
+
+2026-11-05. Requirement source: user's request for separate beginner notebooks on
+discovery, connection, status query, settings, modes and ON/OFF; PROJECT.md captures
+derived acceptance. Expected: six standalone current-API notebooks, hardware-free
+saved defaults, explicit device/write gates, accurate feature limitations and
+separation of electrical/optical state, simulated opt-in paths and error cleanup.
+
+Observed: 18 tests PASS, zero skips/failures; records/notebook-tests.xml.
+Command: uv run --locked --offline --no-sync python -m pytest
+tests/test_tutorial_notebooks.py -q -p no:cacheprovider
+--basetemp tmp/pytest-notebooks-final --junitxml records/notebook-tests.xml.
+Default cells execute from repository root and notebook directory. Byte-level
+simulated transport checks cover identity/status, explicit Single-to-Manual change,
+one ON/OFF pair and partial-write failure preserving original/cleanup errors with
+no ON replay or OFF frame on a transmit-misaligned stream.
+
+All six PASS nbformat schema, relative Markdown links and default Jupyter execution
+in one shared local kernel with namespace resets. records/notebook-validation.json
+retains that successful run; saved tutorials retain empty outputs/execution counts.
+The optional notebooks dependency group locks JupyterLab/ipykernel separately from
+driver runtime. uv lock --check --offline and focused Ruff lint/format PASS.
+UV_CACHE_DIR points to project-local .uv-cache. Python optional GUI/VCP/D2XX extras
+were restored after notebook dependency sync; no native binding was changed.
+
+Initial sandbox runs hit pytest/Jupyter Windows ACL restrictions. Offline tests
+passed outside that restriction. Repeated kernel/context creation intermittently
+failed with ZeroMQ timeout, including a later run of the saved verifier. One full
+six-notebook run via tmp/validate_tutorials.py passed with shared-kernel namespace
+resets; scripts/verify_notebooks.py retains that procedure for reproduction. This
+is evidence of notebook execution, not reliable repeated-kernel startup. Physical
+operation remains UNTESTED. No device enumeration/connection/output, native driver
+change, commit or push occurred. Prior engineering blockers remain unchanged.
+
+## E165 - Local discovery comparison, source inspection only
+
+2026-11-05. User asked whether the two local repositories use similar discovery.
+Inspected thorlabs-control cli.py _discover, transport/d2xx.py list_serials,
+transport/serial_vcp.py usb_descriptor, devices/common.py identity validation;
+compared shutter-control __main__.py, transport.py and device.py.
+thorlabs-control explicitly lists FTDI devices through FT_CreateDeviceInfoList /
+FT_GetDeviceInfoDetail or COM ports through pyserial comports. Its VCP open also
+checks OS descriptor metadata for the selected port. shutter-control offers no
+discovery command and opens configured serial/port directly. Both D2XX paths open
+by serial; both verify APT controller model/serial/firmware on the selected route.
+D2XX implementation differs: ctypes versus ftd2xx wrapper. Neither selects the
+first discovered controller. No enumeration or hardware I/O executed.
+
+
+## D047 - Reference-driven framing, timing and persistent-mode corrections
+
+2026-11-05; REQ-213, user's explicit local-controller reference instruction.
+Initial reference C:/repo/thorlabs-control was clean at d70f2a6e8f494516a3aed169f33bcf6775fdd982.
+Its controller, framing, link and timing paths were inspected only. Subsequent
+reference commits/dirty notebooks belong to other work; inspected code/document
+paths still match the pinned revision. No reference code is copied or added as a
+dependency. pyproject declares MIT; no separate LICENSE file was found.
+
+Use perf_counter for high-resolution monotonic deadlines, OFF intervals and
+dispatch measurement. Reject known malformed message headers immediately and
+make decoder failure terminal, preserving decoded diagnostics and the raw tail.
+Use SRC-001 p34's 255-byte bound for the supported protocol revision.
+
+SRC-002 p20 independently confirms that the last used operating mode is remembered
+between power cycles. Correct the previous omission in guidance: mode transitions
+require separate allow_persistent_mode_changes permission, default false. Selecting
+an already Manual/OFF controller must not rewrite it. A refused permission is not
+an ambiguous write and does not itself latch an error. No EEPROM command is sent.
+
+A partial/unknown-count write leaves command framing uncertain. Refuse all further
+frames on that connection, including cleanup OFF, rather than appending a new frame
+to an incomplete command. Preserve the original failure, cleanup refusal and unknown
+physical state; require independently protected source and explicit recovery. A
+complete-but-late write or receive-only failure still permits a qualified OFF attempt
+when transmit alignment is known. It cannot confirm optical safety.
+
+Do not adopt guessed KEH3 stream/address probes as operational support or a
+quiet-period resync without a manufacturer latency bound. Existing physical,
+firmware, optical and driver acceptance remains open. Rotation code is out of scope.
+
+## E161 / TEST-213 - Controller reference comparison and regression reproduction
+
+2026-11-05. Expected: inspect the user-selected controllers, verify material
+findings against manufacturer sources, implement warranted improvements without
+copying weaker acceptance assumptions or granting hardware authority.
+Observed: 11 new timing/schema/mode cases failed before implementation; two
+partial/unknown-write cleanup cases failed while the complete-but-late control
+case passed. All pass after D047. docs/controller-reference-review.md records the
+adopted and deliberately retained differences. records/controller-reference-validation.json
+pins inspected Git blobs, manufacturer source hashes and final validation scope.
+PASS source comparison and simulated regression correction only.
+
+## E162 / TEST-201..207, TEST-211..213 - Reference follow-up validation
+
+2026-11-05. Final command: uv run --locked --offline python scripts/verify.py
+--tests tests/test_owner.py tests/test_protocol.py tests/test_application.py.
+Observed: 72 selected controller source tests and the same 72 isolated-wheel tests
+PASS, zero skips/failures/errors. Locked dependency installation, no-SDK/native
+module import/help, missing/stale lock rejection, source/wheel Python byte parity,
+scoped lint/format and stable pre/post source/test/dependency hashes PASS.
+The verifier records explicit selection and refuses drift during execution.
+
+The initial broad verifier snapshot was invalidated by concurrent notebook/test
+development. That unrelated work was preserved; its optional dependency group is
+present in the final lockfile, and its evolving tutorial suite is outside the
+selected controller result. A restricted metadata-read command attempted network
+resolution during that update and failed; final verification is locked and offline.
+The earlier delivery-audit snapshot is retained in
+records/reference-before-delivery-validation.json; E158..160 remain historical.
+
+29 existing, inspected DiamondGUI shutter tests PASS against the final owner.
+The first locked attempt rejected stale local-package metadata; uv lock refreshed
+only the notebook-group metadata already present in the local package. The outer
+130 package identities, versions and sources are unchanged. No DiamondGUI source
+edit occurred. Existing unrelated style drift is retained under E159's scope.
+
+The high-resolution clock is QueryPerformanceCounter (reported 100 ns resolution).
+Exact source/wheel simulated protective dispatch values are stored in the XML and
+reference evidence JSON; both meet the 250 ms threshold. These individual software
+measurements do not establish native dispatch, electrical/optical timing or safety.
+No hardware query/output, network probe, driver/firmware change, application launch,
+commit or push occurred. REQ-213 is PASS software; project acceptance stays BLOCKED.
+
+## E166 / TEST-216 - Explicit D2XX/VCP discovery and retained identity gate
+
+2026-11-05. User-authorized requirement REQ-216 is captured in PROJECT.md.
+Expected: explicit inventory without device open, config loading, owner creation,
+automatic selection or identity bypass; empty and failed enumeration distinguishable.
+Implemented lazy discovery helpers using ftd2xx createDeviceInfoList once and
+getDeviceInfoDetail(update=False), or pyserial comports. D2XX returns serial,
+VID/PID, description and open flag; VCP returns port/hardware ID/description.
+CLI dispatches inventory before configuration and never constructs a ShutterHub.
+Missing extras/native library or enumeration errors fail nonzero. Existing exact
+serial opens, identity/firmware checks, ownership and VCP restrictions are retained.
+README/setup/discovery notebook document explicit commands and candidate limitations.
+
+Validation: UV_CACHE_DIR set to workspace .uv-cache;
+uv run --locked --offline --group dev --extra gui python scripts/verify.py.
+PASS: 101 source tests (0.99 s), 101 isolated-wheel tests (1.31 s), lint/format,
+locked backend build, no-SDK/native-module imports/help, missing/stale lock rejection
+and passive example. records/direct-validation.json captures commands and hashes;
+records/offline-tests.xml and wheel-tests.xml capture cases. New TEST-216 cases
+mock both inventory backends and test absent config, no-open/no-owner boundaries,
+other-device metadata, empty results, missing optional modules, enumeration failure,
+missing explicit target and model/serial/firmware mismatch refusal before control.
+Import/help test also covers discover --help without native imports.
+
+Initial uv default-cache access and sandboxed pytest temporary-folder ACL failures
+were environmental; workspace cache and approved offline verification outside that
+filesystem restriction succeeded. No native inventory, hardware enumeration,
+connection, actuation, driver change, commit or push was performed. Physical,
+KEH3 and driver acceptance remain blocked; this is software-only evidence.
+E165 renumbers the earlier local comparison heading to avoid collision with the
+pre-existing E164 tutorial evidence; its findings remain historical.
+
+
+## D048 - Keep KEH3 candidate diagnostics separate from operational qualification
+
+2026-11-05, REQ-208/217. Manufacturer Rev E section 4.3/Figure 17 specifies
+ports and USB IN exclusion. APT Issue 42.1, the inspected official example trees
+and the local reference do not establish KEH3 framing, hub identity, route
+addresses or firmware applicability. A controller identity reply cannot identify
+its containing hub. Implement pure capture analysis and a separate bounded,
+explicit candidate query, preserving rejection by the normal owner. No acceptance
+file, inference from a different Ethernet controller, or matching child identity
+may enable operation. No lab query window is authorized by this offline request.
+
+## E167 / TEST-217 - KEH3 manufacturer investigation and offline diagnostics
+
+2026-11-05. Human scope: focus on Ethernet using the local reference/manufacturer
+docs and implement everything possible offline. Expected: reproducible source
+findings; bounded/no-replay TCP diagnostic; malformed, fragmented, ambiguous,
+wrong-identity, late and cleanup-failure handling; no operational qualification
+or unauthorized socket access. PASS offline preparation only. REQ-208 BLOCKED.
+
+Implemented ethernet.TCPTransport and keh3.analyze_capture/KEH3Probe; CLI
+keh3-analyze and explicitly gated keh3-probe. Only HW_REQ_INFO is sent by the
+candidate probe, to one explicitly supplied generic APT candidate address on one
+configured endpoint. No scan, reconnect, mode/output/configuration command occurs.
+The probe shares controller/endpoint claims and retains them after failed close.
+Reports always mark hub identity unverified and operational routing unavailable.
+Normal ShutterHub still rejects KEH3 routes before I/O, including injected I/O.
+
+Final command: UV_CACHE_DIR set to workspace .uv-cache;
+uv run --locked --offline --group dev --extra gui python scripts/verify.py.
+Observed PASS: 131 source tests, 131 isolated installed-wheel tests; locked build,
+source/wheel byte parity, stable pre/post source/test/dependency hashes, lint/format,
+passive example/import/help without SDK/native modules and missing/stale-lock
+rejection. Separate focused command: uv run --locked --offline --group dev python
+-m pytest tests/test_keh3.py -q -p no:cacheprovider --basetemp
+ tmp/keh3-final-offline-2 --junitxml records/keh3-tests.xml: 18 PASS (0.19 s).
+A split-boundary test covers all 90 positions of the identity frame. Actual socket
+coverage is localhost only; all device replies are simulated. Hashes, tree IDs,
+PDF source URLs and command arrays are in records/keh3-validation.json.
+
+Intermediate failures are not concealed: an earlier verifier used the same wheel
+folder for build artifacts and pytest basetemp, deleting its own built archive;
+the build output now uses build-wheel. Intermittent localhost connection timeouts
+also occurred (including a focused 17 PASS/1 FAIL run). Three direct localhost
+connects and the isolated failing test then passed; the final full source/wheel
+and focused suites passed. The timeout cause remains unconfirmed. These results
+do not establish Windows, lab-network, hub or physical reliability.
+
+APT Issue 42.1 PDF SHA256 is
+b2a6badd7c00b3042ba383e291667e7eab10746c14c4f92cea45fc480c7304ed;
+its 443-page text has no KEH3/40303 contract. The two official Thorlabs example
+repository inventories have no KEH3 paths. This is a bounded source finding,
+not proof that a private or future contract cannot exist. See
+ docs/keh3-offline-validation.md for the exact outstanding manufacturer request.
+No laboratory socket, device query, output, driver change or physical actuation
+was performed. Project acceptance remains BLOCKED, not validated completion.
+
+## D049 - One control/cleanup contract and full-suite verification
+
+2026-11-05, REQ-218; user requested comprehensive review, obsolete-code removal,
+fixes, consistency, substantial code/script simplification and a local commit.
+The user explicitly confirmed that all pending changes should be reviewed together.
+Retain the direct APT migration and separate KEH3 diagnostics, preserving the
+DiamondGUI owner methods and status schema. Remove SDK runtime/templates/assets
+and duplicated internal state/paths, without weakening physical acceptance or
+introducing compatibility aliases, fallback or implicit actuation.
+
+Use one ON/pulse ambiguity guard, one priority OFF/cleanup boundary, one identity
+decoder/matcher and one passive pulse validator. Never reuse an earlier OFF
+success as the current cleanup outcome. A pending protective request owns its
+cancellation event; recovery must defer rather than clear it. Queries and native
+opens check their budget/cancellation before transport access. GUI cleanup has
+one owner. Bound capture-file reads rather than relying on a prior file-size check.
+
+The simplified verifier always runs the complete source and exact-wheel suite.
+Share command/test orchestration, discover the wheel filename, compare wheel
+Python bytes against source, and hash all source/tests/scripts/tutorials/example
+configuration/dependency inputs before and after. Keep build and pytest directories
+separate. Use the uv isolated interpreter runner; retain failure evidence without
+claiming a root cause for observed localhost timeouts. Historical records and
+review documents remain history; STATE.md and REPORT.md describe this checkpoint.
+
+## E168 / TEST-218 - Comprehensive review and final integrated software evidence
+
+2026-11-05. Expected: remove obsolete implementation paths, simplify repeated
+control/verification logic, correct supported defects, preserve owner interfaces
+and uncertainty/identity/interlock boundaries, and commit the reviewed result.
+PASS software review; engineering deployment remains BLOCKED.
+
+Four added regressions failed before implementation: ON retained a previous OFF
+cleanup message; failed pulse OFF displayed stale successful cleanup; recovery
+cleared a pending protective event; and a cancelled query read the transport.
+All four pass after correction. Additional passing checks cover empty hub-only
+fields on USB routes, passive shared pulse validation, expired native-open budgets,
+single GUI cleanup ownership and bounded offline capture-file reads. The receive
+queue, redundant OFF-interval state, diagnostic conversion helper and unused TCP
+receive helper were removed. Tutorial content is unchanged apart from LF line
+endings; Ruff's LF policy is explicit. API/architecture/checkpoint/report are
+reconciled. Old SDK tutorials, CSS and GUI screenshots are absent.
+
+Final command (workspace UV_CACHE_DIR=.uv-cache):
+uv run --locked --offline --group dev --extra gui python scripts/verify.py.
+Observed: 131 full source tests and the identical 131 installed-wheel tests PASS,
+zero failures/errors/skips; lock, lint, format, locked-backend build, clean
+hash-checked dependency installation, no-SDK/native-module import/help, wheel/source
+byte parity, stable pre/post input hashes, missing/stale-lock rejection and passive
+example PASS. Evidence: records/direct-validation.json, offline-tests.xml and
+wheel-tests.xml. The verifier no longer offers partial-suite selection or assumes
+a particular wheel version. Saved tutorial code paths are exercised offline and
+on simulated transports; the earlier real-kernel execution stays historical.
+
+Affected integration command from C:/Users/HFNV/diamondgui:
+uv run --locked --offline --no-sync python -m pytest
+hardware/optics/tests/test_shutter.py gui/tests/test_shutter_control_page.py -q
+-p no:cacheprovider --basetemp C:/repo/thorlabs-shutter-control/tmp/review-diamondgui
+--junitxml C:/repo/thorlabs-shutter-control/records/diamondgui-tests.xml.
+Observed: 29 PASS, zero skips, 0.22 s. No external source/dependency files were
+edited or synced, and no application/runtime/device owner was started.
+
+Initial sandboxed pytest encountered temporary-folder ACL failures; the same
+software-only checks passed outside that restriction. Two fresh-interpreter
+full-wheel runs encountered localhost TCP connect timeouts while the isolated
+failing test passed separately. Final complete runs through the uv isolated runner
+passed. A temporary build/test directory collision was corrected; final artifacts
+use separate build-wheel and wheel folders. The timeout cause remains
+unconfirmed, with no general Windows/network reliability claim. Failures were not
+skipped or relabelled as PASS. Simulated dispatch values in XML remain distinct
+from native latency and optical timing.
+
+records/review-validation.json records the current link/hash audit and size
+comparison. No device enumeration/open/query/output, lab-network probe, driver or
+firmware change occurred. Local commit is explicitly authorized; no publication
+is authorized. REQ-208/209/210 remain blocked under the unchanged physical criteria.

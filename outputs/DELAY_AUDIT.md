@@ -1,3 +1,6 @@
+> Historical Kinesis implementation review. Superseded by the direct-protocol
+> rewrite; not current validation. See REPORT.md and ../STATE.md.
+
 # Software delay and SDK-call audit
 
 REQ-109 follow-up: cached ownership checks in Discover and combined Read TTL /

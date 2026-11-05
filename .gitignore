@@ -21,3 +21,8 @@ dist/
 .DS_Store
 Thumbs.db
 ~$*
+
+# Downloaded third-party reference originals; register hashes in docs/sources.md.
+inputs/reference/
+shutters.local.toml
+.owner-locks/

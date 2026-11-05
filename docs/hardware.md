@@ -1,39 +1,24 @@
-# Hardware and evidence
+# Device, route and driver matrix
 
-[README](../README.md) | [Commissioning](HARDWARE_VALIDATION.md) | [Ethernet](ethernet-assessment.md)
+| Route | Python dependency | Native / OS requirement | Current validation | Rollback |
+| --- | --- | --- | --- | --- |
+| Direct USB, exact serial, D2XX | optional ftd2xx 1.3.8 (pywin32 on Windows) | Matching official FTDI D2XX native DLL and device driver/binding; retains FTDIBUS dependence | Simulated protocol/initialization only; actual driver and firmware UNTESTED | Restore inventoried signed package/binding during all-instrument downtime |
+| Direct USB, exact VCP | optional pyserial 3.5 | Existing FTDI VCP binding and exact COM assignment; retains FTDI dependence | Read-only commissioning; bridge reset equivalence unresolved | Restore original COM/binding/package from inventory |
+| KEH3 left/middle/right | standard Python networking would suffice if wire contract confirmed | Exact hub identity, host, firmware and bay required; USB IN disconnected in Ethernet mode | Unavailable: management identity, framing/initialization/addresses unresolved; no socket opened | Keep route unavailable; independent source protection |
+| KEH3 external USB OUT | unresolved | Requires its own supported-device/routing contract | Unavailable independently of cube bays | No inferred fallback |
+| TTL | unavailable | Actual shutter rating, electrical thresholds/polarity/priming and source ownership | UNTESTED; conflicting generic/KSC descriptions; prior active-low issue historical | Inhibit trigger/source independently under approved procedure |
 
-KSC101 drives an SH05R shutter through manufacturer-approved supply, wiring and
-physical interlock. USB addresses individual cube serials directly or through
-KEH3/KEH6 USB hubs. KEH6 and multiple real pairs are not qualified here; software
-panel count does not establish electrical/power capacity or simultaneous timing.
-Power down before redocking or changing shutter/interlock wiring.
+No driver, firmware, IP address or persistent setting was changed. No connected
+device was enumerated. Previous observations of KSC101 firmware 1.0.7, SH05R and
+one KEH3 route in `records/hardware-evidence.json` apply only to their recorded
+revision/setup and do not establish the present hardware configuration.
 
-![Manufacturer KSC101/SH05R photo](assets/ksc101-sh05r.webp)
+The rewrite is independent of Thorlabs applications and SDK DLLs at the Python
+runtime level. Neither optional USB transport eliminates the FTDI driver. No
+claim is made about resolving the FTDIBUS crash mechanism. Only independently
+validated hub Ethernet could establish host FTDI avoidance for those routes.
 
-[Photo source](https://www.thorlabs.com/optical-shutters); not a test-bench image.
-
-## Retained observations
-
-[hardware-evidence.json](../records/hardware-evidence.json) consolidates observations
-with their original revision/configuration scope. It is not a current calibration.
-
-| Observation | Scope |
-| --- | --- |
-| USB identity/status/reconnect and five Open/hold/Close cycles | Electronic feedback passed; user confirmed the physical sequence on the recorded revision |
-| GUI and shutdown | Browser/USB readback and communication release passed on recorded revisions; independent shutdown timing unmeasured |
-| KEH3 explicit-endpoint Ethernet | One KSC101 discovery/identity/Connect/passive release passed; no output command in that test |
-| LAN notebook | User reports success; preserved output reports discovery, identity, Open/Close feedback and release |
-| No-cable TTL | Configuration/priming/Disarm passed; both active-low Open expectations failed with reported Closed; cause unknown |
-
-## Current limits
-
-Current source changes need affected USB/GUI/cleanup bench requalification.
-Live LAN range scans, Ethernet actuation/timing/recovery, KEH6/multiple actual
-pairs, external electrical TTL signals, physical communication-loss recovery and
-calibrated optical/exposure/shutdown timing remain unqualified. Controller
-readback and API call durations do not independently establish blade position.
-Software cleanup cannot bound a blocking native call; use independent protection.
-
-Physical acceptance requires documented topology, exact local identities/versions,
-approved conditions and independent observations. Keep raw bench data and executed
-notebook results in ignored inputs/private; publish sanitized summaries only.
+Continuous-duty manual operation requires documented shutter compatibility,
+wiring, OFF mapping and recovery interval at the shared owner boundary. Finite
+exposure/duty loads remain disabled. No attached shutter specification has been
+confirmed for this rewrite. Do not infer safe limits from controller capability.

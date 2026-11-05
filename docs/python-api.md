@@ -1,175 +1,81 @@
 # Python API
 
-[README](../README.md) | [Architecture](architecture.md) | [Interface](INTERFACE.md)
-
-Exports: KCubeShutter, ShutterHub, ShutterStatus, TriggerConfig, ShutterError,
-LANDevice and LANDiscovery. Imports/construction are passive. KCubeShutter is USB
-only; ShutterHub owns slots and Ethernet. Use hub methods for owned network channels.
-The discovery type names use uppercase LAN; no mixed-case aliases are exported.
-
-## Construction
-
 ```python
-from thorlabs_shutter_control import KCubeShutter, ShutterHub, config
+from thorlabs_shutter_control import ShutterHub, load_config
 
-c = KCubeShutter(config.SERIAL_NUMBERS[0], timeout=5.0, polling_ms=250)
-hub = ShutterHub(slots=3)  # Empty, unselected panels; no discovery or connection.
-```
-
-Serials are eight digits beginning68, as strings or integers; internally they are
-strings. None means unselected. timeout is finite0.5..60s and at least two polling
-intervals; polling_ms is an integer100..1000. kinesis_dir defaults to config.KINESIS_DIR.
-timeout applies to settings initialization and asynchronous LAN identity polling,
-not to a blocking native call or total address-range scan.
-
-ShutterHub accepts serial_numbers, slots, kinesis_dir and ethernet_endpoints.
-Default slots: max(3, serial count) for USB, or max(serial count, endpoint count)
-when routes are supplied. An explicit positive count must fit both lists.
-None endpoints select USB; LAN endpoints must be IPv4:40304..40307 for KEH3.
-Distinct USB controllers may be injected with controllers= for embedded/test use,
-without other hub options. Network channels belong to their creating hub.
-
-## Connection and manual control
-
-Connect discovers and verifies identity without enabling or changing outputs.
-Its returned snapshot is connection metadata; explicitly request operating feedback.
-Hub connect(slot, serial) requires a selected serial; slots are zero-based.
-
-```python
-verified = False
+hub = ShutterHub(load_config("shutters.local.toml"))  # passive
 try:
-    c.connect()
-    verified = True
-    print(c.identify_device())
-    c.disarm_triggers()  # Explicit Inactive, then Manual commands.
-    if not c.get_operating_status().is_closed_manual:
-        raise RuntimeError("Expected Closed/Inactive/Manual before Enable.")
-    c.enable_device()
-    c.open_shutter()
-    print(c.get_shutter_state())
-    c.close_shutter()
-    print(c.get_shutter_state())
+    hub.connect("beam")                 # identity only; exact configured route
+    sample = hub.get_status("beam")     # dated electrical replies, optical unknown
 finally:
-    c.disconnect(close_shutter=verified)
+    hub.close()                         # communication only
 ```
 
-This example operates hardware and assumes approved conditions/source protection.
-For communication-only checks, disconnect(close_shutter=False) releases without
-Close or mode changes. Do not replace it with safe_shutdown.
+Run scripts with `uv run --locked python your_script.py`. There are no legacy
+KCubeShutter, LANDiscovery, SDK-folder arguments or dynamic slot/discovery APIs.
 
-| Method | Contract |
-| --- | --- |
-| discover() | Return matching KSC101 serials; no Connect/output |
-| connect(serial_number=None) | Use explicit/preselected serial or the sole discovered USB device; validate identity and retain ownership |
-| identify_device() | Read serial/description; does not flash the device display |
-| get_status() | Request operating/TTL feedback; return a fault snapshot on read failure |
-| get_operating_status() | Request operating/key/interlock feedback without TTL; return a fault snapshot on read failure |
-| get_cached_status() | Last observation without I/O; current fault/disconnection takes precedence |
-| get_shutter_state(), get_operating_state(), get_operating_mode(), get_status_bits() | Request the named feedback only |
-| open_shutter(), close_shutter() | Request Active/Inactive only; preserve mode/enable state |
-| enable_device() | Explicit channel enable |
-| set_operating_state(state) | active or inactive |
-| set_operating_mode(mode) | manual, single, auto or triggered |
-| disconnect(close_shutter=True) | Attempt Close when requested, then communication release |
-| safe_shutdown() | Close/release without closure readback |
-
-Setters return None, invalidate display observations and perform no prerequisite
-reads, sleeps, retries, readback or automatic recovery. SDK errors latch faults.
-Callers own readiness, sequencing and verification; the GUI performs explicit
-application checks. Close/release remain available after faults. Native calls can
-block. A returned command does not establish physical state.
-
-Snapshot getters report failed reads in `connection` and `error`; inspect those
-fields before using the values. Narrow getters such as `get_trigger_config()`
-raise `ShutterError` on read failure. Requested feedback calls the SDK request and
-getter without an added sleep; the getter may return a value received before that
-request. Neither completion nor cache age is guaranteed. `has_device` means a
-driver handle is retained, including after failed disconnect, rather than healthy
-communication or demonstrated shutter motion.
-An immediate post-write settings match is a comparison with SDK-returned values,
-not proof that the device acknowledged that write. Physical qualification of the
-current immediate-read paths remains open.
-
-The context manager connects on entry and attempts safe_shutdown on exit. Failed
-entry performs passive connection cleanup; failed release retains the object/claim.
-
-## Status and TTL
-
-ShutterStatus is immutable. It includes connection, has_device, serial_number,
-description, shutter_state, operating_state, operating_mode, key_enabled,
-interlock_enabled, trigger_config, error and status_bits. Undefined enums normalize
-to unknown. A clear interlock bit is unknown; users verify the physical circuit.
-is_closed_manual summarizes Closed/Inactive/Manual. ttl_armed reflects reported
-Triggered/Active, not position. Feedback is not independent optical sensing.
+After physical qualification and within the approved operating window:
 
 ```python
-from thorlabs_shutter_control import TriggerConfig
-
-settings = TriggerConfig(
-    trig1_mode="input", trig1_polarity="high", trig2_mode="disabled", trig2_polarity="high"
-)
-c.configure_triggers(settings)
-print(c.get_trigger_config())
+hub.set_manual_mode("beam")   # changed modes persist: requires separate policy opt-in
+hub.open_shutter("beam")      # qualified continuous-duty manual ON, with readback
+hub.close_shutter("beam")     # priority qualified OFF, with electrical readback
+hub.pulse("beam", 0.5)        # requested host hold, not measured optical exposure
+hub.cancel("beam")           # reaches the active owner and attempts qualified OFF
+hub.shutdown_outputs()        # attempts every connected target, aggregates failures
 ```
 
-Directions: disabled/input/output. Polarity: high/low. configure_triggers only
-writes; get_trigger_config reads. arm_triggers explicitly enables, selects
-Triggered and requests Active; disarm_triggers sends Inactive then Manual.
-These direct methods do not read readiness. Arm may open immediately; see
-[GUI prerequisites](gui.md#trigger-settings) and [hardware limits](hardware.md).
+Optical open/close names are allowed only with an independently established load
+mapping. `set_solenoid(target, bool)` uses the same policy boundary. No public
+output method bypasses it. Invalid arguments/modes fail before output writes;
+nonfinite durations fail before any I/O. Unsupported cycles/TTL are unavailable.
+`enable_device()` rejects explicitly because the protocol aliases channel enable
+to solenoid output. It must not act as a harmless setup call.
+`validate_pulse(target, duration)` checks the same duration/load constraints as
+`pulse()` without connecting or accessing hardware; the CLI uses it before opening
+a transport. Finite exposure/duty loads remain unavailable for both ON and pulse.
 
-## Hub discovery and routing
+SRC-002 p20 specifies that the last used mode is remembered across power cycles.
+Changing to Manual therefore requires `allow_persistent_mode_changes = true` in
+the reviewed qualification policy, in addition to electrical OFF and the preserved
+interlock requirement. The default is false. An already Manual/OFF controller is
+queried without a mode write. A refused opt-in is not an ambiguous write and does
+not itself latch a fault. No separate EEPROM command is sent.
 
-discover_available() returns (routes, warnings): serial -> endpoint, None for USB.
-It combines USB, configured-route discovery and one config-based LAN scan. Failed
-transports warn without hiding successful results. It changes no slot route.
-discover() returns a flat list for configured routes; discover_by_slot() groups
-matching lists after one discovery. Snapshots can omit retained handles; GUI
-identity/cleanup retention is separate.
+`ShutterStatus` retains the DiamondGUI owner schema. Requested state,
+`feedback.electrical_state`, and timestamped human optical observations are
+separate. `feedback.shutter_state` stays unknown without a live independent
+sensor. `transition_confirmed` is false. Interlock mode is the controller's
+configuration, not proof of contact continuity; key/channel/status-bit fields
+stay unknown where this driver does not have an established interpretation.
 
-scan_lan(start_address=None, end_address=None, open_timeout_ms=None) uses
-config.LAN_SCAN_START_IP/END_IP/OPEN_TIMEOUT_MS when omitted. Explicit arguments
-override those defaults; LAN_SCAN_MAX_ADDRESSES limits every scan to1..256.
-Bounds must be IPv4 strings in ascending order; timeout is an integer50..1000ms.
-The SDK scans hub port40303, registers hosts' KEH3 ports40304..40307, builds once
-and refreshes asynchronous TCPIP identities. Result: LANDiscovery(hub_addresses,
-controllers), with LANDevice(serial_number, endpoint). No device Connect/output
-occurs. Release all process-owned handles before broad scanning.
+APT has no transaction identifiers. Freshness says
+`response_after_request_no_transaction_id`, which describes receive provenance,
+not a write acknowledgement or arbitrary network-delay immunity. No SDK cache
+is involved. A query timeout/cancellation, duplicate reply or conflicting frame
+poisons the session; it is never retried or reused for successful results.
+After a short or unknown-count write, transmit alignment is also unknown. That
+connection refuses every subsequent frame, including OFF, so a cleanup frame
+cannot become part of the incomplete command. Independently protect the source
+and restore the controller under the documented recovery procedure. Receive-only
+failures and complete-but-late writes still allow a qualified OFF attempt; their
+uncertain readback cannot confirm optical closure.
 
-configure_slot(slot, ethernet_endpoint=endpoint) passively selects a LAN route;
-omitting the endpoint selects USB. A changed route replaces only a released
-channel, clears its serial and retains SDK folder/timeout/poll settings. Same
-route is a no-op. Failed-release handles forbid replacement. The endpoint tuple
-is read-only. There is no transport fallback or inferred KEH6 LAN mapping.
-
-Hub command/getter methods take slot first; their device contracts match the table
-above. safe_shutdown attempts every slot, aggregates failures and preserves
-interrupts after cleanup attempts. Successful communication release is not closure.
-
-## Embedded GUI
+After any ambiguous output, ON remains locked out even after release/reconnect
+or a new process. Normal successful OFF does not clear an existing fault. With
+the source independently inhibited, optical closure independently observed and
+the controller locally restored to Manual/OFF with interlocks intact:
 
 ```python
-from thorlabs_shutter_control.gui import create_app
-
-app = create_app(hub)  # A ShutterHub is required, including for one panel.
+hub.recover("beam", source_inhibited=True, optical_closed=True,
+            evidence="operator observation record with setup and timestamp")
 ```
 
-The host owns its server and cleanup. An optional on_shutdown callback enables
-cooperative server shutdown after successful hub cleanup; it must not block.
+Recovery reopens only the exact route, verifies identity/firmware and fresh
+OFF/Manual/interlock replies, records the human observation and clears the
+persistent uncertainty marker. It never sends ON or replays a trigger cycle.
+The physical observation remains a dated record, not a continuing optical sensor.
 
-GUI Connect calls the driver's `connect()` and then `hub.get_status(slot)` for a
-full operating/TTL snapshot. GUI Apply TTL reads the operating prerequisite,
-writes settings, then checks one full snapshot for read errors and actual TTL
-agreement. Each action returns that snapshot to the GUI callback for display,
-avoiding a second result read. See [GUI feedback timing](gui.md#feedback-timing).
-Read TTL likewise uses one full snapshot for its draft and display. Known Trigger
-mode batches operating/input prerequisites; cached mode only selects read breadth,
-and a reported change to Triggered still causes an actual input-settings read.
-Background refresh is requested every 100 ms, paused while the callback runs.
-Automatic SDK polling remains 250 ms by default; explicit refresh requests also
-occur. Neither interval guarantees a fresh sample or a maximum command latency.
-
-Direct Python `connect()` still returns connection metadata only; it does not
-automatically request operating or TTL feedback. Setters still return None and
-perform no implicit readback. Use explicit getters and application checks as in
-the examples above. The GUI optimization does not change those driver contracts.
+Names and configured integer application channels are accepted. CH never means
+APT channel: KSC101 protocol channel is always 1. `connection_snapshot()` is
+host metadata only. `identify_device()` and `get_status()` perform explicit I/O.

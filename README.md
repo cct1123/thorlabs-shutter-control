@@ -1,131 +1,76 @@
-# Thorlabs shutter control
+# Direct KSC101 shutter control
 
-Control KSC101 shutter controllers and SH05R shutters from a web page running on
-your Windows computer. KSC101 is the electronic controller; SH05R is the physical
-shutter. A Python API and two notebooks are also available.
+Python control through the documented APT binary protocol. The runtime requires
+no Kinesis, APT application, pythonnet or Thorlabs SDK DLLs. This is a breaking
+rewrite: the former library, SDK discovery workflow and SDK notebooks are removed.
+Six [beginner notebooks](docs/examples/README.md) teach the current API, from
+device inventory to qualified Manual ON/OFF, with hardware off by default.
 
-Connect by USB, directly or through a KEH3/KEH6 USB hub. Ethernet connections use
-the documented KEH3 routes. Starting the app does not discover, connect or move
-hardware; those actions require explicit requests.
+**Engineering status: offline software verified; deployment is blocked.** Direct USB has offline coverage. KEH3 Ethernet, optical behavior,
+TTL, driver persistence and endurance are not qualified. See [state](STATE.md)
+and [delivery report](outputs/REPORT.md).
 
-## Before you start
-
-- Use Windows x64 and Python 3.12 x64.
-- Install the [Thorlabs Kinesis runtime and drivers](https://www.thorlabs.com/software-pages/Motion_Control).
-  Kinesis is the vendor software used to communicate with the controllers.
-- Install [uv](https://docs.astral.sh/uv/), the Python environment/dependency tool.
-- Close other Kinesis, GUI or notebook sessions that own the same controller.
-  Establish the normal physical interlock and independent source protection before
-  operating the shutter.
-
-## Install and run
-
-Open PowerShell in this project folder:
+Use Python 3.12 and [uv](https://docs.astral.sh/uv/):
 
 ```powershell
-uv sync --locked
-uv run shutter-control
+uv sync --locked --group dev --extra gui
+uv run --locked shutter-control --help
+uv run --locked shutter-control --config config/shutters.example.toml check-config
+uv run --locked python scripts/verify.py
 ```
 
-The first command creates the local Python environment and installs dependencies.
-Kinesis and its device drivers must be installed separately. Open
-[localhost:8050](http://127.0.0.1:8050/) in your browser after launching.
-
-## First use
-
-Each panel represents one controller. Start in **Manual** mode for a basic cycle.
-
-1. Click **Discover** to find USB and Ethernet controllers.
-2. Select the intended device in a panel, then click **Connect**. Check its identity
-   and reported state. Connect does not enable the channel or change its output.
-3. Establish **Inactive / Closed** before selecting a mode. Read the panel hint if
-   a control is disabled. The GUI assumes an enabled channel; if setup is needed,
-   follow the [explicit setup sequence](docs/python-api.md#connection-and-manual-control).
-4. Use **Open** and **Close** in Manual mode. Single, Auto and Trigger modes use
-   **Start / Stop**; see the [GUI guide](docs/gui.md) before using them.
-5. Finish with **Shut down GUI & devices**, then independently verify closure.
-   Closing the browser tab does not stop the server or release controllers.
-
-![Main controls with fictional USB and LAN devices](docs/assets/gui-overview.jpg)
-
-The screenshots use fictional software devices. Reported position and Ready
-indicators do not independently prove blade motion or optical closure.
-
-## Configuration
-
-Edit [config.py](src/thorlabs_shutter_control/config.py), then restart the app.
-You can leave serials and endpoints empty and select discovered devices in the GUI.
-
-| Setting | When to change it |
-| --- | --- |
-| KINESIS_DIR | Kinesis is installed outside C:/Program Files/Thorlabs/Kinesis |
-| SERIAL_NUMBERS / ETHERNET_ENDPOINTS | You want optional device/route preselection |
-| SLOTS | You want a different panel count; the default USB view has three |
-| LAN_SCAN_START_IP / LAN_SCAN_END_IP | Your KEH3 is outside the default 192.168.1.0 through 192.168.1.255 range, or you want a narrower scan |
-| LAN_SCAN_MAX_ADDRESSES / LAN_SCAN_OPEN_TIMEOUT_MS | You need to adjust the bounded LAN scan; defaults are 256 addresses and 100 ms per address |
-| PORT | Another app uses the default localhost port 8050 |
-
-Actual serials and addresses belong in local configuration, not shared commits.
-A full LAN scan requires all process-owned controller handles to be released.
-See [setup and troubleshooting](docs/getting-started.md) for exact settings.
-
-## Feedback and timing
-
-Feedback means the latest values available from the SDK. Connect reads operating
-and trigger settings together. Apply TTL checks reported Closed/Inactive/Manual,
-writes settings, and compares the SDK-returned settings with the draft. Read TTL
-also uses one combined result. Each action reuses its result for display.
-
-TTL refers to the electrical trigger signals configured under **Trigger settings**;
-see the [trigger guide](docs/gui.md#trigger-settings) before changing them.
-
-| Timing mechanism | Current behavior |
-| --- | --- |
-| Background GUI refresh | Requested every 100 ms; paused during callbacks |
-| Automatic SDK polling | 250 ms by default; refresh also issues explicit requests |
-| Added Python feedback sleeps | None in snapshot, TTL or scalar reads |
-| LAN discovery retries | Paced at up to 100 ms until the identity condition or deadline |
-
-An SDK getter can return a value received before its latest request. A returned
-state or settings match does not acknowledge that request or prove command
-completion. The 100 ms interval does not guarantee 10 Hz hardware updates.
-Discovery, native calls, queuing, USB/LAN communication and blade motion add time. See
-[GUI feedback timing](docs/gui.md#feedback-timing) for details and limits.
-
-## Common questions
-
-| Problem | Next step |
-| --- | --- |
-| Discover finds nothing | Read the USB/LAN warning; check power, drivers or the configured LAN range |
-| Open / Start is disabled | Read the panel hint and check the key and reported operating state |
-| A controller is already owned | Release its other GUI/notebook/Kinesis connection; resolve a failed disconnect before reconnecting |
-| Connect or Discover is slow | Discovery and native SDK calls take additional time; read the diagnostic message and narrow the configured LAN range where appropriate |
-| The browser was closed | The server can still be running; reopen it and shut down normally, or use terminal Ctrl+C for cleanup |
-
-## Python use and development
-
-Start with the [USB or LAN notebook](docs/examples/README.md) for an explicit
-workflow, or the [Python API guide](docs/python-api.md) for scripting. New developers
-should read the [developer walkthrough](docs/architecture.md#developer-walkthrough):
-it maps the source files, traces a command and describes a first software-only edit.
-The public discovery types are `LANDevice` and `LANDiscovery`, with uppercase LAN
-and no mixed-case compatibility aliases.
+Imports, help, configuration checks and verification never open hardware. An
+absent or outdated lockfile fails the locked workflows. Optional USB dependencies:
 
 ```powershell
-.venv\Scripts\python.exe -B -m pytest -q -p no:cacheprovider
-uv run --locked ruff check --no-cache src tests
-uv build --wheel
+uv sync --locked --extra d2xx  # FTDI native D2XX library/driver installed separately
+uv sync --locked --extra vcp   # Explicit virtual COM port; read-only commissioning
 ```
 
-The 40 software tests use fictional devices, virtual waits and actual Dash
-callback HTTP. They cover USB/LAN, modes/TTL, identity/ownership, cleanup, one/three
-panels, the launcher and both notebooks. They do not contact real hardware or prove
-physical timing. Current USB/GUI, live LAN scanning, Ethernet actuation/recovery,
-multiple pairs and electrical TTL still need bench qualification. The recorded
-active-low no-cable TTL issue remains unresolved.
+Explicit informational discovery needs no configuration file and opens no controller:
 
-More detail: [GUI](docs/gui.md), [API](docs/python-api.md),
-[hardware and commissioning](docs/HARDWARE_VALIDATION.md),
-[delivery report](outputs/REPORT.md), [integrated review](outputs/CHANGE_REVIEW.md),
-[delay audit](outputs/DELAY_AUDIT.md).
-The older baseline tag `baseline-2026-10-21` is provenance, not a new bench result.
+```powershell
+uv run --locked --extra d2xx shutter-control discover
+uv run --locked --extra vcp shutter-control discover --vcp
+```
+
+D2XX lists FTDI serials, USB IDs, descriptions and open flags; VCP lists port
+names, hardware IDs and descriptions. Results can include other instruments and
+are not verified KSC101 identities. No device is automatically selected or saved.
+Control still requires an explicit configured target and matching model, serial
+and allowed firmware read back over APT before control.
+
+Copy the fictional example to ignored `shutters.local.toml`. Set exact controller
+serial, firmware allowlist, physical role and transport. An omitted policy keeps
+the controller read-only. No deployment policy has been validated by this rewrite.
+Never infer shutter wiring or optical safety from a logical name.
+KSC101 remembers changed modes across power cycles. Actual mode transitions also
+require `policy.allow_persistent_mode_changes = true`; ordinary output permission
+does not authorize that persistent effect. Selecting an already active Manual
+mode reads back the state without rewriting it.
+
+Only after the approved physical test prerequisites are met:
+
+```powershell
+uv run --locked shutter-control --target example identify
+uv run --locked shutter-control --target example status
+uv run --locked shutter-control gui
+```
+
+The GUI binds to localhost:8050 and connects only on a click. Qualified manual
+ON/OFF, explicit Manual selection and bounded holds use the same owner as Python
+and DiamondGUI. Electrical feedback never confirms optical closure. Close and
+disconnect release communication; `shutdown_outputs()` is a separate explicit
+cleanup operation. A lost process cannot guarantee a safe shutter.
+
+USB retains FTDI driver dependence. Replacing Kinesis does not demonstrate a fix
+for Windows FTDIBUS crashes. KEH3 ports are documented, but direct framing and hub
+identity remain unresolved; configured Ethernet routes fail before opening a socket.
+
+Read [setup](docs/getting-started.md), [API](docs/python-api.md),
+[architecture](docs/architecture.md), [protocol traceability](docs/INTERFACE.md),
+[sources](docs/sources.md), [transport/driver matrix](docs/hardware.md),
+[commissioning](docs/HARDWARE_VALIDATION.md), [cutover](docs/cutover.md), and
+[DiamondGUI integration](docs/diamondgui.md).
+The [controller reference review](docs/controller-reference-review.md) records
+the improvements taken from `C:/repo/thorlabs-control` and the remaining differences.

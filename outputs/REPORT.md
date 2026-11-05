@@ -1,76 +1,96 @@
-# Current system and delivery
+# Reviewed direct-protocol shutter control
 
-The pending delivery includes uppercase LAN discovery types, removal of fixed
-Python feedback sleeps, reduced GUI feedback work and a 100 ms background refresh
-interval. Source and a newly built wheel each pass 40 software tests. This is
-software validation; current hardware feedback freshness and physical timing
-remain unqualified.
+5 November 2026. **Software review complete; engineering deployment BLOCKED.**
+All pending changes were included at the user's request. The direct APT owner
+replaces the legacy Kinesis implementation, SDK discovery, old GUI/CSS/screenshots
+and obsolete SDK notebook templates. No SDK fallback or second hardware manager
+remains. Historical review outputs and evidence records are retained as history.
+Runtime Python decreases from 2,062 to 1,702 lines against the preceding HEAD
+(360 lines, 17.5%); source size is not used as a substitute for validation.
 
-## Public API and feedback
+Optional D2XX/VCP transport, protocol framing, KSC101 messages, shared ownership
+and application interfaces are separate modules. The core has no Python runtime
+dependencies. Python 3.12, optional GUI/transports/notebooks and development tools
+are managed through the checked-in uv lockfile. The DiamondGUI owner surface is
+preserved; no DiamondGUI source or dependency changes were made by this review.
 
-The exported discovery classes are LANDevice and LANDiscovery. Their constructors,
-annotations and documentation use uppercase LAN; mixed-case aliases are absent.
-KCubeShutter remains the direct USB API, while ShutterHub owns slots and LAN routes.
-Startup and construction remain passive.
+## Review findings and simplification
 
-Snapshot, TTL and scalar feedback getters request values and sample the SDK without
-an added Python sleep. SDK-returned values may precede the request. Neither an
-immediate state value nor a settings match acknowledges a particular request/write.
-Setters still write without implicit feedback; Close/disconnect remain available
-for retained faulted handles. Ownership, identity, route checks and all-slot cleanup
-remain in place. No hardware action was performed for this delivery.
-
-## GUI behavior
-
-| Path | Current behavior |
+| Finding | Result |
 | --- | --- |
-| Discover | Enumerates routes; uses cached handle ownership to retain selections without device status requests |
-| Connect | Verifies identity/route and reuses one full operating/TTL result for display; no output write |
-| Read TTL | One full snapshot supplies draft replacement and display; errors preserve the draft |
-| Known Trigger Start | One full prerequisite snapshot includes operating/input settings; result feedback follows the Active command |
-| Changed mode | Cached mode only chooses read breadth; reported Trigger mode still requires SDK input settings before readiness passes |
-| Ordinary Manual/Single/Auto Start | Operating-only prerequisite; no additional TTL request on the normal path |
-| Apply TTL | Reported Closed/Inactive/Manual prerequisite, settings write and SDK-returned settings comparison |
-| Background refresh | Requested every 100 ms and disabled during callbacks; SDK work remains serialized |
+| ON/pulse duplicated ambiguity and cleanup logic | One shared output guard; every OFF uses the priority cleanup boundary |
+| A new ON retained a previous OFF success message; failed pulse OFF could display stale cleanup | New attempts invalidate earlier cleanup; failed cleanup records the current unconfirmed outcome |
+| Recovery could clear a pending protective request | Recovery defers without releasing/reopening the retained handle |
+| Cancelled queries accessed receive buffers before checking cancellation | Deadline/cancellation checked before transport access; expired native connections also refuse open |
+| Operational/candidate identity layouts and CLI/pulse constraints duplicated | Shared identity decoder/matcher and passive public pulse validation |
+| GUI launched through CLI could release communication twice | Cleanup responsibility transfers once to the GUI |
+| Empty hub-only fields were accepted on USB routes | Strict rejection, including empty supplied values |
+| Capture size was checked separately from an unbounded file read | Read at most 4097 bytes and reject oversized captures at the shared boundary |
+| Verification had selected-suite/version assumptions and omitted tutorial/config hashes | Full suite always runs; wheel name is discovered; source/wheel bytes and stable input hashes are checked |
 
-Automatic SDK polling remains 250 ms by default. Explicit GUI requests also occur;
-these intervals do not guarantee fresh samples or 10 Hz physical updates. The two
-bounded discovery retry sleeps, SDK initialization wait, native scan parameters,
-hub serialization and single-request launcher remain. Native calls and discovery
-can delay clicks; Close is not an independent emergency stop.
+The four cleanup/cancellation regressions failed before their fixes and pass now.
+Additional tests cover passive pulse validation, strict route fields, expired
+connection budgets and GUI cleanup ownership. The redundant receive queue,
+unused diagnostic conversion/receive helpers and duplicate OFF-interval state
+were removed. LF formatting is explicit. See E168 / D049 in
+[records](../records/RECORDS.md) for commands and scope.
 
-## Validation and review
+## Current validation
 
-E155 / TEST-165 validates the integrated working tree: 40 source tests and 40 tests
-against the newly built/extracted wheel, passive uppercase exports/construction,
-six package files matching source, README metadata parity, lint/format and current
-documentation/evidence checks. The documentation pass changes no runtime/test files.
-[Integrated review](CHANGE_REVIEW.md) records the findings and limits;
-[current review evidence](../records/change-review-validation.json) identifies the
-final source, package and document hashes.
+```powershell
+uv run --locked --offline --group dev --extra gui python scripts/verify.py
+```
 
-E154 / TEST-164's source hashes still match. Its 81 before/after scenarios preserve
-48 normal callback responses, with 71 unchanged SDK sequences and 10 intended
-batching/read reductions. Read TTL saves two transport lookups; known Trigger Start
-saves two; Discover removes three device requests and two transport lookups per
-healthy held panel. See [GUI evidence](../records/gui-feedback-validation.json).
-No measured millisecond saving is attributed to those lookups.
+| Evidence | Result | Scope |
+| --- | --- | --- |
+| [Source tests](../records/offline-tests.xml) | 131 PASS, no skips | Simulated control, passive applications/tutorials, localhost TCP |
+| [Exact installed-wheel tests](../records/wheel-tests.xml) | Same 131 PASS | Isolated environment without pythonnet/clr/ftd2xx/serial |
+| [DiamondGUI tests](../records/diamondgui-tests.xml) | 29 PASS | Existing owner/factory/page tests; device access stubbed |
+| [Reproducible verification](../records/direct-validation.json) | All phases PASS | Lock, lint/format, exact wheel parity, input hashes, clean install/help, negative lock cases |
+| [KEH3 preparation](../records/keh3-validation.json) | PASS offline preparation | Source investigation, simulated identity diagnostics and local TCP; not KEH3 operation |
+| [Notebook execution](../records/notebook-validation.json) | Historical six-notebook kernel run | Current saved defaults/simulated opt-in paths are retested in the full suite; repeated kernel startup remains unqualified |
 
-The earlier [sleep-removal evidence](../records/delay-removal-validation.json),
-[delay audit](DELAY_AUDIT.md) and [staged records](../records/RECORDS.md) retain their
-revision-specific results. Earlier 250/500/750 ms wait values and 1 s GUI cadence
-are historical. The user subsequently requested commit/push. Delivery commit
-54619a01361998ff7edf08063fa01f90125ca71d was pushed normally to existing origin/main;
-independent remote readback matched, with a clean checkout. This documentation-only
-publication checkpoint accompanies it. E157 / TEST-167 in
-[records](../records/RECORDS.md) records verification. TEST-165 document hashes
-identify the review checkpoint before publication notes; runtime/test hashes remain current.
+Initial sandboxed pytest runs failed on Windows temp-directory permissions.
+Direct fresh-interpreter runs also encountered localhost TCP connect timeouts;
+the isolated failing test passed separately and the complete final verifier passed
+using its uv isolated runner. These observations do not establish a timeout cause
+or general Windows/network reliability. Build artifacts and pytest temporary
+directories are separate. No failure was converted to a skip or physical PASS.
 
-## Remaining qualification
+## Operating boundaries and remaining acceptance
 
-The software fake returns responses immediately. It cannot establish real SDK
-cache age, acknowledgement of a TTL write, transport throughput, optical timing,
-electrical TTL behavior or bench safety. Removal of sleeps did not supply a response
-acknowledgement mechanism. Existing active-low no-cable TTL observations remain
-unresolved. Follow the separately authorized [commissioning procedure](../docs/HARDWARE_VALIDATION.md)
-for physical qualification, with current configuration and independent observations.
+Exact serial/model/firmware, one owner/receiver and explicit qualification policy
+gate control. Only qualified continuous-duty Manual loads are supported. Changed
+modes persist at power-up and require a separate policy permission. Interlocks
+are never disabled; no hidden trigger priming, reconnect, fallback or ON replay
+occurs. Electrical readback is not optical blade feedback. Close/disconnect
+release communication; output cleanup is explicit.
+
+Uncertainty persists across process exit. A partial/unknown write forbids all
+later frames, including OFF, on that connection. Receive-only ambiguity can permit
+best-effort qualified OFF, but cannot confirm safety. Protected recovery requires
+independent source inhibition and optical observation and never replays ON.
+Simulated protective dispatch meets the 250 ms test target; native latency and
+physical switching remain UNTESTED. APT's arbitrary delayed same-type reply
+ordering remains an unresolved protocol limit.
+
+Direct USB retains FTDI native/OS dependencies and is physically UNTESTED; VCP is
+read-only commissioning. KEH3 operational routes remain BLOCKED before socket
+access. Separate [capture analysis/candidate diagnostics](../docs/keh3-offline-validation.md)
+never verify hub identity or unlock control; no lab probe was run. TTL/cycles,
+finite exposure/duty loads, actual optical mapping, driver persistence and the
+reconnect/reboot/endurance campaign remain unqualified. No hardware, lab-network
+query, binding or driver change was performed in this review.
+
+Supply the deployment evidence package in
+[STATE.md](../STATE.md#human-action-required---supply-the-deployment-evidence-package)
+before preparing an approved physical test window. The local commit is authorized;
+publication is outside this request. The built wheel is
+`dist/thorlabs_shutter_control-1.0.0-py3-none-any.whl`.
+
+Operator references: [setup](../docs/getting-started.md),
+[API](../docs/python-api.md), [architecture](../docs/architecture.md),
+[protocol traceability](../docs/INTERFACE.md), [sources](../docs/sources.md),
+[route/driver matrix](../docs/hardware.md), [commissioning](../docs/HARDWARE_VALIDATION.md),
+[cutover](../docs/cutover.md), [DiamondGUI](../docs/diamondgui.md), and
+[beginner tutorials](../docs/examples/README.md).

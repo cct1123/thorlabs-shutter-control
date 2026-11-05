@@ -1,52 +1,38 @@
-# KEH3 Ethernet
+# KEH3 direct Ethernet: blocked contract
 
-[GUI](gui.md#ethernet-lan-configuration) | [API](python-api.md) | [Hardware](hardware.md)
+SRC-003 (DOC-103012 Rev E, section 4.3/Figure 17) establishes one hub address and
+ports 40303 management, 40304 left, 40305 middle, 40306 right, 40307 external USB.
+USB IN must be disconnected in Ethernet mode. These are physical route facts,
+not proof that an unwrapped APT stream works on those ports.
 
-ShutterHub owns TCPIP discovery, exact endpoint/provider validation and command
-dispatch. KCubeShutter is USB-only. USB and LAN use the same serial ownership
-registry; network routes never fall back to USB. Construction/startup is passive.
+The retrieved manual explains vendor-application discovery and configuration but
+does not establish the direct management identity exchange, wire framing,
+handshake, route-specific APT addresses, supported firmware or external USB-route
+contract. QMI does not establish KEH3 support. Previous Kinesis LAN successes do
+not qualify a new wire implementation.
 
-## Setup and discovery
+All `keh3` routes are parsed and validated but unavailable before socket access.
+Hub serial, firmware, IPv4 address, selected bay and expected controller serial
+are separate configuration fields. No management-port scan, guessed rack address,
+raw-TCP fallback, hub reset or persistent configuration is attempted.
 
-Use the hub's actual configured IPv4 address on a reachable network, approved
-power/docking/shutter wiring and normal physical interlock. Release other owners.
-Follow [KEH3 manual section4.3](https://media.thorlabscms.cn/globalassets/items/k/ke/keh/keh3/doc-103012.pdf?v=0129060351),
-including USB IN disconnected for Ethernet. This application does not configure
-IP addresses, firmware, firewall or hub power.
+Request the manufacturer developer contract for these exact items:
 
-| Port on the same hub IP | Target |
-| --- | --- |
-| 40303 | Hub management/discovery |
-| 40304 / 40305 / 40306 | Left / middle / right cube bay |
-| 40307 | USB OUT device |
+1. TCP/UDP connection type, per-port framing, initialization and idle/reconnect semantics.
+2. Read-only hub serial/model/firmware query and responses; no configuration side effects.
+3. Controller identity/routing exchange for occupied/empty/swapped bays and firmware variants.
+4. External USB OUT supported devices/topologies and concurrent USB/Ethernet restrictions.
+5. Delayed reply ordering, unsolicited messages, faults and recovery guarantees.
 
-Only KEH3 cube endpoints40304..40307 are accepted. Do not infer KEH6 mappings or
-cube identity from a responding management port.
+After clarification, implement a separate hub transport with one owner/receive
+path per documented connection, invalidate all observations on hub loss, and run
+TEST-208. Required bench cases include wrong hub, empty/swapped bays, multiple
+same-model cubes, route loss, shared hub loss and no ON replay after reconnect.
+No Ethernet or FTDI-avoidance acceptance result is currently PASS.
 
-GUI Discover combines USB, configured routes and one shared scan using config.py's
-LAN_SCAN settings. The bounded inclusive scan probes40303, registers discovered
-hosts' cube endpoints, builds once and polls CheckForConnectionChanges/GetDeviceList(68).
-Only exact TCPIP endpoints and valid KSC101 serials are returned. Release all
-process-owned handles for broad scanning; failed/skipped transports warn while
-successful results remain. Native calls may exceed timeout; an empty result does
-not prove absence. Connect is separate and applies the selected detected route.
-
-Configured-route Python discovery registers endpoints, builds once and polls until
-each LAN route has an identity or the controller timeout expires (default5s,
-100ms between polls). It does not require a USB cable. Without slots, supplied
-endpoint/serial lists determine count; omitted routes are USB only when requested
-by that configuration. See the [LAN notebook](examples/shutter_lan_tutorial.ipynb).
-
-## Evidence and limitations
-
-[Retained observations](../records/hardware-evidence.json) include one real
-KEH3/KSC101 explicit-route discovery, identity, Connect and communication-only
-release: discovery0.844s and release0.953s outside the restricted agent sandbox.
-A restricted comparison hung in native Disconnect; its cause remains unknown.
-The user reports successful LAN notebook operation, with feedback saved privately.
-
-Those observations do not qualify the current baseline, live range scanning,
-Ethernet blade motion, calibrated timing, multiple pairs or physical fault recovery.
-Use explicit getters after commands; GUI/procedures own readiness and sequencing.
-Close still targets a retained faulted handle, without rebind or transport fallback.
-Communication release is not independently verified closure.
+5 November follow-up: [offline commissioning support](keh3-offline-validation.md)
+adds a bounded TCP candidate identity probe and hardware-free capture analyzer.
+These diagnostics are separate from operational routes, preserve unverified hub
+identity, require an explicit candidate address, and cannot unlock control.
+The reference and the inspected manufacturer documents do not yet resolve the
+wire contract. No live probe was performed.

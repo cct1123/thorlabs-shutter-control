@@ -1,23 +1,78 @@
-# Current notebooks
+# Beginner tutorial notebooks
 
-[USB tutorial](shutter_open_close_tutorial.ipynb) covers one selected cube: settings,
-identity, explicit Disarm/Closed/Enable setup, Open/hold, Close, feedback, API call
-duration and release. Run cells in order; Open can remain active while paused.
+Each notebook is independent. Start with 1 and work in order:
 
-[LAN tutorial](shutter_lan_tutorial.ipynb) uses ShutterHub with an explicit KEH3
-cube serial/bay endpoint. It separates passive discovery/identity from deliberate
-Manual setup and one Open/hold/Close cycle. For communication-only work, skip
-operation cells and run release; that path sends no Close or mode command.
+| Notebook | What you learn |
+| --- | --- |
+| [1. Device discovery](01_device_discovery.ipynb) | Configured identities, optional COM inventory, discovery limits |
+| [2. Connection](02_connection.ipynb) | Passive owner, exact identity verification, communication release |
+| [3. Status query](03_status_query.ipynb) | Electrical feedback, timestamps, optical uncertainty |
+| [4. Settings](04_settings.ipynb) | TOML, deadlines, qualification policy |
+| [5. Shutter modes](05_shutter_modes.ipynb) | Mode readback and explicit persistent Manual selection |
+| [6. ON/OFF](06_on_off.ipynb) | Qualified solenoid requests with OFF cleanup in one cell |
 
-Use the project .venv kernel, restart after source/config changes, and exclude
-other owners. Set local serial/address and approved hold; shared templates have
-blank local identities/cleared outputs. Imports/settings are passive, later cells
-can actuate real hardware. Users establish normal physical interlock and independent
-source protection. Always finish release; preserve the same object if release fails.
-Cleanup attempts do not prove physical closure or bound a native hang.
+From the repository root, use Python 3.12 through uv:
 
-API call durations, host waits and controller feedback do not establish optical
-state or calibration. Current physical limits and prior notebook observations are
-in [hardware evidence](../hardware.md). Preserve executed copies/results in ignored
-inputs/private/notebooks; keep public examples free of actual device identifiers.
-Tests execute one complete cycle in each notebook using fake devices only.
+```powershell
+uv sync --locked --group notebooks
+uv run --locked --group notebooks jupyter lab docs/examples
+```
+
+Choose **Python 3 (ipykernel)** from this environment. Alternatively select
+the project's `.venv` interpreter in your notebook editor after the sync.
+The optional `notebooks` group is locked in `uv.lock`, separate from driver runtime.
+Stop the server before syncing other extras. For authorized USB work:
+
+```powershell
+uv sync --locked --group notebooks --extra d2xx
+uv run --locked --group notebooks --extra d2xx jupyter lab docs/examples
+# Optional COM inventory / read-only VCP commissioning instead:
+uv sync --locked --group notebooks --extra vcp
+uv run --locked --group notebooks --extra vcp jupyter lab docs/examples
+```
+
+Native FTDI libraries and Windows bindings are separate prerequisites. These
+commands do not authorize driver changes. See [setup](../getting-started.md).
+
+## Default behavior and live use
+
+Run All is hardware-free with saved defaults: access gates are false and config
+identities are fictional with no output policy. There are no saved hardware
+results. A skipped step is not a PASS. Imports/configuration do not scan devices.
+
+Before a live read-only run, copy `config/shutters.example.toml` to ignored
+`shutters.local.toml`, review exact serial/firmware/route/role, then edit `CONFIG`
+and `TARGET`. Enable `RUN_HARDWARE` only within authorization. Discovery has a
+separate `RUN_PORT_INVENTORY` gate; it never auto-connects to candidates. There is
+no network scan. Close other notebook, GUI and CLI owners before connecting.
+
+Mode changes and outputs have additional false-by-default gates. They require
+the approved exact physical setup and qualification policy; no valid deployment
+policy is supplied. A boolean is not physical qualification. Mode changes can
+persist across power cycles. Only Manual output is supported; cycle/TTL setup
+and KEH3 Ethernet remain unavailable.
+
+Run a live operation as a complete cell; do not strand ON between cells.
+Communication release is separate from OFF. Neither OFF readback nor kernel
+shutdown proves optical closure. Keep independent source protection and follow
+[protected recovery](../python-api.md) after ambiguity.
+
+The [direct_control.py](direct_control.py) script remains hardware-free by default:
+
+```powershell
+uv run --locked python docs/examples/direct_control.py
+```
+
+The former Kinesis USB/LAN templates were removed during migration. These new
+notebooks use the current direct-protocol API without restoring the SDK workflow.
+
+For offline notebook schema/link and kernel execution checks:
+
+```powershell
+uv run --locked --group notebooks python scripts/verify_notebooks.py
+```
+
+The verifier uses a local kernel and resets its namespace between notebooks.
+It never saves executed outputs into the tutorials. Repeated kernel startup on
+the authoring host intermittently timed out in ZeroMQ; default Python-cell tests
+and one full six-notebook kernel run passed. No physical result is implied.

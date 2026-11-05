@@ -1,3 +1,6 @@
+> Historical Kinesis implementation review. Superseded by the direct-protocol
+> rewrite; not current validation. See REPORT.md and ../STATE.md.
+
 # Communication, latency and simplicity review
 
 Historical review of the revision below. For the current pending LAN naming,

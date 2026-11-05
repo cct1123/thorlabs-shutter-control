@@ -1,0 +1,105 @@
+{
+  "timestamp_utc": "2026-11-05T07:31:21.482735+00:00",
+  "requirement": "REQ-213",
+  "test": "TEST-213",
+  "scope": "Offline source comparison and selected controller verification; no hardware I/O or reference changes",
+  "reference": {
+    "initial_revision": "d70f2a6e8f494516a3aed169f33bcf6775fdd982",
+    "initial_worktree": "clean at first inspection",
+    "final_revision": "14b5b1e3b6e150ff2af9ac888bf8f8742e255b8e",
+    "final_status": " M STATE.md\n M notebooks/k10cr2/01_discovery.ipynb\n M records/RECORDS.md\n",
+    "note": "Other work advanced the reference checkout; inspected source/document paths still match the pin. This task made no reference edits.",
+    "declared_license": "MIT; no source code copied",
+    "git_blob_sha256": {
+      "src/thorlabs_control/deadline.py": "1782290459e1be6aa4073ef5ad7871a1e64aaebd845e671d5567f621545e8b3b",
+      "src/thorlabs_control/link.py": "bdce7e099dcf148491d35297685fef35ad05a60bcd728e6293469051065d5064",
+      "src/thorlabs_control/apt/frames.py": "3ea10f1ec097c0903ebde1e2d10b0eabd28f4dc24f8a6c4528439597566fa7e8",
+      "src/thorlabs_control/apt/messages.py": "c62d3a596f846a23670cb5b945c554c4317530f6b3a052ad2773b5f5c59449d7",
+      "src/thorlabs_control/devices/ksc101.py": "eeada40d2cbb59a080738682e5bd1ea46bd70587579f64ffdd9cf13645826013",
+      "src/thorlabs_control/devices/keh3.py": "ef2ce620c1209286c52970e46b27b4b8c6a253d372955cf545c5e899ba5c0403",
+      "src/thorlabs_control/transport/d2xx.py": "934bf08dc00180dd394ab001a43e72dd37cabcd947bb50b0e416989fd68622e8",
+      "src/thorlabs_control/transport/serial_vcp.py": "2cbe53d8b7458cc6cb9dd1ccde476132e6b590779f22291602b835e06b17196f",
+      "src/thorlabs_control/transport/tcp.py": "9bd3491f96b46434ec479d906a12e8ebda24ed2b6a96d908b71b19ef9f0290ec",
+      "src/thorlabs_control/routes.py": "85d89a4e17822442c2c89e4c34cfca0e59ee1f4d4346460e8c63070781c42345",
+      "docs/TRACEABILITY.md": "25da82b782df880db329870ffa7abd5a1a7fda0ccbdbb37c6d4ee2134d781a8f",
+      "docs/SOURCES.md": "cc6160f5ee5c40dac6fbfc024528ae1cb29caa99e8b4144f7d79828c07586f00",
+      "docs/DESIGN.md": "87ee9c6c6584a88edace60c38b90f097974342b5baf4c25ebbe404190f5763fc",
+      "pyproject.toml": "316282f1e23095f72093583fe2a8d990722c5d8f7be0857a56cda867837f0232"
+    }
+  },
+  "manufacturer_cross_checks": {
+    "remembered_mode": "SRC-002, HA0368T Rev D, printed p20; automatic MODE memory at power-up",
+    "packet_bound": "SRC-001 Issue 36, printed p34; at most 255 payload bytes",
+    "mode_source_sha256": "b51ac9ca1aa53b02b554dfd5b1c0bd4b99d73e4ba092e47170a64a3f4bab34f5",
+    "protocol_source_sha256": "96668e05c353269d59390d3e00e4e7237c881707b3a947057dd08ead13191966"
+  },
+  "adopted": [
+    "high-resolution monotonic timing",
+    "terminal header/schema validation",
+    "separate persistent-mode permission and no redundant mode write",
+    "no additional frames after partial/unknown-count writes"
+  ],
+  "before_regressions": {
+    "initial_reference_cases": "11 failed before implementation",
+    "partial_write_cases": "2 failed, 1 complete-but-late control case passed before the write guard"
+  },
+  "final_tests": {
+    "offline-tests.xml": 72,
+    "wheel-tests.xml": 72,
+    "diamondgui-tests.xml": 29
+  },
+  "selected_controller_tests": [
+    "tests\\test_owner.py",
+    "tests\\test_protocol.py",
+    "tests\\test_application.py"
+  ],
+  "concurrent_work": "Optional notebook dependencies and tutorial tests preserved and excluded from this selected controller result.",
+  "deadline_clock": {
+    "implementation": "QueryPerformanceCounter()",
+    "monotonic": true,
+    "adjustable": false,
+    "resolution": 1e-07
+  },
+  "simulated_dispatch_ms": {
+    "offline-tests.xml": 2.171499996620696,
+    "wheel-tests.xml": 2.58649999886984
+  },
+  "source_hashes_match": true,
+  "source_wheel_python_parity": true,
+  "wheel_sha256": "be3b0d78ab913512743e0f6bd7ad70fbba7a503032c35aa5a25ebc73e8bf56de",
+  "source_sha256": {
+    "pyproject.toml": "d560b3ad91288951ce22547324f37384c8e323cfab24d11cca27d8a324be7f80",
+    "uv.lock": "bbbca9b12e3f685d1a553dc156f76c487cbcad7334dbd5cea8a8e96b1ed72f31",
+    "src\\thorlabs_shutter_control\\__init__.py": "1ccce0c1685f148a540122793eb3b876392fe5c95c69a13c635fa46c9e5fe973",
+    "src\\thorlabs_shutter_control\\__main__.py": "2773b490f211aa7cd156817752188ad0efd04a428d8636a2f38ae9e5e8a3928b",
+    "src\\thorlabs_shutter_control\\config.py": "5dbf53a946fc332eaca4155f20448f75600075bcdc52c3c2222a398826737234",
+    "src\\thorlabs_shutter_control\\controller.py": "6214817d0b2f7bdf8130b86fee402f0ace66b6dd05f0de2335faf680202d9787",
+    "src\\thorlabs_shutter_control\\device.py": "37c9377e33757d03b7822cbb754368fe3ce902a258f856ea83fdc324e6addcfa",
+    "src\\thorlabs_shutter_control\\discovery.py": "d0c1d84b6761d6fb6534f3afa6f2b3000ea922804270facec7f7e3565a87ca30",
+    "src\\thorlabs_shutter_control\\errors.py": "f2f4ff77dbba39142b992d047b4ce7a0a93e32f7cdcccd8536a47307cb48d86f",
+    "src\\thorlabs_shutter_control\\gui.py": "664f0cbd30545267a03a95b32482e45be33ec384f76b7c5f06896b758295bdce",
+    "src\\thorlabs_shutter_control\\ownership.py": "7fb46ab790bd7bb633d157d6ed1547ff1bb7f7c335be7dfa17ecce8ea77f9a1d",
+    "src\\thorlabs_shutter_control\\protocol.py": "b271c60bd5ed5366c002d5e161679e17d0c9b28e8567ddfdb31066cffd623dd4",
+    "src\\thorlabs_shutter_control\\transport.py": "e5f651e55d4b3bb7edb4708c00d0e8d89900c4df82e4bd9c2285d4a8d1300339",
+    "tests\\conftest.py": "a438af7e92efb6cf0f875655094c75547b6de121caf1f01747af57b36a0c8cb0",
+    "tests\\test_application.py": "481aad4eed43ef6129485ca0d6ac6334a9adb029978b3b5ce6c974030c3ef23e",
+    "tests\\test_owner.py": "7641bac9721789203453b2d203e6daeaa84ed31cf8ce6ea85e7bb75523db6cf7",
+    "tests\\test_protocol.py": "a355d5dee32a0ebb6710fc0215a48b88dadcbb26f5c9db4000fa864c1613ed29",
+    "scripts\\verify.py": "c355807e6604711c62627d8629e5ee06a6850e7421324dd9d9a7fc5315263257"
+  },
+  "external_lock": {
+    "before_sha256": "7b747a5901036080bcd7602b0f270c20b432077bb1bc4300ad7d9fcf750c3868",
+    "after_sha256": "1273f00c5852f543f7fa2a25256a889baf248f15f1ba7adf624d4b63580a571b",
+    "change": "Metadata for an already concurrent optional notebooks dependency group only; package identities/versions/sources unchanged."
+  },
+  "unrelated_external_changes": {
+    "docs/hardware.md": {
+      "recorded_sha256": "911543940956688b1c87dcef5fabaa343a158df471e933eabcfabdca4b21b327",
+      "current_sha256": "bda222e95786f5f24d8a6019a712cb5f8c248c5b203557ac594fbd5383d25f13"
+    },
+    "docs/gui.md": {
+      "recorded_sha256": "99bc78df96dea48dbbaf48014c1228992cf4540d421260bbca2d16c90fc36652",
+      "current_sha256": "1ac7e1e8b3644a6dc48a51243eb11595d2708d292dd455ccdd3dea8b407fb089"
+    }
+  }
+}

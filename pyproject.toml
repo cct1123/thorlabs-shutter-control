@@ -1,13 +1,15 @@
 [project]
 name = "thorlabs-shutter-control"
-version = "0.1.0"
-description = "KSC101 shutter controller with a local Plotly Dash interface"
+version = "1.0.0"
+description = "Direct APT KSC101 control with explicit identity, ownership and recovery"
 readme = "README.md"
-requires-python = ">=3.11,<3.14"
-dependencies = [
-    "dash>=3.0,<5",
-    "pythonnet>=3.0.5,<4; sys_platform == 'win32'",
-]
+requires-python = ">=3.12,<3.13"
+dependencies = []
+
+[project.optional-dependencies]
+vcp = ["pyserial>=3.5,<4"]
+d2xx = ["ftd2xx>=1.3.8,<2; sys_platform == 'win32'"]
+gui = ["dash>=3.0,<5"]
 
 [project.scripts]
 shutter-control = "thorlabs_shutter_control.__main__:main"
@@ -17,14 +19,19 @@ requires = ["hatchling>=1.27,<2"]
 build-backend = "hatchling.build"
 
 [dependency-groups]
-dev = ["pytest>=8,<10", "ruff>=0.11,<1"]
+dev = ["pytest>=8,<10", "ruff>=0.11,<1", "hatchling>=1.27,<2"]
+notebooks = ["jupyterlab>=4,<5", "ipykernel>=6,<8"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+junit_family = "legacy"
 
 [tool.ruff]
-target-version = "py311"
+target-version = "py312"
 line-length = 100
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B"]
+
+[tool.ruff.format]
+line-ending = "lf"

@@ -1,0 +1,361 @@
+{
+  "requirement": "REQ-217",
+  "test": "TEST-217",
+  "date": "2026-11-05",
+  "status": "PASS offline preparation; REQ-208 BLOCKED",
+  "scope": "Software simulation and TCP localhost only; no laboratory sockets, device queries, outputs or driver changes",
+  "manufacturer_sources": [
+    {
+      "file": "inputs\\reference\\keh3.pdf",
+      "url": "https://media.thorlabscms.cn/globalassets/items/k/ke/keh/keh3/doc-103012.pdf",
+      "sha256": "c768e4e3f2317ae29f7bfcdf8b18f750d7adc688d324c55550cdfa9a31a0489b"
+    },
+    {
+      "file": "inputs\\reference\\apt-42.pdf",
+      "url": "https://raw.githubusercontent.com/JovanMarkov96/Thorlabs_Motion_Control/master/docs/manuals/APT_Communications_Protocol.pdf",
+      "sha256": "b2a6badd7c00b3042ba383e291667e7eab10746c14c4f92cea45fc480c7304ed"
+    },
+    {
+      "file": "inputs\\reference\\motion-tree.json",
+      "url": "https://api.github.com/repos/Thorlabs/Motion_Control_Examples/git/trees/main?recursive=1",
+      "sha256": "5d0f5c5b301e26cae15846b910e01f1b4dab706f309ab98625cd19313ef0a879",
+      "tree": "3ef959523e2be48d57704af964f7a2c24547b722",
+      "entries": 1534,
+      "truncated": false,
+      "keh3_paths": []
+    },
+    {
+      "file": "inputs\\reference\\light-tree.json",
+      "url": "https://api.github.com/repos/Thorlabs/Light_Control_and_Manipulation_Examples/git/trees/main?recursive=1",
+      "sha256": "bc8d86aa821d70bb3a2c61116426321ee7e27d6c8015f2e6158bda20e2b6ea79",
+      "tree": "60d74d8b975b8d4265fe96ae6bd7148c1c67cfa5",
+      "entries": 186,
+      "truncated": false,
+      "keh3_paths": []
+    }
+  ],
+  "reference": {
+    "repository": "C:/repo/thorlabs-control",
+    "revision": "14b5b1e3b6e150ff2af9ac888bf8f8742e255b8e",
+    "files": [
+      "src/thorlabs_control/devices/keh3.py",
+      "docs/TRANSPORTS.md"
+    ],
+    "conclusion": "Candidate raw APT probe, no qualified KEH3 contract"
+  },
+  "unresolved": [
+    "TCP/UDP and application framing/initialization",
+    "Hub model/serial/firmware identity exchange",
+    "Bay/external-route message addresses and firmware compatibility",
+    "Reply ordering, connection buffer and reconnect behavior"
+  ],
+  "operational_route_available": false,
+  "hub_identity_verified": false,
+  "source_sha256": {
+    ".python-version": "7b55f8e67b5623c4bef3fa691288da9437d79d3aba156de48d481db32ac7d16d",
+    "config/shutters.example.toml": "2bc06101448ff37c8619015fa98acb5fb47ebfdd9c671ece7c685eaa862521c5",
+    "docs/examples/01_device_discovery.ipynb": "e89794f17a6bee9319ff9f8bfc4ccec96f352720b1ef4b3fe07b000c755d3a05",
+    "docs/examples/02_connection.ipynb": "0bba07d0f4363197121bde008274b5cb2877ae0e5531e64a55b1188202c962f2",
+    "docs/examples/03_status_query.ipynb": "7fc7a6b05159740505623ce77d69108a2eb239f4b118e7cb6bc3560248023fd5",
+    "docs/examples/04_settings.ipynb": "124983218977dc516c454a21a793b0748f802bd518aa5afbcfc7be24f1eafcd9",
+    "docs/examples/05_shutter_modes.ipynb": "9ba8c7978e06b676eac9023f6a577b001824030df4ec1a2fef8e8956e8cb033a",
+    "docs/examples/06_on_off.ipynb": "1558c027cb3e88d6264bee3f44708a27b44c704169c7de7688e2c754bfb2658e",
+    "docs/examples/direct_control.py": "27948bdf6f34ca8f18a2da6d4238a43ffec7919837941fbcaf5c3f27e997865c",
+    "docs/examples/README.md": "fd774a154a038b012aabf2f0b39324237d3bf622cc2289f0763562838307cf4b",
+    "pyproject.toml": "66fb4ef33fa9dc324e09b34e02a78a314b61419446abf8f6c61f50441bab5ea7",
+    "scripts/verify.py": "9846f026b35e9602ef071804d1415a6412e5bd5f758e9c22a65f8b0f631399be",
+    "scripts/verify_notebooks.py": "fc99e4f01815380873f285537e66d171d44dd6c61c083ebb9aa5f0a3c0b0424d",
+    "src/thorlabs_shutter_control/__init__.py": "1ccce0c1685f148a540122793eb3b876392fe5c95c69a13c635fa46c9e5fe973",
+    "src/thorlabs_shutter_control/__main__.py": "9223f417c8dc65764eceaca88b2b6f8d39ad79f4b0e9ceb85670cd8e975c92b8",
+    "src/thorlabs_shutter_control/config.py": "919d62f3246c3c4c655cd1ba002d5ba946d27b58cde654331274507141e5375a",
+    "src/thorlabs_shutter_control/controller.py": "c63b8304825182ab2fac400aabdf4fe5f20285d3f8b80035a965808df9a8dd77",
+    "src/thorlabs_shutter_control/device.py": "94d11cd9d38ee031fb9c22f3312a08ab18ce43a210f143b9c4e8cef693f73c9d",
+    "src/thorlabs_shutter_control/discovery.py": "d0c1d84b6761d6fb6534f3afa6f2b3000ea922804270facec7f7e3565a87ca30",
+    "src/thorlabs_shutter_control/errors.py": "f2f4ff77dbba39142b992d047b4ce7a0a93e32f7cdcccd8536a47307cb48d86f",
+    "src/thorlabs_shutter_control/ethernet.py": "1b39cd04a83c6788783e7b545fc3f4610eda9e35d349cbf016738169f0770ac4",
+    "src/thorlabs_shutter_control/gui.py": "664f0cbd30545267a03a95b32482e45be33ec384f76b7c5f06896b758295bdce",
+    "src/thorlabs_shutter_control/keh3.py": "76e05c9639b77a5897474be6521ba68e944ff08eda937a1a93b43a2f0031bab4",
+    "src/thorlabs_shutter_control/ownership.py": "7fb46ab790bd7bb633d157d6ed1547ff1bb7f7c335be7dfa17ecce8ea77f9a1d",
+    "src/thorlabs_shutter_control/protocol.py": "296d4f399938104eed68c08d0cbaac6542dfd65c4a490bcd61d14bc15d981600",
+    "src/thorlabs_shutter_control/transport.py": "1ea1fd2fc53262d7799743e6c3ca2d294892e4341aa7885a069f5bc821c77720",
+    "tests/conftest.py": "cd86de9771395f473bce16778f3338f031c6a4be63c7c8ded124b249e83afae5",
+    "tests/test_application.py": "97ad7cf05e9486019a0bf4738550685ee3949cc4ae04297b9b285f2b7bd6237f",
+    "tests/test_discovery.py": "0934580b74e78b21ec908a30548f9d66254d04b800fc264ae5302eff9be19c88",
+    "tests/test_keh3.py": "98244123b0f110b511ad65a42e660d2fa6aca1e0ba9d9c99c7517b3345c9633c",
+    "tests/test_owner.py": "1e5be6601efe3db6bed5134cf792a0c58d14971c681ed3fa6f547104ca700969",
+    "tests/test_protocol.py": "2359266f65ada42ac6f996ae2c2a425d03d3fbb3cedfb8af645b10cbfa438098",
+    "tests/test_tutorial_notebooks.py": "ca997b7ff1513ed970aa203d1ddf30ecaee49bcebf2dca7c3bbef985e3d7caa8",
+    "uv.lock": "bbbca9b12e3f685d1a553dc156f76c487cbcad7334dbd5cea8a8e96b1ed72f31"
+  },
+  "wheel_sha256": "cd08637b26001b2843e5b89bbe4c96535bec66963d79cd367d08cf6ddba203fd",
+  "wheel_source_parity": "PASS",
+  "tests": {
+    "offline-tests.xml": {
+      "sha256": "eff5e64e61e68cb084810be3f9f11a8706ea2d08d9611ff5a921b326220dd59d",
+      "suites": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "131",
+          "time": "1.155",
+          "timestamp": "2026-11-05T02:14:15.021600-06:00",
+          "hostname": "HighFieldSetup"
+        }
+      ]
+    },
+    "wheel-tests.xml": {
+      "sha256": "6e9bfbfd028aabb89e47299775a15d9eee0517747dd72f26e9d524440e4dc878",
+      "suites": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "131",
+          "time": "1.586",
+          "timestamp": "2026-11-05T02:14:20.874794-06:00",
+          "hostname": "HighFieldSetup"
+        }
+      ]
+    },
+    "keh3-tests.xml": {
+      "sha256": "6c5b23a41305472798939093cb53838d48c7b299622361a2eee25199bafacd46",
+      "suites": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "18",
+          "time": "0.143",
+          "timestamp": "2026-11-05T02:13:34.699652-06:00",
+          "hostname": "HighFieldSetup"
+        }
+      ]
+    }
+  },
+  "validation_stages": [
+    {
+      "test": "lock current",
+      "command": [
+        "C:\\Users\\HFNV\\AppData\\Local\\hermes\\bin\\uv.EXE",
+        "lock",
+        "--check",
+        "--offline"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.04491759999655187
+    },
+    {
+      "test": "ruff check",
+      "command": [
+        "C:\\repo\\thorlabs-shutter-control\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "src",
+        "tests",
+        "scripts",
+        "docs/examples/direct_control.py"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.149201100000937
+    },
+    {
+      "test": "ruff format",
+      "command": [
+        "C:\\repo\\thorlabs-shutter-control\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "src",
+        "tests",
+        "scripts",
+        "docs/examples/direct_control.py"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.1230169999980717
+    },
+    {
+      "test": "offline tests",
+      "command": [
+        "C:\\repo\\thorlabs-shutter-control\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "C:\\repo\\thorlabs-shutter-control\\tests",
+        "-q",
+        "--tb=short",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp",
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\verification-05cd00d30ec447a39c829792151b76e6\\offline",
+        "--junitxml",
+        "C:\\repo\\thorlabs-shutter-control\\records\\offline-tests.xml"
+      ],
+      "returncode": 0,
+      "elapsed_s": 2.184498899994651
+    },
+    {
+      "test": "build locked backend",
+      "command": [
+        "C:\\repo\\thorlabs-shutter-control\\.venv\\Scripts\\python.exe",
+        "-m",
+        "hatchling",
+        "build",
+        "-t",
+        "wheel",
+        "-d",
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\verification-05cd00d30ec447a39c829792151b76e6\\build-wheel"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.2214079999976093
+    },
+    {
+      "test": "clean venv",
+      "command": [
+        "C:\\Users\\HFNV\\AppData\\Local\\hermes\\bin\\uv.EXE",
+        "venv",
+        "--offline",
+        "--python",
+        "3.12",
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\verification-05cd00d30ec447a39c829792151b76e6\\clean"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.06649489999836078
+    },
+    {
+      "test": "locked clean dependencies",
+      "command": [
+        "C:\\Users\\HFNV\\AppData\\Local\\hermes\\bin\\uv.EXE",
+        "export",
+        "--locked",
+        "--offline",
+        "--extra",
+        "gui",
+        "--group",
+        "dev",
+        "--no-emit-project",
+        "--format",
+        "requirements-txt",
+        "--output-file",
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\verification-05cd00d30ec447a39c829792151b76e6\\requirements.txt"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.04760590000660159
+    },
+    {
+      "test": "clean sync",
+      "command": [
+        "C:\\Users\\HFNV\\AppData\\Local\\hermes\\bin\\uv.EXE",
+        "pip",
+        "sync",
+        "--offline",
+        "--python",
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\verification-05cd00d30ec447a39c829792151b76e6\\clean\\Scripts\\python.exe",
+        "--require-hashes",
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\verification-05cd00d30ec447a39c829792151b76e6\\requirements.txt"
+      ],
+      "returncode": 0,
+      "elapsed_s": 1.3271944000007352
+    },
+    {
+      "test": "install exact wheel",
+      "command": [
+        "C:\\Users\\HFNV\\AppData\\Local\\hermes\\bin\\uv.EXE",
+        "pip",
+        "install",
+        "--offline",
+        "--python",
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\verification-05cd00d30ec447a39c829792151b76e6\\clean\\Scripts\\python.exe",
+        "--no-deps",
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\verification-05cd00d30ec447a39c829792151b76e6\\build-wheel\\thorlabs_shutter_control-1.0.0-py3-none-any.whl"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.19386809999559773
+    },
+    {
+      "test": "clean no SDK/native dependencies",
+      "command": [
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\verification-05cd00d30ec447a39c829792151b76e6\\clean\\Scripts\\python.exe",
+        "-I",
+        "-c",
+        "\nimport importlib.util, json, sys\nimport thorlabs_shutter_control as package\nassert 'site-packages' in package.__file__\nfor name in ('pythonnet', 'clr', 'ftd2xx', 'serial'):\n    assert importlib.util.find_spec(name) is None, name\nassert not {'ftd2xx', 'serial', 'clr', 'pythonnet'} & set(sys.modules)\nprint(json.dumps({'python': sys.version, 'package': package.__file__}))\n"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.1426768000019365
+    },
+    {
+      "test": "clean CLI help",
+      "command": [
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\verification-05cd00d30ec447a39c829792151b76e6\\clean\\Scripts\\python.exe",
+        "-I",
+        "-m",
+        "thorlabs_shutter_control",
+        "--help"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.12996689999999944
+    },
+    {
+      "test": "wheel tests",
+      "command": [
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\verification-05cd00d30ec447a39c829792151b76e6\\clean\\Scripts\\python.exe",
+        "-I",
+        "-m",
+        "pytest",
+        "C:\\repo\\thorlabs-shutter-control\\tests",
+        "-q",
+        "--tb=short",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp",
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\verification-05cd00d30ec447a39c829792151b76e6\\wheel",
+        "--junitxml",
+        "C:\\repo\\thorlabs-shutter-control\\records\\wheel-tests.xml"
+      ],
+      "returncode": 0,
+      "elapsed_s": 4.159182699993835
+    },
+    {
+      "test": "missing lock rejected",
+      "command": [
+        "C:\\Users\\HFNV\\AppData\\Local\\hermes\\bin\\uv.EXE",
+        "lock",
+        "--check",
+        "--offline"
+      ],
+      "returncode": 2,
+      "elapsed_s": 0.04029840000293916
+    },
+    {
+      "test": "outdated lock rejected",
+      "command": [
+        "C:\\Users\\HFNV\\AppData\\Local\\hermes\\bin\\uv.EXE",
+        "lock",
+        "--check",
+        "--offline"
+      ],
+      "returncode": 1,
+      "elapsed_s": 0.10684559999936027
+    },
+    {
+      "test": "passive example",
+      "command": [
+        "C:\\repo\\thorlabs-shutter-control\\.venv\\Scripts\\python.exe",
+        "docs/examples/direct_control.py"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.08495819999370724
+    }
+  ],
+  "observations": [
+    "Final verifier passed full source and exact isolated-wheel suites; source/test/dependency hashes stable across the run.",
+    "Separate KEH3 suite: 18 passed. Fragmentation case exercises all 90 split positions.",
+    "Intermittent real-loopback connect timeouts were observed in earlier runs (including 17 passed/1 failed); direct three-socket loopback check and isolated case passed; final full source/wheel runs passed. Cause remains unconfirmed; this does not prove hardware/network reliability.",
+    "Fixed verifier build artifact directory collision with wheel pytest basetemp; subsequent full verifier completed.",
+    "Captured controller match is diagnostic only and cannot establish the expected hub."
+  ]
+}

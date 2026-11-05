@@ -1,0 +1,50 @@
+{
+  "timestamp_utc": "2026-11-05T07:31:21.514785+00:00",
+  "status": "PASS selected controller/reference/software audit; BLOCKED physical engineering acceptance",
+  "scope": "Selected controller tests only; concurrent tutorial work and physical validation separate",
+  "tests": {
+    "offline-tests.xml": 72,
+    "wheel-tests.xml": 72,
+    "diamondgui-tests.xml": 29
+  },
+  "selected_tests": [
+    "tests\\test_owner.py",
+    "tests\\test_protocol.py",
+    "tests\\test_application.py"
+  ],
+  "local_links_checked": 36,
+  "source_evidence_hashes_match": true,
+  "wheel_python_files_match_source": true,
+  "wheel_sha256": "be3b0d78ab913512743e0f6bd7ad70fbba7a503032c35aa5a25ebc73e8bf56de",
+  "clock": {
+    "implementation": "QueryPerformanceCounter()",
+    "monotonic": true,
+    "adjustable": false,
+    "resolution": 1e-07
+  },
+  "sha256": {
+    "README.md": "3be85bbc229bfe31d8677191bab03d8a7606fa69c70aba9426cdd2107ac3f0b6",
+    "PROJECT.md": "ccdca66ecedc51b8fd361b7b414a292cdd074dc8b4391823c1621ff32497b676",
+    "STATE.md": "2024998c055eadb186334598fe7a1f031ab3800519c986e6dc6704c7a2b3a523",
+    "outputs\\REPORT.md": "ab00b75ec08cc4e1a0b2a1baf5732ccf1f232adda10b09b07688c7d642fc03e8",
+    "docs\\controller-reference-review.md": "3cbe5f302892587c501d534135dd4da3faed05c05656e614a62b9a0188498238",
+    "docs\\sources.md": "9b688817b37ea5139a5623e187dc3f3def4252397599319bddd565adbcd7bd5c",
+    "docs\\INTERFACE.md": "2781c391f51e598c917cd96f779530d457b3dc5253562452f26cc0b9d9fcfd06",
+    "docs\\architecture.md": "3d35eb4d80e2d9d45fac0ade4be2b931598660a341e78726793b403257519646",
+    "docs\\python-api.md": "2a93039d048c600b51c82562049b573cfc61c0343d5ddc1643a70ee3ba66b6d8",
+    "docs\\gui.md": "c27f1efcd6d1390363250a8b584d5c91464d8f0bb27ff98966f247370deac33e",
+    "docs\\getting-started.md": "622ae80e3fa4c16fda5333ec75668347e22542f24c52069850c6bafab3de92ab",
+    "docs\\diamondgui.md": "0a29b87363d126a9d879d6407cbc6bf276838ea1071822962ef486f194d2602b",
+    "docs\\hardware.md": "28722e4629f3ff1c7918d5161c5c107e8c94591151e15bf7ae812f199f36ecba",
+    "docs\\ethernet-assessment.md": "9cb1ac3fab202f983b598d16987d39ffd2c2699b712bf825ce411bec6ab76288",
+    "docs\\HARDWARE_VALIDATION.md": "67bee3cb23a8bf83e933960960b9bcab0c347ea2eada632f43122a6f8514068c",
+    "docs\\cutover.md": "ce29abfed4819b3bdd7bcc70249fcb584f0f73f4d465de8dfb3a3d93e0b66521",
+    "records\\RECORDS.md": "af71d0fcd440dde6ec5046243a73c46f797c9a64fcdc0c5f3ba647addb0c40fd",
+    "records\\direct-validation.json": "04c65dfe03a4213a3b7609190c0974676b31d6ec437c17e87ee48582a4dc61c3",
+    "records\\controller-reference-validation.json": "cf4eb96647651fab188c884df04918c405738527900b1294666db571511a2543",
+    "records\\diamondgui-migration.json": "9474e40158379cf5fcb330fcc4abd0fb7bf973d06040ee71758b70dfc81c30da",
+    "records\\offline-tests.xml": "0f4f82c4d3da6a1f15ab45eb71fa6443bd9850d345e189651135aad3872f22de",
+    "records\\wheel-tests.xml": "6b83925d92d10c1102f23578771a85f09bb90cf1fce07b4ef6bedfaff8244d73",
+    "records\\diamondgui-tests.xml": "1bd9c59f56a3c232286ec17e1617cf5717d8de516ba40411a833a765649e8945"
+  }
+}

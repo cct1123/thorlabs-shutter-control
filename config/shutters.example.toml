@@ -1,0 +1,15 @@
+# Fictional identities. Copy to ignored shutters.local.toml and verify every field.
+# Missing policy means READ ONLY. Never copy unmeasured limits into a live policy.
+# If a qualified policy is later supplied, allow_persistent_mode_changes defaults
+# to false. Explicitly review that separate permission: KSC101 remembers modes.
+[[shutters]]
+name = "example"
+channel = 0
+role = "operator must establish physical beam role"
+serial_number = "68000001"
+firmware = ["1.0.7"]
+[shutters.route]
+kind = "d2xx"
+
+# KEH3 routes require kind, hub_serial, host, bay, hub_firmware. They are currently
+# unavailable even if configured; see docs/ethernet-assessment.md.

@@ -1,192 +1,118 @@
-"""Small protocol double: no DLL loading, sockets, physical timing or TTL model."""
+"""Byte-level simulated KSC101. No SDK, native library, device or network access."""
 
-from copy import copy
-from types import SimpleNamespace
+import struct
+import time
+from collections import deque
+from dataclasses import replace
 
 import pytest
 
-from thorlabs_shutter_control import config, controller
+from thorlabs_shutter_control import ControllerConfig, Policy, Route, ShutterHub
+from thorlabs_shutter_control.protocol import Decoder, Frame
 
 
-class TriggerSettings:
-    TriggerPortMode = SimpleNamespace(
-        Disabled="Disabled", TrigIN_GPI="TrigIN_GPI", TrigOUT_GPO="TrigOUT_GPO"
-    )
-    TriggerPolarity = SimpleNamespace(TriggerHigh="TriggerHigh", TriggerLow="TriggerLow")
+class FakeTransport:
+    def __init__(self, config):
+        self.serial = config.serial_number
+        self.model = "KSC101"
+        self.firmware = (7, 0, 1)
+        self.mode, self.state, self.interlock = 1, 2, 1
+        self.rx = deque()
+        self.history = []
+        self.closed = False
+        self.split = 4096
+        self.delay = 0
+        self.silent = set()
+        self.partial = False
+        self.close_fails = False
+        self.rewrite = lambda raw: raw
+        self.prefix = b""
 
-    def __init__(self):
-        self.Trigger1Mode, self.Trigger1Polarity = "TrigIN_GPI", "TriggerHigh"
-        self.Trigger2Mode, self.Trigger2Polarity = "TrigOUT_GPO", "TriggerHigh"
+    def write(self, raw, deadline):
+        frame = Decoder().feed(raw)[0]
+        self.history.append((time.perf_counter(), frame))
+        if frame.message_id == 0x04CB:
+            self.state = frame.param2
+            if self.partial:
+                return 3  # Possibly applied, even though transport reports short write.
+        elif frame.message_id == 0x04C0:
+            self.mode = frame.param2
+        if frame.message_id in self.silent:
+            return len(raw)
+        reply = None
+        if frame.message_id == 5:
+            p = bytearray(84)
+            struct.pack_into("<I", p, 0, int(self.serial))
+            p[4:12] = self.model.encode().ljust(8, b"\0")
+            p[14:17] = bytes(self.firmware)
+            struct.pack_into("<H", p, 78, 1)
+            struct.pack_into("<H", p, 82, 1)
+            reply = Frame(6, destination=1, source=0x50, payload=bytes(p))
+        elif frame.message_id in (0x04C1, 0x04CC, 0x04C7):
+            ident, value = {
+                0x04C1: (0x04C2, self.mode),
+                0x04CC: (0x04CD, self.state),
+                0x04C7: (0x04C8, self.interlock),
+            }[frame.message_id]
+            reply = Frame(ident, 1, value, 1, 0x50)
+        if reply:
+            self.rx.append(self.prefix + self.rewrite(reply.encode()))
+        return len(raw)
 
+    def read(self, seconds):
+        if self.delay:
+            time.sleep(self.delay)
+        if not self.rx:
+            time.sleep(seconds)
+            return b""
+        data = self.rx.popleft()
+        if len(data) > self.split:
+            self.rx.appendleft(data[self.split :])
+            data = data[: self.split]
+        return data
 
-class Device:
-    """Fictional SDK handle: calls records operations; fail names one operation to reject."""
+    def read_nowait(self):
+        return b"".join(self.rx.popleft() for _ in range(len(self.rx)))
 
-    def __init__(self, serial):
-        self.serial = self.identity = serial
-        self.IsConnected, self.USBConnected = False, "Disconnected"
-        self.CommsStatus, self.Status = "OK", SimpleNamespace(KeyEnabled=True)
-        self.position, self.operation, self.mode = "Closed", "Inactive", "Manual"
-        self.calls, self.fail, self.polling = [], None, 0
-        self.settings = TriggerSettings()
+    def close(self):
+        if self.close_fails:
+            raise OSError("simulated release failure")
+        self.closed = True
 
-    def record(self, name, *args):
-        self.calls.append((name, *args))
-        if self.fail == name:
-            raise RuntimeError(f"{name} failed")
-
-    def Connect(self, serial):
-        self.record("connect", serial)
-        self.IsConnected, self.USBConnected = True, "Connected"
-
-    def IsSettingsInitialized(self):
-        return True
-
-    def StartPolling(self, milliseconds):
-        self.record("poll", milliseconds)
-        self.polling = milliseconds
-
-    def PollingDuration(self):
-        return self.polling
-
-    def GetDeviceInfo(self):
-        self.record("identity")
-        return SimpleNamespace(
-            SerialNumberText=self.identity, Description="FICTIONAL SOFTWARE DEVICE"
-        )
-
-    def RequestStatus(self):
-        self.record("status")
-
-    def RequestOperatingState(self):
-        self.record("operation")
-
-    def RequestOperatingMode(self):
-        self.record("mode_read")
-
-    def GetStatusBits(self):
-        return 0x2000
-
-    def GetSolenoidState(self):
-        return self.position
-
-    def GetOperatingState(self):
-        return self.operation
-
-    def GetOperatingMode(self):
-        return self.mode
-
-    def SetOperatingState(self, value):
-        self.record("state", value)
-        self.operation = value
-        self.position = "Open" if value == "Active" else "Closed"
-
-    def SetOperatingMode(self, value):
-        self.record("mode", value)
-        self.mode = value
-
-    def EnableDevice(self):
-        self.record("enable")
-
-    def RequestTriggerConfigParams(self):
-        self.record("ttl_read")
-
-    def GetTriggerConfigParams(self):
-        return copy(self.settings)
-
-    def SetTriggerConfigParams(self, settings):
-        self.record("ttl_write")
-        self.settings = copy(settings)
-
-    def StopPolling(self):
-        self.record("stop_poll")
-        self.polling = 0
-
-    def Disconnect(self):
-        self.record("disconnect")
-        self.IsConnected, self.USBConnected = False, "Disconnected"
-
-
-class Manager:
-    """Fictional enumeration: registered LAN routes appear after ready_after refreshes."""
-
-    def __init__(self, routes):
-        self.routes, self.entries, self.calls = routes, [], []
-        self.refreshes, self.ready_after, self.scan_error = 0, 1, False
-
-    def BuildDeviceList(self):
-        self.calls.append(("build",))
-        self.refreshes = 0
-
-    def CreateManualDeviceEntry(self, endpoint):
-        self.entries.append(endpoint)
-
-    def CheckForConnectionChanges(self):
-        self.refreshes += 1
-
-    def GetDeviceList(self, kind):
-        return [
-            s
-            for s, endpoint in self.routes.items()
-            if endpoint is None or (endpoint in self.entries and self.refreshes >= self.ready_after)
-        ]
-
-    def GetTransportInfo(self, serial):
-        endpoint = self.routes[serial]
-        return SimpleNamespace(
-            GetProvider=lambda: "TCPIP" if endpoint else "FTDI",
-            GetComSpec=lambda: endpoint or "USB",
-        )
-
-    def ScanEthernetRange(self, start, end, port, timeout):
-        self.calls.append(("scan", start, end, port, timeout))
-        if self.scan_error:
-            raise RuntimeError("LAN scan failed")
-        return ["192.0.2.10"]
+    @property
+    def output_frames(self):
+        return [f for _, f in self.history if f.message_id in (0x04CB, 0x04C0, 0x0210)]
 
 
 @pytest.fixture
-def bench(monkeypatch):
-    """Provide one fictional USB cube and one LAN cube, with no real SDK calls.
-
-    Replacing the SDK loader prevents DLL/network/device access. The virtual clock
-    advances requested sleeps immediately; it measures software waits, not motion.
-    Device.fail injects one named SDK failure for ownership/cleanup checks.
-    """
-    usb, lan = Device("68000001"), Device("68000002")
-    devices = {d.serial: d for d in (usb, lan)}
-    endpoint = "192.0.2.10:40304"
-    manager = Manager({usb.serial: None, lan.serial: endpoint})
-    sdk = SimpleNamespace(
-        manager=manager,
-        device_type=SimpleNamespace(CreateKCubeSolenoid=devices.__getitem__),
-        trigger_settings=TriggerSettings,
-        enums=SimpleNamespace(
-            OperatingStates=SimpleNamespace(Active="Active", Inactive="Inactive"),
-            OperatingModes=SimpleNamespace(
-                Manual="Manual",
-                SingleToggle="SingleToggle",
-                AutoToggle="AutoToggle",
-                Triggered="Triggered",
-            ),
-        ),
+def config():
+    return ControllerConfig(
+        "beam",
+        0,
+        "fictional beam role",
+        "68000001",
+        ("1.0.7",),
+        Route("d2xx"),
+        Policy("simulated qualification only", "fake load", "closed", 0, True),
     )
-    loads, clock = [], [0.0]
 
-    def load(directory):
-        loads.append(directory)
-        return sdk
 
-    def sleep(seconds):
-        clock[0] += seconds
+@pytest.fixture
+def bench(config, tmp_path):
+    devices = []
 
-    monkeypatch.setattr(controller, "_load_sdk", load)
-    monkeypatch.setattr(controller, "_device_owners", {})
-    monkeypatch.setattr(
-        controller, "time", SimpleNamespace(sleep=sleep, monotonic=lambda: clock[0])
-    )
-    monkeypatch.setattr(config, "LAN_SCAN_START_IP", "192.0.2.0")
-    monkeypatch.setattr(config, "LAN_SCAN_END_IP", "192.0.2.255")
-    return SimpleNamespace(
-        usb=usb, lan=lan, devices=devices, manager=manager, endpoint=endpoint, loads=loads
-    )
+    def factory(c, d):
+        device = FakeTransport(c)
+        devices.append(device)
+        return device
+
+    hub = ShutterHub([config], transport_factory=factory, lock_directory=tmp_path)
+    yield hub, devices, factory, tmp_path
+    for device in devices:
+        device.close_fails = False
+    hub.close()
+
+
+@pytest.fixture
+def second(config):
+    return replace(config, name="second", channel=1, serial_number="68000002")

@@ -1,0 +1,42 @@
+{
+  "source_drift": [],
+  "hash_inputs_with_crlf": [],
+  "broken_current_links": [],
+  "runtime_python_lines": {
+    "head": 2062,
+    "reviewed": 1702,
+    "removed": 360
+  },
+  "inspected_link_files": 26,
+  "scope": "software/source/documentation audit; no instruments or lab network",
+  "baseline_commit": "8f324a6cfec98b73b4b32c6f4e5035db6c3b53c6",
+  "test_suites": {
+    "offline-tests.xml": {
+      "tests": "131",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "1.149"
+    },
+    "wheel-tests.xml": {
+      "tests": "131",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "2.036"
+    },
+    "diamondgui-tests.xml": {
+      "tests": "29",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "0.219"
+    }
+  },
+  "evidence_sha256": {
+    "direct-validation.json": "e4f10fe111689e2abe850850f0022244737f47bda5c88854c2bc2f6126c10488",
+    "offline-tests.xml": "bffadcef9bffa2a83dfdff685c94d810fc747bb81b8ae0badcac31cf6916fdc6",
+    "wheel-tests.xml": "745e04cdc25799a2c5e3cb9268431c4c8ec1d0e2f826badceb3b7dbdf176fe46",
+    "diamondgui-tests.xml": "50ca1fa15e3de28a6216c22781cc52069053ed5f5ca0d55c7bda706e2e3fc500"
+  }
+}
