@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="26" skipped="0" tests="29" time="0.998" timestamp="2026-11-06T16:55:34.288580-06:00" hostname="HighFieldSetup"><testcase classname="hardware.optics.tests.test_shutter" name="test_canonical_owner_is_shared_and_example_is_passive" time="0.003" /><testcase classname="hardware.optics.tests.test_shutter" name="test_notebook_defaults_are_hardware_free" time="0.001" /><testcase classname="hardware.optics.tests.test_shutter" name="test_factory_enforces_existing_channel_and_route_metadata" time="0.001" /><testcase classname="gui.tests.test_shutter_control_page" name="test_initial_render_is_passive_and_unknown" time="0.012"><failure message="AttributeError: module 'isolated_shutter_page' has no attribute 'layout'">gui\tests\test_shutter_control_page.py:71: in test_initial_render_is_passive_and_unknown
+    actions, values, fields = callback_arguments(page)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^
+gui\tests\test_shutter_control_page.py:56: in callback_arguments
+    items = list(components(page.layout))
+                            ^^^^^^^^^^^
+E   AttributeError: module 'isolated_shutter_page' has no attribute 'layout'</failure></testcase><testcase classname="gui.tests.test_shutter_control_page" name="test_missing_feedback_keeps_all_lamps_unknown[None]" time="0.005"><failure message="AttributeError: module 'isolated_shutter_page' has no attribute 'summary'">gui\tests\test_shutter_control_page.py:99: in test_missing_feedback_keeps_all_lamps_unknown
+    item for item in components(page.summary(sample)) if getattr(item, "role", None) == "img"
+                                ^^^^^^^^^^^^
+E   AttributeError: module 'isolated_shutter_page' has no attribute 'summary'</failure></testcase><testcase classname="gui.tests.test_shutter_control_page" name="test_missing_feedback_keeps_all_lamps_unknown[sample1]" time="0.002"><failure message="AttributeError: module 'isolated_shutter_page' has no attribute 'summary'">gui\tests\test_shutter_control_page.py:99: in test_missing_feedback_keeps_all_lamps_unknown
+    item for item in components(page.summary(sample)) if getattr(item, "role", None) == "img"
+                                ^^^^^^^^^^^^
+E   AttributeError: module 'isolated_shutter_page' has no attribute 'summary'</failure></testcase><testcase classname="gui.tests.test_shutter_control_page" name="test_missing_feedback_keeps_all_lamps_unknown[sample2]" time="0.002"><failure message="AttributeError: module 'isolated_shutter_page' has no attribute 'summary'">gui\tests\test_shutter_control_page.py:99: in test_missing_feedback_keeps_all_lamps_unknown
+    item for item in components(page.summary(sample)) if getattr(item, "role", None) == "img"
+                                ^^^^^^^^^^^^
+E   AttributeError: module 'isolated_shutter_page' has no attribute 'summary'</failure></testcase><testcase classname="gui.tests.test_shutter_control_page" name="test_reported_position_is_distinct_from_requested_target" time="0.002"><failure message="AttributeError: module 'isolated_shutter_page' has no attribute 'summary'">gui\tests\test_shutter_control_page.py:106: in test_reported_position_is_distinct_from_requested_target
+    view = page.summary(
+           ^^^^^^^^^^^^
+E   AttributeError: module 'isolated_shutter_page' has no attribute 'summary'</failure></testcase><testcase classname="gui.tests.test_shutter_control_page" name="test_native_operating_mode_names_have_truthful_display_labels[manual-Manual]" time="0.002"><failure message="AttributeError: module 'isolated_shutter_page' has no attribute 'summary'">gui\tests\test_shutter_control_page.py:142: in test_native_operating_mode_names_have_truthful_display_labels
+    view = page.summary({"connection": "connected", "feedback": {"operating_mode": mode}})
+           ^^^^^^^^^^^^
+E   AttributeError: module 'isolated_shutter_page' has no attribute 'summary'</failure></testcase><testcase classname="gui.tests.test_shutter_control_page" name="test_native_operating_mode_names_have_truthful_display_labels[single-Single]" time="0.002"><failure message="AttributeError: module 'isolated_shutter_page' has no attribute 'summary'">gui\tests\test_shutter_control_page.py:142: in test_native_operating_mode_names_have_truthful_display_labels
+    view = page.summary({"connection": "connected", "feedback": {"operating_mode": mode}})
+           ^^^^^^^^^^^^
+E   AttributeError: module 'isolated_shutter_page' has no attribute 'summary'</failure></testcase><testcase classname="gui.tests.test_shutter_control_page" name="test_native_operating_mode_names_have_truthful_display_labels[auto-Auto]" time="0.002"><failure message="AttributeError: module 'isolated_shutter_page' has no attribute 'summary'">gui\tests\test_shutter_control_page.py:142: in test_native_operating_mode_names_have_truthful_display_labels
+    view = page.summary({"connection": "connected", "feedback": {"operating_mode": mode}})
+           ^^^^^^^^^^^^
+E   AttributeError: module 'isolated_shutter_page' has no attribute 'summary'</failure></testcase><testcase classname="gui.tests.test_shutter_control_page" name="test_native_operating_mode_names_have_truthful_display_labels[triggered-Trigger]" time="0.002"><failure message="AttributeError: module 'isolated_shutter_page' has no attribute 'summary'">gui\tests\test_shutter_control_page.py:142: in test_native_operating_mode_names_have_truthful_display_labels
+    view = page.summary({"connection": "connected", "feedback": {"operating_mode": mode}})
+           ^^^^^^^^^^^^
+E   AttributeError: module 'isolated_shutter_page' has no attribute 'summary'</failure></testcase><testcase classname="gui.tests.test_shutter_control_page" name="test_fault_hides_previous_position_and_operating_lamps" time="0.002"><failure message="AttributeError: module 'isolated_shutter_page' has no attribute 'summary'">gui\tests\test_shutter_control_page.py:148: in test_fault_hides_previous_position_and_operating_lamps
+    view = page.summary(
+           ^^^^^^^^^^^^
+E   AttributeError: module 'isolated_shutter_page' has no attribute 'summary'</failure></testcase><testcase classname="gui.tests.test_shutter_control_page" name="test_readback_for_another_target_is_not_displayed_or_used" time="0.002"><failure message="AttributeError: module 'isolated_shutter_page' has no attribute 'layout'">gui\tests\test_shutter_control_page.py:168: in test_readback_for_another_target_is_not_displayed_or_used
+    actions, values, fields = callback_arguments(page)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^
+gui\tests\test_shutter_control_page.py:56: in callback_arguments
+    items = list(components(page.layout))
+                            ^^^^^^^^^^^
+E   AttributeError: module 'isolated_shutter_page' has no attribute 'layout'</failure></testcase><testcase classname="gui.tests.test_shutter_control_page" name="test_only_visible_shutter_tick_requests_status[/hardwares/shutter-/hardwares/shutter-True]" time="0.002"><failure message="AttributeError: module 'isolated_shutter_page' has no attribute 'layout'">gui\tests\test_shutter_control_page.py:190: in test_only_visible_shutter_tick_requests_status
+    actions, values, fields = callback_arguments(page)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^
+gui\tests\test_shutter_control_page.py:56: in callback_arguments
+    items = list(components(page.layout))
+                            ^^^^^^^^^^^
+E   AttributeError: module 'isolated_shutter_page' has no attribute 'layout'</failure></testcase><testcase classname="gui.tests.test_shutter_control_page" name="test_only_visible_shutter_tick_requests_status[/hardwares/verdi-/hardwares/shutter-False]" time="0.003"><failure message="AttributeError: module 'isolated_shutter_page' has no attribute 'layout'">gui\tests\test_shutter_control_page.py:190: in test_only_visible_shutter_tick_requests_status
+    actions, values, fields = callback_arguments(page)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^
+gui\tests\test_shutter_control_page.py:56: in callback_arguments
+    items = list(components(page.layout))
+                            ^^^^^^^^^^^
+E   AttributeError: module 'isolated_shutter_page' has no attribute 'layout'</failure></testcase><testcase classname="gui.tests.test_shutter_control_page" name="test_only_visible_shutter_tick_requests_status[/hardwares/shutter-/hardwares/rotator-False]" time="0.003"><failure message="AttributeError: module 'isolated_shutter_page' has no attribute 'layout'">gui\tests\test_shutter_control_page.py:190: in test_only_visible_shutter_tick_requests_status
+    actions, values, fields = callback_arguments(page)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^
+gui\tests\test_shutter_control_page.py:56: in callback_arguments
+    items = list(components(page.layout))
+                            ^^^^^^^^^^^
+E   AttributeError: module 'isolated_shutter_page' has no attribute 'layout'</failure></testcase><testcase classname="gui.tests.test_shutter_control_page" name="test_shutter_write_controls_have_no_page_permission_gate" time="0.002"><failure message="AttributeError: module 'isolated_shutter_page' has no attribute 'action_disabled'">gui\tests\test_shutter_control_page.py:200: in test_shutter_write_controls_have_no_page_permission_gate
+    assert not page.action_disabled(action)
+               ^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'isolated_shutter_page' has no attribute 'action_disabled'</failure></testcase><testcase classname="gui.tests.test_shutter_control_page" name="test_failed_command_displays_error_without_automatic_close[manual-set_manual_mode]" time="0.005"><failure message="AttributeError: module 'isolated_shutter_page' has no attribute 'layout'">gui\tests\test_shutter_control_page.py:213: in test_failed_command_displays_error_without_automatic_close
+    actions, values, fields = callback_arguments(page)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^
+gui\tests\test_shutter_control_page.py:56: in callback_arguments
+    items = list(components(page.layout))
+                            ^^^^^^^^^^^
+E   AttributeError: module 'isolated_shutter_page' has no attribute 'layout'</failure></testcase><testcase classname="gui.tests.test_shutter_control_page" name="test_failed_command_displays_error_without_automatic_close[enable-enable_device]" time="0.002"><failure message="AttributeError: module 'isolated_shutter_page' has no attribute 'layout'">gui\tests\test_shutter_control_page.py:213: in test_failed_command_displays_error_without_automatic_close
+    actions, values, fields = callback_arguments(page)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^
+gui\tests\test_shutter_control_page.py:56: in callback_arguments
+    items = list(components(page.layout))
+                            ^^^^^^^^^^^
+E   AttributeError: module 'isolated_shutter_page' has no attribute 'layout'</failure></testcase><testcase classname="gui.tests.test_shutter_control_page" name="test_failed_command_displays_error_without_automatic_close[shutter-open-open_shutter]" time="0.002"><failure message="AttributeError: module 'isolated_shutter_page' has no attribute 'layout'">gui\tests\test_shutter_control_page.py:213: in test_failed_command_displays_error_without_automatic_close
+    actions, values, fields = callback_arguments(page)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^
+gui\tests\test_shutter_control_page.py:56: in callback_arguments
+    items = list(components(page.layout))
+                            ^^^^^^^^^^^
+E   AttributeError: module 'isolated_shutter_page' has no attribute 'layout'</failure></testcase><testcase classname="gui.tests.test_shutter_control_page" name="test_failed_command_displays_error_without_automatic_close[shutter-close-close_shutter]" time="0.003"><failure message="AttributeError: module 'isolated_shutter_page' has no attribute 'layout'">gui\tests\test_shutter_control_page.py:213: in test_failed_command_displays_error_without_automatic_close
+    actions, values, fields = callback_arguments(page)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^
+gui\tests\test_shutter_control_page.py:56: in callback_arguments
+    items = list(components(page.layout))
+                            ^^^^^^^^^^^
+E   AttributeError: module 'isolated_shutter_page' has no attribute 'layout'</failure></testcase><testcase classname="gui.tests.test_shutter_control_page" name="test_page_reuses_owner_command_result_without_second_read[manual-set_manual_mode]" time="0.002"><failure message="AttributeError: module 'isolated_shutter_page' has no attribute 'hcf'">gui\tests\test_shutter_control_page.py:242: in test_page_reuses_owner_command_result_without_second_read
+    target = next(iter(page.hcf.SHUTTER_CH_MAP))
+                       ^^^^^^^^
+E   AttributeError: module 'isolated_shutter_page' has no attribute 'hcf'</failure></testcase><testcase classname="gui.tests.test_shutter_control_page" name="test_page_reuses_owner_command_result_without_second_read[enable-enable_device]" time="0.002"><failure message="AttributeError: module 'isolated_shutter_page' has no attribute 'hcf'">gui\tests\test_shutter_control_page.py:242: in test_page_reuses_owner_command_result_without_second_read
+    target = next(iter(page.hcf.SHUTTER_CH_MAP))
+                       ^^^^^^^^
+E   AttributeError: module 'isolated_shutter_page' has no attribute 'hcf'</failure></testcase><testcase classname="gui.tests.test_shutter_control_page" name="test_page_reuses_owner_command_result_without_second_read[shutter-open-open_shutter]" time="0.003"><failure message="AttributeError: module 'isolated_shutter_page' has no attribute 'hcf'">gui\tests\test_shutter_control_page.py:242: in test_page_reuses_owner_command_result_without_second_read
+    target = next(iter(page.hcf.SHUTTER_CH_MAP))
+                       ^^^^^^^^
+E   AttributeError: module 'isolated_shutter_page' has no attribute 'hcf'</failure></testcase><testcase classname="gui.tests.test_shutter_control_page" name="test_page_reuses_owner_command_result_without_second_read[shutter-close-close_shutter]" time="0.003"><failure message="AttributeError: module 'isolated_shutter_page' has no attribute 'hcf'">gui\tests\test_shutter_control_page.py:242: in test_page_reuses_owner_command_result_without_second_read
+    target = next(iter(page.hcf.SHUTTER_CH_MAP))
+                       ^^^^^^^^
+E   AttributeError: module 'isolated_shutter_page' has no attribute 'hcf'</failure></testcase><testcase classname="gui.tests.test_shutter_control_page" name="test_observation_header_tracks_selected_readback_without_resolving_hardware" time="0.004"><failure message="AttributeError: module 'isolated_shutter_page' has no attribute 'hcf'">gui\tests\test_shutter_control_page.py:263: in test_observation_header_tracks_selected_readback_without_resolving_hardware
+    target = next(iter(page.hcf.SHUTTER_CH_MAP))
+                       ^^^^^^^^
+E   AttributeError: module 'isolated_shutter_page' has no attribute 'hcf'</failure></testcase><testcase classname="gui.tests.test_shutter_control_page" name="test_thorlabs_labels_keep_configured_command_keys_out_of_visible_text" time="0.005"><failure message="AttributeError: module 'isolated_shutter_page' has no attribute 'TITLE'">gui\tests\test_shutter_control_page.py:290: in test_thorlabs_labels_keep_configured_command_keys_out_of_visible_text
+    assert page.TITLE == "Thorlabs Shutter"
+           ^^^^^^^^^^
+E   AttributeError: module 'isolated_shutter_page' has no attribute 'TITLE'</failure></testcase><testcase classname="gui.tests.test_shutter_control_page" name="test_protective_close_reaches_owner_before_page_lock" time="0.004"><failure message="AttributeError: module 'isolated_shutter_page' has no attribute 'hcf'">gui\tests\test_shutter_control_page.py:310: in test_protective_close_reaches_owner_before_page_lock
+    target = next(iter(page.hcf.SHUTTER_CH_MAP))
+                       ^^^^^^^^
+E   AttributeError: module 'isolated_shutter_page' has no attribute 'hcf'</failure></testcase></testsuite></testsuites>

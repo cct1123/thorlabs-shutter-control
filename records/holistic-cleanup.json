@@ -1,0 +1,373 @@
+{
+  "scope": "Verified generated Python/Ruff/uv caches and disposable verification/pytest directories only",
+  "targets": [
+    {
+      "path": ".ruff_cache",
+      "files": 10,
+      "bytes": 3670.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": ".uv-cache",
+      "files": 17510,
+      "bytes": 324932480.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "src/thorlabs_shutter_control/__pycache__",
+      "files": 13,
+      "bytes": 110854.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tests/__pycache__",
+      "files": 8,
+      "bytes": 258856.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "docs/examples/__pycache__",
+      "files": 2,
+      "bytes": 3430.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/pytest-4aba1632ad574a62a860593bca69141a",
+      "files": 0,
+      "bytes": 0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/pytest-a8dccece9eff438eb34c9aca12604da1",
+      "files": 25,
+      "bytes": 436.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/pytest-notebooks",
+      "files": 0,
+      "bytes": 0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/pytest-notebooks-final",
+      "files": 6,
+      "bytes": 380.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/pytest-notebooks-verified",
+      "files": 4,
+      "bytes": 4.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-02cfca79acd343529df2642b198e2202",
+      "files": 56,
+      "bytes": 7198.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-05cd00d30ec447a39c829792151b76e6",
+      "files": 4497,
+      "bytes": 139009074.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-11abc8371c0d44418b2064ff0fe5f02d",
+      "files": 4485,
+      "bytes": 139019901.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-12af4847c96544c0aedb45f3be737021",
+      "files": 4499,
+      "bytes": 138997195.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-13a55d55ca7b46a4ab6e525e4a7b1a77",
+      "files": 4497,
+      "bytes": 139017004.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-1e1f3fd401db41808bc17bb5521baf3e",
+      "files": 4483,
+      "bytes": 138994653.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-1ebc4a1244ca47e09e842d13f892ed86",
+      "files": 4436,
+      "bytes": 138844871.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-24c83642ec634e9f9f69b490b5a60b26",
+      "files": 4494,
+      "bytes": 138853063.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-2f3d08da53774e96b341e3a1d9aa5c0c",
+      "files": 0,
+      "bytes": 0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-3162dba844aa44e49f1bf765947b678d",
+      "files": 4497,
+      "bytes": 139010460.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-3c9e23339a4e432c9bee0a497e69d015",
+      "files": 4442,
+      "bytes": 138852661.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-42181e4d50574769bce84537710d940a",
+      "files": 4499,
+      "bytes": 138995790.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-440a0bc2b4604610aa5094af6262b9cd",
+      "files": 4479,
+      "bytes": 138991747.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-52ec961c11a64d0e9fe990434cf0a9c7",
+      "files": 44,
+      "bytes": 575553.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-558db7c6dbeb4746a82ef9998357f212",
+      "files": 0,
+      "bytes": 0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-5792f3c4d3be4b88b189addc3bc805de",
+      "files": 0,
+      "bytes": 0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-6109f4abb45d41a1a457b543059b79f9",
+      "files": 4462,
+      "bytes": 138957775.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-6143427183404199a4213232c02bd01b",
+      "files": 0,
+      "bytes": 0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-648015fc4506451a9f8ac4b899e5c507",
+      "files": 4479,
+      "bytes": 138991746.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-68aba17817b741ca84c9d1b463dd983d",
+      "files": 4497,
+      "bytes": 139009074.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-74927830ea3a4fe7a6392640f2ba22c1",
+      "files": 4485,
+      "bytes": 139019901.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-75abc9fd2387426eac10011d0f2cc9b7",
+      "files": 4494,
+      "bytes": 138853469.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-8364bc04392c4d75b86b5aaeee713bab",
+      "files": 4483,
+      "bytes": 138995377.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-84f455a2480445f28d823917636ad2dd",
+      "files": 4470,
+      "bytes": 138983451.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-85474d42ad5f4b349859a8db41a2a95e",
+      "files": 4443,
+      "bytes": 138954531.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-8750c95c0bb94c00bb1426b95976b67c",
+      "files": 4446,
+      "bytes": 138950377.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-899daa500bdb4dc2b3f0c1ab8cbdcb88",
+      "files": 4485,
+      "bytes": 139017057.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-9160a7f1e5b945a3af06839415c500c4",
+      "files": 4424,
+      "bytes": 138843208.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-aad03a96c8854b5c8850981b356f0c3e",
+      "files": 4505,
+      "bytes": 139016343.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-bfac1a4d426a4b24b9db9ea12f4f0583",
+      "files": 4485,
+      "bytes": 139019799.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-c101939b5f934bf5b36227cd8b231801",
+      "files": 0,
+      "bytes": 0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-c2131f18756b478d97ff807098fe90fc",
+      "files": 4485,
+      "bytes": 139017403.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-c4b27f05bb0e473f827ce164ec206517",
+      "files": 0,
+      "bytes": 0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-ca129300e9464b3c925d08bb007b7b46",
+      "files": 0,
+      "bytes": 0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-cdb4e9be36b44fcda7b7a5eb8c76e873",
+      "files": 4499,
+      "bytes": 138997195.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-ce56d200123c4401a7ddeeb023620b67",
+      "files": 56,
+      "bytes": 3166.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-d0b4bc09377d4807bbb58370ba57f162",
+      "files": 4432,
+      "bytes": 138844091.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-d699c00e83e549b9892a2d0a8d0d8d9a",
+      "files": 4436,
+      "bytes": 138845530.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-d8f981dcfb6a442e948a561bf37ee065",
+      "files": 4499,
+      "bytes": 138997195.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-da5defd029414988a9ef5cf50bc03458",
+      "files": 4485,
+      "bytes": 139017568.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-e5ada1c3be8544b4866d3ade2cba96c5",
+      "files": 4483,
+      "bytes": 138994654.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-e67e3e226d624fd9b16f5c3ba0b8aa21",
+      "files": 0,
+      "bytes": 0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-e9e1402e75a94e0a8854366e5ef9a091",
+      "files": 4442,
+      "bytes": 138950530.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-ea4d926fc8444abba2fd3c2806fa3226",
+      "files": 4499,
+      "bytes": 138997195.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-f6a2ff39aa9b4c2f88cf498844f62f89",
+      "files": 27,
+      "bytes": 967.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-fc5201835eef4f7382e043e16f15fc39",
+      "files": 4496,
+      "bytes": 138983303.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-fd546550fc114f43878f9b3b705533b0",
+      "files": 4497,
+      "bytes": 139009074.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/verification-fe034560fcf7458cb2bc2783ce6caead",
+      "files": 3732,
+      "bytes": 127748061.0,
+      "result": "REMOVED"
+    },
+    {
+      "path": "tmp/diamondgui-integration",
+      "files": 0,
+      "bytes": 0,
+      "result": "REMOVED"
+    }
+  ],
+  "preserved": [
+    ".venv",
+    "dist current wheel",
+    "inputs/private backups",
+    "inputs/reference",
+    "records",
+    "manuals",
+    "runtime ownership state",
+    "ambiguous tmp investigation scripts and historical work"
+  ],
+  "completed_at_utc": "2026-11-06T22:54:43.1703105Z",
+  "elapsed_s": 86.6790758,
+  "failures": [],
+  "protected_venv_configuration": "UNCHANGED"
+}

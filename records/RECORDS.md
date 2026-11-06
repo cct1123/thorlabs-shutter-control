@@ -1944,3 +1944,54 @@ b9b2309. Six byte-exact notebook snapshots before normalization are retained
 under inputs/private/notebooks/holistic-review-before-lf; hashes and normalized
 paths are recorded in records/holistic-normalization.json. Saved outputs were
 not cleared. Four original PDFs remain binary/unchanged. No new physical test.
+
+## E185 - TEST-211/223 actual external integration check (6 November 2026)
+
+A live path check contradicted the earlier unavailable-checkout assumption:
+C:/Users/HFNV/diamondgui exists and is dirty. Inspected its AGENTS.md, pytest
+hooks/config, local-config loading, passive shutter adapter, both focused tests
+and the page source before execution. The page has zero executable AST nodes:
+its entire contents are commented out. Current metadata still selects the old
+logical key/left-bay port 40304. No external source/configuration was edited.
+
+From the external repository root, using this package's uv-selected environment,
+disabled pytest plugin autoload and Python bytecode, ran only:
+hardware/optics/tests/test_shutter.py and gui/tests/test_shutter_control_page.py,
+with -m "unit and not hardware", -p no:cacheprovider and basetemp/XML redirected
+inside this project. No live HardwareManager/runtime/device was resolved.
+Observed 3 owner/factory PASS and 26 page FAIL, all missing attributes from the
+commented module. This supersedes the historical 29-case integration PASS and
+blocks integrated deployment; local package checks do not conceal that failure.
+Evidence: records/diamondgui-current-integration.json (exact source hashes,
+metadata and external revision), records/diamondgui-current-tests.xml.
+Asked whether restoring the separately edited integration belongs in this task;
+without a scope change, preserve those external dirty edits and report the gap.
+
+## E186 - TEST-223 scoped cleanup and final review (6 November 2026)
+
+Inventoried 58 explicitly generated targets before deletion: repository-local
+Python/Ruff/uv caches and disposable verification/pytest directories. Verified
+each resolved absolute path stayed inside this workspace and contained no tracked
+files. Native PowerShell removal completed all 58, zero failures, in 86.69 s;
+178,212 files, 5,317,497,320 logical bytes. A later inspected integration-test
+directory was similarly removed, bringing the scoped target count to 59. The
+environment configuration hash was unchanged. Preserved .venv/current wheel,
+manuals, records, private notebook backups, source preimages, reference originals,
+runtime ownership state and ambiguous investigation/history files. Logical bytes
+do not equal physical savings when hardlinks are shared. Manifest:
+records/holistic-cleanup.json. No tracked deletion came from cache cleanup.
+
+Runtime Python is 1,588 lines versus 1,702 at 9d486b3: net reduction 114 (6.7%).
+The user-requested staged runtime/manual commits are b9b2309 and 2297162.
+Current checkpoint/report now distinguish the passing package review, external
+integration FAIL, historical E181 cycle and unmet physical/deployment acceptance.
+The latest remote main was fetched before publication; no force push is planned.
+
+Final recheck: 160 source + 160 isolated-wheel cases PASS, six existing static
+notebook manifests still match current files, and the wheel's embedded README
+matches the current README. The verifier now includes README in its input hashes
+and explicitly passes -B alongside -I because isolated Python ignores environment
+bytecode settings. Removed the small leftover test/example caches from the prior
+tool run; all 59 scoped cache/temp targets are absent after final verification.
+112 final local Markdown targets resolve. records/holistic-review.json captures
+these results and the separate 3 PASS / 26 FAIL external integration result.

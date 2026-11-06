@@ -1,0 +1,42 @@
+{
+  "requirement_id": "REQ-223",
+  "test_id": "TEST-223",
+  "evidence_ids": [
+    "E183",
+    "E184",
+    "E185",
+    "E186"
+  ],
+  "checked_at_utc": "2026-11-06T23:00:06.553739+00:00",
+  "package_result": "PASS software review",
+  "project_result": "BLOCKED integrated/physical deployment",
+  "source_tests": 160,
+  "installed_wheel_tests": 160,
+  "static_notebooks": 6,
+  "hardware_operations": 0,
+  "external_integration": {
+    "result": "FAIL",
+    "passed": 3,
+    "failed": 26,
+    "artifact": "records/diamondgui-current-integration.json"
+  },
+  "local_markdown_links": 111,
+  "wheel_readme_matches_current": true,
+  "readme_sha256": "543ed1d08ec7775c557b7b62f439d7e3b6ab4d4dd6ab2b9b6c53a80138a67273",
+  "wheel_sha256": "a5f8c2c8e958169878c679fe06b1fb505e5f23b9a93a8d81b594f56fda26c767",
+  "unchanged_manufacturer_pdfs": 4,
+  "cleanup_targets": 59,
+  "cleanup_files": 178212,
+  "cleanup_logical_bytes": 5317497320.0,
+  "cleanup_failures": 0,
+  "exact_notebook_backups_verified": 6,
+  "scoped_cache_targets_absent": true,
+  "runtime_lines": {
+    "baseline_revision": "9d486b3",
+    "before": 1702,
+    "after": 1588,
+    "net_removed": 114,
+    "reduction_percent": 6.7
+  },
+  "scope": "Source/package/docs/pruning/cleanup only; preserve external dirty integration; historical hardware evidence unchanged in meaning"
+}

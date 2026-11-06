@@ -1,0 +1,36 @@
+{
+  "evidence_id": "E185",
+  "test_id": "TEST-211/223",
+  "verified_at_utc": "2026-11-06T22:56:16.784434+00:00",
+  "scope": "Inspected external integration using isolated application test doubles and passive owner construction only; no device access or external source/config edits",
+  "external_checkout": "C:\\Users\\HFNV\\diamondgui",
+  "external_head": "1887c2fcbaa35e9b2e71d37d8be9e8603a4fec7b",
+  "result": "FAIL external page: 3 owner/factory cases pass; 26 page cases fail",
+  "tests": 29,
+  "passed": 3,
+  "failed": 26,
+  "skipped": 0,
+  "page_executable_statements": 0,
+  "cause": "The existing dirty shutter page is entirely commented out; expected layout/summary/SESSION exports are absent",
+  "configured_shutter_metadata": {
+    "SHUTTER_CONFIG_PATH": "hardware/optics/beampath/shutters.local.toml",
+    "SHUTTERHUB_IP": "192.168.1.19",
+    "SHUTTER_CH_MAP": {
+      "verdi shutter": {
+        "CH": 0,
+        "SN": 68800777,
+        "IP_PORT": 40304
+      }
+    }
+  },
+  "configuration_gap": "Existing name and left-bay port 40304 differ from this repository shutter/middle-bay 40305 configuration; no physical route was changed or queried",
+  "source_sha256": {
+    "hardware/optics/beampath/shutter.py": "8442ac089717366f84758addee218dcee200ff93ea84faaa9f28266afd926960",
+    "hardware/optics/tests/test_shutter.py": "582841fa1374e5a4fcef269ab9d616521a4bd8952fc2f2866854977d25ea03d7",
+    "gui/pages/hardware_pages/shutter_control.py": "630122c8ae86421d8180966b303f0f5eccf7ecd92bd6a1997bcdee6aa3ebba6d",
+    "gui/tests/test_shutter_control_page.py": "b90faab350b4fe8342dc13bd0757b908c7b185112dff18172bc469f5a10ec47b",
+    "hardware/config.py": "14bd018118a667816794b6e92bb2ea08e3c9a492a4d864384d77068a0144e5ff"
+  },
+  "artifact": "records/diamondgui-current-tests.xml",
+  "external_change_decision": "Pending user preference; preserve separate dirty edits by default"
+}

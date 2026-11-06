@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def hashes():
     patterns = ("src/**/*.py", "tests/*.py", "scripts/*.py", "docs/examples/*", "config/*.toml")
-    files = {ROOT / name for name in ("pyproject.toml", "uv.lock", ".python-version")}
+    files = {ROOT / name for name in ("pyproject.toml", "uv.lock", ".python-version", "README.md")}
     files.update(p for pattern in patterns for p in ROOT.glob(pattern) if p.is_file())
     return {
         p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
@@ -132,7 +132,7 @@ def main():
         python,
         wheel,
     )
-    isolated = [*uv, "run", "--offline", "--no-project", "--python", python, "python", "-I"]
+    isolated = [*uv, "run", "--offline", "--no-project", "--python", python, "python", "-I", "-B"]
     run(
         "clean no SDK/native dependencies",
         isolated,

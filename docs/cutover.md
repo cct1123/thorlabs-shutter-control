@@ -20,8 +20,11 @@ Saved notebook outputs, older JSON field names and historical reports preserve
 their original evidence. Their existence does not make them current runtime APIs.
 
 The selected Ethernet controller's E181 commissioning and local software checks
-are recorded separately. The external DiamondGUI checkout is unavailable here;
-its factory/page integration must be revalidated before deploying this revision.
+are recorded separately. Current external DiamondGUI checks pass 3 owner/factory
+cases and fail 26 page cases: its dirty page is entirely commented out and its
+metadata still selects the old name/port. Restore the intended page and migrate
+the deployment mapping before claiming integrated cutover; see
+[the integration findings](diamondgui.md).
 
 1. Keep independent source protection engaged. Stop tasks and release all shutter
    owners. Confirm optical state independently. Record the old source revision and

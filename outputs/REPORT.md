@@ -1,96 +1,94 @@
-# Reviewed direct-protocol shutter control
+# Holistic review and migration delivery
 
-5 November 2026. **Software review complete; engineering deployment BLOCKED.**
-All pending changes were included at the user's request. The direct APT owner
-replaces the legacy Kinesis implementation, SDK discovery, old GUI/CSS/screenshots
-and obsolete SDK notebook templates. No SDK fallback or second hardware manager
-remains. Historical review outputs and evidence records are retained as history.
-Runtime Python decreases from 2,062 to 1,702 lines against the preceding HEAD
-(360 lines, 17.5%); source size is not used as a substitute for validation.
+6 November 2026. **Package review PASS; integrated deployment remains blocked.**
+The package has one shared owner and direct APT driver for Python, CLI, GUI and
+six real Ethernet notebooks. The review performed no device operation.
 
-Optional D2XX/VCP transport, protocol framing, KSC101 messages, shared ownership
-and application interfaces are separate modules. The core has no Python runtime
-dependencies. Python 3.12, optional GUI/transports/notebooks and development tools
-are managed through the checked-in uv lockfile. The DiamondGUI owner surface is
-preserved; no DiamondGUI source or dependency changes were made by this review.
+## Defects corrected
 
-## Review findings and simplification
+| Finding | Correction | Evidence |
+| --- | --- | --- |
+| GUI shutdown could send OFF after a read-only session when a write policy existed | Cleanup depends on prior output/mode attempts; read-only faults are reported without actuation | E183 owner regressions, with/without policy and fault |
+| Release with no selected GUI target could disconnect every route | All six controls require an exact configured name before dispatch | E183 Flask callback cases for missing/unknown targets |
+| Minimum OFF rest started at command dispatch | Start rest after fresh electrical OFF readback | E183 delayed-transition regression; early ON refused |
+| Candidate connection manager, analyzer/probe CLI and gated example duplicated current workflows | Removed superseded paths; one owner, TOML configuration and static notebook verification | [Migration replacements](../docs/cutover.md) |
+| Generic config target and notebook-guide API differed from current usage | Consistent shutter name; guide uses shutter_config.SHUTTER | Static/passive setup and CLI checks |
+| Current guides cited the manual-copy record as the live ON/OFF result | Corrected links to E181 and separated historical/current validation | E184 documentation audit |
+| External DiamondGUI checkpoint incorrectly said its checkout was unavailable | Live inspection found a commented-out page and stale metadata; documented current deployment failure without altering the separate dirty checkout | E185: 3 owner/factory PASS, 26 page FAIL |
+| Verification accumulated disposable environments | Remove successful-run work; retain failed-run diagnostics; avoid subprocess Python/Ruff caches | Successful full verification and scoped cleanup manifest |
 
-| Finding | Result |
-| --- | --- |
-| ON/pulse duplicated ambiguity and cleanup logic | One shared output guard; every OFF uses the priority cleanup boundary |
-| A new ON retained a previous OFF success message; failed pulse OFF could display stale cleanup | New attempts invalidate earlier cleanup; failed cleanup records the current unconfirmed outcome |
-| Recovery could clear a pending protective request | Recovery defers without releasing/reopening the retained handle |
-| Cancelled queries accessed receive buffers before checking cancellation | Deadline/cancellation checked before transport access; expired native connections also refuse open |
-| Operational/candidate identity layouts and CLI/pulse constraints duplicated | Shared identity decoder/matcher and passive public pulse validation |
-| GUI launched through CLI could release communication twice | Cleanup responsibility transfers once to the GUI |
-| Empty hub-only fields were accepted on USB routes | Strict rejection, including empty supplied values |
-| Capture size was checked separately from an unbounded file read | Read at most 4097 bytes and reject oversized captures at the shared boundary |
-| Verification had selected-suite/version assumptions and omitted tutorial/config hashes | Full suite always runs; wheel name is discovered; source/wheel bytes and stable input hashes are checked |
+The DiamondGUI public method/status surface remains intact. No SDK backend,
+constructor shim, implicit transport fallback, command retry or ON replay remains.
+Runtime Python shrank from 1,702 to 1,588 lines relative to 9d486b3: 114 net lines
+removed (6.7%), including the superseded candidate path.
+Electrical output, operating state and optical observation stay separate. VCP and
+KEH3 external USB OUT control remain unavailable; writes require the reviewed
+load policy and Manual/interlock/identity/ownership checks.
 
-The four cleanup/cancellation regressions failed before their fixes and pass now.
-Additional tests cover passive pulse validation, strict route fields, expired
-connection budgets and GUI cleanup ownership. The redundant receive queue,
-unused diagnostic conversion/receive helpers and duplicate OFF-interval state
-were removed. LF formatting is explicit. See E168 / D049 in
-[records](../records/RECORDS.md) for commands and scope.
+## Final software evidence
 
-## Current validation
+**160 source tests + 160 isolated installed-wheel tests PASS**, with zero failures,
+errors or skips. Locked dependencies, lint/format, clean build/install/import/help,
+source-wheel parity, negative lock cases and passive configuration validation pass.
+All six notebooks pass schema/syntax/link checks without executing their cells.
+Tests use software byte transports and localhost; they establish no physical result.
+
+Commands:
 
 ```powershell
 uv run --locked --offline --group dev --extra gui python scripts/verify.py
+uv run --locked --offline --group notebooks python scripts/verify_notebooks.py
 ```
 
-| Evidence | Result | Scope |
-| --- | --- | --- |
-| [Source tests](../records/offline-tests.xml) | 131 PASS, no skips | Simulated control, passive applications/tutorials, localhost TCP |
-| [Exact installed-wheel tests](../records/wheel-tests.xml) | Same 131 PASS | Isolated environment without pythonnet/clr/ftd2xx/serial |
-| [DiamondGUI tests](../records/diamondgui-tests.xml) | 29 PASS | Existing owner/factory/page tests; device access stubbed |
-| [Reproducible verification](../records/direct-validation.json) | All phases PASS | Lock, lint/format, exact wheel parity, input hashes, clean install/help, negative lock cases |
-| [KEH3 preparation](../records/keh3-validation.json) | PASS offline preparation | Source investigation, simulated identity diagnostics and local TCP; not KEH3 operation |
-| [Notebook execution](../records/notebook-validation.json) | Historical six-notebook kernel run | Current saved defaults/simulated opt-in paths are retested in the full suite; repeated kernel startup remains unqualified |
+All verification input hashes matched the staged Git blobs. Reviewed changed text
+was normalized to the repository's LF policy, with six byte-exact notebook backups
+and saved outputs retained privately. Four manufacturer PDFs remain unchanged and
+match their registered SHA-256 values. 112 local Markdown targets exist; all
+reviewed JSON/XML evidence parses. See [E183/E184](../records/RECORDS.md),
+[source/wheel manifest](../records/direct-validation.json),
+[source tests](../records/offline-tests.xml), [wheel tests](../records/wheel-tests.xml),
+[static notebook checks](../records/notebook-validation.json),
+[manual integrity](../records/manuals-verification.json) and
+[normalization/backups](../records/holistic-normalization.json).
+The [final review manifest](../records/holistic-review.json) records the current
+package PASS and external integration FAIL together.
 
-Initial sandboxed pytest runs failed on Windows temp-directory permissions.
-Direct fresh-interpreter runs also encountered localhost TCP connect timeouts;
-the isolated failing test passed separately and the complete final verifier passed
-using its uv isolated runner. These observations do not establish a timeout cause
-or general Windows/network reliability. Build artifacts and pytest temporary
-directories are separate. No failure was converted to a skip or physical PASS.
+## Cleanup and delivery
 
-## Operating boundaries and remaining acceptance
+Stage 1: b9b2309, runtime migration, owner/GUI fixes, examples and operator/API docs.
+Stage 2: 2297162, manufacturer manuals, source/state interpretation and historical
+evidence. The final checkpoint/cleanup commit and remote synchronization are
+recorded in STATE.md and the engineering delivery record.
 
-Exact serial/model/firmware, one owner/receiver and explicit qualification policy
-gate control. Only qualified continuous-duty Manual loads are supported. Changed
-modes persist at power-up and require a separate policy permission. Interlocks
-are never disabled; no hidden trigger priming, reconnect, fallback or ON replay
-occurs. Electrical readback is not optical blade feedback. Close/disconnect
-release communication; output cleanup is explicit.
+Only inventoried generated cache/test/build paths are removed. The environment,
+current wheel, manuals, records, private notebook backups, reference originals and
+runtime ownership state are preserved. Investigation scripts, source preimages
+and ambiguous temporary history remain available. Logical byte totals do not
+measure physical disk savings because caches and environments can share hardlinks.
+See [cleanup inventory/results](../records/holistic-cleanup.json).
+Cleanup removed 59 targets, including 178,212 generated files from the main
+inventory (5,317,497,320 logical bytes); all removals completed without failure.
 
-Uncertainty persists across process exit. A partial/unknown write forbids all
-later frames, including OFF, on that connection. Receive-only ambiguity can permit
-best-effort qualified OFF, but cannot confirm safety. Protected recovery requires
-independent source inhibition and optical observation and never replays ON.
-Simulated protective dispatch meets the 250 ms test target; native latency and
-physical switching remain UNTESTED. APT's arbitrary delayed same-type reply
-ordering remains an unresolved protocol limit.
+## Historical hardware evidence and remaining limits
 
-Direct USB retains FTDI native/OS dependencies and is physically UNTESTED; VCP is
-read-only commissioning. KEH3 operational routes remain BLOCKED before socket
-access. Separate [capture analysis/candidate diagnostics](../docs/keh3-offline-validation.md)
-never verify hub identity or unlock control; no lab probe was run. TTL/cycles,
-finite exposure/duty loads, actual optical mapping, driver persistence and the
-reconnect/reboot/endurance campaign remain unqualified. No hardware, lab-network
-query, binding or driver change was performed in this review.
+[E181](../records/ethernet-control-live.json) records one real SH05R cycle on
+KSC101 68800777, firmware 1.0.7, KEH3 middle bay 192.168.1.19:40305: protected
+OFF/Manual preparation, 2 s initial OFF pause, one ON with a 1 s host hold,
+priority OFF and release. Electrical bits were 0x2000 -> 0x2001 -> 0x2000;
+ON-to-OFF host dispatch was 1.0569156 s. Final recorded state was Manual/OFF.
+The user did not observe blade motion. This is historical evidence for its recorded
+hashes; the review changed controller/GUI code and did not repeat or requalify
+physical operation. Present state, independent optical closure/timing, key/contact
+continuity, local/TTL behavior, hub identity/recovery, other topology, native
+250 ms dispatch, driver persistence, reboot and endurance remain unverified.
+A manufacturer design mapping is not an independent optical measurement.
 
-Supply the deployment evidence package in
-[STATE.md](../STATE.md#human-action-required---supply-the-deployment-evidence-package)
-before preparing an approved physical test window. The local commit is authorized;
-publication is outside this request. The built wheel is
-`dist/thorlabs_shutter_control-1.0.0-py3-none-any.whl`.
-
-Operator references: [setup](../docs/getting-started.md),
-[API](../docs/python-api.md), [architecture](../docs/architecture.md),
-[protocol traceability](../docs/INTERFACE.md), [sources](../docs/sources.md),
-[route/driver matrix](../docs/hardware.md), [commissioning](../docs/HARDWARE_VALIDATION.md),
-[cutover](../docs/cutover.md), [DiamondGUI](../docs/diamondgui.md), and
-[beginner tutorials](../docs/examples/README.md).
+The four repository manuals cover KSC101, KEH3/KEH6 and APT Issues 36/42.1;
+[the SH05R source](../docs/sources.md) was reviewed online earlier, but its unchanged
+local PDF is still missing. The external DiamondGUI checkout is present and dirty:
+3 passive owner/factory tests PASS, but 26 page tests FAIL because its shutter
+page is entirely commented out. Its metadata still selects the old name and
+port 40304. No external edits were made. See [current integration findings](../records/diamondgui-current-integration.json)
+and [failing page tests](../records/diamondgui-current-tests.xml). The historical
+29-case PASS is superseded. In-repo owner/schema, CLI and GUI tests pass. [STATE.md](../STATE.md) records the exact human dependency
+and resumption conditions. The full engineering project is BLOCKED, not COMPLETE.

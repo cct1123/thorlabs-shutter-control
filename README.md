@@ -59,6 +59,10 @@ GUI shutdown sends OFF only for targets with prior output or mode attempts;
 read-only faults remain visible without incidental actuation. Every GUI control
 requires an exact selected target.
 
+The separate DiamondGUI checkout currently fails its page integration tests
+because its shutter page is commented out and its route metadata is stale.
+See [the integration findings](docs/diamondgui.md) before deploying there.
+
 Optional USB extras are `--extra d2xx` or `--extra vcp`; both retain FTDI driver
 dependence. `shutter-control discover` lists D2XX metadata; `discover --vcp` lists
 COM metadata. Neither selects a controller. Replacing Kinesis does not establish

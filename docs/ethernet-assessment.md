@@ -1,5 +1,8 @@
 # KEH3 Ethernet Manual ON/OFF
 
+The actual cycle below is E181's dated hardware evidence. The holistic review
+changed controller/GUI code and did not repeat or requalify physical operation.
+
 Docked-bay control is implemented through the canonical ShutterHub/TCP/APT path.
 The earlier blanket ban was an implementation restriction, not a manufacturer
 prohibition. APT Issue42.1 section2.1 explicitly separates command framing from
