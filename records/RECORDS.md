@@ -2074,3 +2074,13 @@ tests were run in this no-simulator campaign; old160+160 results are historical
 and are not represented as current full-suite coverage after these source changes.
 Broader physical, fault-injection, external DiamondGUI and deployment qualification
 remain separate. REQ-224 PASS for the actual selected WebUI/controller workflow.
+
+## E190 - WebUI independent-observation follow-up (6 November 2026)
+
+User reply: "I did not observe the blade". This applies to E188/E189
+WebUI cycles. Recorded controller ON/OFF remains PASS; independent blade motion
+and optical closure remain UNTESTED. This is absence of observation, not evidence
+that motion failed. Preserved original browser captures/hashes and recorded the
+human follow-up separately in records/webui-observation-followup.json. Updated
+current state, report and derived live-validation summary. No device operation,
+mode/output change or additional cycle was performed.

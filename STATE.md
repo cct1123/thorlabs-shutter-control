@@ -26,7 +26,9 @@ lock, exact wheel parity, isolated install/import/help and invalid-port checks P
 No simulated-device tests ran in this campaign. The previous160+160 full suite is
 historical for its recorded revision; affected full fault/deadline/cancellation
 regressions are not claimed as newly revalidated by this selected happy path.
-Independent blade/optical observation has not been supplied and remains UNTESTED.
+E190: the user reports "I did not observe the blade". Independent blade motion
+and optical closure remain UNTESTED; controller readback results are unchanged.
+Follow-up: records/webui-observation-followup.json. No additional actuation.
 
 ## Previously delivered holistic review
 

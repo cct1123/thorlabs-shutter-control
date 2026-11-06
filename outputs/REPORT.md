@@ -29,8 +29,10 @@ See [actual browser results](../records/webui-final-live.json),
 [passive package validation](../records/webui-package-validation.json),
 [saved-evidence check](../records/webui-evidence-validation.json) and
 [final OFF screenshot](../records/webui-final-off.jpg). E188/E189 in records/RECORDS.md
-retain the baseline, corrections, commands and scope. Independent blade motion,
-optical closure/calibration and the separate DiamondGUI deployment remain unverified.
+retain the baseline, corrections, commands and scope. In E190 the user reports:
+"I did not observe the blade". Independent blade motion, optical closure/calibration
+and the separate DiamondGUI deployment remain unverified. No additional cycle was
+performed; original browser evidence and its hashes are unchanged.
 No further hardware cycle is planned.
 
 ---

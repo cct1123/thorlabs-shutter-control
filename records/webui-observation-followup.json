@@ -1,0 +1,13 @@
+{
+  "evidence_id": "E190",
+  "requirement_id": "REQ-224",
+  "recorded_at_utc": "2026-11-06T23:18:52.209433+00:00",
+  "source": "User reply to independent blade-observation question after the WebUI test",
+  "statement": "I did not observe the blade",
+  "applies_to": "E188/E189 actual WebUI ON/OFF cycles",
+  "controller_readback_result": "Unchanged: recorded ON then OFF PASS",
+  "independent_blade_motion": "UNTESTED: not observed",
+  "independent_optical_closure": "UNTESTED",
+  "additional_device_operations": "NONE; no repeat cycle requested or performed",
+  "raw_browser_evidence": "Preserved unchanged; follow-up observation recorded separately"
+}

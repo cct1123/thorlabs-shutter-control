@@ -38,7 +38,7 @@
   ],
   "final_controller_state": "Last live readback Manual/OFF; no fault; no assertion of continuing state after release",
   "ownership_released": true,
-  "optical_observation": "Not supplied; controller readback only",
+  "optical_observation": "User reports: I did not observe the blade. Independent blade motion/optical closure remain UNTESTED.",
   "runtime_sha256": {
     "src/thorlabs_shutter_control/config.py": "919d62f3246c3c4c655cd1ba002d5ba946d27b58cde654331274507141e5375a",
     "src/thorlabs_shutter_control/controller.py": "48d826d230265711d5612e79595ce4ce23ff706fe4c8811b35a80d65573a688e",
@@ -66,5 +66,6 @@
     "Controller readback only; independent blade motion/optical closure and calibrated timing unverified",
     "No driver/firmware/network/hub settings, other device, Trigger/TTL/cycle command or external DiamondGUI change",
     "Previous 160/160 simulated software suite belongs to its historical revision; no simulated-device tests were executed in this campaign"
-  ]
+  ],
+  "human_observation_followup": "records/webui-observation-followup.json (E190); original browser captures unchanged"
 }
