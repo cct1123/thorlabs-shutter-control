@@ -16,8 +16,10 @@ def main(argv=None):
     parser.add_argument("--config", default="shutters.local.toml")
     parser.add_argument("--target", help="Exact configured logical name")
     commands = parser.add_subparsers(dest="command", required=True)
-    for command in ("check-config", "identify", "status", "safe-off", "gui"):
+    for command in ("check-config", "identify", "status", "safe-off"):
         commands.add_parser(command)
+    gui = commands.add_parser("gui", help="Open the localhost WebUI without connecting")
+    gui.add_argument("--port", type=int, default=8050, help="Localhost HTTP port (default: 8050)")
     discover = commands.add_parser(
         "discover", help="Explicit informational inventory; never opens or selects a controller"
     )
@@ -56,7 +58,7 @@ def main(argv=None):
             from .gui import run
 
             gui_hub, hub = hub, None  # GUI owns both output cleanup and communication release.
-            run(gui_hub)
+            run(gui_hub, port=args.port)
             return 0
         if args.target is None:
             raise ValueError("--target is required; no first-device selection")

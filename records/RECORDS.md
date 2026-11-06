@@ -2009,3 +2009,68 @@ this follow-up checkpoint records it, and final local/remote parity is checked
 again after publishing the checkpoint. REQ-223 scoped repository review/delivery
 PASS. Full project remains BLOCKED by E185's external integration failure and the
 unmet physical/deployment requirements; no new physical action was performed.
+
+## E188 - TEST-224 actual WebUI baseline (6 November 2026)
+
+User requested actual hardware control through the WebUI, no fake/simulator,
+with issue diagnosis, fixes and script updates. The user confirmed: "Yes,
+unchanged and protected for this WebUI test" for SH05R, KSC10168800777 at
+192.168.1.19:40305, independently blocked source, isolated triggers and intact
+key/interlock. This is the current protected test window, separate from E181's
+earlier one-cycle authorization. No unrelated device or external application edit.
+
+Production CLI startup at the fixed default 8050 failed. Native socket diagnosis
+confirmed another listener (PID52384); explicit local bind9857 was available.
+Added a validated gui --port option; started the real production GUI at9857,
+without touching the existing application. Browser automation used visible page
+controls, no hidden/direct callback submission, injected transport or simulator.
+
+Browser Release with no selected target was refused. Selected shutter and
+Connect verified68800777/1.0.7/hardware3/channel1. Read returned actual Manual,
+electrical OFF0x2000, interlock requirement true, no fault. Connect's original
+result had unknown feedback. At23:06:58UTC the first ON was refused even after a
+long preceding read/wait: the rest timer started only on the first ON attempt.
+After the rest, visible ON/OFF clicks returned ON0x2001 at23:07:11.233867UTC,
+OFF0x2000 at23:07:11.629272UTC, no fault. Released after OFF before restarting.
+Those are dated electrical observations, not calibrated exposure or blade motion.
+Evidence: records/webui-baseline-live.json and webui-baseline-off.jpg.
+
+## E189 - TEST-224 corrected real WebUI and passive package validation
+
+Fresh OFF feedback now starts the configured rest interval; any observed ON
+invalidates the previous interval. The WebUI Connect explicitly requests fresh
+status after identity. Early ON shows the remaining rest and states that ON was
+not dispatched; no automatic wait, retry or hidden output preparation was added.
+Library connect remains identity-only. GUI --port validates1..65535 and remains
+localhost-only. scripts/verify.py now checks passive GUI help; the new
+scripts/verify_webui_evidence.py checks saved browser observations without
+connecting or simulating devices. Such a checker cannot authenticate provenance
+or replace live browser/hardware evidence.
+
+Restarted the corrected production server and reloaded the visible browser.
+Connect at23:09:04.333209UTC returned fresh Manual/OFF on the exact identity.
+After the OFF rest, the FIRST ON click succeeded: fresh0x2001 at
+23:09:20.904994UTC; the following OFF click returned0x2000 at
+23:09:21.251408UTC. Explicit OFF followed by immediate ON was correctly refused
+with1.66s remaining; fresh Read remained OFF/no fault. The already-Manual button
+returned Manual/OFF without a mode transition. Final Release then Read reported
+disconnected, has_device=false, requestedOFF, no fault. Stopped only the test
+server after release. Two short ON/OFF cycles total in this campaign: one before
+and one after fixes, plus explicit OFF/guard checks; no endurance sequence.
+No independent optical observation has been supplied; do not infer blade motion.
+
+Actual evidence: records/webui-final-live.json, webui-final-off.jpg and the
+hash/provenance wrapper records/webui-live-validation.json. The saved-observation
+checker PASS is records/webui-evidence-validation.json. All changed runtime
+sources were unchanged between the final live run and package/hash validation.
+
+Passive checks PASS: syntax compilation, scoped Ruff lint/format, locked uv
+dependencies, exact wheel/source Python parity, clean isolated wheel install and
+imports with no SDK/native/GUI dependency loaded, GUI help with --port, invalid
+port rejection before app creation, and the saved actual-observation checker.
+The updated wheel is retained under dist; its temporary environment was removed.
+Artifacts/commands: records/webui-package-validation.json. No simulated-device
+tests were run in this no-simulator campaign; old160+160 results are historical
+and are not represented as current full-suite coverage after these source changes.
+Broader physical, fault-injection, external DiamondGUI and deployment qualification
+remain separate. REQ-224 PASS for the actual selected WebUI/controller workflow.

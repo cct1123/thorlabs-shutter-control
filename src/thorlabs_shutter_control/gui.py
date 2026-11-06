@@ -12,6 +12,10 @@ def create_app(hub):
         [
             html.H1("KSC101 direct control"),
             html.P("Electrical readback is not an optical observation. No automatic connection."),
+            html.P(
+                "Connect reads the current mode and electrical output. Before ON, keep Manual "
+                "selected and wait the configured minimum OFF interval."
+            ),
             dcc.Dropdown(id="target", options=[c.name for c in hub.configs], clearable=False),
             html.Div(
                 [
@@ -31,6 +35,10 @@ def create_app(hub):
         style={"maxWidth": "900px", "margin": "3rem auto", "fontFamily": "sans-serif"},
     )
 
+    def connect(target):
+        hub.connect(target)
+        return hub.get_status(target)  # Show fresh feedback and begin observed OFF rest.
+
     @app.callback(
         Output("result", "children"),
         [Input(key, "n_clicks") for key in ("connect", "read", "manual", "on", "off", "release")],
@@ -43,7 +51,7 @@ def create_app(hub):
             if target not in {c.name for c in hub.configs}:
                 raise ValueError("Select an exact configured target before using a control")
             method = {
-                "connect": hub.connect,
+                "connect": connect,
                 "read": hub.get_status,
                 "manual": hub.set_manual_mode,
                 "on": lambda name: hub.set_solenoid(name, True),
@@ -62,12 +70,14 @@ def create_app(hub):
     return app
 
 
-def run(hub):
+def run(hub, *, port=8050):
+    if type(port) is not int or not 1 <= port <= 65535:
+        raise ValueError("WebUI port must be an integer in 1..65535")
     app = create_app(hub)
     original = None
     try:
         # Threaded requests keep protective OFF reachable during an active query.
-        app.run(host="127.0.0.1", port=8050, debug=False, use_reloader=False, threaded=True)
+        app.run(host="127.0.0.1", port=port, debug=False, use_reloader=False, threaded=True)
     except BaseException as exc:
         original = exc
     for cleanup in (hub.shutdown_outputs, hub.close):

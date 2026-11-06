@@ -4,6 +4,24 @@ Date: 4 November 2026
 Status: Engineering requirements
 Project management: uv
 
+## Actual WebUI user-flow test (user request, 6 November 2026)
+
+"run test with the webui. use actual hardware. no fake simulator. control the
+shutter via webui to mimick actual users' behavior. identify issues. fix bugs.
+update scripts."
+
+Exercise this repository's localhost WebUI through visible browser controls and
+the production owner/transport for shutter 68800777, SH05R, KEH3 middle bay
+192.168.1.19:40305. Validate connection, fresh status, user-facing command and
+release behavior; diagnose/fix observed issues and update repeatable procedures
+or scripts. No simulated transport or direct callback/API substitute may be
+reported as WebUI/hardware evidence. Output tests depend on confirmed present
+source protection, trigger isolation and intact key/interlock; finish OFF/Manual
+and release. Do not change drivers, firmware, hub/network settings, other devices
+or the separately edited DiamondGUI application. Physical optical observation
+remains independent from controller output readback. Derive REQ-224 / TEST-224
+for the browser/live evidence, supported fixes and affected software validation.
+
 ## Holistic review and delivery (user request, 6 November 2026)
 
 "holistic review. identify flaws. fix issues. prune. clean out legacy codes.

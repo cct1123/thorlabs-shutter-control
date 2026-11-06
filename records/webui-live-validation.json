@@ -1,0 +1,70 @@
+{
+  "requirement_id": "REQ-224",
+  "test_id": "TEST-224",
+  "evidence_ids": [
+    "E188",
+    "E189"
+  ],
+  "checked_at_utc": "2026-11-06T23:14:22.781101+00:00",
+  "result": "PASS selected actual WebUI/controller workflow",
+  "hardware": {
+    "model": "KSC101",
+    "serial_number": "68800777",
+    "firmware": "1.0.7",
+    "hardware_version": 3,
+    "shutter_model": "SH05R",
+    "endpoint": "192.168.1.19:40305",
+    "bay": "middle"
+  },
+  "authority": "Latest user request for actual WebUI control; user confirmed unchanged protected SH05R/source-blocked/isolated-trigger/key-interlock setup",
+  "method": "Visible browser target selection, Connect, Read, ON, OFF, Manual, Release; production ShutterHub and TCP; no simulator, injected transport or direct callback/API substitute",
+  "cycles": {
+    "baseline": 1,
+    "corrected": 1,
+    "total": 2
+  },
+  "baseline_issues": [
+    "Default port 8050 occupied by another process; fixed GUI port prevented startup",
+    "First ON refused despite long prior read/wait because rest began on the ON attempt",
+    "WebUI Connect returned unknown feedback rather than fresh mode/output"
+  ],
+  "fixed_results": [
+    "Explicit --port 9857 starts without touching the port-8050 application",
+    "Connect shows exact identity and fresh Manual/OFF",
+    "First ON after observed OFF rest succeeds: bit0 set, 0x2001",
+    "OFF click confirms bit0 clear, 0x2000",
+    "Immediate ON during OFF rest refused with 1.66 s remaining; fresh read remains OFF without fault",
+    "Manual query confirms already-Manual/OFF; release and disconnected snapshot confirm no device handle"
+  ],
+  "final_controller_state": "Last live readback Manual/OFF; no fault; no assertion of continuing state after release",
+  "ownership_released": true,
+  "optical_observation": "Not supplied; controller readback only",
+  "runtime_sha256": {
+    "src/thorlabs_shutter_control/config.py": "919d62f3246c3c4c655cd1ba002d5ba946d27b58cde654331274507141e5375a",
+    "src/thorlabs_shutter_control/controller.py": "48d826d230265711d5612e79595ce4ce23ff706fe4c8811b35a80d65573a688e",
+    "src/thorlabs_shutter_control/device.py": "1acb497677b1e58aed54bc38376601a81ac47c7aa7cf1ce5329b0dfffa45da18",
+    "src/thorlabs_shutter_control/discovery.py": "d0c1d84b6761d6fb6534f3afa6f2b3000ea922804270facec7f7e3565a87ca30",
+    "src/thorlabs_shutter_control/errors.py": "f2f4ff77dbba39142b992d047b4ce7a0a93e32f7cdcccd8536a47307cb48d86f",
+    "src/thorlabs_shutter_control/ethernet.py": "8608c91f897f603b2cc5ebc99d528d00f61fc1b15fcee3134d6daa1a21a05ff0",
+    "src/thorlabs_shutter_control/gui.py": "15a055154ad42d97dc9be1da8f57c6f5107cc03c3437e31b37b9852493644e36",
+    "src/thorlabs_shutter_control/ownership.py": "7fb46ab790bd7bb633d157d6ed1547ff1bb7f7c335be7dfa17ecce8ea77f9a1d",
+    "src/thorlabs_shutter_control/protocol.py": "4aa123b577acce11ccef53a9e77f594a6fcbc6ec47baa063f04293dd601d676f",
+    "src/thorlabs_shutter_control/transport.py": "4813b39b923d0daeeb230d255f9c5b6804ab8227584b329c8be94782ea16ffd0",
+    "src/thorlabs_shutter_control/__init__.py": "1ccce0c1685f148a540122793eb3b876392fe5c95c69a13c635fa46c9e5fe973",
+    "src/thorlabs_shutter_control/__main__.py": "6d86421747d8851b826bdecd3c6353ea06334cd3be86669396ef8aee8a8bc821",
+    "config/shutter.ethernet.toml": "5bacb23cb4fbacbcebd86ffd4cdc553e9c81eca206412696500a3f183e76ccae"
+  },
+  "artifacts_sha256": {
+    "records/webui-baseline-live.json": "763e84aab9778e743b49cb8807713b0d9349032eb2f015fe398351b441a5be82",
+    "records/webui-baseline-off.jpg": "60a1cae4df5538fc48a8e482965ae63558d94edfe627fd117d5af11ad0c251ac",
+    "records/webui-final-live.json": "e0f8bfdc94890b5b9d416714aca60f87566146678165557068f36d0f88bf257e",
+    "records/webui-final-off.jpg": "2485c9e94db1944fa8c3266902ff46e9bf5ce3a68363977b710cfbe9b9c4c613"
+  },
+  "passive_validation": "records/webui-package-validation.json",
+  "saved_evidence_check": "records/webui-evidence-validation.json",
+  "limits": [
+    "Controller readback only; independent blade motion/optical closure and calibrated timing unverified",
+    "No driver/firmware/network/hub settings, other device, Trigger/TTL/cycle command or external DiamondGUI change",
+    "Previous 160/160 simulated software suite belongs to its historical revision; no simulated-device tests were executed in this campaign"
+  ]
+}

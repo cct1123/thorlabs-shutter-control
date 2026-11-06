@@ -1,0 +1,16 @@
+{
+  "requirement_id": "REQ-224",
+  "result": "PASS recorded WebUI evidence consistency",
+  "scope": "Saved observations only; no new hardware action or simulator",
+  "evidence": "C:\\repo\\thorlabs-shutter-control\\records\\webui-final-live.json",
+  "sha256": "e0f8bfdc94890b5b9d416714aca60f87566146678165557068f36d0f88bf257e",
+  "checks": [
+    "exact identity/route",
+    "fresh OFF",
+    "first ON",
+    "OFF",
+    "rest refusal",
+    "release"
+  ],
+  "optical_observation": "Not supplied; controller readback only"
+}

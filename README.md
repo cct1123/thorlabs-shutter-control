@@ -46,10 +46,14 @@ shutters.local.toml and supply the exact identities/routes. Omit policy for read
 uv run --locked shutter-control --config shutters.local.toml check-config
 uv run --locked shutter-control --config shutters.local.toml --target shutter identify
 uv run --locked shutter-control --config shutters.local.toml --target shutter status
-uv run --locked shutter-control --config shutters.local.toml gui
+uv run --locked shutter-control --config shutters.local.toml gui --port 9857
 ```
 
-The GUI is localhost:8050 and connects only on a click. Qualified D2XX and docked
+The GUI binds only localhost; the example selects port 9857 (default 8050).
+Use an explicit free port when another application is running; there is no
+automatic fallback or takeover. Connect verifies identity and reads fresh mode,
+interlock configuration and electrical output. Fresh OFF starts the configured
+rest interval, so ON does not need a preliminary failed click. Qualified D2XX and docked
 KEH3 Manual ON/OFF and host holds use the same owner and reviewed load policy.
 Leaving Trigger mode requires explicit source protection through the Python API
 or CLI; the GUI does not supply that confirmation. Changed modes persist and
@@ -101,4 +105,13 @@ separate and never executes device cells:
 
 ```powershell
 uv run --locked --group notebooks python scripts/verify_notebooks.py
+```
+
+Actual browser testing on the selected SH05R verified ON/OFF, OFF-rest refusal and
+release using the production TCP owner, with no simulator. See the
+[WebUI procedure and evidence](docs/gui.md). To check the saved observations
+without operating hardware:
+
+```powershell
+uv run --locked python scripts/verify_webui_evidence.py
 ```

@@ -233,6 +233,10 @@ class ShutterHub:
         mode = c.driver.operating_mode(d, protective=protective)
         required = c.driver.interlock_required(d, protective=protective)
         bits = c.driver.status_bits(d, protective=protective)
+        if bits & 1:
+            c.next_on = None  # An observed active output invalidates the previous OFF interval.
+        elif c.next_on is None and c.config.policy is not None:
+            c.next_on = clock() + c.config.policy.min_off_s
         return ShutterFeedback(
             shutter_state="unknown",
             operating_mode=mode,
@@ -364,11 +368,12 @@ class ShutterHub:
         feedback = self._preflight(c, d)
         if feedback.electrical_state != "off":
             raise ShutterError("Output already active; timing/ownership is unknown")
-        if c.next_on is None:
-            # First ON after connect needs a measured complete OFF interval.
-            c.next_on = clock() + policy.min_off_s
-        if clock() < c.next_on:
-            raise ShutterError("Minimum OFF/duty recovery interval has not elapsed")
+        remaining = c.next_on - clock()  # Fresh OFF preflight establishes this interval.
+        if remaining > 0:
+            raise ShutterError(
+                f"Minimum OFF/duty recovery interval has not elapsed; wait {remaining:.2f} s. "
+                "ON was not dispatched."
+            )
         c.claim.mark_uncertain("ON may have applied; safe state not yet confirmed")
         c.requested = "on"
         c.cleanup = None

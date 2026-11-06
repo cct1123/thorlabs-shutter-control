@@ -1,0 +1,188 @@
+{
+  "requirement_id": "REQ-224",
+  "checked_at_utc": "2026-11-06T23:13:28.840213+00:00",
+  "result": "PASS passive package and saved-evidence checks",
+  "scope": "No device operation, simulator, injected transport, synthetic callback or live HTTP API used by these package checks; actual browser/hardware evidence is separate",
+  "source_sha256": {
+    "src/thorlabs_shutter_control/config.py": "919d62f3246c3c4c655cd1ba002d5ba946d27b58cde654331274507141e5375a",
+    "src/thorlabs_shutter_control/controller.py": "48d826d230265711d5612e79595ce4ce23ff706fe4c8811b35a80d65573a688e",
+    "src/thorlabs_shutter_control/device.py": "1acb497677b1e58aed54bc38376601a81ac47c7aa7cf1ce5329b0dfffa45da18",
+    "src/thorlabs_shutter_control/discovery.py": "d0c1d84b6761d6fb6534f3afa6f2b3000ea922804270facec7f7e3565a87ca30",
+    "src/thorlabs_shutter_control/errors.py": "f2f4ff77dbba39142b992d047b4ce7a0a93e32f7cdcccd8536a47307cb48d86f",
+    "src/thorlabs_shutter_control/ethernet.py": "8608c91f897f603b2cc5ebc99d528d00f61fc1b15fcee3134d6daa1a21a05ff0",
+    "src/thorlabs_shutter_control/gui.py": "15a055154ad42d97dc9be1da8f57c6f5107cc03c3437e31b37b9852493644e36",
+    "src/thorlabs_shutter_control/ownership.py": "7fb46ab790bd7bb633d157d6ed1547ff1bb7f7c335be7dfa17ecce8ea77f9a1d",
+    "src/thorlabs_shutter_control/protocol.py": "4aa123b577acce11ccef53a9e77f594a6fcbc6ec47baa063f04293dd601d676f",
+    "src/thorlabs_shutter_control/transport.py": "4813b39b923d0daeeb230d255f9c5b6804ab8227584b329c8be94782ea16ffd0",
+    "src/thorlabs_shutter_control/__init__.py": "1ccce0c1685f148a540122793eb3b876392fe5c95c69a13c635fa46c9e5fe973",
+    "src/thorlabs_shutter_control/__main__.py": "6d86421747d8851b826bdecd3c6353ea06334cd3be86669396ef8aee8a8bc821",
+    "scripts/verify.py": "5ce15f5da282d00d39588fae70f9afa9187026e60768dd4d36a3e68464cb96a0",
+    "scripts/verify_webui_evidence.py": "ade7e8566a892e5fbb22780a1b7e1de092bdceffeebc72a1c594737cecf5154b",
+    "config/shutter.ethernet.toml": "5bacb23cb4fbacbcebd86ffd4cdc553e9c81eca206412696500a3f183e76ccae",
+    "README.md": "ea3d9c75bd65128089586decf1707254b3485e483070336faf4d2fb1f91ea7eb",
+    "pyproject.toml": "66fb4ef33fa9dc324e09b34e02a78a314b61419446abf8f6c61f50441bab5ea7",
+    "uv.lock": "bbbca9b12e3f685d1a553dc156f76c487cbcad7334dbd5cea8a8e96b1ed72f31"
+  },
+  "wheel_sha256": "0d49142a1ad54c318ffbb6d5f0b3c4cd232c2006e8a287a6ff504302bc50364b",
+  "wheel_python_source_parity": "PASS",
+  "results": [
+    {
+      "check": "lock current",
+      "command": [
+        "C:\\Users\\HFNV\\AppData\\Local\\hermes\\bin\\uv.EXE",
+        "lock",
+        "--check",
+        "--offline"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "Resolved 123 packages in 1ms\n"
+    },
+    {
+      "check": "ruff lint",
+      "command": [
+        "C:\\repo\\thorlabs-shutter-control\\.venv\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "ruff",
+        "check",
+        "--no-cache",
+        "src/thorlabs_shutter_control/controller.py",
+        "src/thorlabs_shutter_control/gui.py",
+        "src/thorlabs_shutter_control/__main__.py",
+        "scripts/verify.py",
+        "scripts/verify_webui_evidence.py"
+      ],
+      "exit_code": 0,
+      "stdout": "All checks passed!\n",
+      "stderr": ""
+    },
+    {
+      "check": "ruff formatting",
+      "command": [
+        "C:\\repo\\thorlabs-shutter-control\\.venv\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "--no-cache",
+        "src/thorlabs_shutter_control/controller.py",
+        "src/thorlabs_shutter_control/gui.py",
+        "src/thorlabs_shutter_control/__main__.py",
+        "scripts/verify.py",
+        "scripts/verify_webui_evidence.py"
+      ],
+      "exit_code": 0,
+      "stdout": "5 files already formatted\n",
+      "stderr": ""
+    },
+    {
+      "check": "saved actual browser observations",
+      "command": [
+        "C:\\repo\\thorlabs-shutter-control\\.venv\\Scripts\\python.exe",
+        "-B",
+        "scripts/verify_webui_evidence.py",
+        "--output",
+        "records/webui-evidence-validation.json"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"requirement_id\": \"REQ-224\",\n  \"result\": \"PASS recorded WebUI evidence consistency\",\n  \"scope\": \"Saved observations only; no new hardware action or simulator\",\n  \"evidence\": \"C:\\\\repo\\\\thorlabs-shutter-control\\\\records\\\\webui-final-live.json\",\n  \"sha256\": \"e0f8bfdc94890b5b9d416714aca60f87566146678165557068f36d0f88bf257e\",\n  \"checks\": [\n    \"exact identity/route\",\n    \"fresh OFF\",\n    \"first ON\",\n    \"OFF\",\n    \"rest refusal\",\n    \"release\"\n  ],\n  \"optical_observation\": \"Not supplied; controller readback only\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel build",
+      "command": [
+        "C:\\repo\\thorlabs-shutter-control\\.venv\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "hatchling",
+        "build",
+        "-t",
+        "wheel",
+        "-d",
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\webui-package-6fd2e39038384dcc8b4dae4689d17778\\build"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "tmp\\webui-package-6fd2e39038384dcc8b4dae4689d17778\\build\\thorlabs_shutter_control-1.0.0-py3-none-any.whl\n"
+    },
+    {
+      "check": "clean venv",
+      "command": [
+        "C:\\Users\\HFNV\\AppData\\Local\\hermes\\bin\\uv.EXE",
+        "venv",
+        "--offline",
+        "--python",
+        "3.12",
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\webui-package-6fd2e39038384dcc8b4dae4689d17778\\clean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "Using CPython 3.12.7 interpreter at: C:\\ProgramData\\anaconda3\\python.exe\nCreating virtual environment at: tmp\\webui-package-6fd2e39038384dcc8b4dae4689d17778\\clean\nActivate with: tmp\\webui-package-6fd2e39038384dcc8b4dae4689d17778\\clean\\Scripts\\activate\n"
+    },
+    {
+      "check": "install exact wheel without dependencies",
+      "command": [
+        "C:\\Users\\HFNV\\AppData\\Local\\hermes\\bin\\uv.EXE",
+        "pip",
+        "install",
+        "--offline",
+        "--no-deps",
+        "--python",
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\webui-package-6fd2e39038384dcc8b4dae4689d17778\\clean\\Scripts\\python.exe",
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\webui-package-6fd2e39038384dcc8b4dae4689d17778\\build\\thorlabs_shutter_control-1.0.0-py3-none-any.whl"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "Using Python 3.12.7 environment at: tmp\\webui-package-6fd2e39038384dcc8b4dae4689d17778\\clean\nResolved 1 package in 4ms\nPrepared 1 package in 26ms\nInstalled 1 package in 157ms\n + thorlabs-shutter-control==1.0.0 (from file:///C:/repo/thorlabs-shutter-control/tmp/webui-package-6fd2e39038384dcc8b4dae4689d17778/build/thorlabs_shutter_control-1.0.0-py3-none-any.whl)\n"
+    },
+    {
+      "check": "isolated passive imports",
+      "command": [
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\webui-package-6fd2e39038384dcc8b4dae4689d17778\\clean\\Scripts\\python.exe",
+        "-I",
+        "-B",
+        "-c",
+        "import sys; import thorlabs_shutter_control as p; import thorlabs_shutter_control.gui; assert 'site-packages' in p.__file__; assert not {'dash','ftd2xx','serial','clr','pythonnet'} & set(sys.modules); print(p.__file__)"
+      ],
+      "exit_code": 0,
+      "stdout": "C:\\repo\\thorlabs-shutter-control\\tmp\\webui-package-6fd2e39038384dcc8b4dae4689d17778\\clean\\Lib\\site-packages\\thorlabs_shutter_control\\__init__.py\n",
+      "stderr": ""
+    },
+    {
+      "check": "isolated GUI help",
+      "command": [
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\webui-package-6fd2e39038384dcc8b4dae4689d17778\\clean\\Scripts\\python.exe",
+        "-I",
+        "-B",
+        "-m",
+        "thorlabs_shutter_control",
+        "gui",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: __main__.py gui [-h] [--port PORT]\n\noptions:\n  -h, --help   show this help message and exit\n  --port PORT  Localhost HTTP port (default: 8050)\n",
+      "stderr": ""
+    },
+    {
+      "check": "invalid port refused passively",
+      "command": [
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\webui-package-6fd2e39038384dcc8b4dae4689d17778\\clean\\Scripts\\python.exe",
+        "-I",
+        "-B",
+        "-m",
+        "thorlabs_shutter_control",
+        "--config",
+        "C:\\repo\\thorlabs-shutter-control\\config\\shutter.ethernet.toml",
+        "gui",
+        "--port",
+        "0"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Unconfirmed: WebUI port must be an integer in 1..65535\n"
+    }
+  ],
+  "full_simulated_test_suite": "NOT RUN for this no-simulator campaign; prior 160/160 results remain historical"
+}

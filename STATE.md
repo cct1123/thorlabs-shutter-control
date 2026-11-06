@@ -1,8 +1,39 @@
 # Engineering state
 
+## Latest actual WebUI validation (6 November 2026)
+
+REQ-224 / TEST-224: PASS for the selected actual WebUI/controller workflow.
+The user confirmed the unchanged protected SH05R setup. Visible browser actions
+used the production owner/TCP at 192.168.1.19:40305, KSC10168800777/1.0.7;
+no simulator, injected transport or direct callback substitute. Two short ON/OFF
+cycles total (baseline and corrected), plus explicit OFF/rest-guard checks.
+The final live read was Manual/OFF/no fault; Release then Read showed disconnected,
+has_device=false and requestedOFF. The test server on9857 was stopped after
+release; the separate8050 listener was left alone. No further actuation is planned.
+
+E188 exposed default-port collision, unknown feedback after GUI Connect and a
+first-ON rest-timer bug. E189 fixes gui --port, fresh feedback on WebUI Connect,
+OFF-rest timing beginning at fresh OFF rather than a failed ON attempt, and a
+remaining-wait message. First ON after the rest now succeeds; immediate ON during
+rest is refused with1.66s remaining, followed by fresh OFF/no fault. Already-Manual
+selection remained a read-only no-op. Library connect remains identity-only.
+
+Evidence: records/webui-baseline-live.json, webui-final-live.json, the two JPEGs,
+webui-live-validation.json (runtime/config/artifact hashes), webui-evidence-validation.json
+and webui-package-validation.json. scripts/verify_webui_evidence.py checks saved
+observations without operating or simulating hardware. Passive compile/lint/format,
+lock, exact wheel parity, isolated install/import/help and invalid-port checks PASS.
+No simulated-device tests ran in this campaign. The previous160+160 full suite is
+historical for its recorded revision; affected full fault/deadline/cancellation
+regressions are not claimed as newly revalidated by this selected happy path.
+Independent blade/optical observation has not been supplied and remains UNTESTED.
+
+## Previously delivered holistic review
+
 Updated 6 November 2026. **REQ-223 repository review/delivery COMPLETE.
 Full physical/deployment qualification remains BLOCKED.**
-No device operation, connection, driver change or repeat commissioning in this review.
+That prior review performed no device operation; E188/E189 above are the separately
+authorized current live WebUI work. No driver, firmware or network setting changed.
 
 ## Current architecture and configuration
 
@@ -26,7 +57,7 @@ requires explicit source_inhibited=True and persistent-mode policy permission,
 sends OFF first, then confirms Manual/OFF. Interlock readback is configuration,
 not measured contact continuity. Optical state is never inferred from output bits.
 
-## Current review and validation
+## Previous review validation (historical revision)
 
 E183 / TEST-223: 160 source + 160 isolated installed-wheel tests PASS, zero
 failures/errors/skips. Locked dependencies/build/install/import/help, source-wheel
@@ -110,7 +141,8 @@ Human criteria remain in PROJECT.md. PASS is scoped to its stated method/revisio
 | REQ-220 | Exact Ethernet ON/OFF | TEST-220; E181 | PASS recorded controller cycle/release only; optics unobserved; current physical revision UNTESTED |
 | REQ-221 | Repository manuals | TEST-221; E179/E184 hash checks | PASS four unchanged copies; local SH05R PDF missing |
 | REQ-222 | Earlier manual/package review | TEST-222; E182 | Historical scoped PASS; current software revalidated in E183 |
-| REQ-223 | Holistic review, prune, naming, staged push (derived) | TEST-223; E183-E187 and holistic-review/publication manifests | PASS scoped repository review/delivery; external deployment blockers documented |
+| REQ-223 | Holistic review, prune, naming, staged push (derived) | TEST-223; E183-E187 and holistic-review/publication manifests | PASS prior scoped repository delivery; external deployment blockers documented |
+| REQ-224 | Actual WebUI user flow, fixes and scripts | TEST-224; E188/E189 actual browser/controller + passive package checks | PASS selected actual WebUI/controller path; independent optics and full changed-package fault matrix open |
 
 ## Short plan and human action required
 

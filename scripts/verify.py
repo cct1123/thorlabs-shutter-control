@@ -149,6 +149,7 @@ print(json.dumps({'python': sys.version, 'package': package.__file__}))
         cwd=work,
     )
     run("clean CLI help", isolated, "-m thorlabs_shutter_control --help", cwd=work)
+    run("clean WebUI help", isolated, "-m thorlabs_shutter_control gui --help", cwd=work)
     tests("wheel", isolated)
     for label in ("missing", "outdated"):
         folder = work / label
