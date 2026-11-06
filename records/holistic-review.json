@@ -20,7 +20,7 @@
     "failed": 26,
     "artifact": "records/diamondgui-current-integration.json"
   },
-  "local_markdown_links": 111,
+  "local_markdown_links": 112,
   "wheel_readme_matches_current": true,
   "readme_sha256": "543ed1d08ec7775c557b7b62f439d7e3b6ab4d4dd6ab2b9b6c53a80138a67273",
   "wheel_sha256": "a5f8c2c8e958169878c679fe06b1fb505e5f23b9a93a8d81b594f56fda26c767",
@@ -38,5 +38,6 @@
     "net_removed": 114,
     "reduction_percent": 6.7
   },
-  "scope": "Source/package/docs/pruning/cleanup only; preserve external dirty integration; historical hardware evidence unchanged in meaning"
+  "scope": "Source/package/docs/pruning/cleanup only; preserve external dirty integration; historical hardware evidence unchanged in meaning",
+  "documentation_link_recheck": "PASS after adding the final review-manifest link to outputs/REPORT.md; no source/package input changed"
 }
