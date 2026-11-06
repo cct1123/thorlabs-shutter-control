@@ -1,7 +1,7 @@
 # Engineering state
 
-Updated 6 November 2026. **REQ-223 software review validated; staged delivery in
-progress. Full physical/deployment qualification remains BLOCKED.**
+Updated 6 November 2026. **REQ-223 repository review/delivery COMPLETE.
+Full physical/deployment qualification remains BLOCKED.**
 No device operation, connection, driver change or repeat commissioning in this review.
 
 ## Current architecture and configuration
@@ -46,7 +46,10 @@ successful disposable environment and retains failed-run diagnostics.
 
 Stage 1: b9b2309 runtime, regression fixes, examples, migration/API/operator docs.
 Stage 2: 2297162 manufacturer manuals, source/state interpretation and preserved
-hardware evidence. Stage 3: final report/checkpoint, cleanup and publication record.
+hardware evidence. Stage 3: c6f6661 final review/checkpoint and cleanup record.
+E187 verifies all three stages published to origin/main at c6f6661, matching local
+HEAD with a clean working tree. This follow-up checkpoint preserves that observed
+result; final remote parity is checked again after its publication.
 Publication is explicitly authorized by the current user request in PROJECT.md.
 
 E185 supersedes the old unavailable-checkout assumption: the external DiamondGUI
@@ -107,12 +110,14 @@ Human criteria remain in PROJECT.md. PASS is scoped to its stated method/revisio
 | REQ-220 | Exact Ethernet ON/OFF | TEST-220; E181 | PASS recorded controller cycle/release only; optics unobserved; current physical revision UNTESTED |
 | REQ-221 | Repository manuals | TEST-221; E179/E184 hash checks | PASS four unchanged copies; local SH05R PDF missing |
 | REQ-222 | Earlier manual/package review | TEST-222; E182 | Historical scoped PASS; current software revalidated in E183 |
-| REQ-223 | Holistic review, prune, naming, staged push (derived) | TEST-223; E183/E184 and final cleanup/delivery record | Software/docs PASS; final commit/push pending |
+| REQ-223 | Holistic review, prune, naming, staged push (derived) | TEST-223; E183-E187 and holistic-review/publication manifests | PASS scoped repository review/delivery; external deployment blockers documented |
 
 ## Short plan and human action required
 
-Finish the scoped cleanup/report commit, push all three stages, verify remote HEAD
-and clean status. No further implementation or physical command is planned here.
+The requested repository work is delivered. No further implementation or physical
+command is planned here. Keep the external dirty integration intact until its
+intended restoration/mapping is agreed. Full-project BLOCKED is not validated
+deployment completion.
 
 For the broader deployment, provide one approved commissioning handoff: the exact
 current setup, independent source protection, allowed commands/rated limits and

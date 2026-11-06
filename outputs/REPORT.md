@@ -57,8 +57,10 @@ package PASS and external integration FAIL together.
 
 Stage 1: b9b2309, runtime migration, owner/GUI fixes, examples and operator/API docs.
 Stage 2: 2297162, manufacturer manuals, source/state interpretation and historical
-evidence. The final checkpoint/cleanup commit and remote synchronization are
-recorded in STATE.md and the engineering delivery record.
+evidence. Stage 3: c6f6661, final review/checkpoint and cleanup evidence.
+All three review stages were pushed to origin/main and verified against remote
+HEAD at c6f6661 with a clean working tree (E187, records/holistic-publication.json).
+A follow-up publication checkpoint preserves that observed delivery result.
 
 Only inventoried generated cache/test/build paths are removed. The environment,
 current wheel, manuals, records, private notebook backups, reference originals and

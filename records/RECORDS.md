@@ -1995,3 +1995,17 @@ bytecode settings. Removed the small leftover test/example caches from the prior
 tool run; all 59 scoped cache/temp targets are absent after final verification.
 112 final local Markdown targets resolve. records/holistic-review.json captures
 these results and the separate 3 PASS / 26 FAIL external integration result.
+
+## E187 - TEST-223 verified publication (6 November 2026)
+
+Pushed origin/main with an ordinary fast-forward: 8f324a6 ->
+c6f6661eb948a5acd4a6d21b9345ae68363ad57d. This publishes review stages b9b2309,
+2297162 and c6f6661 and the pre-existing unpushed migration checkpoint 9d486b3.
+git ls-remote --heads origin main returned exactly local HEAD c6f6661; the working
+tree was clean after refreshing the index for byte-identical LF-normalized files.
+No source content was changed by that refresh. No force push or external-repository
+change occurred. records/holistic-publication.json preserves this observed result;
+this follow-up checkpoint records it, and final local/remote parity is checked
+again after publishing the checkpoint. REQ-223 scoped repository review/delivery
+PASS. Full project remains BLOCKED by E185's external integration failure and the
+unmet physical/deployment requirements; no new physical action was performed.

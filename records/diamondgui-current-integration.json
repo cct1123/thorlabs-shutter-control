@@ -32,5 +32,5 @@
     "hardware/config.py": "14bd018118a667816794b6e92bb2ea08e3c9a492a4d864384d77068a0144e5ff"
   },
   "artifact": "records/diamondgui-current-tests.xml",
-  "external_change_decision": "Pending user preference; preserve separate dirty edits by default"
+  "external_change_decision": "Preserved separate existing dirty page/configuration; restoration awaits user scope decision and is not part of this delivered repository change"
 }

@@ -1,0 +1,20 @@
+{
+  "evidence_id": "E187",
+  "requirement_id": "REQ-223",
+  "checked_at_utc": "2026-11-06T23:02:11.227402+00:00",
+  "result": "PASS verified publication of reviewed implementation/documentation/cleanup stages",
+  "remote": "origin",
+  "branch": "main",
+  "local_commit": "c6f6661eb948a5acd4a6d21b9345ae68363ad57d",
+  "verified_remote_commit": "c6f6661eb948a5acd4a6d21b9345ae68363ad57d",
+  "working_tree_clean_at_check": true,
+  "review_commits": [
+    "b9b2309",
+    "2297162",
+    "c6f6661"
+  ],
+  "included_prior_unpushed_migration_commit": "9d486b3",
+  "push": "normal fast-forward, no force",
+  "scope": "Publication of this repository only; external DiamondGUI files unchanged; integrated/physical deployment remains blocked",
+  "note": "This evidence is saved in a follow-up publication checkpoint; final remote parity is checked again after pushing that checkpoint."
+}
