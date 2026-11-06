@@ -1,5 +1,6 @@
-"""Bounded TCP bytes for explicit commissioning, not a KEH3 wire-contract claim."""
+"""Bounded TCP bytes; APT framing and complete/partial-write handling stay in Session."""
 
+import select
 import socket
 
 from .errors import ShutterError
@@ -18,19 +19,23 @@ class TCPTransport:
     def write(self, data, deadline):
         # Exactly one send. A partial result is surfaced, never replayed.
         self.socket.settimeout(deadline.remaining())
-        count = self.socket.send(data)
-        deadline.remaining()
-        return count
+        return self.socket.send(data)  # Session checks lateness after learning the exact count.
 
     def read(self, seconds):
         self.socket.settimeout(seconds)
         try:
             data = self.socket.recv(4096)
-        except TimeoutError:
+        except (TimeoutError, BlockingIOError):
             return b""
         if not data:
             raise ShutterError("TCP peer disconnected; shutter state is unknown")
         return data
+
+    def read_nowait(self):
+        """Drain only arrived bytes so Session can reject unsolicited replies."""
+        if not select.select([self.socket], [], [], 0)[0]:
+            return b""
+        return self.read(0)
 
     def close(self):
         self.socket.close()

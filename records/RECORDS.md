@@ -961,3 +961,963 @@ records/review-validation.json records the current link/hash audit and size
 comparison. No device enumeration/open/query/output, lab-network probe, driver or
 firmware change occurred. Local commit is explicitly authorized; no publication
 is authorized. REQ-208/209/210 remain blocked under the unchanged physical criteria.
+
+
+## D050 - Live-only example notebooks, without simulated execution
+
+2026-11-05, REQ-215. Active human instruction: "revise all the example notebooks.
+directly deal with the hardware . no simulator." Supersedes the earlier
+fictional-config/default-skipped and fake-transport notebook acceptance. Keep
+REQ-215 / TEST-215 stable and preserve old E164/E168 results as historical.
+
+All six notebooks call production APIs. Discovery directly invokes native D2XX
+or VCP inventory without configuration or device open. Other examples require
+ignored shutters.local.toml and an explicitly selected name; no example identity
+is used as a live default. Read-only operation cells connect directly. Mode and
+ON/OFF operation cells require typed confirmation for that serial before opening,
+with real policy/identity/interlock checks still enforced by the owner. The ON/OFF
+pair remains within one cell; cleanup and release failures preserve the first
+error. Unsupported VCP writes, KEH3 operation and TTL/cycle modes remain unavailable.
+
+Notebook validation is static: schema, compilation, local links, cleared outputs.
+Remove kernel execution and injected fake notebook paths, rather than enabling
+live cells in automated verification. Existing driver/protocol regression fakes
+remain offline tests, separately scoped from actual notebook/bench behavior.
+The source owner/API and DiamondGUI are unchanged. No physical qualification or
+exact actuation window is inferred from a request to revise examples.
+
+## E169 / TEST-215 - Live notebook revision, actual native inventory and static checks
+
+2026-11-05. Expected: six standalone live-hardware examples, no simulator,
+no silent skipped-success path, explicit identity/configuration, retained write
+qualification and cleanup, no automatic execution of live cells by verification.
+PASS static implementation; actual controller/physical execution BLOCKED.
+
+Actual host operation: existing .venv/Scripts/python.exe imported
+thorlabs_shutter_control.discovery and called list_d2xx_devices() and
+list_vcp_ports() once each, printing rows. Four D2XX entries and six COM entries
+were reported; see records/notebook-hardware-inventory.json for the exact output.
+No visible descriptor identifies a KSC101. One D2XX row has blank serial/description,
+VID/PID 0000:0000 and OPEN flag; this is unknown, not proof of absent hardware.
+No entry was opened or selected automatically. shutters.local.toml is absent.
+Readback, mode, solenoid, optical state and timing tests were NOT RUN.
+
+Command (workspace UV_CACHE_DIR=.uv-cache):
+uv run --locked --offline --no-sync python scripts/verify_notebooks.py.
+Observed: six schema/syntax/link/cleared-output PASS results, each explicitly
+hardware_execution=NOT RUN. records/notebook-validation.json contains hashes.
+No kernel was started, no tutorial cells were executed, and no simulator injected.
+
+Integrated command (same workspace cache):
+uv run --locked --offline --no-sync --group dev --extra gui python scripts/verify.py.
+Observed: 129 full source tests (1.28 s), identical 129 installed-wheel tests
+(1.50 s), zero skips/failures/errors; lint/format, lock, exact wheel/source parity,
+clean dependency installation/import/help, stable input hashes, negative lock
+checks and the separate passive script PASS. Test count falls from 131 because
+18 old default/fake notebook checks were replaced with 16 static/prerequisite
+checks. Existing control/protocol tests remain software-only. Runtime source is
+unchanged, so E168's 29 DiamondGUI integration results remain applicable.
+records/direct-validation.json, offline-tests.xml and wheel-tests.xml are current.
+
+The initial sandbox verifier failed on Windows temporary-directory access
+(WinError 5). The same full software-only verifier then passed outside that
+restriction; no test was skipped or relabelled. Final notebook schema checks have
+no missing-cell-ID warning. No controller connection/query/actuation, laboratory
+socket, driver/binding/firmware change, commit or push was performed. To resume
+live controller testing, supply the reviewed exact controller/configuration and
+actual setup/qualification; prepare an approved bounded window for write/physical
+acceptance. Project deployment remains BLOCKED, not validated completion.
+
+
+## D051 - One actual read-only attempt on the Windows-identified shutter
+
+2026-11-05, REQ-202/203/215. Human instruction: "try to communicate with the
+shutter". Authorizes current native/PnP inventory and exact-target read-only
+identity/status communication. Retain all physical, ownership and driver/security
+boundaries. No broad COM probing, mode/output command, driver/binding change,
+security bypass, or unverified network fallback is justified by this instruction.
+
+Present-only Windows inventory identifies USB VID_0403/PID_FAF0 serial 68800777 as
+Kinesis Solenoid Controller. Use this current identity, not the blank D2XX row or
+first device. Ignored shutters.local.toml selects logical name shutter, application
+channel 0, physical role explicitly unverified, exact serial, D2XX, no policy.
+Expected firmware 1.0.7 comes from historical records for this serial and remains
+a strict check; no current firmware is inferred. Use canonical ownership locks,
+5 s connect/identity and 3 s status budgets, standard production initialization,
+communication-only release and no automatic retry. If native open fails, inspect
+binding metadata before any protocol or device-state hypothesis.
+
+## E170 / TEST-202 - Actual shutter connection failed at D2XX native open
+
+2026-11-05, actual host/hardware, no simulator. Expected: exact serial 68800777
+opens, model/firmware/channel identity verifies, and read-only status returns;
+no mode/output commands. Result: FAIL native open; identity/status NOT RUN.
+
+Repeated real D2XX/VCP inventory matches E169: four D2XX entries (one blank/OPEN)
+and six COM entries, no named KSC101 descriptor. Sandboxed CIM metadata read was
+denied; read-only Windows metadata outside that restriction succeeded.
+Get-PnpDevice -PresentOnly confirms Kinesis Solenoid Controller
+USB\VID_0403&PID_FAF0\68800777, status OK. This supersedes descriptor-only lack
+of identification; it does not prove a functioning protocol path.
+
+Actual command (workspace UV_CACHE_DIR=.uv-cache):
+uv run --locked --offline --no-sync python tmp/read_only_shutter.py.
+The script loads the no-policy config, constructs ShutterHub with normal locks,
+and calls connect("shutter"), followed by identify_device/get_status only if
+connection succeeds. Finally calls hub.close() and writes the result. It ran
+outside the filesystem restriction for canonical LOCALAPPDATA ownership locks.
+At 2026-11-05T23:56:04.370481+00:00 it failed in connect with
+ftd2xx.DeviceError DEVICE_NOT_OPENED after 0.05634319999808213 s. The failure is
+at FT_OpenEx for the exact serial, before USB initialization or APT transmission.
+Communication release completed. No timeout, identity mismatch or protocol
+failure was observed because no controller request could be sent. No retry.
+
+Diagnostic command:
+pnputil /enum-devices /instanceid "USB\VID_0403&PID_FAF0\68800777" /drivers /services /stack.
+Observed: device Stopped; class/GUID/manufacturer Unknown; stack CSDeviceControl,
+USBHUB3. Get-PnpDeviceProperty reports empty service, driver INF/version and driver;
+problem code 0, devnode status 25190400. Parent is
+USB\VID_0424&PID_2514\7&22314d84&0&4. Win32_SystemDriver identifies CSDeviceControl
+as running CrowdStrike Device Control Service, path
+C:\Windows\system32\drivers\CSDeviceControl.sys. The apparent PnP OK versus
+PnPUtil Stopped states are preserved; neither is rewritten as a protocol PASS.
+
+Conclusion: current exact-serial D2XX access fails; device presence is confirmed.
+No function-driver binding is reported. A CrowdStrike filter is present in the
+stack, but its causal role/policy decision has not been established. Do not
+claim a firmware/protocol defect or remedy this with a security bypass. Required
+resumption: administrator-reviewed restoration of approved USB access and binding
+for this exact instance, with any driver cutover under the established downtime/
+inventory/rollback rules, then repeat metadata and one read-only attempt.
+
+Evidence: records/live-shutter-communication.json (config snapshot, native error,
+exact PnP/stack observations, command/script hash and release outcome). Config is
+local/ignored; no policy was fabricated. Prior software test evidence remains
+applicable because no runtime/test/notebook source changed. No mode/output,
+driver/binding/security change, lab-network socket, unrelated device open,
+commit or push occurred. Optical/electrical state and current firmware remain
+unknown; deployment remains BLOCKED.
+
+
+## D052 - Query the user-confirmed Ethernet endpoint without enabling control
+
+2026-11-05, REQ-208/217. User instruction: "try ethernet instead", then
+"try 192.168.1.19", followed by the exact current mapping:
+SHUTTERHUB_IP="192.168.1.19", SHUTTERHUB_PORT=40303,
+SHUTTER_CH_MAP={"verdi shutter":{"CH":0,"SN":68800777,"IP_PORT":40304}}.
+User confirms: "Yes—powered, Ethernet connected, USB IN disconnected". This is
+human-reported current physical evidence satisfying the KEH3 manual section 4.3
+USB IN exclusion; it does not establish optical state or load qualification.
+
+The preserved executed LAN notebook already recorded this IP, bay port and serial;
+its historical evidence was used to prepare the candidate before the user supplied
+the current map. Its SHA256/provenance are in the artifact. Hub serial/firmware
+remain unknown, explicitly marked UNKNOWN in the diagnostic-only config; expected
+controller firmware 1.0.7 remains historical. No unknown field counts as verified.
+
+Authorize one separate KEH3Probe on 192.168.1.19:40304, candidate 0x50, one
+HW_REQ_INFO (05 00 00 00 50 01), 5 s total budget and canonical serial/endpoint
+claims. No scan, retry, other bay, mode/output, settings or route qualification.
+Following TCP refusal, test only the user-supplied hub management port with a
+TCP connect/close (no payload), one ping and local connection metadata. Do not
+send controller queries to the undocumented management protocol or modify any
+security/driver configuration. These explicit Ethernet diagnostics supersede
+the earlier offline/no-network authority only within this bounded scope.
+
+## E171 / TEST-208 - Real Ethernet: management reachable, shutter bay refuses TCP
+
+2026-11-05 (America/Chicago). Actual lab network, no simulator. Expected: selected
+bay TCP opens, one candidate identity request yields KSC101 68800777; matching
+identity would remain unqualified for operation. Result: FAIL bay TCP; identity
+NOT RUN. Management TCP and ICMP are separate PASS reachability observations.
+
+Initial local metadata: Find-NetRoute selects Ethernet, host 192.168.1.201,
+192.168.1.0/24 directly connected, route metric 256. Cached neighbor .19 was
+Unreachable with 00-00-00-00-00-00; this was not treated as a current live test.
+Sandbox metadata access was denied; the read-only check succeeded outside that
+restriction. The manual restriction was checked and human confirmation obtained
+before any target socket was opened.
+
+Actual command (workspace UV_CACHE_DIR=.uv-cache):
+uv run --locked --offline --no-sync python tmp/read_only_ethernet.py.
+At 2026-11-06T00:44:03.646229+00:00 (5 November local), KEH3Probe.run returned
+probe-unconfirmed: [WinError 10061] No connection could be made because the target
+machine actively refused it. Elapsed 2.0469001999954344 s; request_hex/raw_hex
+empty, identity null, no frames. Thus no APT request was sent, not a firmware,
+framing or identity failure. cleanup_error=null; no retained transport or claim.
+The actual diagnostic logical label was shutter_ethernet_candidate; the user's
+later explicit label "verdi shutter" refers to the same exact serial/endpoint.
+
+Follow-up command:
+uv run --locked --offline --no-sync python tmp/check_hub_management.py.
+At 2026-11-06T00:44:33.865658+00:00, TCP 192.168.1.19:40303 connected from
+192.168.1.201:23024 in 0.027860099995450582 s and closed successfully. Zero
+application bytes sent. Then ping.exe -n 1 -w 2000 192.168.1.19 returned one
+32-byte reply in <1 ms, TTL 64, sent=1/received=1/loss=0%. Neighbor metadata now
+Reachable, MAC D8-47-8F-93-68-CB. Neither observation identifies a hub/controller.
+Get-NetTCPConnection -RemoteAddress 192.168.1.19 then found no current connections
+from this PC; other machines/owners remain outside this observation's scope.
+
+Conclusion: the confirmed IP is reachable and accepts the management TCP port;
+its configured shutter-bay port refused access. No cause is established. Missing
+cube power/placement, another owner, forwarding/initialization/firmware behavior
+or network access policy are not distinguished by these observations. The
+manufacturer troubleshooting section requests cube power, USB IN absence and
+Ethernet indicators; user already confirmed hub power/Ethernet/USB IN state.
+The remaining precise human check is cube serial/left-bay confirmation and exact
+display/LED state without moving a powered cube, plus any known application owner.
+The question is pending. Do not automatically scan, reboot, redock, broaden
+address candidates or send unknown management commands.
+
+Artifacts: records/live-ethernet-communication.json (actual config, source hash,
+current human map, native failure, no transmitted bytes, released claims) and
+records/live-hub-management-tcp.json (TCP/ICMP/neighbor and owner snapshot).
+No runtime/tests/notebook source changed; prior source/wheel/static evidence
+remains applicable. No mode/output, settings, driver/security change, commit or
+push occurred. Hub identity, controller firmware/status, optical behavior and
+operational routing remain UNTESTED/BLOCKED, not validated completion.
+
+
+## D053 - Correct the selected bay from current human evidence, retain control gates
+
+2026-11-05, REQ-202/203/208/217. User replied "middle" to the physical rear-view
+bay question. Treat this as a current correction of the prior left-bay/40304 map,
+not permission to scan all ports or physically move the cube. SRC-003 section
+4.3/Figure 17 and Route.endpoint map middle to 40305. Logical CH remains 0; the
+expected serial remains 68800777 and is verified from the reply. Within existing
+power/Ethernet/USB IN confirmation and query-only authority, repeat the same
+bounded candidate identity method once at this corrected endpoint. This is a
+new evidence-driven target, not an automatic retry of the failed left-bay route.
+
+Use the existing KEH3Probe, raw HW_REQ_INFO destination 0x50, 5 s total deadline,
+normal canonical serial/endpoint claims and no mode/output/settings. A matching
+controller reply does not identify the hub, prove future exchanges/reconnects,
+establish manufacturer support or authorize actuation. Do not remove the normal
+owner's KEH3 restriction from this one observed identity result.
+
+## E172 / TEST-208 - Actual middle-bay Ethernet controller identity PASS
+
+2026-11-05 America/Chicago. Expected: query 192.168.1.19:40305 returns KSC101
+serial 68800777 with allowed firmware and channel count, no mode/output command,
+complete communication release. PASS for this one actual identity exchange.
+
+Command (workspace UV_CACHE_DIR=.uv-cache):
+uv run --locked --offline --no-sync python tmp/read_only_ethernet_middle.py.
+At 2026-11-06T00:47:15.450867+00:00, one 6-byte request 05 00 00 00 50 01
+received one complete 90-byte HW_GET_INFO response. Actual decoded identity:
+serial_number=68800777, model=KSC101, firmware=1.0.7, hardware_version=3,
+channels=1. The source/destination and payload layout matched the existing
+candidate decoder. First-byte observation 0.005952100000286009 s; total probe
+0.06683550000161631 s. These are single software observations, not a distribution,
+native latency guarantee or physical shutter timing measurement.
+
+Probe verdict candidate-controller-match-hub-unverified; error=null,
+cleanup_error=null; retained_transport=false, retained_claim=false. Request and
+complete reply hex, response SHA256, script/source hashes, parameters and current
+corrected mapping are in records/live-ethernet-middle-communication.json. Only
+one HW_REQ_INFO was sent; no status, mode, output, hub settings, scan, driver or
+security change occurred. Standard-library sockets plus the direct APT decoder
+were used; no simulator, SDK or native FTDI transport was involved in this probe.
+
+Correct map: SHUTTERHUB_IP=192.168.1.19, SHUTTERHUB_PORT=40303,
+SHUTTER_CH_MAP={"verdi shutter":{"CH":0,"SN":68800777,"IP_PORT":40305}}.
+Also saved in ignored inputs/private/current-ethernet-topology.json. The prior
+shutters.local.toml is the USB commissioning config, not this Ethernet map; no
+external DiamondGUI setting was edited. E171 remains evidence of a refusal on
+the formerly assumed left bay; it no longer supports a claim that the intended
+shutter is inaccessible via Ethernet. The physical-bay question is resolved.
+
+Actual controller identity/firmware on this endpoint are now observed, replacing
+historical-only expectation. Hub identity/firmware, other messages, reconnect,
+wrong/swapped/empty bays, actual electrical/mode/interlock/optical state, timing,
+loads and safe operation remain unqualified. Normal operational KEH3 routes stay
+unavailable; project deployment remains BLOCKED. The user's read-only communication
+attempt is fulfilled. No runtime/test/notebook source changed, no further test or
+identity retry is needed for this result, and no commit or push occurred.
+
+
+## D054 - Fixed-endpoint Ethernet notebooks with a generic shutter name
+
+2026-11-06, REQ-215. Active user instruction: update all example notebooks to use
+Ethernet at 192.168.1.19:40305 for the specified shutter, no simulator; follow-up:
+"remove the verdi wording". Use generic label shutter in current examples and
+guide. Keep actual serial 68800777, CH 0, middle bay, allowed firmware 1.0.7;
+management port 40303 is distinct. Historical evidence labels are not rewritten.
+
+All six setup cells construct this exact validated diagnostic configuration;
+no local TOML, USB/COM inventory/fallback or example identity is used. Notebook 1
+uses the existing one-query KEH3Probe. The other read cells use one shared example
+EthernetReadOnly helper, actual TCP, existing APT Session/KSC101 query methods and
+canonical serial/endpoint claims, explicit deadlines, no retry or injection.
+Only connect/status/close are exposed. Read failures end the diagnostic session;
+close failures retain resources on the reader and preserve original error notes.
+Add TCPTransport.read_nowait for Session's unsolicited/late traffic check, using
+select with zero wait. Existing real localhost transport tests exercise empty,
+fragmented data and EOF. No operational KEH3 route gate is bypassed or removed.
+
+Mode and ON/OFF notebooks read actual diagnostics and present optional owner calls
+against the same Ethernet config, explicitly expected to raise UnsupportedRoute
+today. No policy is fabricated, raw-write control interface exposed, USB fallback
+used or physical permission inferred. ON/OFF cleanup is attempted only after an
+ON attempt, preserving first failure and release notes. Read-only status must
+not claim optical closure or turn an unsupported state into OFF.
+
+A real status run revealed scalar state 0, not the documented ON=1/OFF=2. Preserve
+strict driver rejection and add raw frame hex to the ProtocolError. The helper
+retains partial identity/mode/interlock observations with status_complete=false;
+notebooks print that partial diagnostic and re-raise. Do not broaden accepted
+state values, change modes/outputs or hide the failure to make examples pass.
+
+## E173 / TEST-215 - Fixed Ethernet notebooks: software PASS, complete live status FAIL
+
+2026-11-06. Expected artifact criteria: all six notebooks select shutter/68800777/
+CH0/middle 192.168.1.19:40305, no simulator, current APIs, passive setup, actual
+read diagnostics, clear write restrictions and preserved first/cleanup failures.
+PASS revised artifacts and software; actual complete status FAIL, not completion.
+
+Commands (workspace UV_CACHE_DIR=.uv-cache):
+uv run --locked --offline --no-sync python scripts/verify_notebooks.py.
+Observed six schema/syntax/link/cleared-output PASS; hashes recorded in
+records/notebook-validation.json. Lint/format now covers all docs/examples,
+including notebooks and helper. Passive tests execute only initial config cells
+from root and docs/examples, forbid socket creation and assert exact serial,
+endpoint, route and no output policy. No simulated notebook replies are used.
+
+Final integrated command:
+uv run --locked --offline --no-sync --group dev --extra gui python scripts/verify.py.
+Observed 131 full source tests (1.15 s) and identical 131 isolated installed-wheel
+tests (1.47 s), zero failures/errors/skips. Lock, lint/format, locked wheel build,
+clean hash-checked install/import/help, exact wheel/source parity, stable input
+hashes, missing/stale lock rejection and separate passive script PASS. XML and
+records/direct-validation.json are current. These remain software/localhost
+results, distinct from actual lab data. Existing protocol tests retain their
+separate offline transports; none substitutes simulated execution of a notebook.
+
+First final-verifier attempt had 12 test-reader failures after Ruff normalized
+notebook source to standard line lists; compile expected a string. Normalize
+source before compiling in the passive test, then full source/wheel checks pass.
+This was a verification-reader defect, not a skipped test or successful device
+operation. Source/helper changes invalidated earlier hashes until final checks.
+
+Actual hardware command, authorized read-only continuation on exact user route:
+uv run --locked --offline --no-sync python tmp/validate_ethernet_status_notebook.py.
+Only notebook 3's exact Python cells execute in a fresh interpreter, no Jupyter
+kernel, saved-output modification, simulator or mode/output/settings command.
+At 2026-11-06T19:30:27.451897+00:00, identity verified but complete status failed
+ProtocolError Unsupported scalar value 0 in 0x04cd, elapsed 0.17213740000443067 s.
+Socket/claims released. Artifact records/ethernet-notebook-live-status.json.
+
+One diagnostic follow-up retained raw error bytes and partial observations.
+At 2026-11-06T19:31:41.274126+00:00, actual identity KSC101/68800777/1.0.7,
+hardware 3, one channel; mode triggered; interlock_required=true. Solenoid reply
+cd0401000150 has param2=0. SRC-001 pp193-194 defines 1 ON and 2 OFF; no supported
+interpretation for 0 was established. Complete status FAIL, status_complete=false,
+optical unknown. Error note retains raw bytes. Elapsed 0.14694159998907708 s;
+no retained transport/claim, no output/mode/settings request. See
+records/ethernet-notebook-live-status-diagnostic.json for exact notebook/helper/
+TCP hashes and receipt time. These two single durations are not timing acceptance.
+
+Conclusion: the requested generic fixed-Ethernet examples are implemented and
+statically verified; actual identity/mode/interlock reads are observed, but
+complete electrical status, hub identity, route/control/recovery support and
+physical behavior remain unqualified. Manufacturer interpretation of this exact
+state reply is the next dependency. Mode/ON/OFF cells were not executed, and
+normal owner refuses them before I/O. No driver/security change, physical action,
+external DiamondGUI edit, commit or push occurred. Project remains BLOCKED.
+
+
+## D055 - Reduce notebook code by sharing config and removing unavailable write sequences
+
+2026-11-06, REQ-215. User: "simplify and reduce codes in the notebooks".
+Keep the exact real 192.168.1.19:40305/68800777/shutter route and no simulator.
+Move the repeated validated SHUTTER config and timeout to the existing read-only
+helper. Keep a short bootstrap compatible with root and docs/examples; no hidden
+test import-path substitution is needed. EthernetReadOnly defaults to that frozen
+config. Preserve explicit reader variables and context cleanup so resources remain
+available after a failed close. No additional abstraction or hardware API is added.
+
+Attach partial observations to the original raised exception, next to the raw
+reply note. This removes repeated printing/except blocks without suppressing or
+reclassifying failures. Replace long, currently unavailable mode/ON/OFF owner
+sequences with require_supported_route(SHUTTER), the same production eligibility
+gate. Those cells raise before I/O and do not ask for meaningless actuation
+confirmation, attempt ON or create an OFF-cleanup obligation. No output boundary,
+status interpretation, ownership requirement or physical criterion is weakened.
+
+## E174 / TEST-215 - Simplified notebooks and final software evidence
+
+2026-11-06. Expected: substantial notebook code reduction, unchanged generic exact
+Ethernet target, independent passive setup, live read semantics/strict errors,
+no simulator and no new hardware operation for a presentation refactor. PASS
+software/static artifact criteria; physical/status gaps from E173 remain open.
+
+Notebook physical Python code-cell lines, including blanks, before/after:
+01 discovery 52 -> 18; 02 connection 49 -> 11; 03 status 53 -> 11;
+04 settings 59 -> 18; 05 modes 65 -> 14; 06 ON/OFF 90 -> 14.
+Total 368 -> 86, reduction 76.6304347826087%. Both snapshots use Ruff-formatted
+sources. Counting excludes Markdown and the shared helper; shared configuration
+and diagnostics are explicit in docs/examples/ethernet_readonly.py. This metric
+measures notebook readability, not hardware performance or total package size.
+records/notebook-simplification.json records counts and all six final hashes.
+
+Commands, workspace UV_CACHE_DIR=.uv-cache:
+uv run --locked --offline --no-sync python scripts/verify_notebooks.py.
+uv run --locked --offline --no-sync --group dev --extra gui python scripts/verify.py.
+Six schema/syntax/link/cleared-output checks PASS. Full source 131 and exact
+installed-wheel 131 tests PASS, no failures/errors/skips, with lint/format,
+lock/build/clean install/import/help, source/wheel parity, stable input hashes and
+negative lock checks PASS. XML/direct-validation.json contain exact timings and
+commands. The software verifier ran outside the previously recorded Windows
+sandbox temporary-directory restriction; no new test failure occurred.
+
+Passive tests execute each first setup cell from root and examples, forbid
+socket creation, clear the helper module cache and verify shared name/serial/
+endpoint/route/no policy. No simulated device response or notebook execution is
+used. Runtime transport/driver/owner source was unchanged in this refactor.
+No new hardware result is claimed, and E173's raw state-0 ProtocolError remains
+unresolved. Historical actual record hashes refer to their recorded revision.
+No lab query, mode/output/settings command, driver/security change, external
+DiamondGUI edit, commit or push occurred. Requested simplification is complete;
+project deployment remains BLOCKED by the previously recorded engineering gaps.
+
+
+## E175 / TEST-215 - Inspect the user's saved notebook 3 traceback
+
+2026-11-06. User: "ran notebook 1 and 2. 3 ran into problems. check error message".
+Read the current saved outputs of notebooks 01/02/03; no device access, code edit,
+re-execution, simulator, source formatting or notebook output clearing performed.
+Notebook 01 saved candidate-controller-match-hub-unverified with one matching
+KSC101 68800777/firmware 1.0.7/hardware 3/channel 1 frame from 192.168.1.19:40305.
+Notebook 02 saved the same verified identity. Notebook 03 saved ProtocolError:
+Unsupported scalar value 0 in 0x04cd, raw controller reply cd0401000150.
+
+Saved traceback points to EthernetReadOnly.status -> KSC101.state -> scalar.
+Reply decodes as message 0x04CD, channel 1, state param2=0, destination 1/source
+0x50. scalar accepts only documented states (1,2), marks the session poisoned
+and raises. This is after successful identity/mode/interlock reads, not a failure
+to open TCP or identify the selected controller. Partial observation includes
+triggered mode, interlock_required=true and failure receipt time
+2026-11-06T20:07:51.971533+00:00; status_complete=false, optical_state=unknown.
+This is the same raw state-0 result observed independently in E173. Its semantic
+cause remains unresolved; no evidence establishes OFF or optical closure.
+
+records/notebook-3-error-inspection.json preserves file SHA256 values, execution
+counts, output and ANSI-stripped traceback. The user's notebook outputs remain
+untouched. Their saved execution changes notebook byte hashes and cleared-output
+criterion relative to E174; no claim is made that old static output-cleared PASS
+applies to the current executed files. No source/runtime change or new test was
+needed to identify the existing strict-decoder rejection. No mode/output/setting,
+firmware/driver/security change, external application action, commit or push.
+The next dependency remains firmware-specific interpretation of state 0; do not
+broaden accepted states or change device mode merely to silence the exception.
+
+
+## D056 - Repair read-only status using independent actual status bits, not an invented zero enum
+
+2026-11-06, REQ-203/215. User explicitly requested investigation of firmware1.0.7
+state0 and notebook3 repair using real hardware, no simulator. Bounded read-only
+queries on exact 192.168.1.19:40305/68800777 are authorized; mode/output/enable,
+priming, settings, resets and driver/security changes remain outside scope.
+User reports "solenoid off mode is trigger" and confirms OFF in response to the
+front-display question. These describe the same human-reported current condition,
+not independent optical/electrical measurements or an ON test authorization.
+
+APT Issue36 pp193-194 and Issue42.1 pp190-191 enumerate only ON=1/OFF=2. A pinned
+manufacturer-authored solenoid SDK header in the official Thorlabs repository
+also enumerates only 1/2 and documents status bit0 as output enabled/disabled.
+That header is TCube-family, not a firmware-specific KSC101 contract. No published
+1.0.7 definition for 0 was found in this bounded search. The official KSC101
+example uses the SDK's operating-state interface, not a documented raw0 mapping.
+Search/retrieval failures are not proof that a private/newer contract cannot exist.
+No SDK binary was installed/loaded or used for real control. SRC-007 records the
+primary header URL/blob/hash; downloaded reference files stay ignored.
+
+Use fresh 0x0429/0x042A status bits for read-only output display, corroborated by
+actual current capture, human OFF display and historical same-controller 0x2000
+closed/0x2001 open records. Preserve legacy0 as raw undocumented data/warning;
+never normalize it to OFF. Allow raw0 only in the identity-verified firmware1.0.7
+diagnostic path; production state() and output preflight retain strict rejection.
+Add fixed 0x042A length6 schema, exact channel1/status-dword decode and poisoning
+on invalid channel. No catch-all error suppression, query fallback/retry or
+operational route qualification. Optical state remains unknown.
+
+Before repair, back up user notebook3 to ignored inputs/private/notebooks/
+03-status-before-state-zero-fix-0472ebe61c4a.ipynb. Notebooks1/2 and their output
+remain byte-identical to E175. Save notebook3's new actual output after executing
+it in a fresh real kernel. Static validation now inventories existing execution
+without clearing/failing saved hardware evidence; syntax/schema/link checks remain.
+
+## E176 / TEST-203 / TEST-215 - State-zero real investigation and repaired notebook3 PASS
+
+2026-11-06, actual hardware, no simulator. Requirements: investigate raw0, preserve
+uncertainty, fix and execute notebook3 on exact target without changing outputs.
+PASS read-only repair/real execution. Universal firmware meaning of legacy0 is
+not established; hub/actuator/physical qualification remains BLOCKED.
+
+Actual investigation 1 command, workspace UV_CACHE_DIR=.uv-cache:
+uv run --locked --offline --no-sync python tmp/investigate_state_zero.py.
+At 2026-11-06T20:15:59.736863+00:00, identity reverified 68800777/KSC101/1.0.7,
+hardware3/channel1. TX/RX: 050000005001 -> 90-byte identity;
+c10401005001 -> c20401040150 (mode4);
+c70401005001 -> c80401010150 (interlock requirement1);
+cc0401005001 -> cd0401000150 (raw0). Read-only status-update request
+800401005001 had no reply in 5 s; DeadlineExceeded, total5.092015799993533 s.
+Stop and close/release; this request was not replayed. Raw capture artifact:
+records/state-zero-hardware-investigation.json. No state interpretation was
+silently substituted for the timeout.
+
+Independent query command:
+uv run --locked --offline --no-sync python tmp/investigate_status_bits.py.
+At 2026-11-06T20:16:35.016962+00:00, a new identity-verified session sent
+290401005001 -> 2a0406008150010000200000. Exact payload010000200000 decodes
+channel1, status8192/0x2000; bit0 clear. Total0.06320879999839235 s; release
+completed. Artifact records/state-zero-statusbits-investigation.json. This is
+a distinct documented read query following failed 0x0480, not its retry or a
+scan. Header documentation and historical/current OFF observations support the
+read-only output-bit interpretation; no new ON/physical timing result is claimed.
+
+Repair adds diagnostic status_bits decoding, retains raw legacy0 and warning,
+and calculates electrical_state only from actual fresh bits. Wrong frame form,
+length and channel, unsupported nonzero codes and timeouts still fail. The
+notebook3 code stays short; Markdown explains sources, limits and kernel restart.
+Original failed output remains in the backup/E175 evidence.
+
+Actual final command:
+uv run --locked --offline --no-sync python tmp/validate_and_save_notebook3.py.
+At 2026-11-06T20:20:45.102512+00:00, a fresh python3 Jupyter kernel from this
+project .venv executed notebook3 against actual hardware and saved its output.
+Result: identity68800777/1.0.7/hardware3/channel1; mode triggered;
+interlock_required=true; legacy_solenoid_state_raw=0; status_bits=8192;
+electrical_state=off; electrical_state_source=0x042A bit0; explicit legacy warning;
+status_complete=true; optical_state=unknown; hub identity/operational route false.
+All socket/claims released, collector cell was not saved. Total kernel workflow
+4.178309999988414 s; not a timing acceptance measurement. Artifact
+records/notebook3-state-zero-fix-live.json contains actual output, source/notebook
+hashes, interpreter and released-resource flags. Local Jupyter emitted nonfatal
+Windows event-loop/TCP warnings; execution itself passed. No output/mode/enable,
+priming, settings or physical action occurred.
+
+Final software commands:
+uv run --locked --offline --no-sync python scripts/verify_notebooks.py.
+uv run --locked --offline --no-sync --group dev --extra gui python scripts/verify.py.
+Six schema/syntax/link/static execution-inventory checks PASS. Full source137
+(1.28s), exact installed-wheel137 (1.50s), zero failures/errors/skips. Six new
+protocol tests use an actual captured frame and malformed channel/form/length
+variants; no simulated notebook responses. Existing control regressions keep
+their separate software-only transports. Lock, lint/format, build, clean hashed
+install/import/help, wheel/source parity, stable input hashes and negative lock
+checks PASS. Evidence direct-validation.json, XML and notebook-validation.json.
+
+No user notebook1/2 edit (hash-verified), external DiamondGUI edit, SDK/native
+runtime dependency, firmware/driver/security change, commit or push. Hardware
+state0's published meaning remains unknown beyond the observed OFF/Trigger
+correlation; the repaired notebook no longer depends on inventing that meaning.
+Project deployment remains BLOCKED by the existing operating/physical criteria.
+
+
+## D057 - Correct state-zero interpretation using exact KSC101 API reference
+
+6 November 2026; source: user's instruction to read the manual/API reference,
+continuing the authorized real-hardware state-zero investigation and notebook3
+repair (REQ-203/215). Exact KSC101 Kinesis .NET SolenoidStatus documents
+SolenoidStates Closed=0/Open=1, distinct from OperatingStates Active=1/Inactive=2.
+The exact KSC101 C header and older APT state table use a different 1/2
+representation. The earlier D056/E176 broad claim that zero was undocumented was
+incomplete; retain those records as historical evidence, superseded on this point.
+
+SRC-008 documents a validly Thorlabs-signed local Kinesis installer1.14.60.0.
+Only header/API help files were extracted using archive readers and a read-only
+MSI File-table lookup. No installer, SDK, DLL, driver, binding or security policy
+was executed/installed/changed. Provenance/hashes: records/ksc101-api-reference-findings.json.
+The exact KSC101 GetStatusBits defines output mask0x00000001 enabled1/disabled0;
+therefore the notebook output-bit interpretation no longer relies on a TCube-only
+reference. Bit0x2000 is unused, not interpreted as physical interlock readiness.
+
+Keep raw0x04CD in solenoid_state_reply_raw, accepting zero diagnostically only on
+identity-verified firmware1.0.7. Independently query status bits to display output
+OFF/ON and corresponding documented controller Closed/Open feedback0/1. No
+universal raw-wire enum across firmware or optical measurement is asserted.
+Production state() remains strict1/2; no operational route/output gate changes.
+Original failed notebook3 and all previous capture artifacts are preserved.
+
+## E177 / TEST-203 / TEST-215 - Exact API correction and final real notebook3 PASS
+
+Expected: exact 68800777/1.0.7, triggered, raw0x04CD0, fresh output bit0 clear,
+controller feedback0/Closed, optical unknown, all queries validated, socket/claims
+released, zero mode/output commands. Conditions: same powered Ethernet/middle-bay
+setup and user's OFF/Trigger observation; USB IN disconnected as confirmed by
+user. Read-only authorization persists; no output, enable, priming, settings,
+mode, reset, driver/security changes or ownership takeover authorized/performed.
+
+Command: uv run --locked --offline --no-sync python tmp/validate_and_save_notebook3.py.
+Final actual fresh Jupyter kernel timestamp 2026-11-06T20:36:51.756567+00:00.
+Observed identity68800777/1.0.7/hardware3/channel1; triggered;
+interlock_required=true; raw solenoid_state_reply_raw=0; status_bits=8192;
+solenoid_state_raw=0; controller_solenoid_state=closed; electrical_state=off;
+source=0x042A bit0 (exact KSC101 GetStatusBits); status_complete=true;
+optical_state=unknown; hub/operational route false. PASS expected conditions.
+Socket/claims released, no output/mode command. Kernel .venv/Scripts/python.exe,
+workflow 1.2598744 s (single observation, not timing qualification).
+Notebook saved real output; unsaved result collector removed. Artifact
+records/notebook3-api-corrected-live.json contains source/notebook hashes and
+release flags. Nonfatal local Jupyter Windows event-loop/TCP warnings did not
+prevent execution. Original user notebooks1/2 hashes remain byte-identical to E175.
+
+Final software commands:
+uv run --locked --offline --no-sync --group dev --extra gui python scripts/verify.py.
+uv run --locked --offline --no-sync python scripts/verify_notebooks.py.
+Source137 and exact installed-wheel137 PASS, zero failures/errors/skips. Lock,
+lint/format, build, clean dependency/install/import/help, source/wheel parity,
+negative lock and passive import checks PASS. All six notebook schema/syntax/local
+link checks PASS without live-cell execution; saved output inventoried/preserved.
+Source/notebook hashes match the final actual hardware artifact and verification
+manifests. Tests with software-only transports remain distinct from real notebook
+validation; no simulated notebook response was used. Evidence: direct-validation.json,
+notebook-validation.json, offline-tests.xml and wheel-tests.xml.
+
+REQ-203/215 PASS for this read-only correction. Broader KEH3 control, actual-load,
+optical, driver/persistence and endurance acceptance remain BLOCKED/UNTESTED as
+recorded in STATE.md. No new commit, push or external DiamondGUI edit.
+
+
+## D058 - One source-backed owner/API; retire candidate and notebook implementations
+
+6 November2026, user comprehensive source/control/API review and slimming request;
+PROJECT.md source/API criteria, REQ-219. Sources of truth: SRC-001/007 APT framing/
+command tables; SRC-002 KSC101 mode/trigger/persistence behavior; SRC-003 KEH3 port/
+USB restrictions; SRC-008 exact KSC101 C/.NET programmer reference. Keep .NET
+feedbackClosed0/Open1, OperatingStatesActive1/Inactive2, C feedbackClosed2/Open1
+and APT output-command1/2 distinct. Older T-Cube text does not override the KSC101
+manual; no new physical timing/trigger/control qualification is inferred.
+
+Replace both normal readback and electrical command confirmation with fresh status
+bits (exact KSC101 mask0x1). Do not infer operating Active/Inactive from output bits.
+The explicit get_solenoid_state_reply API returns an unmodified raw byte; normal
+status no longer queries it or needs a firmware-specific zero-acceptance branch.
+
+Consolidate read-only Ethernet into ShutterHub. This revises the former blanket
+connection refusal, not control qualification: require_control_route still blocks
+all KEH3/VCP mode/output writes before dispatch, even with policy/injection. Remove
+the obsolete candidate probe/analyzer/CLI and duplicate notebook owner, preserving
+captures and pre-review notebooks/outputs. Add context-managed passive release,
+reuse connect identity in CLI identify, and keep the existing DiamondGUI surface.
+
+Correct command-path gaps: ordinary sends refuse a receive-poisoned session; mode
+transitions share ON/pulse ambiguity/cleanup handling; healthy read-only shutdown
+has no incidental OFF obligation. Existing partial-write alignment, durable fault
+journal, priority OFF, separate cleanup budgets, policy and explicit recovery stay.
+These are software changes, not authority for physical output or driver changes.
+
+## E178 / TEST-203/204/205/206/207/212/215/217/219 - Source/API review and final validation
+
+Expected: exact source-backed command bytes and distinct state meanings; one owner
+for all apps; no simulator/injected transport in notebooks; code reduction without
+weakening ownership/timeout/output constraints; correct real read-only status and
+resource release on exact68800777/1.0.7 at192.168.1.19:40305. Mode/output and physical
+acceptance are out of live scope. Conditions retain user power/Ethernet/USB IN and
+OFF/Trigger report; transient state is queried again. No target scan or takeover.
+
+Review artifact records/source-api-review.json lists reviewed files,8 resolved
+findings, exact source hashes and reduction. Baseline records/source-review-baseline.json.
+Runtime/scripts/shared notebook support2125->1843 lines:282 removed,13.27%; notebook
+code86->80 lines. Tests/output/unchanged standalone example excluded from the first
+count. Obsolete probe-only17 parametrized cases retired with their implementation;
+7 behavior/API regressions added, leaving127 current cases. Original user/pre-review
+notebooks preserved byte-for-byte via records/source-review-notebook-backups.json.
+Historical state-zero raw captures, E176/E177 artifacts and original failed3 remain.
+
+Commands: uv run --locked --offline --no-sync python tmp/review_live_notebook.py1,
+2 and3 (each separate explicit invocation, actual script takes a space before the
+number). Fresh real python3 kernels, actual TCP, no simulated response or transport
+injection. Unsaved Session.send audit rejects non-query IDs; unsaved collector
+checks exact identity, expected status and released handle/claim. Original notebook
+cells/actual output saved; audit/collector cells not saved. Final runs:
+- Notebook1: 2026-11-06T20:50:31.177939+00:00; PASS; 1.1154503s workflow; sent ['050000005001']; no retained handle/claim.
+- Notebook2: 2026-11-06T20:51:06.764680+00:00; PASS; 1.4344325s workflow; sent ['050000005001']; no retained handle/claim.
+- Notebook3: 2026-11-06T20:50:49.292296+00:00; PASS; 1.2012994s workflow; sent ['050000005001', '050000005001', 'c10401005001', 'c70401005001', '290401005001']; no retained handle/claim.
+Notebook1/2 identity68800777/KSC101/1.0.7/hardware3/channel1; notebook3 triggered,
+electrical off, bits8192/0x2000, interlock requirementtrue, operating/optical unknown.
+No raw0x04CD is requested by normal get_status. Artifacts
+records/source-review-live-notebook-1/2/3.json contain final notebook/config/runtime
+hashes and query frames. Times are single workflow observations, not timing acceptance.
+Notebook2 initial unsaved collector NameError (asdict import missing) is preserved
+in source-review-live-notebook-2-collector-failure.json; actual original cells had
+completed. Corrected collector and fresh explicit rerun PASS. No production-source
+or hardware change was needed. Nonfatal local Jupyter Windows event-loop/TCP
+warnings did not prevent actual execution.
+
+One separate explicit actual get_solenoid_state_reply read returned0, identity
+verified, sent050000005001 twice andcc0401005001, resources released. Artifact
+records/source-review-raw-diagnostic.json. Byte0 is retained without enum conversion.
+No output/mode/enable/priming/settings/reset or other physical action was performed.
+All audited frames were queries on the one authorized endpoint.
+
+Final commands:
+uv run --locked --offline --no-sync --group dev --extra gui python scripts/verify.py.
+uv run --locked --offline --no-sync python scripts/verify_notebooks.py.
+127 source +127 exact installed-wheel tests PASS; no failures/errors/skips. Full
+lock/lint/format/build/clean hashed dependencies/install/import/help/source-wheel
+parity/negative locks PASS. Six schema/syntax/link checks and12 passive setup cases
+PASS; no automatic batch live notebook execution. Notebooks4/5/6 static/passive
+only. Final manifests/direct-validation/XML/source-api-review and real artifacts
+hash-match current runtime/notebooks. Original backup SHA values match preserved
+user1/2 output evidence. Local documentation links and git diff whitespace check PASS.
+
+No external source edit/commit/push. External C:/Users/HFNV/diamondgui checkout
+is absent, so historical29 integration cases cannot be marked current PASS; local
+owner-method/schema/CLI/GUI regressions PASS. REQ-219 local review PASS; deployment
+still BLOCKED by hub/control/actual-load/optical/driver/persistence criteria in STATE.md.
+
+## E179 / TEST-220 - Repository manuals and APT protocol copies, 6 November 2026
+
+Human request: ensure the device manual and APT command protocol documents are
+in the repository. Expected: unchanged, non-ignored PDF copies for KSC101,
+KEH3/KEH6 and both protocol revisions already used by the project; valid PDF
+identities/revisions/page counts; SHA-256 equality with registered originals;
+working local index/source links. No hardware operation is in this test scope.
+
+Existing downloads were present only under ignored inputs/reference. Copied
+ksc101.pdf, keh3.pdf, apt.pdf and apt-42.pdf to docs/manuals with descriptive names.
+All four match the original byte content and registered SHA-256 values exactly:
+45, 33, 421 and 443 pages respectively; total 36,142,241 bytes. The index retains
+SRC-002/003/001/007 provenance and both APT revisions to preserve historical page
+references. The legacy KSC101 cover warning is explicit. Copyright/notices remain
+unchanged. Actual optical shutter model/manual (SRC-004) is still missing.
+
+Validation: pdfinfo and pypdf independently confirm page counts. Fresh pypdf text
+from the first six and last two pages confirms model, document number/revision
+and dates. pdftoppm rendered each title page; all four were visually inspected.
+Poppler emitted missing Symbol/ArialUnicode font warnings while rendering the
+originals; the inspected title pages remained legible and the PDFs were unchanged.
+git check-ignore returns 1 (not ignored); git ls-files --cached --others
+--exclude-standard sees every PDF. Local Markdown links in README.md,
+docs/sources.md, docs/manuals/README.md and outputs/REPORT.md pass.
+
+Final verification command (documentation tools, no project dependency change):
+uv --cache-dir .uv-cache run --no-project --offline
+C:/Users/HFNV/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe
+tmp/verify_manuals.py. Result PASS; manifest records/manuals-verification.json.
+Initial verifier attempts encountered inaccessible default uv cache, unavailable
+pdftotext and incomplete identity-page sampling; the final run uses a local cache,
+bundled pypdf and the expanded page selection. No document/source defect was found.
+
+Updated PROJECT.md, STATE.md, source register, root index and report. No runtime,
+dependency, notebook, hardware or driver change; existing dirty work preserved.
+No commit or push. REQ-220 PASS for repository availability/integrity only;
+deployment/physical acceptance remains BLOCKED under its existing conditions.
+
+## E182 / TEST-222 - Manual consistency and package validation, 6 November 2026
+
+Human request: read the manuals, check consistency and validate the package.
+Expected: implemented supported frames and state semantics agree with manufacturer
+sources; operator instructions describe the actual API; final source and isolated
+wheel checks pass; physical acceptance is not inferred from software tests.
+
+Freshly extracted all four repository PDFs and reviewed relevant KSC101 Rev D,
+KEH3/KEH6 Rev E and APT Issues36/42.1 sections. Rechecked exact KSC101 API HTML
+and hashes. Command IDs, six-byte layouts, identity offsets, mode/interlock values,
+ON1/OFF2, fault frames and D2XX initialization agree. Visually checked KEH3
+Figure17: rear-view left40304/middle40305/right40306, management40303. The generic
+status-query layout alone does not establish KSC101 applicability; exact SDK mask
+and recorded real firmware1.0.7 exchanges provide the additional basis. Generic
+trigger cycling differs from KSC101 level/priming behavior; TTL remains unsupported.
+
+Corrected stale documentation of the docked-KEH3 blanket write ban and query-only
+notebooks; documented Trigger exit confirmation/GUI limitation; repaired the
+example's missing OFF preparation/pause; registered the formerly dangling SRC-009
+SH05R reference after online manufacturer-manual review. Local unchanged SH05R
+PDF retrieval failed (HTTPS/HTTP mirror timeout; manufacturer legacy URL HTML),
+so no local copy/hash is claimed. Four existing PDFs are unchanged and non-ignored.
+Current REQ-221 disambiguates the documentation requirement from REQ-220 control;
+historical E179 retains its original duplicated REQ/TEST IDs.
+
+Added15 software cases:6 literal request/reply exchanges,3 docked-bay control
+cases,1 missing-policy refusal,3 default TCP route selections,2 delayed/absent
+transition cases. The current driver waits for output transitions within the same
+deadline and never repeats ON/OFF; the new tests cover transient old bits and
+deadline expiry. No runtime source, device command or notebook cell was changed
+or executed by this review. Separate commissioning files arrived in the shared
+checkout; their exact runtime/config hashes match the validated package. Their
+single recorded ON/OFF and final Manual/OFF/release are acknowledged, not repeated.
+The live record explicitly reports no independent optical/blade observation.
+
+Final command: uv run --locked --offline --no-sync --group dev --extra gui
+python scripts/verify.py with UV_CACHE_DIR=.uv-cache.144 source +144 exact installed
+wheel tests PASS, zero failures/errors/skips; lock, Ruff, clean hashed dependency
+install, build/parity, SDK-free import/help and negative locks PASS. Six notebook
+schema/syntax/link checks PASS using scripts/verify_notebooks.py; no cells run.
+Restricted attempts failed on pytest temp-directory WinError5; authorized runs
+outside the filesystem sandbox passed, without changing ACL/driver/security
+settings. One intermediate check caught guide formatting; normalized before rerun.
+
+Final integrity/link collector: bundled Python through uv --no-project --offline,
+tmp/manual-review/record_review.py. All4 PDF identities/pages/hashes, all current
+software/notebook hashes, commissioning-runtime/config equality and local Markdown
+links PASS. git diff --check PASS. Exact snapshot/counts/limits are in
+records/package-consistency-review.json; current direct-validation/XML/notebook
+manifests replace their older generated contents, which must not be attributed
+to E178's revision. External DiamondGUI checkout remains absent. No commit/push;
+unrelated dirty work preserved. REQ-222 PASS for the stated review/software scope;
+optical behavior, other topologies, native timing, persistence and endurance remain
+unqualified. Current transient device state must be rechecked before future use.
+
+
+## D059 - Admit documented docked KEH3 control; explicit protected OFF/Manual preparation
+
+6 November2026. User explicitly requests real shutter ON/OFF at192.168.1.19:40305
+using Thorlabs manuals/protocol, no simulator, then confirms currentSH05R and safe
+setup in response to the independently blocked source/isolated-trigger question.
+This is new controlled-action authority beyond the earlier read-only review.
+One1s added ON hold,2s OFF pause, finishOFF/Manual/release; no TTL, other target,
+interlock bypass, firmware/driver/security/network or other settings changes.
+
+The blanket docked-KEH3 ban was local software policy, not a manufacturer prohibition.
+APT/SRC-007 section2.1 defines transport independence; pp190-191 define0x04CB1/2.
+KEH3/SRC-003 section4.3/Figure17 defines bay-port routing. Existing actual identity/
+status frames establish this endpoint/address. User selects this exact controller
+by live model/serial/firmware/channel count at the stated endpoint; unknown hub
+serial/firmware are metadata, not falsely verified or a new blocker for this scope.
+Broader wrong-hub/swap/shared-failure and other topology qualification stay open.
+
+Control-route check now admits docked bays with the existing load policy; VCP and
+external USB OUT remain unavailable. Explicit protected Trigger->Manual needs
+source_inhibited=True and persistent-mode permission. It sends OFF/deactivate,
+confirms output clear, selects Manual then verifies Manual/OFF; ordinary ON/OFF
+does not change mode. Native SH05R/KSC101 load/design mapping is supported by
+SRC-009, current model/protection user-reported; this is not independent optics.
+
+Output confirmation requests fresh status bits within the original deadline until
+the bit matches, with no output resend or failed-query retry. TCP returns the send
+count to Session before the late-success check, preserving known alignment after
+a complete-but-late send. Partial/unknown writes still forbid further frames;
+ordinary poisoned commands, ownership, durable uncertainty, separate cleanup and
+no ON replay remain intact. CLI pulse explicitly preparesOFF/rest before ON.
+Tracked config/shutter.ethernet.toml and ignored shutters.local.toml now select the
+actual Ethernet SH05R; old local USB config is backed up privately. Notebooks5/6
+now expose explicit mode preparation / balanced real ON/OFF, no simulated response.
+
+## E181 / TEST-220 / REQ-220 - Actual Ethernet SH05R ON/OFF and final package PASS
+
+This evidence ID avoids E179 (manual copies, historical TEST-220 now REQ-221) and
+E180 reserved by the concurrent manual/package review. That review performs no
+device actions; the independently authorized live work here must remain separate.
+
+Expected: fresh exact KSC10168800777/1.0.7/hardware3/channel1 at192.168.1.19:40305,
+source blocked/triggers isolated per current user confirmation; explicit OFF/Manual,
+one1s added ON hold, positive output-bit readback, OFF bit clear, Manual retained,
+release complete. No simulator, SDK/native DLL or transport injection used for live
+validation. Optical/operating state must not be fabricated from electrical bits.
+
+Pre-actuation full source/wheel129/129 and static6 checks passed at that point.
+A later integrated suite includes the parallel manual-review regressions and is
+142/142; those software transports do not establish physical behavior.
+Initial notebook display imports were caught by Ruff, corrected before any writes.
+
+Actual preparation command:
+uv run --locked --offline --no-sync python tmp/ethernet_manual_prepare.py.
+At2026-11-06T21:26:03.171963+00:00 fresh initial Triggered/OFF, interlock requirement
+true; sentcb0401025001 then c00401015001, verified fresh Manual/OFF0x2000, released
+socket/claim. Audit forbids ON in this phase. Artifact
+records/ethernet-control-manual-preparation.json contains exact sent/reply frames,
+identity, before/after status, code/config hashes and release flags. PASS.
+
+Actual cycle command:
+uv run --locked --offline --no-sync python tmp/ethernet_on_off_notebook.py.
+At2026-11-06T21:26:53.535384+00:00, a fresh project .venv Jupyter kernel executed
+the original notebook6 cells, plus unsaved real-message audit/result collector.
+Explicit OFF and2s pause, exactly onecb0401015001 ON, fresh status0x2001,1s added
+hold, prioritycb0401025001 OFF, fresh final0x2000, Manual and no error/journal fault.
+Observed status sequence8192,8192,8192,8192,8193,8193,8193,8192,8192.
+The transient reads during OFF were resolved by bounded fresh-status observation,
+not by resending ON/OFF. ON-to-OFF host dispatch1.0569155999983195s; total Jupyter
+workflow4.5788799000001745s. These are software observations, not calibrated optics.
+Socket/claims released. Actual notebook output saved; audit/collector cells removed.
+Artifact records/ethernet-control-live.json includes source/config/notebook hashes,
+all TX/RX frames,1 ON attempt, interpreter, final status/release and scope. PASS.
+
+Human independent-observation answer: "I did not observe it". Therefore controller
+ON/OFF is demonstrated; independent blade motion/optical closure/timing are NOT
+PASS. No repeat cycle was performed to obtain that observation. Current native
+SH05R Hall-sense return is not independently sampled by this implementation.
+
+Fresh post-release real CLI status verified Manual/OFF0x2000, same identity and no
+persistent fault; CLI released normally. Artifact records/ethernet-control-final-status.json.
+No other output/mode/settings/enable, priming, other-target, driver/security or
+firmware operation occurred. Manual selection is remembered, as documented.
+
+Final integrated verification:
+uv run --locked --offline --no-sync --group dev --extra gui python scripts/verify.py.
+uv run --locked --offline --no-sync python scripts/verify_notebooks.py.
+142 source +142 exact installed-wheel tests, zero failures/errors/skips. Lock,
+lint/format/build/clean dependency/install/import/help, source-wheel parity,
+negative locks and all6 static schemas/syntax/links PASS. Notebook6 additionally
+has this real execution; others retain their separately dated evidence. All current
+source/config/notebook/manifests hash-match the actual sessions. No simulator is
+used as hardware evidence; software regression scopes remain explicitly separate.
+
+Manufacturer-authored SH05R manual was read via web PDF; direct download timed out,
+no local hash invented (records/sh05r-manual-reference.json, SRC-009). Repository
+manual copies and the concurrent software review are preserved, not replaced.
+No external DiamondGUI source edit, SDK installation, commit or push. Exact-target
+REQ-220 PASS for implementation/control/readback/release. Wider optical, interlock/
+local/TTL behavior, other bays/topologies, hub recovery, native timing, reboot and
+endurance acceptance remain open; no repeated hardware work is pending.
+
+
+E181 final integrated recheck: the parallel manual/package review is now E182
+(not the earlier reserved E180). Additional source-only regressions increased the
+final suite to 144 source and 144 installed-wheel tests, no failures/errors/skips.
+Current actual-control runtime/config/notebook hashes still match both real sessions;
+source/static manifests match current files. These new software tests do not add
+physical cycles or alter the hardware evidence. Canonical STATE/report retain
+REQ-221/222 documentation work and the separately completed REQ-220 live result.
+
+## D060 - Holistic review scope and migration boundary (6 November 2026)
+
+User explicitly requested review, fixes, pruning, consistent naming, documentation,
+cache/temp cleanup, staged commits and push. Publication is now authorized.
+Preserve the pending migration, actual hardware records, manuals, executed notebook
+outputs/private backups and environments. Do not repeat device operations. Keep
+the public DiamondGUI owner surface; retire only superseded internal/candidate
+paths. External DiamondGUI integration and broader physical acceptance remain open.
+
+## E183 - TEST-223 owner, GUI and migration review (6 November 2026)
+
+Baseline: uv run --locked --offline --group dev --extra gui python scripts/verify.py
+passed 144 source and 144 isolated installed-wheel tests. The sandbox denied uv's
+existing global cache; the same software-only command ran with approved access.
+No instrument or lab-network operation was performed.
+
+Added targeted regressions before fixes. The selected run produced 16 failures
+and 1 pass: it exposed incidental qualified read-only shutdown OFF, a too-early
+rest timer, and unselected GUI Release closing a connection; other GUI cases
+confirmed inconsistent target rejection. Fault-only read sessions previously
+entered the output cleanup path. Corrected shutdown obligation tracking, explicit
+GUI target selection and electrical OFF rest accounting. Read-only faults remain
+visible and persistent, but never create an incidental output command. Prior
+output/mode attempts retain cleanup obligations and aggregate failures.
+
+Affected suite after fixes: 86 owner/application tests PASS. Integrated checks:
+160 source + 160 isolated-wheel tests PASS, no failures/errors/skips. Lock,
+Ruff lint/format, clean build/install/import/help, exact source-wheel parity,
+negative lock cases and passive configuration validation all PASS. Command:
+uv run --locked --offline --group dev --extra gui python scripts/verify.py.
+All six notebooks PASS schema/syntax/link checks, with no cell execution:
+uv run --locked --offline --group notebooks python scripts/verify_notebooks.py.
+Artifacts: records/direct-validation.json, offline-tests.xml, wheel-tests.xml,
+notebook-validation.json. Tests use simulated byte transports and localhost only.
+
+Retired the candidate keh3 module/commands, duplicate notebook connection path
+and redundant gated direct_control.py example. One owner serves Ethernet and USB;
+current examples use the same shutter name and TOML route. The raw diagnostic,
+electrical output, operating state and optical observations remain separate.
+Preserved DiamondGUI method/status names are public integration contracts, not
+duplicate legacy backends. Migration replacements are in docs/cutover.md.
+
+Verification now removes its own successful disposable environment, suppresses
+Python/Ruff caches for subprocesses and retains failed-run work for diagnosis.
+Initial tooling rechecks caught an incorrectly placed Ruff cache flag and CRLF
+inside a new fenced example; both were corrected before the passing full run.
+Hardware E181 and manual/package E182 retain their original hashes. This review
+changes controller/GUI runtime code, so the old live result is historical evidence
+for its recorded revision; current software checks do not requalify physical use.

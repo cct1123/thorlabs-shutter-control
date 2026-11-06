@@ -41,6 +41,7 @@ def main():
     work.mkdir(parents=True)
     environment = dict(os.environ)
     environment.pop("PYTHONPATH", None)
+    environment["PYTHONDONTWRITEBYTECODE"] = "1"
     results = []
 
     def run(label, prefix, flags, *arguments, cwd=ROOT, reject=False):
@@ -84,11 +85,11 @@ def main():
         run(
             "ruff " + check,
             source_python,
-            "-m ruff " + check,
+            "-m ruff " + check + " --no-cache",
             "src",
             "tests",
             "scripts",
-            "docs/examples/direct_control.py",
+            "docs/examples",
         )
     tests("offline", source_python)
     run(
@@ -159,7 +160,13 @@ print(json.dumps({'python': sys.version, 'package': package.__file__}))
             shutil.copyfile(ROOT / "uv.lock", folder / "uv.lock")
         (folder / "pyproject.toml").write_text(project, encoding="utf-8")
         run(label + " lock rejected", uv, "lock --check --offline", cwd=folder, reject=True)
-    run("passive example", source_python, "docs/examples/direct_control.py")
+    run(
+        "passive config validation",
+        source_python,
+        "-m thorlabs_shutter_control --config",
+        ROOT / "config/shutters.example.toml",
+        "check-config",
+    )
     if before != hashes():
         raise RuntimeError(
             "Source, tests, tutorials, configuration or dependencies changed during verification"
@@ -179,6 +186,10 @@ print(json.dumps({'python': sys.version, 'package': package.__file__}))
     (ROOT / "records/direct-validation.json").write_text(
         json.dumps(report, indent=2) + "\n", encoding="utf-8"
     )
+    # Preserve failed-run diagnostics, but remove this successful disposable environment.
+    if work.resolve().parent != (ROOT / "tmp").resolve():
+        raise RuntimeError("Refusing to remove verification data outside the project tmp directory")
+    shutil.rmtree(work)
     print("All software checks passed; physical/Ethernet/driver acceptance remains open.")
 
 

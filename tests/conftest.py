@@ -48,6 +48,9 @@ class FakeTransport:
             struct.pack_into("<H", p, 78, 1)
             struct.pack_into("<H", p, 82, 1)
             reply = Frame(6, destination=1, source=0x50, payload=bytes(p))
+        elif frame.message_id == 0x0429:
+            bits = 0x2001 if self.state == 1 else 0x2000
+            reply = Frame(0x042A, destination=1, source=0x50, payload=struct.pack("<HI", 1, bits))
         elif frame.message_id in (0x04C1, 0x04CC, 0x04C7):
             ident, value = {
                 0x04C1: (0x04C2, self.mode),

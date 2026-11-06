@@ -51,7 +51,8 @@ persist automatically (SRC-002 p20) even without an explicit EEPROM command.
 | Already owned | Release the active owner; a failed release retains claims; do not delete lock files to bypass ownership |
 | Identity mismatch | Check exact controller/route with source protected; no fallback or output cleanup to a mismatched device |
 | Fault lockout | Keep independent optical protection; use documented protected recovery, never repeat ON |
-| Unsupported KEH3 route | Obtain the missing manufacturer wire/identity contract; changing a port is not a fix |
+| Control route unavailable | VCP and KEH3 external USB OUT writes are refused; docked KEH3 writes require the reviewed load policy and Manual/interlock checks |
+| Trigger->Manual refused | Establish independent source protection and trigger isolation, then use Python source_inhibited=True or CLI manual --source-inhibited |
 | OFF unconfirmed | Physical state remains unknown; use independent source protection and inspect the shutter |
 | Write framing unknown | No more frames, including OFF, are sent on that connection; independently inhibit the source and perform protected recovery |
 

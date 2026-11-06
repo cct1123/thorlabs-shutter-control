@@ -12,11 +12,11 @@ from os import PathLike
 from threading import Event, Lock, RLock
 
 from .config import load_config, positive, text, validate_configs
-from .device import KSC101
+from .device import KSC101, Identity
 from .errors import Cancelled, IdentityMismatch, ShutterError
 from .ownership import Claim
 from .protocol import Deadline, Session, clock
-from .transport import open_transport, require_supported_route
+from .transport import open_transport, require_control_route
 
 
 def utc_now():
@@ -27,7 +27,7 @@ def utc_now():
 class ShutterFeedback:
     shutter_state: str = "unknown"  # Optical state: never inferred from electrical readback.
     operating_mode: str = "unknown"
-    operating_state: str = "unknown"
+    operating_state: str = "unknown"  # Never inferred from the output bit.
     key_enabled: bool | None = None
     interlock_enabled: bool | None = None  # Configuration, not physical continuity.
     channel_enabled: bool | None = None
@@ -58,6 +58,7 @@ class ShutterStatus:
     optical_observed_at: str | None = None
     optical_provenance: str | None = None
     optical_observed_state: str = "unknown"
+    identity: Identity | None = None
 
 
 @dataclass
@@ -111,6 +112,18 @@ class ShutterHub:
         self._lock_directory = lock_directory
         self._channels = {c.name: _Channel(c) for c in self.configs}
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, error_type, error, traceback):
+        try:
+            self.close()
+        except BaseException as cleanup:
+            if error is None:
+                raise
+            error.add_note(f"Communication release failed: {cleanup}; retain owner")
+        return False
+
     def _channel(self, target):
         for c in self._channels.values():
             if (isinstance(target, str) and target == c.config.name) or (
@@ -135,6 +148,7 @@ class ShutterHub:
             c.config.channel,
             c.config.serial_number,
             c.config.route.endpoint,
+            identity=c.identity,
             connection="fault" if c.fault else "connected" if c.identity else "disconnected",
             has_device=c.transport is not None,
             identity_verified=c.identity is not None,
@@ -176,7 +190,6 @@ class ShutterHub:
                 exc.add_note(f"Could not persist uncertainty: {journal_error}; retain lockout")
 
     def _open(self, c, deadline):
-        require_supported_route(c.config)
         if c.transport is not None or c.claim is not None:
             raise ShutterError("Retained handle/claim: release or recover explicitly")
         c.claim = Claim(c.config, self._lock_directory)
@@ -217,15 +230,15 @@ class ShutterHub:
 
     def _feedback(self, c, d, *, protective=False):
         c.identity = c.driver.identity(d, protective=protective)
-        mode = c.driver.mode(d, protective=protective)
+        mode = c.driver.operating_mode(d, protective=protective)
         required = c.driver.interlock_required(d, protective=protective)
-        state = c.driver.state(d, protective=protective)
+        bits = c.driver.status_bits(d, protective=protective)
         return ShutterFeedback(
             shutter_state="unknown",
             operating_mode=mode,
-            operating_state="active" if state == "on" else "inactive",
             interlock_enabled=required,
-            electrical_state=state,
+            status_bits=bits,
+            electrical_state="on" if bits & 1 else "off",
             electrical_observed_at=utc_now(),
         )
 
@@ -252,8 +265,21 @@ class ShutterHub:
                 self._fault(c, exc)
                 raise
 
+    def get_solenoid_state_reply(self, target):
+        """Explicit raw diagnostic, separate from normalized electrical feedback."""
+        c, d = self._channel(target), Deadline(self.query_timeout)
+        with self._locked(c, d):
+            self._ready(c)
+            try:
+                c.identity = c.driver.identity(d)
+                return c.driver.solenoid_state_reply(d)
+            except BaseException as exc:
+                self._fault(c, exc)
+                raise
+
     @staticmethod
     def _policy(c):
+        require_control_route(c.config)
         if c.config.policy is None:
             raise ShutterError("Writes disabled: attached shutter limits/mapping are unqualified")
         return c.config.policy
@@ -268,10 +294,12 @@ class ShutterHub:
             raise ShutterError("Manufacturer interlock requirement disabled; refuse output")
         return feedback
 
-    def set_operating_mode(self, target, mode):
+    def set_operating_mode(self, target, mode, *, source_inhibited=False):
         """Select Manual explicitly; SRC-002 p20 says changed modes persist at power-up."""
         if mode != "manual":
             raise ValueError("Cycle/TTL modes unavailable until their limits and contracts qualify")
+        if type(source_inhibited) is not bool:
+            raise ValueError("source_inhibited must be boolean")
         c, d = self._channel(target), Deadline(self.query_timeout)
         policy = self._policy(c)
         with self._locked(c, d):
@@ -281,9 +309,10 @@ class ShutterHub:
             except BaseException as exc:
                 self._fault(c, exc)
                 raise
-            if before.operating_mode not in ("manual", "single", "auto"):
+            if before.operating_mode == "triggered" and not source_inhibited:
                 raise ShutterError(
-                    "External trigger authority unresolved: source must be inhibited"
+                    "Trigger->Manual requires independently inhibited source and isolated "
+                    "trigger control; pass source_inhibited=True after establishing them"
                 )
             if before.electrical_state != "off" or not before.interlock_enabled:
                 raise ShutterError("Mode change requires electrical OFF and interlock requirement")
@@ -294,20 +323,21 @@ class ShutterHub:
                     "Mode changes are persistent across power cycles (SRC-002 p20); "
                     "explicit allow_persistent_mode_changes policy permission is required"
                 )
-            try:
+            with self._output_operation(c):
                 c.claim.mark_uncertain("Explicit mode transition pending")
-                c.driver.set_manual(d)
+                c.output_attempts += 1  # Mode changes can also affect output.
+                c.driver.set_output(False, d)  # OFF/deactivate before changing operating mode.
+                c.driver.wait_output(False, d)
+                c.driver.set_operating_mode("manual", d)
                 after = self._feedback(c, d)
                 if after.operating_mode != "manual" or after.electrical_state != "off":
                     raise ShutterError("Manual mode transition unconfirmed or changed output")
+                c.next_on = clock() + policy.min_off_s
                 c.claim.clear_uncertain()
                 return self._snapshot(c, after)
-            except BaseException as exc:
-                self._fault(c, exc)
-                raise
 
-    def set_manual_mode(self, target):
-        return self.set_operating_mode(target, "manual")
+    def set_manual_mode(self, target, *, source_inhibited=False):
+        return self.set_operating_mode(target, "manual", source_inhibited=source_inhibited)
 
     def enable_device(self, target):
         self._channel(target)
@@ -315,7 +345,7 @@ class ShutterHub:
 
     @contextmanager
     def _output_operation(self, c):
-        """Keep ON and pulse ambiguity/cleanup behavior at one command boundary."""
+        """One ambiguity/cleanup guard for mode, ON and pulse writes."""
         attempts = c.output_attempts
         try:
             yield
@@ -345,16 +375,15 @@ class ShutterHub:
         c.optical = "unknown"
         c.optical_at = c.optical_evidence = None
         c.output_attempts += 1
-        c.driver.set_solenoid(True, d)
-        if c.driver.state(d) != "on":
-            raise ShutterError("Electrical ON readback does not match; possible interlock/fault")
+        c.driver.set_output(True, d)
+        bits = c.driver.wait_output(True, d)
         return self._snapshot(
             c,
             replace(
                 feedback,
                 shutter_state="unknown",
                 electrical_state="on",
-                operating_state="active",
+                status_bits=bits,
                 electrical_observed_at=utc_now(),
             ),
         )
@@ -390,10 +419,11 @@ class ShutterHub:
             c.identity = c.driver.identity(d, protective=True)
         dispatched = clock()
         c.output_attempts += 1
-        c.driver.set_solenoid(False, d, protective=True)
-        c.next_on = clock() + policy.min_off_s
+        c.driver.set_output(False, d, protective=True)
         if c.driver.session.poisoned:
             raise ShutterError("OFF dispatched on ambiguous session; no confirmed safe state")
+        c.driver.wait_output(False, d, protective=True)
+        c.next_on = clock() + policy.min_off_s  # Rest begins with observed OFF, not dispatch.
         feedback = self._feedback(c, d, protective=True)
         if feedback.electrical_state != "off" or feedback.operating_mode != "manual":
             raise ShutterError("OFF unconfirmed or external/cycle authority remains active")
@@ -531,6 +561,10 @@ class ShutterHub:
     def shutdown_outputs(self):
         failures = []
         for c in self._channels.values():
+            if c.output_attempts == 0 and c.requested is None:
+                if c.fault:
+                    failures.append((c.config.name, ShutterError(f"Read-only fault: {c.fault}")))
+                continue  # A policy permits commands; it does not create a cleanup obligation.
             if c.transport is not None:
                 try:
                     self.safe_state(c.config.name)

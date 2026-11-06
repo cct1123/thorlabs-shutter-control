@@ -61,8 +61,27 @@ def test_invalid_cli_pulse_does_not_connect(monkeypatch, capsys):
         "thorlabs_shutter_control.ShutterHub.connect",
         lambda *a: pytest.fail("Unexpected connection"),
     )
-    assert main(["--config", str(path), "--target", "example", "pulse", "--seconds", "nan"]) == 1
+    assert main(["--config", str(path), "--target", "shutter", "pulse", "--seconds", "nan"]) == 1
     assert "finite" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("command", ["identify", "status"])
+def test_cli_reads_share_owner_schema_and_release(bench, monkeypatch, capsys, command):
+    from thorlabs_shutter_control import __main__ as cli
+
+    hub, devices, _, _ = bench
+    monkeypatch.setattr(cli, "load_config", lambda path: hub.configs)
+    monkeypatch.setattr(cli, "ShutterHub", lambda configs: hub)
+    assert cli.main(["--target", "beam", command]) == 0
+    value = json.loads(capsys.readouterr().out)
+    if command == "identify":
+        assert value["serial_number"] == "68000001"
+        assert len(devices[0].history) == 1  # Reuse the identity already verified by connect.
+    else:
+        assert value["identity"]["serial_number"] == "68000001"
+        assert value["feedback"]["status_bits"] == 0x2000
+        assert value["feedback"]["operating_state"] == "unknown"
+    assert devices[0].closed and not devices[0].output_frames
 
 
 def test_d2xx_contract_uses_exact_serial_no_enumeration(monkeypatch):
@@ -131,6 +150,34 @@ def test_gui_construction_is_passive(bench):
     assert client.get("/_dash-dependencies").status_code == 200
     assert not devices
     assert "Solenoid ON" in client.get("/_dash-layout").get_data(as_text=True)
+
+
+@pytest.mark.parametrize("target", [None, "unknown"])
+@pytest.mark.parametrize("action", ["connect", "read", "manual", "on", "off", "release"])
+def test_gui_requires_an_exact_target_for_every_action(bench, target, action):
+    from thorlabs_shutter_control.gui import create_app
+
+    hub, devices, _, _ = bench
+    hub.connect("beam")
+    before = len(devices[0].history)
+    client = create_app(hub).server.test_client()
+    response = client.post(
+        "/_dash-update-component",
+        json={
+            "output": "result.children",
+            "outputs": {"id": "result", "property": "children"},
+            "changedPropIds": [f"{action}.n_clicks"],
+            "inputs": [
+                {"id": key, "property": "n_clicks", "value": int(key == action)}
+                for key in ("connect", "read", "manual", "on", "off", "release")
+            ],
+            "state": [{"id": "target", "property": "value", "value": target}],
+        },
+    )
+    assert response.status_code == 200
+    message = response.get_json()["response"]["result"]["children"]
+    assert "Select an exact configured target" in message
+    assert not devices[0].closed and len(devices[0].history) == before
 
 
 def test_existing_diamond_owner_surface_and_feedback_schema(bench):

@@ -1,61 +1,62 @@
-"""Validate saved defaults in a local Jupyter kernel; never enable hardware gates.
+"""Statically validate live-hardware tutorials without executing their cells.
 
 Run: uv run --locked --group notebooks python scripts/verify_notebooks.py
-Kernel namespace resets between notebooks; saved notebooks are never overwritten.
+Hardware execution belongs in an operator-controlled notebook session.
 """
 
 import hashlib
 import json
-import os
 import re
 from pathlib import Path
-
-import nbformat
-from jupyter_client import KernelManager
-from nbclient import NotebookClient
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def inspect_notebook(path):
+    """Check syntax/links and inventory saved execution; never execute or erase it."""
+    notebook = json.loads(path.read_text(encoding="utf-8"))
+    if notebook["nbformat"] != 4:
+        raise ValueError(f"Unsupported notebook format: {path}")
+    code_cells = 0
+    saved_output_cells = 0
+    for index, cell in enumerate(notebook["cells"]):
+        source = cell["source"]
+        source = source if isinstance(source, str) else "".join(source)
+        if cell["cell_type"] == "code":
+            if cell["execution_count"] is not None or cell["outputs"]:
+                saved_output_cells += 1
+            compile(source, f"{path}:cell-{index}", "exec")
+            code_cells += 1
+        elif cell["cell_type"] == "markdown":
+            for target in re.findall(r"\]\(([^)]+)\)", source):
+                target = target.split("#", 1)[0]
+                if target and "://" not in target and not (path.parent / target).is_file():
+                    raise ValueError(f"Broken link in {path}: {target}")
+    return dict(
+        notebook=path.name,
+        sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
+        python_syntax="PASS",
+        markdown_links="PASS",
+        saved_output_cells=saved_output_cells,
+        hardware_execution="NOT RUN",
+        code_cells=code_cells,
+    )
+
+
 def main():
-    os.environ.setdefault("JUPYTER_RUNTIME_DIR", str(ROOT / "tmp/notebook-runtime"))
-    os.environ.setdefault("IPYTHONDIR", str(ROOT / "tmp/notebook-ipython"))
+    import nbformat
+
     results = []
-    manager = KernelManager(kernel_name="python3")
-    try:
-        manager.start_kernel(cwd=str(ROOT / "docs/examples"))
-        for path in sorted((ROOT / "docs/examples").glob("0*.ipynb")):
-            notebook = nbformat.read(path, as_version=4)
-            nbformat.validate(notebook)
-            for cell in notebook.cells:
-                if cell.cell_type == "markdown":
-                    for target in re.findall(r"\]\(([^)]+)\)", cell.source):
-                        if "://" not in target and not (path.parent / target).resolve().is_file():
-                            raise ValueError(f"Broken link in {path}: {target}")
-            code_cells = sum(cell.cell_type == "code" for cell in notebook.cells)
-            notebook.cells.insert(
-                0, nbformat.v4.new_code_cell("get_ipython().run_line_magic('reset', '-f')")
-            )
-            NotebookClient(notebook, km=manager, timeout=30, startup_timeout=30).execute()
-            results.append(
-                dict(
-                    notebook=path.relative_to(ROOT).as_posix(),
-                    sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
-                    schema="PASS",
-                    markdown_links="PASS",
-                    default_kernel_execution="PASS",
-                    code_cells=code_cells,
-                )
-            )
-            print(path.name, "PASS", flush=True)
-    finally:
-        if manager.has_kernel:
-            manager.shutdown_kernel(now=True)
+    for path in sorted((ROOT / "docs/examples").glob("*.ipynb")):
+        nbformat.validate(nbformat.read(path, as_version=4))
+        result = inspect_notebook(path)
+        result["schema"] = "PASS"
+        results.append(result)
+        print(path.name, "PASS static checks; hardware NOT RUN", flush=True)
     (ROOT / "records/notebook-validation.json").write_text(
         json.dumps(
             dict(
-                scope="offline saved defaults, no physical validation",
-                method="one local kernel, namespace reset between independent notebooks",
+                scope="static notebook validation only; no cell execution or hardware substitute",
                 results=results,
             ),
             indent=2,

@@ -1,55 +1,65 @@
 {
-  "scope": "offline saved defaults, no physical validation",
+  "scope": "static notebook validation only; no cell execution or hardware substitute",
   "results": [
     {
-      "notebook": "docs/examples/01_device_discovery.ipynb",
-      "schema": "PASS",
+      "notebook": "01_device_discovery.ipynb",
+      "sha256": "e98c8ede0eb0b9c877b08f76654770008897108dc2ed4075d7869ddef728f5e4",
+      "python_syntax": "PASS",
       "markdown_links": "PASS",
-      "default_kernel_execution": "PASS",
-      "code_cells": 3,
-      "sha256": "aa39a6a9fc840cf1b5aaf3d8980c928e12405415a3cc1c8175a468aea7d0b7a1"
-    },
-    {
-      "notebook": "docs/examples/02_connection.ipynb",
-      "schema": "PASS",
-      "markdown_links": "PASS",
-      "default_kernel_execution": "PASS",
-      "code_cells": 3,
-      "sha256": "0bba07d0f4363197121bde008274b5cb2877ae0e5531e64a55b1188202c962f2"
-    },
-    {
-      "notebook": "docs/examples/03_status_query.ipynb",
-      "schema": "PASS",
-      "markdown_links": "PASS",
-      "default_kernel_execution": "PASS",
+      "saved_output_cells": 2,
+      "hardware_execution": "NOT RUN",
       "code_cells": 2,
-      "sha256": "7fc7a6b05159740505623ce77d69108a2eb239f4b118e7cb6bc3560248023fd5"
+      "schema": "PASS"
     },
     {
-      "notebook": "docs/examples/04_settings.ipynb",
-      "schema": "PASS",
+      "notebook": "02_connection.ipynb",
+      "sha256": "f54b5934e17eced3c71be015eec92b747077717e8e12c7c3b694d36ad63fdf13",
+      "python_syntax": "PASS",
       "markdown_links": "PASS",
-      "default_kernel_execution": "PASS",
+      "saved_output_cells": 2,
+      "hardware_execution": "NOT RUN",
       "code_cells": 2,
-      "sha256": "124983218977dc516c454a21a793b0748f802bd518aa5afbcfc7be24f1eafcd9"
+      "schema": "PASS"
     },
     {
-      "notebook": "docs/examples/05_shutter_modes.ipynb",
-      "schema": "PASS",
+      "notebook": "03_status_query.ipynb",
+      "sha256": "0e40f83758b59c4a8007f25118fa581d662c6177d134683cdbf4ef74ece74e4c",
+      "python_syntax": "PASS",
       "markdown_links": "PASS",
-      "default_kernel_execution": "PASS",
-      "code_cells": 3,
-      "sha256": "9ba8c7978e06b676eac9023f6a577b001824030df4ec1a2fef8e8956e8cb033a"
+      "saved_output_cells": 2,
+      "hardware_execution": "NOT RUN",
+      "code_cells": 2,
+      "schema": "PASS"
     },
     {
-      "notebook": "docs/examples/06_on_off.ipynb",
-      "schema": "PASS",
+      "notebook": "04_settings.ipynb",
+      "sha256": "340e0c9aefe9b6300b073f9c6edc1adef79ab0f803d28dbecf3d1b8695f5f5bf",
+      "python_syntax": "PASS",
       "markdown_links": "PASS",
-      "default_kernel_execution": "PASS",
-      "code_cells": 3,
-      "sha256": "1558c027cb3e88d6264bee3f44708a27b44c704169c7de7688e2c754bfb2658e"
+      "saved_output_cells": 0,
+      "hardware_execution": "NOT RUN",
+      "code_cells": 2,
+      "schema": "PASS"
+    },
+    {
+      "notebook": "05_shutter_modes.ipynb",
+      "sha256": "41d06f4d88ba4e8cc736564c509ab7bdf4cfa902cbd0654f6111a6c7484c92be",
+      "python_syntax": "PASS",
+      "markdown_links": "PASS",
+      "saved_output_cells": 0,
+      "hardware_execution": "NOT RUN",
+      "code_cells": 2,
+      "schema": "PASS"
+    },
+    {
+      "notebook": "06_on_off.ipynb",
+      "sha256": "d221adcb6da625a99585e1555ed3144dd3c1e1b2bda1b7bb6197ea6d4179d8b4",
+      "python_syntax": "PASS",
+      "markdown_links": "PASS",
+      "saved_output_cells": 2,
+      "hardware_execution": "NOT RUN",
+      "code_cells": 2,
+      "schema": "PASS"
     }
-  ],
-  "method": "one local kernel, namespace reset between notebooks; successful run via tmp/validate_tutorials.py",
-  "limitation": "Repeated startup also encountered local ZeroMQ timeouts; reliability is unqualified."
+  ]
 }

@@ -9,6 +9,7 @@ No Thorlabs DLL is loaded. Native driver call latency still needs qualification.
 import time
 
 from .errors import ShutterError, UnsupportedRoute
+from .ethernet import TCPTransport
 
 
 def dwell(deadline, seconds):
@@ -101,20 +102,20 @@ class D2XXTransport:
         self.device.close()
 
 
-def require_supported_route(config):
-    """Keep unresolved routes unavailable even when a byte backend is injected."""
-    if config.route.kind == "keh3":
+def require_control_route(config):
+    """Connection/readback is separate from qualification for physical output."""
+    if config.route.kind == "keh3" and config.route.bay == "external":
         raise UnsupportedRoute(
-            f"KEH3 {config.route.hub_serial} {config.route.endpoint} unavailable: "
-            "direct framing, hub identity and firmware contract unresolved (SRC-003). "
-            "No socket opened; no USB fallback."
+            "KEH3 external USB control unavailable; select a documented docked cube bay"
         )
-    if config.route.kind == "vcp" and config.policy is not None:
+    if config.route.kind == "vcp":
         raise UnsupportedRoute("VCP bridge reset/binding unqualified: read-only commissioning")
 
 
 def open_transport(config, deadline):
-    require_supported_route(config)
+    if config.route.kind == "keh3":
+        host, port = config.route.endpoint.split(":")
+        return TCPTransport(host, int(port), deadline)
     if config.route.kind == "vcp":
         return VCPTransport(config.route.port, deadline)
     return D2XXTransport(config.serial_number, deadline)

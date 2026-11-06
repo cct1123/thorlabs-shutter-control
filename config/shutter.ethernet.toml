@@ -1,0 +1,21 @@
+# Exact user-selected controller. No discovery or alternate-bay fallback.
+[[shutters]]
+name = "shutter"
+channel = 0
+role = "SH05R on KSC10168800777, KEH3 middle bay"
+serial_number = "68800777"
+firmware = ["1.0.7"]
+[shutters.route]
+kind = "keh3"
+host = "192.168.1.19"
+bay = "middle"
+hub_serial = "UNKNOWN; controller selected by exact serial"
+hub_firmware = "UNKNOWN; not inferred from controller identity"
+
+[shutters.policy]
+evidence = "PROJECT.md exact Ethernet ON/OFF request and user SH05R/safe confirmation 2026-11-06; SRC-009 SH05R manual. Source protection/trigger isolation required for physical use; optical state remains unmeasured."
+shutter_model = "SH05R"
+off_optical_state = "closed"  # Manufacturer design mapping, not a live optical measurement.
+continuous_on_allowed = true  # SH05R manual pp6-7, driven by native KSC101.
+min_off_s = 2.0  # Conservative commissioning pause, not a calibrated/rated minimum.
+allow_persistent_mode_changes = true  # Explicit Manual preparation; stays Manual afterward.

@@ -15,7 +15,10 @@ The prepared `build_shutter_owner` factory takes the explicit new TOML path plus
 the existing `SHUTTER_CH_MAP` metadata and hub address. It rejects differences in
 logical names, application CH, serials or selected hub routes before connection.
 The existing mapping is retained; no USB fallback is substituted for its LAN
-route. The exact hub identity/firmware and new local TOML are still missing.
+route. The exact hub identity/firmware remains unknown. This repository now
+supplies config/shutter.ethernet.toml for the selected controller, with hub
+metadata explicitly unknown; the unavailable external checkout's local
+configuration has not been inspected or migrated in this review.
 
 The page reuses command results rather than issuing another status read. Its
 Close request reaches the active owner before waiting for the page presentation
@@ -38,3 +41,12 @@ Integration tests are recorded in `records/diamondgui-tests.xml`. They establish
 the passive import/configuration boundary, mapping refusals, page result/schema
 behavior and protective dispatch around the page lock. They do not establish
 real task cancellation, beam routing, optical safety or native driver timing.
+
+The 6 November source/API review preserves these public owner methods and existing
+status fields, adds nested verified identity, and uses fresh output-status bits.
+operating_state now stays unknown rather than being inferred from output OFF/ON.
+Docked Ethernet now uses this owner for explicit qualified Manual ON/OFF;
+VCP/external USB and missing-policy controls remain restricted. E181 tests the
+core real middle-bay controller, not the unavailable external application.
+The former external checkout path is unavailable on the current host, so its
+historical integration result must not be treated as revalidated for this review.

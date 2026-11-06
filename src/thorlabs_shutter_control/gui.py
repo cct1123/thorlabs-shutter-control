@@ -40,11 +40,13 @@ def create_app(hub):
     def act(*values):
         target = values[-1]
         try:
+            if target not in {c.name for c in hub.configs}:
+                raise ValueError("Select an exact configured target before using a control")
             method = {
                 "connect": hub.connect,
                 "read": hub.get_status,
                 "manual": hub.set_manual_mode,
-                "on": hub.open_shutter,
+                "on": lambda name: hub.set_solenoid(name, True),
                 "off": hub.safe_state,
                 "release": hub.disconnect,
             }[ctx.triggered_id]

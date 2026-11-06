@@ -4,6 +4,44 @@ Date: 4 November 2026
 Status: Engineering requirements
 Project management: uv
 
+## Holistic review and delivery (user request, 6 November 2026)
+
+"holistic review. identify flaws. fix issues. prune. clean out legacy codes.
+ensure clean migration. require consistent naming. update doc. update readme.
+prune. clean cache and temp. commit stage by stage. push"
+
+Review the pending migration and current runtime, fix demonstrated defects,
+remove superseded implementations, reconcile current terminology and documentation,
+and remove only verified generated caches/temporary artifacts. Preserve manuals,
+hardware evidence, notebook outputs/backups, environments and runtime ownership
+state. Deliver focused local commits and push to the configured origin. This
+request authorizes publication of the reviewed repository changes; it does not
+authorize new device operations, driver changes or repeated commissioning.
+Derived REQ-223: regressions for review findings, full source/isolated-wheel and
+static notebook verification, documented migration boundaries, scoped cleanup,
+reviewed staged commits and successful remote synchronization. Broader physical
+acceptance remains separate.
+
+## Manual consistency and package validation (user request, 6 November 2026)
+
+"read them. check the consistency. validate the control package"
+
+Review the repository manuals and both APT revisions against implemented frames,
+transport setup, controller state interpretation, control prerequisites and public
+interfaces. Correct supported local inconsistencies and validate the final source,
+isolated wheel and tutorial syntax. This review performs no device operations;
+software checks do not complete the outstanding physical commissioning objective.
+
+## Repository documentation (user request, 6 November 2026)
+
+"ensure we have the device manual and the apt command protocol documents in the repo"
+
+Include the KSC101 controller manual, KEH3/KEH6 hub manual and both APT protocol
+revisions already used by the project in a non-ignored repository directory.
+Preserve the manufacturer PDFs unchanged, link them from the source register,
+and validate identity, revisions, page counts and recorded hashes. This request
+does not identify the attached shutter model or resolve its missing load manual.
+
 ## Comprehensive review (user request, 5 November 2026)
 
 Review all pending changes together, remove obsolete implementations, fix supported
@@ -14,15 +52,156 @@ affected integration tests; retain unresolved physical acceptance explicitly.
 This review authorizes local implementation, software verification and a local
 commit. It does not authorize device operations, driver changes or publication.
 
+## Exact Ethernet ON/OFF (user request, 6 November2026)
+
+"resolve the ethernet control restriction and implement shutter on/off at
+192.168.1.19:40305. use the thorlabs manual and protocol. no simulator."
+The user answered the physical-setup question "yes SH05R. safe." confirming the
+current attached SH05R and the queried independently blocked source/isolated
+external-trigger conditions. This authorizes the necessary explicit OFF/Manual
+preparation and one short ON/OFF commissioning cycle on KSC10168800777/1.0.7,
+KEH3 middle bay192.168.1.19:40305. Added ON hold1s, minimum test OFF pause2s;
+finish OFF/Manual and release. Reuse this bounded authorization; no repeated
+permission request. These are commissioning pauses, not calibrated optical timing.
+No TTL/configuration/priming, interlock bypass, firmware/driver/security/network
+setting, other controller or repeated endurance cycle is authorized.
+
+Derived REQ-220: remove the unsupported blanket docked-KEH3 write ban using
+SRC-003 port routing and the transport-independent APT command contract; retain
+exact controller identity, Manual/load-policy/ownership/deadline/cleanup checks.
+The user selects the exact controller at this endpoint; unverified hub metadata
+must not be represented as verified and is not a prerequisite for this selected
+controller's commissioning. This supersedes earlier blanket Ethernet control
+refusals; broader hub-swap, other bay, optical, timing and endurance qualification
+remain separate. Test actual ON/OFF/readback and release on real hardware, no
+simulator. Do not use a software test as a physical acceptance substitute.
+
+## Source/API consistency and slimming (user request, 6 November 2026)
+
+"comprehensive review of the source codes. revise the control commands and api.
+ensure the consistency. use the manual, thorlabs protocols, programmer guide as
+sources of truth. prune and slim down codebase. straightforward and happy path
+focus."
+
+Review the complete runtime, entry points, examples and verification against
+SRC-001/002/003/007/008. Derive REQ-219: one consistent query/command contract;
+separate operating state, electrical output and optical observation; remove
+redundant implementation and misleading fields/claims; quantify code reduction;
+retain ownership, bounded I/O, fault recovery and the existing qualified-output
+limits. Reuse the shared owner for verified read-only Ethernet queries rather
+than a second notebook connection manager. This revises the earlier blanket
+normal-owner KEH3 connection refusal for read-only queries only; KEH3 actuation
+remains unavailable. Preserve the pre-review executed notebooks and user outputs as hash-identified
+backups before revising tutorial cells; keep historical evidence.
+Software changes and bounded queries on the already authorized exact controller
+are in scope; no physical actuation, mode/settings writes, driver/security change
+or publication is authorized by this review.
+
 ## Beginner tutorials (user request, 5 November 2026)
 
 Deliver separate beginner example notebooks for device discovery, connection,
-status query, settings, shutter modes, and ON/OFF. Derived acceptance: each is
-standalone, uses the current API, runs hardware-free by default, explains its
-prerequisites and expected result, and gates explicit device access and writes.
-Unsupported discovery/routes/modes must be identified rather than invented.
-Validate offline execution and supported opt-in examples on simulated transports;
-this request does not authorize physical operation.
+status query, settings, shutter modes, and ON/OFF.
+
+Revised user instruction, 5 November 2026: "revise all the example notebooks.
+directly deal with the hardware . no simulator." This supersedes the earlier
+hardware-free-default and simulated-notebook acceptance. Each notebook must be
+standalone and use the real production interface, with actual native inventory
+or explicit local device configuration. Missing setup must fail clearly rather
+than execute a fictional example or report a skipped operation as success.
+Read-only connection/query cells run directly once configured; mode/output cells
+retain explicit operator confirmation, qualification, ownership and cleanup.
+Unsupported routes/modes stay explicit. Notebook verification is static only;
+no simulated transport or automatic batch execution of live cells is acceptable.
+Live native inventory is authorized by this instruction. Physical actuation still
+requires the exact setup, limits and approved window under the boundaries below.
+
+## Read-only hardware communication (user request, 5 November 2026)
+
+"try to communicate with the shutter" authorizes current host inventory and a
+bounded read-only identity/status attempt on an explicitly identified controller.
+Windows currently reports Kinesis Solenoid Controller USB serial 68800777.
+Use the existing exact-serial production USB owner and ordinary initialization;
+no mode/output commands, driver or binding changes, device reset/reboot outside
+normal transport initialization, unrelated-device probing or ownership takeover.
+No actuation qualification is inferred. Record exact native errors and readback.
+
+## Read-only Ethernet attempt (user request, 5 November 2026)
+
+"try ethernet instead" authorizes a bounded query-only attempt on the recorded
+KEH3 left-bay endpoint 192.168.1.19:40304, expecting controller 68800777.
+User confirms now: "Yes—powered, Ethernet connected, USB IN disconnected".
+This supersedes earlier offline-only scope for this single live diagnostic.
+Use the separate candidate identity probe, one HW_REQ_INFO to candidate address
+0x50, total 5 s budget, no scan, automatic retries, mode/output or hub settings.
+Hub serial/firmware and raw-APT compatibility are unverified. A reply does not
+qualify the operational route or authorize actuation. No driver/security changes.
+
+The user subsequently explicitly supplied this current mapping:
+
+```python
+SHUTTERHUB_IP = "192.168.1.19"
+SHUTTERHUB_PORT = 40303
+SHUTTER_CH_MAP = {"verdi shutter": {"CH": 0, "SN": 68800777, "IP_PORT": 40304}}
+```
+
+The selected bay refused TCP. A subsequent bounded management-port TCP
+connect/close with no payload and one ICMP echo are within this read-only
+connectivity diagnosis; no management query, other port/host scan or actuation.
+
+Current physical correction (5 November 2026): in response to the rear-view bay
+question, the user reports "middle". This supersedes the earlier left-bay/40304
+assumption for the expected KSC101 68800777. The middle-bay port is 40305 per
+SRC-003 section 4.3/Figure 17. Try one equivalent read-only candidate identity
+query on 192.168.1.19:40305, retaining the same authority and limits. The logical
+application channel remains 0; no controller is moved and no other bay scanned.
+
+Corrected current mapping (human bay correction, actual identity verified E172):
+
+```python
+SHUTTERHUB_IP = "192.168.1.19"
+SHUTTERHUB_PORT = 40303
+SHUTTER_CH_MAP = {"verdi shutter": {"CH": 0, "SN": 68800777, "IP_PORT": 40305}}
+```
+
+This records one successful controller identity exchange, not hub/operational or
+physical qualification. No normal-owner route gate is removed by this result.
+
+## Fixed-endpoint Ethernet notebooks (user request, 6 November 2026)
+
+Update all six example notebooks to use Ethernet at 192.168.1.19:40305 for
+controller serial 68800777, CH 0, middle bay, no simulator. The follow-up
+"remove the verdi wording" changes the display/configuration name to "shutter"
+throughout current examples and their guide. Historical evidence retains its
+original labels. Every notebook must construct this exact real route without
+USB/COM discovery, fallback or a required local TOML edit. Identity/status/settings
+reads use actual TCP diagnostic access; operational mode/ON/OFF examples retain
+the existing production-owner route/qualification boundary and state their
+current unsupported result. No physical actuation or route qualification is
+inferred. Validate static/passive setup without injecting simulated transports;
+record any real read-only validation separately. Preserve unrelated dirty work.
+
+## Notebook simplification (user request, 6 November 2026)
+
+"simplify and reduce codes in the notebooks": remove repeated configuration,
+path discovery and error/cleanup blocks while preserving standalone execution
+from the root or examples directory, the generic shutter name, exact real
+192.168.1.19:40305/68800777 route, strict errors, ownership and no simulator.
+Keep reusable configuration and error details in the existing shared helper.
+Replace currently unsupported mode/ON/OFF sequences with a concise explicit
+check of the same production route restriction; no actuation or acceptance
+criterion is weakened. Quantify notebook code reduction and revalidate the
+current artifacts without repeating satisfied hardware measurements.
+
+## State-zero investigation and notebook 3 repair (user request, 6 November 2026)
+
+Investigate what solenoid state 0 means for actual KSC101 firmware 1.0.7 and fix
+notebook 3 using real hardware, no simulator. Current target remains shutter
+68800777 at 192.168.1.19:40305. This authorizes bounded read-only identity, mode,
+interlock configuration, raw solenoid state and independent status/status-bit
+queries on that exact controller. Preserve raw evidence, user-executed notebooks
+and current mode/output/settings. No priming, enable, mode/output write, resets,
+firmware/driver/security change or alternative target is authorized. A missing
+published definition must be reported honestly, not replaced by invented OFF.
 
 ## Implementation references
 

@@ -3,6 +3,7 @@
 import argparse
 import json
 import sys
+import time
 from dataclasses import asdict
 
 from . import ShutterHub, load_config
@@ -23,22 +24,12 @@ def main(argv=None):
     discover.add_argument(
         "--vcp", action="store_true", help="List COM ports instead of D2XX devices"
     )
-    commands.add_parser("manual", help="Select Manual; changed modes are remembered at power-up")
-    for name in ("keh3-analyze", "keh3-probe"):
-        sub = commands.add_parser(
-            name, help="Candidate identity diagnostics; never qualifies a route"
-        )
-        sub.add_argument("--destination", type=lambda value: int(value, 0), required=True)
-        if name == "keh3-analyze":
-            sub.add_argument(
-                "--capture", required=True, help="Raw binary RX capture, at most 4096 bytes"
-            )
-        else:
-            sub.add_argument(
-                "--query-authorized",
-                action="store_true",
-                help="Operator confirms a bounded identity-query bench authorization",
-            )
+    manual = commands.add_parser("manual", help="Select Manual; stays selected at power-up")
+    manual.add_argument(
+        "--source-inhibited",
+        action="store_true",
+        help="Source blocked and trigger control isolated",
+    )
     pulse = commands.add_parser("pulse", help="Bounded hold on a continuous-duty qualified load")
     pulse.add_argument("--seconds", required=True, type=float)
     args = parser.parse_args(argv)
@@ -57,24 +48,6 @@ def main(argv=None):
             )
             return 0
         configs = load_config(args.config)
-        if args.command in ("keh3-analyze", "keh3-probe"):
-            from pathlib import Path
-
-            from .keh3 import CAPTURE_LIMIT, KEH3Probe, analyze_capture
-
-            selected = next((c for c in configs if c.name == args.target), None)
-            if selected is None:
-                raise ValueError("--target must name one exact configured KEH3 controller")
-            if args.command == "keh3-analyze":
-                with Path(args.capture).open("rb") as stream:
-                    raw = stream.read(CAPTURE_LIMIT + 1)
-                report = analyze_capture(selected, raw, destination=args.destination)
-            else:
-                report = KEH3Probe(
-                    selected, destination=args.destination, authorized=args.query_authorized
-                ).run()
-            print(json.dumps(asdict(report), indent=2))
-            return 0 if report.verdict == "candidate-controller-match-hub-unverified" else 2
         if args.command == "check-config":
             print(json.dumps([asdict(c) for c in configs], indent=2))
             return 0
@@ -90,18 +63,22 @@ def main(argv=None):
         # Validate public pulse arguments before opening a transport.
         if args.command == "pulse":
             hub.validate_pulse(args.target, args.seconds)
-        hub.connect(args.target)
+        connection = hub.connect(args.target)
         action = {
-            "identify": hub.identify_device,
             "status": hub.get_status,
             "safe-off": hub.safe_state,
-            "manual": hub.set_manual_mode,
         }
-        result = (
-            hub.pulse(args.target, args.seconds)
-            if args.command == "pulse"
-            else (action[args.command](args.target))
-        )
+        if args.command == "identify":
+            result = connection.identity
+        elif args.command == "pulse":
+            hub.safe_state(args.target)  # Explicit OFF preparation is part of this output command.
+            selected = next(c for c in configs if c.name == args.target)
+            time.sleep(selected.policy.min_off_s)
+            result = hub.pulse(args.target, args.seconds)
+        elif args.command == "manual":
+            result = hub.set_manual_mode(args.target, source_inhibited=args.source_inhibited)
+        else:
+            result = action[args.command](args.target)
         print(json.dumps(asdict(result), indent=2))
     except (Exception, KeyboardInterrupt) as exc:
         original = exc
