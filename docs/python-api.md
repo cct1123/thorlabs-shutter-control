@@ -68,6 +68,9 @@ The CLI pulse command performs explicit OFF preparation and that pause.
 The minimum OFF interval begins after electrical OFF readback, so transition
 latency cannot consume the required rest time. This is an electrical observation,
 not a measured optical closure time.
+Fresh OFF from get_status also starts that interval; an ON click is not required
+to start it. Any observed ON invalidates the previous OFF interval. Library
+connect remains identity-only; the WebUI Connect additionally reads fresh status.
 Mode-write failures share the output ambiguity/cleanup guard. ON and pulse also
 preserve the original failure and any separate cleanup outcome. Output methods
 remain unavailable on VCP, KEH3 external USB OUT and without the reviewed load policy.

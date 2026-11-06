@@ -1,3 +1,43 @@
+# Actual hardware WebUI validation
+
+6 November 2026. **PASS selected browser/controller user flow; broader deployment
+and independent optical qualification remain open.** No simulator was used.
+
+Tested the production WebUI at localhost:9857 through visible browser controls
+against SH05R/KSC10168800777, firmware1.0.7, KEH3 middle bay192.168.1.19:40305.
+The user confirmed the unchanged source-blocked/trigger-isolated/key-interlock setup.
+One baseline and one corrected short ON/OFF cycle returned0x2000 ->0x2001 ->0x2000.
+Final Manual/OFF/no fault, communication released; the test server was stopped.
+
+Fixed three observed issues: the hardcoded port prevented coexistence with an
+existing8050 application; GUI Connect showed unknown feedback; and the first ON
+unnecessarily failed because the OFF-rest timer began on that click. The GUI now
+accepts an explicit --port, reads fresh status after connection, and counts rest
+from fresh OFF. The first ON after rest succeeds. Immediate ON during the OFF
+interval is still refused, showing1.66s remaining and no dispatched ON; a fresh
+read confirmed OFF/no fault afterward. Manual was already selected and not rewritten.
+
+Updated [the WebUI guide](../docs/gui.md), README and scripts. The new saved-evidence
+checker validates exact identity/route, OFF/ON/OFF, rest refusal and release without
+connecting or fabricating a run. Passive syntax/lint/format, lock, wheel/source
+parity, clean isolated installation/import/help and invalid-port checks pass.
+No fake/simulated-device tests ran in this campaign; the earlier160/160 result
+below belongs to its older revision and is not new full-suite coverage.
+
+See [actual browser results](../records/webui-final-live.json),
+[live provenance/hashes](../records/webui-live-validation.json),
+[passive package validation](../records/webui-package-validation.json),
+[saved-evidence check](../records/webui-evidence-validation.json) and
+[final OFF screenshot](../records/webui-final-off.jpg). E188/E189 in records/RECORDS.md
+retain the baseline, corrections, commands and scope. Independent blade motion,
+optical closure/calibration and the separate DiamondGUI deployment remain unverified.
+No further hardware cycle is planned.
+
+---
+
+The following report is the previously delivered holistic review. Its tests,
+counts and publication hashes apply to that historical revision.
+
 # Holistic review and migration delivery
 
 6 November 2026. **Package review PASS; integrated deployment remains blocked.**
