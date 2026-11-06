@@ -1,0 +1,51 @@
+{
+  "timestamp_utc": "2026-11-06T00:44:33.865658+00:00",
+  "scope": "TCP connect/close only; no application payload or state change command",
+  "endpoint": "192.168.1.19:40303",
+  "provenance": "Current user SHUTTERHUB_IP/SHUTTERHUB_PORT mapping",
+  "expected_shutter_map": {
+    "verdi shutter": {
+      "CH": 0,
+      "SN": 68800777,
+      "IP_PORT": 40304
+    }
+  },
+  "timeout_s": 5.0,
+  "payload_bytes_sent": 0,
+  "hub_identity_verified": false,
+  "controller_identity_verified": false,
+  "tcp_connected": true,
+  "local_endpoint": [
+    "192.168.1.201",
+    23024
+  ],
+  "remote_endpoint": [
+    "192.168.1.19",
+    40303
+  ],
+  "connection_release": "completed",
+  "elapsed_s": 0.027860099995450582,
+  "command": "uv run --locked --offline --no-sync python tmp/check_hub_management.py",
+  "ping": {
+    "command": "ping.exe -n 1 -w 2000 192.168.1.19",
+    "sent": 1,
+    "received": 1,
+    "loss_percent": 0,
+    "reply_time": "<1 ms",
+    "ttl": 64,
+    "scope": "ICMP reachability only; no device identity"
+  },
+  "neighbor_after_checks": {
+    "ip": "192.168.1.19",
+    "mac": "D8-47-8F-93-68-CB",
+    "state": "Reachable",
+    "interface": "Ethernet",
+    "scope": "cached Windows neighbor observation"
+  },
+  "existing_local_hub_connections_after_release": {
+    "command": "Get-NetTCPConnection -RemoteAddress '192.168.1.19'",
+    "observation": "No current local TCP connections",
+    "scope": "this PC at observation time; other machines not excluded"
+  },
+  "result": "PASS TCP/ICMP reachability only; hub and shutter identity UNTESTED"
+}

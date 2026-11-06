@@ -1,0 +1,146 @@
+{
+  "evidence_id": "E182",
+  "requirement_id": "REQ-222",
+  "test_id": "TEST-222",
+  "verified_at_utc": "2026-11-06T21:35:41.231748+00:00",
+  "result": "PASS",
+  "scope": "Manufacturer/source consistency, software source/wheel and static notebooks; no device operation by this review.",
+  "sources_reviewed": [
+    "APT Issue42.1 pp11-12,28-34,44-50,128,184-191; Issue36 pp31-37,187-194",
+    "KSC101 RevD sections3.3-3.4,4.3-4.5,6.3, appendicesA/C",
+    "KEH3/KEH6 RevE sections1.1,4.1-4.3, Figure17 visually inspected",
+    "Exact KSC101 Kinesis1.14.60 SolenoidStatus/GetStatusBits HTML, hashes rechecked",
+    "Thorlabs SH05R TTN264481-D02 RevA online manufacturer-authored mirror, printedpp2-7"
+  ],
+  "documents": [
+    {
+      "path": "docs/manuals/KSC101_Manual_HA0368T_Rev_D.pdf",
+      "sha256": "b51ac9ca1aa53b02b554dfd5b1c0bd4b99d73e4ba092e47170a64a3f4bab34f5",
+      "pages": 45,
+      "result": "PASS"
+    },
+    {
+      "path": "docs/manuals/KEH3_KEH6_Manual_DOC-103012_Rev_E.pdf",
+      "sha256": "c768e4e3f2317ae29f7bfcdf8b18f750d7adc688d324c55550cdfa9a31a0489b",
+      "pages": 33,
+      "result": "PASS"
+    },
+    {
+      "path": "docs/manuals/APT_Communications_Protocol_Issue_36.pdf",
+      "sha256": "96668e05c353269d59390d3e00e4e7237c881707b3a947057dd08ead13191966",
+      "pages": 421,
+      "result": "PASS"
+    },
+    {
+      "path": "docs/manuals/APT_Communications_Protocol_Issue_42.1.pdf",
+      "sha256": "b2a6badd7c00b3042ba383e291667e7eab10746c14c4f92cea45fc480c7304ed",
+      "pages": 443,
+      "result": "PASS"
+    }
+  ],
+  "tests": {
+    "offline": {
+      "tests": 144,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wheel": {
+      "tests": 144,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "notebooks": "6 static PASS; no cell execution",
+  "local_markdown_links_checked": 91,
+  "findings": [
+    "Framing, identity offsets, mode/interlock/output values and D2XX initialization agree with reviewed documents.",
+    "Reconciled stale KEH3 blanket-ban and query-only notebook claims with actual code.",
+    "Documented Trigger exit source assertion, persistent-mode permission and GUI limitation.",
+    "Corrected Python pulse example to prepare OFF and wait the configured interval.",
+    "Documented generic APT status-query applicability gap and exact KSC101 API/live evidence.",
+    "Added15 regressions:6 literal queries,3 docked controls,1 policy refusal,3 TCP route selections,2 transition waits.",
+    "Registered missing SRC-009 reference; local SH05R PDF download remains unavailable.",
+    "Disambiguated current documentationREQ-221 and reviewREQ-222 from commissioningREQ-220; historicalE179 IDs retained."
+  ],
+  "verification_environment_notes": [
+    "Restricted pytest runs failed with WinError5 on temporary-directory access; same checks PASS outside sandbox.",
+    "Intermediate final run detected notebook-guide formatting; Ruff normalized it before successful full rerun.",
+    "No ACL, device, driver, firmware or security settings changed by this review."
+  ],
+  "independently_arriving_commissioning_records": {
+    "path": "records/ethernet-control-live.json",
+    "runtime_and_config_hashes_match": true,
+    "observed_status_bits": [
+      8192,
+      8192,
+      8192,
+      8192,
+      8193,
+      8193,
+      8193,
+      8192,
+      8192
+    ],
+    "on_attempts": 1,
+    "final_electrical_state": "off",
+    "final_mode": "manual",
+    "released": true,
+    "optical_observation": "User reports: I did not observe it. No independent blade motion/optical confirmation; controller ON/OFF only.",
+    "scope": "Existing separate recorded cycle reviewed, not repeated or observed by this review."
+  },
+  "limitations": [
+    "A local unchanged SH05R manual is still absent; mirror timeouts and manufacturer HTML response are not PDF copies.",
+    "No new device access; recorded electrical ON/OFF does not demonstrate optical blade motion or present transient state.",
+    "Other firmware/bays, hub identity/recovery, optical timing, TTL, native dispatch, persistence and endurance remain unqualified.",
+    "External DiamondGUI checkout unavailable; only current in-repo interface/application regressions revalidated.",
+    "No commit/push; pre-existing dirty work preserved."
+  ],
+  "software_manifest_sha256": "9b6a3ec3f783711295726a66b7fab01fcd04f760e88b71ed11f87af7f0510f34",
+  "source_sha256": {
+    "config/shutter.ethernet.toml": "a3ead7c489bcab71f1dda51c90f0c0e34d6348ed345b7184c07941eb87e57e33",
+    "config/shutters.example.toml": "6f542bc60545e256e0610ef1e4da9adce8f467b089abca432070af04c64ad3d3",
+    "docs/architecture.md": "0e14d56c8131e465494b800c57ffba394056c6b84c0137f2938061b4a5a6ea9e",
+    "docs/assets/README.md": "0a1d9f59826be16027e971a2bfb29fcdc36a656b2ef1c2d88b09d9e1da3bf9fe",
+    "docs/controller-reference-review.md": "2002f56e5b83b90569472b1eeb4a3c4e6873e86031169b15e4ee98485868ce12",
+    "docs/cutover.md": "9bed3ad410dc6bee7d8994f6fbda543690af93ac83d7d258706f94407352a873",
+    "docs/diamondgui.md": "1522489036c5d57449faf24fff809c2c2ce070fe9304602e54aea07da10c3f31",
+    "docs/ethernet-assessment.md": "327c1a06276c7f61aa1043578891077745f8a2e66a8a92a1c69c0e6ffd8ffcea",
+    "docs/examples/README.md": "835a8f02d9399c9e8563f1199294fa076ae0b1334d9fb54352db023d74ecb3e1",
+    "docs/getting-started.md": "a606454b28d88bd7063d7431bd55998e2621b30de33d7c48676416a8f552b61c",
+    "docs/gui.md": "ab8a3acc532a14782d9d77672e27acff626c6b8a1cdb4a62c40716dd835e2b4d",
+    "docs/hardware.md": "b7e90e751be2fb154fdc0d5f012e7a27b83268e77c2406e170d02951582755ba",
+    "docs/HARDWARE_VALIDATION.md": "5ed93bff39dc45badb3cfa35559840793ef7a581376cf6c3d0d50702b3d9ca17",
+    "docs/INTERFACE.md": "502a8935b103950ad9c0164890f29da68bda145967c8ee816134fb8244ce1026",
+    "docs/keh3-offline-validation.md": "a3331ca3999edc10ece2251821649150e430e732d639e9c0e1525b2985419af4",
+    "docs/manuals/README.md": "43ac77a14d69969c37dbdc599852944292a6884bfa60471e8b8429169270744d",
+    "docs/python-api.md": "50cc7e4f4a2f8362204a9a9dea513c04c55685f4d84e4313ec2c7721c2f0b39e",
+    "docs/qmi-discovery-review.md": "1ab6b93a107980f7d5aec6a6cd0eb10e88b3ca417d82d64ec73bb4b4bfc9e828",
+    "docs/sources.md": "fb087eecd6af57bf0ea489250e8ce13d355836e86455a042ec4be4068b103895",
+    "docs/state-zero-investigation.md": "1eb63b3e65d74570c2aafa12b5d3ea9ad9276e03d0a937d5dacf34e48ef6c316",
+    "outputs/REPORT.md": "c7dcd886847f2cf92428ec57ca9e305d4572c80b4b713a98200ed62a9c17ec05",
+    "PROJECT.md": "db8ad943880f9a13383f2a3d7e0f234f33411b34bc8569d41a39c0951522201b",
+    "README.md": "7177006b4386d0656df9c8b41259977161f1e7c4a57d41b1cb5a97f2e7cb8bbb",
+    "src/thorlabs_shutter_control/__init__.py": "1ccce0c1685f148a540122793eb3b876392fe5c95c69a13c635fa46c9e5fe973",
+    "src/thorlabs_shutter_control/__main__.py": "01229aa9a1bccb6cc1b9cdd7c5a966c2a8818aa3bcb8a2f45b9246160cf52f03",
+    "src/thorlabs_shutter_control/config.py": "919d62f3246c3c4c655cd1ba002d5ba946d27b58cde654331274507141e5375a",
+    "src/thorlabs_shutter_control/controller.py": "f55e9e01f8bb7016808e37c48528cf7520d8e4d5585cf717dcb2ef6c34af6627",
+    "src/thorlabs_shutter_control/device.py": "1acb497677b1e58aed54bc38376601a81ac47c7aa7cf1ce5329b0dfffa45da18",
+    "src/thorlabs_shutter_control/discovery.py": "d0c1d84b6761d6fb6534f3afa6f2b3000ea922804270facec7f7e3565a87ca30",
+    "src/thorlabs_shutter_control/errors.py": "f2f4ff77dbba39142b992d047b4ce7a0a93e32f7cdcccd8536a47307cb48d86f",
+    "src/thorlabs_shutter_control/ethernet.py": "8608c91f897f603b2cc5ebc99d528d00f61fc1b15fcee3134d6daa1a21a05ff0",
+    "src/thorlabs_shutter_control/gui.py": "664f0cbd30545267a03a95b32482e45be33ec384f76b7c5f06896b758295bdce",
+    "src/thorlabs_shutter_control/ownership.py": "7fb46ab790bd7bb633d157d6ed1547ff1bb7f7c335be7dfa17ecce8ea77f9a1d",
+    "src/thorlabs_shutter_control/protocol.py": "4aa123b577acce11ccef53a9e77f594a6fcbc6ec47baa063f04293dd601d676f",
+    "src/thorlabs_shutter_control/transport.py": "4813b39b923d0daeeb230d255f9c5b6804ab8227584b329c8be94782ea16ffd0",
+    "STATE.md": "ffdb0740183db8557d5b0799ca18594d81a06dda4602b758deec854e158f4f93",
+    "tests/conftest.py": "a5b69020c77f9f497044d2c2f0a1c538d5fecd644c9a8365b91ffaf39ad3bed7",
+    "tests/test_application.py": "1909968e4fdf2b05e42a0459301cf680a08ead431bfc404487afb3db142c6722",
+    "tests/test_discovery.py": "0934580b74e78b21ec908a30548f9d66254d04b800fc264ae5302eff9be19c88",
+    "tests/test_ethernet.py": "0705da436ba2fd4b542dd2f9cf82f7a9a5b17f00d1ebb52d81e1e51acc5a2955",
+    "tests/test_owner.py": "a29b645c94955893774e425c277877a351d09fedbc12e0a027bd67e6202261af",
+    "tests/test_protocol.py": "43956f0b01d0b6524eb125e23186a8e41baa4ff30aaf36e8361f9b776760e7c9",
+    "tests/test_tutorial_notebooks.py": "2180024ab49c9d017d7082e32632359f383c7030c46d3886acc6b5444e18ecd6"
+  }
+}

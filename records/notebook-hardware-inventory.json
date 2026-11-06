@@ -1,0 +1,30 @@
+{
+  "date": "2026-11-05",
+  "scope": "Actual host-native descriptor inventory only; no device opened, controller queried or output changed",
+  "method": "Existing .venv/Scripts/python.exe; call list_d2xx_devices() and list_vcp_ports(), print returned rows",
+  "d2xx": {
+    "result": "PASS enumeration",
+    "rows": [
+      "VDIS200\tVID:PID=0403:6001\tVDI Synth Rev 4b\tclosed",
+      "FTB8VKKU\tVID:PID=0403:6001\tUS232R\tclosed",
+      "FTB8VN29\tVID:PID=0403:6001\tUS232R\tclosed",
+      "\tVID:PID=0000:0000\t\tOPEN"
+    ]
+  },
+  "vcp": {
+    "result": "PASS enumeration",
+    "rows": [
+      "COM10\tUSB VID:PID=0403:6001 SER=FTB8VKKUA\tUSB Serial Port (COM10)",
+      "COM3\tUSB VID:PID=0403:6001 SER=VDIS200A\tUSB Serial Port (COM3)",
+      "COM4\tUSB VID:PID=0483:A3E5 SER=207430675330 LOCATION=1-3.1.1\tWindfreak Serial USB Devices (COM4)",
+      "COM5\tUSB VID:PID=0403:6001 SER=FTB8VN29A\tUSB Serial Port (COM5)",
+      "COM6\tUSB VID:PID=0483:A3E5 SER=209233635232 LOCATION=1-7.3.3.1.4\tWindfreak Serial USB Devices (COM6)",
+      "COM9\tUSB VID:PID=0403:6001 SER=FTB8W4Y7A\tUSB Serial Port (COM9)"
+    ]
+  },
+  "interpretation": "No visible descriptor identifies a KSC101. The blank OPEN entry is unknown; device absence is not established.",
+  "local_config_present": false,
+  "controller_identity_verification": "NOT RUN: no reviewed exact target/configuration",
+  "physical_actuation": "NOT RUN",
+  "driver_changes": "NONE"
+}

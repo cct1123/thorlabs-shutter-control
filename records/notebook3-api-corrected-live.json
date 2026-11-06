@@ -1,0 +1,40 @@
+{
+  "timestamp_utc": "2026-11-06T20:36:51.756567+00:00",
+  "scope": "Actual Jupyter notebook 3 against 68800777/1.0.7 at 192.168.1.19:40305; no simulator",
+  "method": "Fresh python3 kernel, original notebook cells plus an unsaved result collector",
+  "helper_sha256": "04b8cba7ea8318a431f55f29eb323cacd6f0df0ad27646806daf1e7a4668bb1b",
+  "driver_sha256": "31ba4b203b5a53c31240647942c5ff61404bfdb489d990580b4cb0e1872f1318",
+  "protocol_sha256": "a6e1d576f37ce688297c640f88c8627d42f071e98029d314237553679e79fe88",
+  "mode_output_commands_sent": 0,
+  "result": "PASS real notebook 3; KSC101 documented Closed=0 feedback and fresh output OFF",
+  "status": {
+    "endpoint": "192.168.1.19:40305",
+    "status_complete": true,
+    "optical_state": "unknown",
+    "hub_identity_verified": false,
+    "operational_route_available": false,
+    "identity": {
+      "serial_number": "68800777",
+      "model": "KSC101",
+      "firmware": "1.0.7",
+      "hardware_version": 3,
+      "channels": 1
+    },
+    "operating_mode": "triggered",
+    "interlock_required": true,
+    "solenoid_state_reply_raw": 0,
+    "status_bits": 8192,
+    "solenoid_state_raw": 0,
+    "controller_solenoid_state": "closed",
+    "solenoid_state_reference": "KSC101 SolenoidStatus.SolenoidStates",
+    "electrical_state": "off",
+    "electrical_state_source": "0x042A status bit 0 (KSC101 GetStatusBits)",
+    "observed_at_utc": "2026-11-06T20:36:52.874814+00:00",
+    "feedback_freshness": "response_after_request_no_transaction_id"
+  },
+  "retained_transport": false,
+  "retained_claim": false,
+  "kernel_python": "C:\\repo\\thorlabs-shutter-control\\.venv\\Scripts\\python.exe",
+  "notebook_sha256": "f64a078837ef6f366a72b99a4c8ce79ff24f3e35676bb2e4fe491bcaf6c677cb",
+  "elapsed_s": 1.2598743999988073
+}

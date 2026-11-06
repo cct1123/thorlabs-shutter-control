@@ -1,0 +1,35 @@
+{
+  "date": "2026-11-06",
+  "requirement": "REQ-220",
+  "evidence": "E181",
+  "software_counts": {
+    "offline": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "144",
+      "time": "1.162",
+      "timestamp": "2026-11-06T15:32:47.116863-06:00",
+      "hostname": "HighFieldSetup"
+    },
+    "wheel": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "144",
+      "time": "1.486",
+      "timestamp": "2026-11-06T15:32:52.881362-06:00",
+      "hostname": "HighFieldSetup"
+    }
+  },
+  "source_manifest": "records/direct-validation.json",
+  "notebooks": "records/notebook-validation.json",
+  "live_preparation": "records/ethernet-control-manual-preparation.json",
+  "live_cycle": "records/ethernet-control-live.json",
+  "final_cli": "records/ethernet-control-final-status.json",
+  "runtime_config_notebook_hash_match": "PASS",
+  "independent_motion": "User did not observe; not verified",
+  "result": "PASS scoped actual controller ON/OFF and release"
+}

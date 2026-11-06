@@ -1,0 +1,40 @@
+{
+  "timestamp_utc": "2026-11-06T19:31:41.274126+00:00",
+  "scope": "One actual read-only status notebook; no simulator or mode/output commands",
+  "notebook": "docs/examples/03_status_query.ipynb",
+  "notebook_sha256": "51ceacb800d8dd6d38132a619b871f0efb5dddaa989736d62b088cf1f95ba993",
+  "helper_sha256": "0840bdbdeda5def8fac6c7254119f5ba431b75947c30866bfcee07f1cd76447d",
+  "tcp_sha256": "82e0583d3bc134ec1bd5e807c7bc653045bccf09b55056f152d6dea479157ac2",
+  "method": "Execute exact Python cells in a fresh interpreter; no Jupyter kernel or saved output modification",
+  "result": "FAIL complete status; actual identity/mode/interlock partial readback retained",
+  "error": {
+    "type": "ProtocolError",
+    "message": "Unsupported scalar value 0 in 0x04cd",
+    "notes": [
+      "Raw controller reply: cd0401000150"
+    ]
+  },
+  "partial_observation": {
+    "endpoint": "192.168.1.19:40305",
+    "status_complete": false,
+    "optical_state": "unknown",
+    "hub_identity_verified": false,
+    "operational_route_available": false,
+    "identity": {
+      "serial_number": "68800777",
+      "model": "KSC101",
+      "firmware": "1.0.7",
+      "hardware_version": 3,
+      "channels": 1
+    },
+    "operating_mode": "triggered",
+    "interlock_required": true,
+    "failed_at_utc": "2026-11-06T19:31:41.420934+00:00"
+  },
+  "retained_transport": false,
+  "retained_claim": false,
+  "elapsed_s": 0.14694159998907708,
+  "stdout": "shutter 68800777 192.168.1.19:40305\nIncomplete live readback (not a successful status):\n{'endpoint': '192.168.1.19:40305',\n 'failed_at_utc': '2026-11-06T19:31:41.420934+00:00',\n 'hub_identity_verified': False,\n 'identity': {'channels': 1,\n              'firmware': '1.0.7',\n              'hardware_version': 3,\n              'model': 'KSC101',\n              'serial_number': '68800777'},\n 'interlock_required': True,\n 'operating_mode': 'triggered',\n 'operational_route_available': False,\n 'optical_state': 'unknown',\n 'status_complete': False}\n",
+  "command": "uv run --locked --offline --no-sync python tmp/validate_ethernet_status_notebook.py",
+  "mode_output_commands_sent": 0
+}

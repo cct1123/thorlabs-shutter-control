@@ -1,0 +1,54 @@
+{
+  "date": "2026-11-06",
+  "scope": "Notebook simplification; static/software checks only, no new hardware operation",
+  "line_count_method": "Sum of splitlines() for code-cell sources, including blank lines, before/after Ruff formatting",
+  "before_code_lines": 368,
+  "after_code_lines": 86,
+  "reduction_percent": 76.6304347826087,
+  "results": [
+    {
+      "notebook": "01_device_discovery.ipynb",
+      "before_code_lines": 52,
+      "after_code_lines": 18,
+      "sha256": "986046a8afcf9ce6c361fead943ad2b3d543ad611bbf265e7f71d28fe135bc35"
+    },
+    {
+      "notebook": "02_connection.ipynb",
+      "before_code_lines": 49,
+      "after_code_lines": 11,
+      "sha256": "debebbbf8238da7d7c9be660c544d21cadc541104833b3343d966bec9f0f1eac"
+    },
+    {
+      "notebook": "03_status_query.ipynb",
+      "before_code_lines": 53,
+      "after_code_lines": 11,
+      "sha256": "f8e546919712d5b10b2bb1e0032fef1000f81943064be5742fe4241222382d5a"
+    },
+    {
+      "notebook": "04_settings.ipynb",
+      "before_code_lines": 59,
+      "after_code_lines": 18,
+      "sha256": "e27d429ecbc05a85e072073f10bddfc9ad0f74b87d4ef7e15abf313008eb93bf"
+    },
+    {
+      "notebook": "05_shutter_modes.ipynb",
+      "before_code_lines": 65,
+      "after_code_lines": 14,
+      "sha256": "b2f865f63e4a51a4956fa2bd61b2dc60928c96314996b819d02f7fa07c6b58dc"
+    },
+    {
+      "notebook": "06_on_off.ipynb",
+      "before_code_lines": 90,
+      "after_code_lines": 14,
+      "sha256": "66eca9ce962f0ef2a2d8f3af199aeff918d1c95c7fa76296422142500a97c2da"
+    }
+  ],
+  "software_tests": {
+    "offline tests": "131 passed in 1.17s",
+    "wheel tests": "131 passed in 1.45s"
+  },
+  "endpoint": "192.168.1.19:40305",
+  "serial": "68800777",
+  "name": "shutter",
+  "hardware_execution": "NOT RUN; E173 actual status failure remains historical evidence"
+}

@@ -1,0 +1,73 @@
+{
+  "scope": "Pre-review source baseline; existing dirty work retained",
+  "files": {
+    "docs/examples/ethernet_readonly.py": {
+      "lines": 140,
+      "sha256": "04b8cba7ea8318a431f55f29eb323cacd6f0df0ad27646806daf1e7a4668bb1b"
+    },
+    "scripts/verify.py": {
+      "lines": 186,
+      "sha256": "9b31b6be527678ff732b9ad23814bf375e138b0c747c6b80ff711b4857ffc644"
+    },
+    "scripts/verify_notebooks.py": {
+      "lines": 70,
+      "sha256": "6caae7de5c496ccc11395cf0a534410acb419f39becde4355d07cddf26fa6a08"
+    },
+    "src/thorlabs_shutter_control/__init__.py": {
+      "lines": 17,
+      "sha256": "1ccce0c1685f148a540122793eb3b876392fe5c95c69a13c635fa46c9e5fe973"
+    },
+    "src/thorlabs_shutter_control/__main__.py": {
+      "lines": 122,
+      "sha256": "95d8b539d94d452a4d4d6119ef9fde09d283bd108a40d751542d5fbcaf1516b6"
+    },
+    "src/thorlabs_shutter_control/config.py": {
+      "lines": 176,
+      "sha256": "919d62f3246c3c4c655cd1ba002d5ba946d27b58cde654331274507141e5375a"
+    },
+    "src/thorlabs_shutter_control/controller.py": {
+      "lines": 549,
+      "sha256": "c63b8304825182ab2fac400aabdf4fe5f20285d3f8b80035a965808df9a8dd77"
+    },
+    "src/thorlabs_shutter_control/device.py": {
+      "lines": 100,
+      "sha256": "31ba4b203b5a53c31240647942c5ff61404bfdb489d990580b4cb0e1872f1318"
+    },
+    "src/thorlabs_shutter_control/discovery.py": {
+      "lines": 40,
+      "sha256": "d0c1d84b6761d6fb6534f3afa6f2b3000ea922804270facec7f7e3565a87ca30"
+    },
+    "src/thorlabs_shutter_control/errors.py": {
+      "lines": 34,
+      "sha256": "f2f4ff77dbba39142b992d047b4ce7a0a93e32f7cdcccd8536a47307cb48d86f"
+    },
+    "src/thorlabs_shutter_control/ethernet.py": {
+      "lines": 43,
+      "sha256": "82e0583d3bc134ec1bd5e807c7bc653045bccf09b55056f152d6dea479157ac2"
+    },
+    "src/thorlabs_shutter_control/gui.py": {
+      "lines": 80,
+      "sha256": "664f0cbd30545267a03a95b32482e45be33ec384f76b7c5f06896b758295bdce"
+    },
+    "src/thorlabs_shutter_control/keh3.py": {
+      "lines": 170,
+      "sha256": "76e05c9639b77a5897474be6521ba68e944ff08eda937a1a93b43a2f0031bab4"
+    },
+    "src/thorlabs_shutter_control/ownership.py": {
+      "lines": 61,
+      "sha256": "7fb46ab790bd7bb633d157d6ed1547ff1bb7f7c335be7dfa17ecce8ea77f9a1d"
+    },
+    "src/thorlabs_shutter_control/protocol.py": {
+      "lines": 217,
+      "sha256": "a6e1d576f37ce688297c640f88c8627d42f071e98029d314237553679e79fe88"
+    },
+    "src/thorlabs_shutter_control/transport.py": {
+      "lines": 120,
+      "sha256": "1ea1fd2fc53262d7799743e6c3ca2d294892e4341aa7885a069f5bc821c77720"
+    }
+  },
+  "preserved_notebooks": {
+    "docs/examples/01_device_discovery.ipynb": "29bee8cd81677903995ed91f114823a7b53057a454e4818d100bc9017dd017d7",
+    "docs/examples/02_connection.ipynb": "44f25cc1c5279c8d28a76944dfddea89089c00b192800d381b18b6ea91eadde7"
+  }
+}

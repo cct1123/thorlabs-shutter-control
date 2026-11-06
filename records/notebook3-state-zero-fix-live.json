@@ -1,0 +1,40 @@
+{
+  "timestamp_utc": "2026-11-06T20:20:45.102512+00:00",
+  "scope": "Actual Jupyter notebook 3 against 68800777/1.0.7 at 192.168.1.19:40305; no simulator",
+  "method": "Fresh python3 kernel, original notebook cells plus an unsaved result collector",
+  "helper_sha256": "75bc068b17939791947aaf0fc0673dd147db5b7bee42c9c6757bfbede14d3daf",
+  "driver_sha256": "31ba4b203b5a53c31240647942c5ff61404bfdb489d990580b4cb0e1872f1318",
+  "protocol_sha256": "a6e1d576f37ce688297c640f88c8627d42f071e98029d314237553679e79fe88",
+  "mode_output_commands_sent": 0,
+  "result": "PASS real notebook 3; OFF from fresh status bits, legacy 0 preserved as undocumented",
+  "status": {
+    "endpoint": "192.168.1.19:40305",
+    "status_complete": true,
+    "optical_state": "unknown",
+    "hub_identity_verified": false,
+    "operational_route_available": false,
+    "identity": {
+      "serial_number": "68800777",
+      "model": "KSC101",
+      "firmware": "1.0.7",
+      "hardware_version": 3,
+      "channels": 1
+    },
+    "operating_mode": "triggered",
+    "interlock_required": true,
+    "legacy_solenoid_state_raw": 0,
+    "status_bits": 8192,
+    "electrical_state": "off",
+    "electrical_state_source": "0x042A status bit 0; not legacy 0x04CD",
+    "warnings": [
+      "Legacy state 0 is undocumented on firmware 1.0.7; use status-bit feedback."
+    ],
+    "observed_at_utc": "2026-11-06T20:20:46.259738+00:00",
+    "feedback_freshness": "response_after_request_no_transaction_id"
+  },
+  "retained_transport": false,
+  "retained_claim": false,
+  "kernel_python": "C:\\repo\\thorlabs-shutter-control\\.venv\\Scripts\\python.exe",
+  "notebook_sha256": "5990db3a44d8a42edcbfdbe9ee29ccd306a4dda379f50d73d55ace53d3e65e55",
+  "elapsed_s": 4.178309999988414
+}

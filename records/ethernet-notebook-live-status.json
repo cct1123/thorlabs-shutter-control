@@ -1,0 +1,21 @@
+{
+  "timestamp_utc": "2026-11-06T19:30:27.451897+00:00",
+  "scope": "One actual read-only status notebook; no simulator or mode/output commands",
+  "notebook": "docs/examples/03_status_query.ipynb",
+  "notebook_sha256": "d0530cc975c759de72afdff48d7d736adb181604b3592ed509c7748abbca6231",
+  "helper_sha256": "9a119203f93760fb4137bc9ab53010d5bd50ca7816d63b9d9447b139cc9f3272",
+  "tcp_sha256": "82e0583d3bc134ec1bd5e807c7bc653045bccf09b55056f152d6dea479157ac2",
+  "method": "Execute exact Python cells in a fresh interpreter; no Jupyter kernel or saved output modification",
+  "result": "FAIL complete status: undocumented solenoid value 0",
+  "error": {
+    "type": "ProtocolError",
+    "message": "Unsupported scalar value 0 in 0x04cd",
+    "notes": []
+  },
+  "retained_transport": false,
+  "retained_claim": false,
+  "elapsed_s": 0.17213740000443067,
+  "stdout": "shutter 68800777 192.168.1.19:40305\n",
+  "command": "uv run --locked --offline --no-sync python tmp/validate_ethernet_status_notebook.py",
+  "mode_output_commands_sent": 0
+}

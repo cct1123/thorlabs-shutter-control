@@ -1,0 +1,97 @@
+{
+  "date": "2026-11-06",
+  "scope": "Read-only inspection of human-executed saved notebook outputs; no new device operation",
+  "provenance": "User reports notebook 1/2 ran and notebook 3 failed; current saved outputs inspected directly",
+  "observations": [
+    {
+      "notebook": "docs/examples/01_device_discovery.ipynb",
+      "sha256": "29bee8cd81677903995ed91f114823a7b53057a454e4818d100bc9017dd017d7",
+      "cells": [
+        {
+          "cell_index": 2,
+          "execution_count": 1,
+          "stdout": "shutter 192.168.1.19:40305\n"
+        },
+        {
+          "cell_index": 4,
+          "execution_count": 2,
+          "stdout": "{'candidate_address': 80,\n 'cleanup_error': None,\n 'endpoint': '192.168.1.19:40305',\n 'error': None,\n 'expected_controller': '68800777',\n 'expected_firmware': ('1.0.7',),\n 'expected_hub': 'UNKNOWN (diagnostics only)',\n 'first_byte_after_s': 0.022107400000095367,\n 'frames': ['06005400815009d119044b534331303100001000070001004b534331303120536f6c656e6f696420436f6e74726f6c6c657220202020202076332e312020202020202020202031003134313531344a756c000000030000000100'],\n 'hub_identity_verified': False,\n 'identity': {'channels': 1,\n              'firmware': '1.0.7',\n              'hardware_version': 3,\n              'model': 'KSC101',\n              'serial_number': '68800777'},\n 'operational_route_available': False,\n 'raw_hex': '06005400815009d119044b534331303100001000070001004b534331303120536f6c656e6f696420436f6e74726f6c6c657220202020202076332e312020202020202020202031003134313531344a756c000000030000000100',\n 'request_hex': '050000005001',\n 'route': {'bay': 'middle',\n           'host': '192.168.1.19',\n           'hub_firmware': 'UNKNOWN (diagnostics only)',\n           'hub_serial': 'UNKNOWN (diagnostics only)',\n           'kind': 'keh3',\n           'port': None},\n 'verdict': 'candidate-controller-match-hub-unverified'}\n"
+        }
+      ]
+    },
+    {
+      "notebook": "docs/examples/02_connection.ipynb",
+      "sha256": "44f25cc1c5279c8d28a76944dfddea89089c00b192800d381b18b6ea91eadde7",
+      "cells": [
+        {
+          "cell_index": 2,
+          "execution_count": 1,
+          "stdout": "shutter 192.168.1.19:40305\n"
+        },
+        {
+          "cell_index": 4,
+          "execution_count": 2,
+          "stdout": "{'channels': 1,\n 'firmware': '1.0.7',\n 'hardware_version': 3,\n 'model': 'KSC101',\n 'serial_number': '68800777'}\n"
+        }
+      ]
+    },
+    {
+      "notebook": "docs/examples/03_status_query.ipynb",
+      "sha256": "0472ebe61c4a3a804a581289faf538d932ba577a447d6e12635bd2cfeba6f683",
+      "cells": [
+        {
+          "cell_index": 2,
+          "execution_count": 1,
+          "stdout": "shutter 192.168.1.19:40305\n"
+        },
+        {
+          "cell_index": 4,
+          "execution_count": 2,
+          "errors": [
+            {
+              "type": "ProtocolError",
+              "message": "Unsupported scalar value 0 in 0x04cd",
+              "traceback": [
+                "---------------------------------------------------------------------------",
+                "ProtocolError                             Traceback (most recent call last)",
+                "Cell In[2], line 3\n      1 reader = EthernetReadOnly()\n      2 with reader:\n----> 3     pprint(reader.status())\n",
+                "File c:\\repo\\thorlabs-shutter-control\\docs\\examples\\ethernet_readonly.py:94, in EthernetReadOnly.status(self)\n     92 result[\"operating_mode\"] = self._driver.mode(deadline)\n     93 result[\"interlock_required\"] = self._driver.interlock_required(deadline)\n---> 94 result[\"electrical_state\"] = self._driver.state(deadline)\n     95 result[\"observed_at_utc\"] = datetime.now(timezone.utc).isoformat()\n     96 result[\"feedback_freshness\"] = \"response_after_request_no_transaction_id\"\n",
+                "File C:\\repo\\thorlabs-shutter-control\\src\\thorlabs_shutter_control\\device.py:71, in KSC101.state(self, deadline, protective)\n     68 def state(self, deadline, *, protective=False):\n     69     return (\n     70         \"on\"\n---> 71         if self.scalar(0x04CC, 0x04CD, (1, 2), deadline, protective=protective) == 1\n     72         else \"off\"\n     73     )\n",
+                "File C:\\repo\\thorlabs-shutter-control\\src\\thorlabs_shutter_control\\device.py:62, in KSC101.scalar(self, request, reply, allowed, deadline, protective)\n     60     error = ProtocolError(f\"Unsupported scalar value {frame.param2} in 0x{reply:04x}\")\n     61     error.add_note(f\"Raw controller reply: {frame.encode().hex()}\")\n---> 62     raise error\n     63 return frame.param2\n",
+                "ProtocolError: Unsupported scalar value 0 in 0x04cd",
+                "Raw controller reply: cd0401000150",
+                "Incomplete live readback: {'endpoint': '192.168.1.19:40305', 'status_complete': False, 'optical_state': 'unknown', 'hub_identity_verified': False, 'operational_route_available': False, 'identity': {'serial_number': '68800777', 'model': 'KSC101', 'firmware': '1.0.7', 'hardware_version': 3, 'channels': 1}, 'operating_mode': 'triggered', 'interlock_required': True, 'failed_at_utc': '2026-11-06T20:07:51.971533+00:00'}"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "diagnosis": {
+    "error": "ProtocolError: Unsupported scalar value 0 in 0x04cd",
+    "raw_reply_hex": "cd0401000150",
+    "decoded_reply": {
+      "message_id": "0x04CD",
+      "channel": 1,
+      "state_value": 0,
+      "destination": 1,
+      "source": "0x50"
+    },
+    "successful_partial_reads": {
+      "serial": "68800777",
+      "firmware": "1.0.7",
+      "mode": "triggered",
+      "interlock_required": true
+    },
+    "failure_location": "KSC101.state -> scalar validates reply param2 against (1, 2)",
+    "documented_state_values": {
+      "1": "ON",
+      "2": "OFF"
+    },
+    "meaning_of_zero": "UNRESOLVED; do not infer OFF or optical closure",
+    "relationship_to_prior_evidence": "Same invalid reply as E173 actual diagnostics"
+  },
+  "edits_to_notebooks_or_code": "NONE; all human-saved output preserved",
+  "hardware_queries": "NONE"
+}

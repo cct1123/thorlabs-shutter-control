@@ -1,5 +1,9 @@
 # Controller reference review - 5 November 2026
 
+Historical comparison checkpoint. The current [source/API contract](INTERFACE.md)
+now shares read-only Ethernet access through ShutterHub; candidate tools were
+retired. Dated claims below retain their original scope.
+
 The user selected `C:/repo/thorlabs-control` as an implementation reference. The
 inspected checkout was clean at `d70f2a6e8f494516a3aed169f33bcf6775fdd982`. It was
 read only; no code, tests, notebooks or device-control tools were executed there.

@@ -1,0 +1,101 @@
+{
+  "test_id": "TEST-220",
+  "requirement_id": "REQ-220",
+  "evidence_id": "E179",
+  "verified_at_utc": "2026-11-06T21:19:00.514714+00:00",
+  "result": "PASS",
+  "scope": "Repository document integrity and availability only; no device operations or runtime changes.",
+  "method": "Compare unchanged copies to original downloads and registered SHA-256 values; pdfinfo and pypdf page counts; fresh pypdf identity/revision extraction from first six and last two pages; render/visually inspect title pages; git check-ignore/ls-files; local Markdown links.",
+  "pdfinfo_version": "pdfinfo version 26.07.0\nCopyright 2005-2026 The Poppler Developers - http://poppler.freedesktop.org\nCopyright 1996-2011, 2022 Glyph & Cog, LLC",
+  "local_markdown_links_pass": true,
+  "documents": [
+    {
+      "source_id": "SRC-002",
+      "path": "docs/manuals/KSC101_Manual_HA0368T_Rev_D.pdf",
+      "sha256": "b51ac9ca1aa53b02b554dfd5b1c0bd4b99d73e4ba092e47170a64a3f4bab34f5",
+      "bytes": 23848654,
+      "pages": 45,
+      "identity_markers": [
+        "KSC101",
+        "HA0368T",
+        "Rev D",
+        "June 2023"
+      ],
+      "original_download_url": "https://media.thorlabs.com/contentassets/e92d618c92c94cea9096b3f231859611/etn017648-d02.pdf",
+      "source_copy_byte_identical": true,
+      "hash_matches_source_register": true,
+      "pdfinfo_pass": true,
+      "fresh_text_identity_pass": true,
+      "git_not_ignored": true,
+      "git_visible": true,
+      "title_page_render_visually_checked": true
+    },
+    {
+      "source_id": "SRC-003",
+      "path": "docs/manuals/KEH3_KEH6_Manual_DOC-103012_Rev_E.pdf",
+      "sha256": "c768e4e3f2317ae29f7bfcdf8b18f750d7adc688d324c55550cdfa9a31a0489b",
+      "bytes": 1804093,
+      "pages": 33,
+      "identity_markers": [
+        "KEH3",
+        "KEH6",
+        "DOC-103012",
+        "Rev. E",
+        "January 22, 2026"
+      ],
+      "original_download_url": "https://media.thorlabscms.cn/globalassets/items/k/ke/keh/keh3/doc-103012.pdf",
+      "source_copy_byte_identical": true,
+      "hash_matches_source_register": true,
+      "pdfinfo_pass": true,
+      "fresh_text_identity_pass": true,
+      "git_not_ignored": true,
+      "git_visible": true,
+      "title_page_render_visually_checked": true
+    },
+    {
+      "source_id": "SRC-001",
+      "path": "docs/manuals/APT_Communications_Protocol_Issue_36.pdf",
+      "sha256": "96668e05c353269d59390d3e00e4e7237c881707b3a947057dd08ead13191966",
+      "bytes": 4532993,
+      "pages": 421,
+      "identity_markers": [
+        "Host-Controller Communications Protocol",
+        "Issue 36",
+        "17 April 2023"
+      ],
+      "original_download_url": "https://raw.githubusercontent.com/amsikking/thorlabs_KSC101/master/APT_Communications_Protocol.pdf",
+      "source_copy_byte_identical": true,
+      "hash_matches_source_register": true,
+      "pdfinfo_pass": true,
+      "fresh_text_identity_pass": true,
+      "git_not_ignored": true,
+      "git_visible": true,
+      "title_page_render_visually_checked": true
+    },
+    {
+      "source_id": "SRC-007",
+      "path": "docs/manuals/APT_Communications_Protocol_Issue_42.1.pdf",
+      "sha256": "b2a6badd7c00b3042ba383e291667e7eab10746c14c4f92cea45fc480c7304ed",
+      "bytes": 5956501,
+      "pages": 443,
+      "identity_markers": [
+        "Host-Controller Communications Protocol",
+        "Issue 42.1",
+        "09 September 2025"
+      ],
+      "original_download_url": "https://raw.githubusercontent.com/JovanMarkov96/Thorlabs_Motion_Control/master/docs/manuals/APT_Communications_Protocol.pdf",
+      "source_copy_byte_identical": true,
+      "hash_matches_source_register": true,
+      "pdfinfo_pass": true,
+      "fresh_text_identity_pass": true,
+      "git_not_ignored": true,
+      "git_visible": true,
+      "title_page_render_visually_checked": true
+    }
+  ],
+  "limitations": [
+    "KSC101 manual is the legacy APT guide, not a verified latest revision.",
+    "APT originals were retrieved from mirrors documented in docs/sources.md.",
+    "Actual attached optical shutter model/manual remains unknown."
+  ]
+}

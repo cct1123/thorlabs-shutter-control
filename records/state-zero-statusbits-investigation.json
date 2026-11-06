@@ -1,0 +1,64 @@
+{
+  "timestamp_utc": "2026-11-06T20:16:35.016962+00:00",
+  "scope": "Actual exact-controller read-only raw state/status comparison",
+  "config": {
+    "name": "shutter",
+    "channel": 0,
+    "role": "Shutter; actual load/wiring not yet qualified",
+    "serial_number": "68800777",
+    "firmware": [
+      "1.0.7"
+    ],
+    "route": {
+      "kind": "keh3",
+      "port": null,
+      "hub_serial": "UNKNOWN (diagnostics only)",
+      "host": "192.168.1.19",
+      "bay": "middle",
+      "hub_firmware": "UNKNOWN (diagnostics only)"
+    },
+    "policy": null
+  },
+  "transcript": [
+    {
+      "direction": "TX",
+      "hex": "050000005001"
+    },
+    {
+      "direction": "RX",
+      "hex": "06005400815009d119044b534331303100001000070001004b534331303120536f6c656e6f696420436f6e74726f6c6c657220202020202076332e312020202020202020202031003134313531344a756c000000030000000100"
+    },
+    {
+      "direction": "TX",
+      "hex": "290401005001"
+    },
+    {
+      "direction": "RX",
+      "hex": "2a0406008150010000200000"
+    }
+  ],
+  "queries": [
+    {
+      "query": "status_bits_raw",
+      "reply_hex": "2a0406008150010000200000",
+      "param1": 0,
+      "param2": 0,
+      "payload_hex": "010000200000",
+      "candidate_channel_status": {
+        "channel": 1,
+        "status_bits": 8192
+      }
+    }
+  ],
+  "result": "PASS raw query capture; semantics require source/observation comparison",
+  "mode_output_commands_sent": 0,
+  "identity": {
+    "serial_number": "68800777",
+    "model": "KSC101",
+    "firmware": "1.0.7",
+    "hardware_version": 3,
+    "channels": 1
+  },
+  "communication_release": "completed",
+  "elapsed_s": 0.06320879999839235
+}

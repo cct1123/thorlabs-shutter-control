@@ -1,0 +1,317 @@
+{
+  "timestamp_utc": "2026-11-06T21:26:53.535384+00:00",
+  "scope": "Actual SH05R ON/OFF at192.168.1.19:40305, KSC10168800777/1.0.7; no simulator, no transport injection",
+  "authority": "User requests Ethernet ON/OFF and confirms currentSH05R/safe/source-blocked/trigger-isolated setup; one1s added ON hold,2s OFF pause, finishOFF/Manual",
+  "method": "Original notebook6 cells in a fresh real Jupyter kernel; unsaved message audit and result collector",
+  "runtime_sha256": {
+    "src/thorlabs_shutter_control/__init__.py": "1ccce0c1685f148a540122793eb3b876392fe5c95c69a13c635fa46c9e5fe973",
+    "src/thorlabs_shutter_control/__main__.py": "01229aa9a1bccb6cc1b9cdd7c5a966c2a8818aa3bcb8a2f45b9246160cf52f03",
+    "src/thorlabs_shutter_control/config.py": "919d62f3246c3c4c655cd1ba002d5ba946d27b58cde654331274507141e5375a",
+    "src/thorlabs_shutter_control/controller.py": "f55e9e01f8bb7016808e37c48528cf7520d8e4d5585cf717dcb2ef6c34af6627",
+    "src/thorlabs_shutter_control/device.py": "1acb497677b1e58aed54bc38376601a81ac47c7aa7cf1ce5329b0dfffa45da18",
+    "src/thorlabs_shutter_control/discovery.py": "d0c1d84b6761d6fb6534f3afa6f2b3000ea922804270facec7f7e3565a87ca30",
+    "src/thorlabs_shutter_control/errors.py": "f2f4ff77dbba39142b992d047b4ce7a0a93e32f7cdcccd8536a47307cb48d86f",
+    "src/thorlabs_shutter_control/ethernet.py": "8608c91f897f603b2cc5ebc99d528d00f61fc1b15fcee3134d6daa1a21a05ff0",
+    "src/thorlabs_shutter_control/gui.py": "664f0cbd30545267a03a95b32482e45be33ec384f76b7c5f06896b758295bdce",
+    "src/thorlabs_shutter_control/ownership.py": "7fb46ab790bd7bb633d157d6ed1547ff1bb7f7c335be7dfa17ecce8ea77f9a1d",
+    "src/thorlabs_shutter_control/protocol.py": "4aa123b577acce11ccef53a9e77f594a6fcbc6ec47baa063f04293dd601d676f",
+    "src/thorlabs_shutter_control/transport.py": "4813b39b923d0daeeb230d255f9c5b6804ab8227584b329c8be94782ea16ffd0"
+  },
+  "config_sha256": "a3ead7c489bcab71f1dda51c90f0c0e34d6348ed345b7184c07941eb87e57e33",
+  "result": "PASS actual ON then OFF; Manual; exact identity; released",
+  "independent_optical_observation": "User reports: I did not observe it. No independent blade motion/optical confirmation; controller ON/OFF only.",
+  "status": {
+    "name": "shutter",
+    "channel": 0,
+    "serial_number": "68800777",
+    "endpoint": "192.168.1.19:40305",
+    "connection": "connected",
+    "has_device": true,
+    "identity_verified": true,
+    "observed_serial_number": "68800777",
+    "description": "KSC101 firmware 1.0.7",
+    "generation": 1,
+    "observed_at": "2026-11-06T21:26:57.983524+00:00",
+    "feedback_freshness": "response_after_request_no_transaction_id",
+    "feedback": {
+      "shutter_state": "unknown",
+      "operating_mode": "manual",
+      "operating_state": "unknown",
+      "key_enabled": null,
+      "interlock_enabled": true,
+      "channel_enabled": null,
+      "status_bits": 8192,
+      "electrical_state": "off",
+      "electrical_observed_at": "2026-11-06T21:26:57.983524+00:00"
+    },
+    "requested_state": "off",
+    "transition_confirmed": false,
+    "error": null,
+    "cleanup": "Electrical OFF readback; dispatch monotonic=126866.308265; optical unknown",
+    "optical_observed_at": null,
+    "optical_provenance": null,
+    "optical_observed_state": "unknown",
+    "identity": {
+      "serial_number": "68800777",
+      "model": "KSC101",
+      "firmware": "1.0.7",
+      "hardware_version": 3,
+      "channels": 1
+    }
+  },
+  "after_release": {
+    "name": "shutter",
+    "channel": 0,
+    "serial_number": "68800777",
+    "endpoint": "192.168.1.19:40305",
+    "connection": "disconnected",
+    "has_device": false,
+    "identity_verified": false,
+    "observed_serial_number": null,
+    "description": null,
+    "generation": 1,
+    "observed_at": null,
+    "feedback_freshness": "unknown",
+    "feedback": {
+      "shutter_state": "unknown",
+      "operating_mode": "unknown",
+      "operating_state": "unknown",
+      "key_enabled": null,
+      "interlock_enabled": null,
+      "channel_enabled": null,
+      "status_bits": null,
+      "electrical_state": "unknown",
+      "electrical_observed_at": null
+    },
+    "requested_state": "off",
+    "transition_confirmed": false,
+    "error": null,
+    "cleanup": "Electrical OFF readback; dispatch monotonic=126866.308265; optical unknown",
+    "optical_observed_at": null,
+    "optical_provenance": null,
+    "optical_observed_state": "unknown",
+    "identity": null
+  },
+  "retained_claim": false,
+  "sent_frames": [
+    {
+      "monotonic_s": 126862.964084,
+      "hex": "050000005001"
+    },
+    {
+      "monotonic_s": 126863.0309621,
+      "hex": "050000005001"
+    },
+    {
+      "monotonic_s": 126863.0862096,
+      "hex": "cb0401025001"
+    },
+    {
+      "monotonic_s": 126863.0862576,
+      "hex": "290401005001"
+    },
+    {
+      "monotonic_s": 126863.101876,
+      "hex": "050000005001"
+    },
+    {
+      "monotonic_s": 126863.1239084,
+      "hex": "c10401005001"
+    },
+    {
+      "monotonic_s": 126863.1399647,
+      "hex": "c70401005001"
+    },
+    {
+      "monotonic_s": 126863.1558409,
+      "hex": "290401005001"
+    },
+    {
+      "monotonic_s": 126865.1727,
+      "hex": "050000005001"
+    },
+    {
+      "monotonic_s": 126865.1952743,
+      "hex": "c10401005001"
+    },
+    {
+      "monotonic_s": 126865.2112246,
+      "hex": "c70401005001"
+    },
+    {
+      "monotonic_s": 126865.2274275,
+      "hex": "290401005001"
+    },
+    {
+      "monotonic_s": 126865.2513554,
+      "hex": "cb0401015001"
+    },
+    {
+      "monotonic_s": 126865.2515402,
+      "hex": "290401005001"
+    },
+    {
+      "monotonic_s": 126865.2697956,
+      "hex": "290401005001"
+    },
+    {
+      "monotonic_s": 126866.2853969,
+      "hex": "050000005001"
+    },
+    {
+      "monotonic_s": 126866.308271,
+      "hex": "cb0401025001"
+    },
+    {
+      "monotonic_s": 126866.3083287,
+      "hex": "290401005001"
+    },
+    {
+      "monotonic_s": 126866.3353223,
+      "hex": "290401005001"
+    },
+    {
+      "monotonic_s": 126866.3501602,
+      "hex": "290401005001"
+    },
+    {
+      "monotonic_s": 126866.3560906,
+      "hex": "050000005001"
+    },
+    {
+      "monotonic_s": 126866.3781633,
+      "hex": "c10401005001"
+    },
+    {
+      "monotonic_s": 126866.394113,
+      "hex": "c70401005001"
+    },
+    {
+      "monotonic_s": 126866.4102032,
+      "hex": "290401005001"
+    }
+  ],
+  "query_frames": [
+    {
+      "request": "050000005001",
+      "reply": "06005400815009d119044b534331303100001000070001004b534331303120536f6c656e6f696420436f6e74726f6c6c657220202020202076332e312020202020202020202031003134313531344a756c000000030000000100",
+      "status_bits": null
+    },
+    {
+      "request": "050000005001",
+      "reply": "06005400815009d119044b534331303100001000070001004b534331303120536f6c656e6f696420436f6e74726f6c6c657220202020202076332e312020202020202020202031003134313531344a756c000000030000000100",
+      "status_bits": null
+    },
+    {
+      "request": "290401005001",
+      "reply": "2a0406008150010000200000",
+      "status_bits": 8192
+    },
+    {
+      "request": "050000005001",
+      "reply": "06005400815009d119044b534331303100001000070001004b534331303120536f6c656e6f696420436f6e74726f6c6c657220202020202076332e312020202020202020202031003134313531344a756c000000030000000100",
+      "status_bits": null
+    },
+    {
+      "request": "c10401005001",
+      "reply": "c20401010150",
+      "status_bits": null
+    },
+    {
+      "request": "c70401005001",
+      "reply": "c80401010150",
+      "status_bits": null
+    },
+    {
+      "request": "290401005001",
+      "reply": "2a0406008150010000200000",
+      "status_bits": 8192
+    },
+    {
+      "request": "050000005001",
+      "reply": "06005400815009d119044b534331303100001000070001004b534331303120536f6c656e6f696420436f6e74726f6c6c657220202020202076332e312020202020202020202031003134313531344a756c000000030000000100",
+      "status_bits": null
+    },
+    {
+      "request": "c10401005001",
+      "reply": "c20401010150",
+      "status_bits": null
+    },
+    {
+      "request": "c70401005001",
+      "reply": "c80401010150",
+      "status_bits": null
+    },
+    {
+      "request": "290401005001",
+      "reply": "2a0406008150010000200000",
+      "status_bits": 8192
+    },
+    {
+      "request": "290401005001",
+      "reply": "2a0406008150010000200000",
+      "status_bits": 8192
+    },
+    {
+      "request": "290401005001",
+      "reply": "2a0406008150010001200000",
+      "status_bits": 8193
+    },
+    {
+      "request": "050000005001",
+      "reply": "06005400815009d119044b534331303100001000070001004b534331303120536f6c656e6f696420436f6e74726f6c6c657220202020202076332e312020202020202020202031003134313531344a756c000000030000000100",
+      "status_bits": null
+    },
+    {
+      "request": "290401005001",
+      "reply": "2a0406008150010001200000",
+      "status_bits": 8193
+    },
+    {
+      "request": "290401005001",
+      "reply": "2a0406008150010001200000",
+      "status_bits": 8193
+    },
+    {
+      "request": "290401005001",
+      "reply": "2a0406008150010000200000",
+      "status_bits": 8192
+    },
+    {
+      "request": "050000005001",
+      "reply": "06005400815009d119044b534331303100001000070001004b534331303120536f6c656e6f696420436f6e74726f6c6c657220202020202076332e312020202020202020202031003134313531344a756c000000030000000100",
+      "status_bits": null
+    },
+    {
+      "request": "c10401005001",
+      "reply": "c20401010150",
+      "status_bits": null
+    },
+    {
+      "request": "c70401005001",
+      "reply": "c80401010150",
+      "status_bits": null
+    },
+    {
+      "request": "290401005001",
+      "reply": "2a0406008150010000200000",
+      "status_bits": 8192
+    }
+  ],
+  "on_attempts": 1,
+  "kernel_python": "C:\\repo\\thorlabs-shutter-control\\.venv\\Scripts\\python.exe",
+  "observed_status_bits": [
+    8192,
+    8192,
+    8192,
+    8192,
+    8193,
+    8193,
+    8193,
+    8192,
+    8192
+  ],
+  "on_to_off_dispatch_s": 1.0569155999983195,
+  "notebook_sha256": "96cb616b771431c09ff1d37f0c72d071b99a155a6f1b6928bf325b4c5c264499",
+  "elapsed_s": 4.5788799000001745
+}

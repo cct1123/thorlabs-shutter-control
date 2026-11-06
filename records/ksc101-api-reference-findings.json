@@ -1,0 +1,59 @@
+{
+  "date": "2026-11-06",
+  "source": "Thorlabs Kinesis 1.14.60 signed local installer; headers and API help extracted only",
+  "installer": {
+    "file": "C:\\Users\\HFNV\\Downloads\\thorlabs_kinesis_setup_27990_x64.exe",
+    "bytes": 178612936,
+    "sha256": "298c4cc03a6c3b4d5c174964ae9193d13baca63dab10c1595b4e9ad5d914ff05",
+    "authenticode": "Valid; signer Thorlabs, Inc.",
+    "file_version": "1.14.60.0"
+  },
+  "extraction": "7-Zip PE overlay -> read-only ISSetupStream archive decode -> read-only MSI database File table -> extract only header/C_API/DotNet_API help. Installer/SDK never executed or installed.",
+  "documents": {
+    "ksc101_header": {
+      "path": "inputs/reference/state-zero/Thorlabs.MotionControl.KCube.Solenoid.h",
+      "sha256": "528c5e92604710c258e5e67326ddeb7a8c9add2b297bd1d903e60ff02ef60445"
+    },
+    "dotnet_api_chm": {
+      "path": "inputs/reference/state-zero/kinesis-1.14.60/thorlabs.motioncontrol.dotne",
+      "sha256": "dcb4fae76f194e7185a8d7356d8ae1f5b570fa847af7be3d6601ade4ac1cd4c5"
+    },
+    "c_api_chm": {
+      "path": "inputs/reference/state-zero/kinesis-1.14.60/thorlabs.motioncontrol.c_api",
+      "sha256": "833ca50b8e7a932e12938f4ada066f266b52f03e118640081429b0bffe94e8a4"
+    },
+    "solenoid_status_class": {
+      "path": "inputs/reference/state-zero/kinesis-1.14.60/dotnet-api/a08484.html",
+      "sha256": "add82aed2829c80b0047923d62d6e66ac6bb133a7093d0429d10b4fc7ab4300c"
+    },
+    "solenoid_state_enum": {
+      "path": "inputs/reference/state-zero/kinesis-1.14.60/dotnet-api/a08484_af14fa54d58b737821059156c4ce0298c.html",
+      "sha256": "28f1cbb49bed01c9a979cb52a2470e333a0b0d2ceeccce5c1ee2c8667b2e35e4"
+    },
+    "ksc101_get_status_bits": {
+      "path": "inputs/reference/state-zero/kinesis-1.14.60/dotnet-api/a08488_a33fd41ba3b79a5078c4609d804c51376.html",
+      "sha256": "cf20d5625aaae5eab3b2081e461b394b2ca213658183a47859c76afd545da72b"
+    },
+    "ksc101_get_operating_state": {
+      "path": "inputs/reference/state-zero/kinesis-1.14.60/dotnet-api/a08488_a17ec982fd4d4ce12229bb09fe9671aa2.html",
+      "sha256": "f0913138657d2f73bd30bb986de9a8fe1db2a2490a50b0771ae32cc58a271259"
+    }
+  },
+  "findings": {
+    "KSC101_dotnet_SolenoidStatus_SolenoidStates": {
+      "Closed": 0,
+      "Open": 1
+    },
+    "KSC101_dotnet_OperatingStates": {
+      "Active": 1,
+      "Inactive": 2
+    },
+    "KSC101_C_header_SC_SolenoidStates": {
+      "SC_SolenoidOpen": 1,
+      "SC_SolenoidClosed": 2
+    },
+    "KSC101_GetStatusBits_output_mask": "0x00000001: enabled=1, disabled=0",
+    "scope": "The exact KSC101 .NET physical-feedback enum documents Closed=0; older protocol/C API enums differ. Current firmware1.0.7 raw0 and output-bit0 clear match the user OFF/Trigger display. No universal raw-wire claim across other firmware and no optical feedback assertion.",
+    "supersedes": "The earlier claim that 0 was entirely undocumented was incomplete; the .NET reference had not yet been inspected."
+  }
+}

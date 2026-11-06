@@ -1,0 +1,23 @@
+{
+  "timestamp_utc": "2026-11-06T20:51:24.647286+00:00",
+  "scope": "Actual new public raw diagnostic API; no simulator/transport injection",
+  "endpoint": "192.168.1.19:40305",
+  "identity": {
+    "serial_number": "68800777",
+    "model": "KSC101",
+    "firmware": "1.0.7",
+    "hardware_version": 3,
+    "channels": 1
+  },
+  "solenoid_state_reply_raw": 0,
+  "interpretation": "unmodified diagnostic byte; not used as operating/output feedback",
+  "sent_frames": [
+    "050000005001",
+    "050000005001",
+    "cc0401005001"
+  ],
+  "mode_output_commands_sent": 0,
+  "retained_claim": false,
+  "retained_transport": false,
+  "result": "PASS"
+}

@@ -1,0 +1,59 @@
+{
+  "timestamp_utc": "2026-11-06T21:31:07.212757+00:00",
+  "scope": "Actual fresh CLI identity/status after the single ON/OFF cycle; read-only, no simulator",
+  "command": [
+    "uv",
+    "run",
+    "--locked",
+    "--offline",
+    "--no-sync",
+    "shutter-control",
+    "--config",
+    "config/shutter.ethernet.toml",
+    "--target",
+    "shutter",
+    "status"
+  ],
+  "returncode": 0,
+  "status": {
+    "name": "shutter",
+    "channel": 0,
+    "serial_number": "68800777",
+    "endpoint": "192.168.1.19:40305",
+    "connection": "connected",
+    "has_device": true,
+    "identity_verified": true,
+    "observed_serial_number": "68800777",
+    "description": "KSC101 firmware 1.0.7",
+    "generation": 1,
+    "observed_at": "2026-11-06T21:31:07.189547+00:00",
+    "feedback_freshness": "response_after_request_no_transaction_id",
+    "feedback": {
+      "shutter_state": "unknown",
+      "operating_mode": "manual",
+      "operating_state": "unknown",
+      "key_enabled": null,
+      "interlock_enabled": true,
+      "channel_enabled": null,
+      "status_bits": 8192,
+      "electrical_state": "off",
+      "electrical_observed_at": "2026-11-06T21:31:07.189547+00:00"
+    },
+    "requested_state": null,
+    "transition_confirmed": false,
+    "error": null,
+    "cleanup": null,
+    "optical_observed_at": null,
+    "optical_provenance": null,
+    "optical_observed_state": "unknown",
+    "identity": {
+      "serial_number": "68800777",
+      "model": "KSC101",
+      "firmware": "1.0.7",
+      "hardware_version": 3,
+      "channels": 1
+    }
+  },
+  "stderr": "",
+  "result": "PASS fresh post-release Manual/OFF; no journal fault"
+}

@@ -1,0 +1,19 @@
+{
+  "date": "2026-11-06",
+  "source": "Thorlabs SH05R/SH05R-M User Guide TTN264481-D02, RevA24February2022,15 PDF pages",
+  "url": "https://oxxius.ru/upload/iblock/6c6/hl12m6ms8y6qlnttgzhww6040mysz7ym/TTN264481_D02.pdf",
+  "hosting": "Manufacturer-authored primary manual on public mirror, not official Thorlabs hosting",
+  "method": "Web PDF text inspected pp3,5-7; direct host download timed out, so no local PDF hash is claimed",
+  "findings": {
+    "recommended_controllers": [
+      "SC10",
+      "KSC101"
+    ],
+    "initial_design_state": "Closed",
+    "steady_state_at_20C": "4W, continuous",
+    "KSC101_typical_timing": "Reported in guide; not calibrated by this task",
+    "position_sensor": "Hall sense return is separate from the output command bit; not measured by current implementation"
+  },
+  "human_setup": "User confirms currentSH05R and safe/source-blocked/trigger-isolated conditions on 2026-11-06",
+  "scope": "NativeKSC101 selected; no custom voltage/pulse, TTL or optical-feedback inference"
+}

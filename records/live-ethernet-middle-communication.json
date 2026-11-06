@@ -1,0 +1,98 @@
+{
+  "timestamp_utc": "2026-11-06T00:47:15.450867+00:00",
+  "scope": "Actual Ethernet candidate identity only; no simulator, output or mode commands",
+  "authorization": "User: try ethernet instead; then corrected physical bay to middle",
+  "physical_precondition": {
+    "provenance": "current human report",
+    "report": "Yes\u2014powered, Ethernet connected, USB IN disconnected"
+  },
+  "endpoint_provenance": {
+    "source": "inputs/private/notebooks/shutter_lan_tutorial-fc609ca6e6fc.ipynb",
+    "sha256": "fc609ca6e6fcd9017f87abd4b62b978db7bae157eab90d2a49909d671159b1a9",
+    "scope": "historical left-bay endpoint superseded by current human report: middle bay, port 40305; hub identity unverified"
+  },
+  "config": {
+    "name": "verdi shutter",
+    "channel": 0,
+    "role": "Read-only identity candidate; physical role/hub identity unverified",
+    "serial_number": "68800777",
+    "firmware": [
+      "1.0.7"
+    ],
+    "route": {
+      "kind": "keh3",
+      "port": null,
+      "hub_serial": "UNKNOWN (diagnostic only)",
+      "host": "192.168.1.19",
+      "bay": "middle",
+      "hub_firmware": "UNKNOWN (diagnostic only)"
+    },
+    "policy": null
+  },
+  "unknown_fields": [
+    "hub_serial",
+    "hub_firmware"
+  ],
+  "firmware_provenance": "1.0.7 historical expectation; verify against actual reply",
+  "candidate_destination": "0x50; generic APT device hypothesis",
+  "timeout_s": 5.0,
+  "request_expected_hex": "050000005001",
+  "script_sha256": "bcd244e126d8a0e45e164cfd7e7c18e4bda04540868dea4852401457484a4241",
+  "observation": {
+    "endpoint": "192.168.1.19:40305",
+    "expected_controller": "68800777",
+    "expected_hub": "UNKNOWN (diagnostic only)",
+    "candidate_address": 80,
+    "verdict": "candidate-controller-match-hub-unverified",
+    "raw_hex": "06005400815009d119044b534331303100001000070001004b534331303120536f6c656e6f696420436f6e74726f6c6c657220202020202076332e312020202020202020202031003134313531344a756c000000030000000100",
+    "request_hex": "050000005001",
+    "frames": [
+      "06005400815009d119044b534331303100001000070001004b534331303120536f6c656e6f696420436f6e74726f6c6c657220202020202076332e312020202020202020202031003134313531344a756c000000030000000100"
+    ],
+    "identity": {
+      "serial_number": "68800777",
+      "model": "KSC101",
+      "firmware": "1.0.7",
+      "hardware_version": 3,
+      "channels": 1
+    },
+    "error": null,
+    "cleanup_error": null,
+    "first_byte_after_s": 0.005952100000286009,
+    "hub_identity_verified": false,
+    "operational_route_available": false,
+    "route": {
+      "kind": "keh3",
+      "port": null,
+      "hub_serial": "UNKNOWN (diagnostic only)",
+      "host": "192.168.1.19",
+      "bay": "middle",
+      "hub_firmware": "UNKNOWN (diagnostic only)"
+    },
+    "expected_firmware": [
+      "1.0.7"
+    ]
+  },
+  "result": "PASS candidate controller identity only; hub/routing UNQUALIFIED",
+  "elapsed_s": 0.06683550000161631,
+  "retained_transport": false,
+  "retained_claim": false,
+  "corrected_user_mapping": {
+    "SHUTTERHUB_IP": "192.168.1.19",
+    "SHUTTERHUB_PORT": 40303,
+    "SHUTTER_CH_MAP": {
+      "verdi shutter": {
+        "CH": 0,
+        "SN": 68800777,
+        "IP_PORT": 40305
+      }
+    }
+  },
+  "bay_provenance": "Human answered middle to the rear-view physical bay question; port 40305 from SRC-003 section 4.3/Figure 17.",
+  "command": "uv run --locked --offline --no-sync python tmp/read_only_ethernet_middle.py",
+  "response_bytes": 90,
+  "response_sha256": "ccf62fbc51b3e3b4d5b124c58c14d3858a07943a86c9ec539ec5928daf835607",
+  "request_bytes": 6,
+  "identity_scope": "Actual controller identity verified on this endpoint for this single exchange; hub identity, reconnect behavior, other messages, outputs and optical behavior remain unqualified.",
+  "mode_output_commands_sent": 0
+}

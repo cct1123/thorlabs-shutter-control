@@ -1,0 +1,215 @@
+{
+  "timestamp_utc": "2026-11-06T21:26:03.171963+00:00",
+  "scope": "Real 68800777/1.0.7 at192.168.1.19:40305; user SH05R/source protection confirmation; explicit OFF then Manual only; no simulator",
+  "runtime_sha256": {
+    "src/thorlabs_shutter_control/__init__.py": "1ccce0c1685f148a540122793eb3b876392fe5c95c69a13c635fa46c9e5fe973",
+    "src/thorlabs_shutter_control/__main__.py": "01229aa9a1bccb6cc1b9cdd7c5a966c2a8818aa3bcb8a2f45b9246160cf52f03",
+    "src/thorlabs_shutter_control/config.py": "919d62f3246c3c4c655cd1ba002d5ba946d27b58cde654331274507141e5375a",
+    "src/thorlabs_shutter_control/controller.py": "f55e9e01f8bb7016808e37c48528cf7520d8e4d5585cf717dcb2ef6c34af6627",
+    "src/thorlabs_shutter_control/device.py": "1acb497677b1e58aed54bc38376601a81ac47c7aa7cf1ce5329b0dfffa45da18",
+    "src/thorlabs_shutter_control/discovery.py": "d0c1d84b6761d6fb6534f3afa6f2b3000ea922804270facec7f7e3565a87ca30",
+    "src/thorlabs_shutter_control/errors.py": "f2f4ff77dbba39142b992d047b4ce7a0a93e32f7cdcccd8536a47307cb48d86f",
+    "src/thorlabs_shutter_control/ethernet.py": "8608c91f897f603b2cc5ebc99d528d00f61fc1b15fcee3134d6daa1a21a05ff0",
+    "src/thorlabs_shutter_control/gui.py": "664f0cbd30545267a03a95b32482e45be33ec384f76b7c5f06896b758295bdce",
+    "src/thorlabs_shutter_control/ownership.py": "7fb46ab790bd7bb633d157d6ed1547ff1bb7f7c335be7dfa17ecce8ea77f9a1d",
+    "src/thorlabs_shutter_control/protocol.py": "4aa123b577acce11ccef53a9e77f594a6fcbc6ec47baa063f04293dd601d676f",
+    "src/thorlabs_shutter_control/transport.py": "4813b39b923d0daeeb230d255f9c5b6804ab8227584b329c8be94782ea16ffd0"
+  },
+  "config_sha256": "a3ead7c489bcab71f1dda51c90f0c0e34d6348ed345b7184c07941eb87e57e33",
+  "result": "PASS real OFF/Manual preparation; released; no ON sent",
+  "connection": {
+    "name": "shutter",
+    "channel": 0,
+    "serial_number": "68800777",
+    "endpoint": "192.168.1.19:40305",
+    "connection": "connected",
+    "has_device": true,
+    "identity_verified": true,
+    "observed_serial_number": "68800777",
+    "description": "KSC101 firmware 1.0.7",
+    "generation": 1,
+    "observed_at": null,
+    "feedback_freshness": "unknown",
+    "feedback": {
+      "shutter_state": "unknown",
+      "operating_mode": "unknown",
+      "operating_state": "unknown",
+      "key_enabled": null,
+      "interlock_enabled": null,
+      "channel_enabled": null,
+      "status_bits": null,
+      "electrical_state": "unknown",
+      "electrical_observed_at": null
+    },
+    "requested_state": null,
+    "transition_confirmed": false,
+    "error": null,
+    "cleanup": null,
+    "optical_observed_at": null,
+    "optical_provenance": null,
+    "optical_observed_state": "unknown",
+    "identity": {
+      "serial_number": "68800777",
+      "model": "KSC101",
+      "firmware": "1.0.7",
+      "hardware_version": 3,
+      "channels": 1
+    }
+  },
+  "initial": {
+    "name": "shutter",
+    "channel": 0,
+    "serial_number": "68800777",
+    "endpoint": "192.168.1.19:40305",
+    "connection": "connected",
+    "has_device": true,
+    "identity_verified": true,
+    "observed_serial_number": "68800777",
+    "description": "KSC101 firmware 1.0.7",
+    "generation": 1,
+    "observed_at": "2026-11-06T21:26:03.297718+00:00",
+    "feedback_freshness": "response_after_request_no_transaction_id",
+    "feedback": {
+      "shutter_state": "unknown",
+      "operating_mode": "triggered",
+      "operating_state": "unknown",
+      "key_enabled": null,
+      "interlock_enabled": true,
+      "channel_enabled": null,
+      "status_bits": 8192,
+      "electrical_state": "off",
+      "electrical_observed_at": "2026-11-06T21:26:03.297718+00:00"
+    },
+    "requested_state": null,
+    "transition_confirmed": false,
+    "error": null,
+    "cleanup": null,
+    "optical_observed_at": null,
+    "optical_provenance": null,
+    "optical_observed_state": "unknown",
+    "identity": {
+      "serial_number": "68800777",
+      "model": "KSC101",
+      "firmware": "1.0.7",
+      "hardware_version": 3,
+      "channels": 1
+    }
+  },
+  "final": {
+    "name": "shutter",
+    "channel": 0,
+    "serial_number": "68800777",
+    "endpoint": "192.168.1.19:40305",
+    "connection": "connected",
+    "has_device": true,
+    "identity_verified": true,
+    "observed_serial_number": "68800777",
+    "description": "KSC101 firmware 1.0.7",
+    "generation": 1,
+    "observed_at": "2026-11-06T21:26:03.456417+00:00",
+    "feedback_freshness": "response_after_request_no_transaction_id",
+    "feedback": {
+      "shutter_state": "unknown",
+      "operating_mode": "manual",
+      "operating_state": "unknown",
+      "key_enabled": null,
+      "interlock_enabled": true,
+      "channel_enabled": null,
+      "status_bits": 8192,
+      "electrical_state": "off",
+      "electrical_observed_at": "2026-11-06T21:26:03.456417+00:00"
+    },
+    "requested_state": null,
+    "transition_confirmed": false,
+    "error": null,
+    "cleanup": null,
+    "optical_observed_at": null,
+    "optical_provenance": null,
+    "optical_observed_state": "unknown",
+    "identity": {
+      "serial_number": "68800777",
+      "model": "KSC101",
+      "firmware": "1.0.7",
+      "hardware_version": 3,
+      "channels": 1
+    }
+  },
+  "sent_frames": [
+    "050000005001",
+    "050000005001",
+    "c10401005001",
+    "c70401005001",
+    "290401005001",
+    "050000005001",
+    "c10401005001",
+    "c70401005001",
+    "290401005001",
+    "cb0401025001",
+    "290401005001",
+    "c00401015001",
+    "050000005001",
+    "c10401005001",
+    "c70401005001",
+    "290401005001"
+  ],
+  "queries": [
+    {
+      "request": "050000005001",
+      "reply": "06005400815009d119044b534331303100001000070001004b534331303120536f6c656e6f696420436f6e74726f6c6c657220202020202076332e312020202020202020202031003134313531344a756c000000030000000100"
+    },
+    {
+      "request": "050000005001",
+      "reply": "06005400815009d119044b534331303100001000070001004b534331303120536f6c656e6f696420436f6e74726f6c6c657220202020202076332e312020202020202020202031003134313531344a756c000000030000000100"
+    },
+    {
+      "request": "c10401005001",
+      "reply": "c20401040150"
+    },
+    {
+      "request": "c70401005001",
+      "reply": "c80401010150"
+    },
+    {
+      "request": "290401005001",
+      "reply": "2a0406008150010000200000"
+    },
+    {
+      "request": "050000005001",
+      "reply": "06005400815009d119044b534331303100001000070001004b534331303120536f6c656e6f696420436f6e74726f6c6c657220202020202076332e312020202020202020202031003134313531344a756c000000030000000100"
+    },
+    {
+      "request": "c10401005001",
+      "reply": "c20401040150"
+    },
+    {
+      "request": "c70401005001",
+      "reply": "c80401010150"
+    },
+    {
+      "request": "290401005001",
+      "reply": "2a0406008150010000200000"
+    },
+    {
+      "request": "290401005001",
+      "reply": "2a0406008150010000200000"
+    },
+    {
+      "request": "050000005001",
+      "reply": "06005400815009d119044b534331303100001000070001004b534331303120536f6c656e6f696420436f6e74726f6c6c657220202020202076332e312020202020202020202031003134313531344a756c000000030000000100"
+    },
+    {
+      "request": "c10401005001",
+      "reply": "c20401010150"
+    },
+    {
+      "request": "c70401005001",
+      "reply": "c80401010150"
+    },
+    {
+      "request": "290401005001",
+      "reply": "2a0406008150010000200000"
+    }
+  ],
+  "retained_transport": false,
+  "retained_claim": false
+}

@@ -1,0 +1,80 @@
+{
+  "scope": "Canonical LF for reviewed changed text only; manufacturer PDFs unchanged",
+  "notebook_backups": [
+    {
+      "path": "inputs\\private\\notebooks\\holistic-review-before-lf\\01_device_discovery.ipynb",
+      "sha256": "245463276190cd31e561e6669f696642b6b277909fd2507e67170e7a771a1eb3"
+    },
+    {
+      "path": "inputs\\private\\notebooks\\holistic-review-before-lf\\02_connection.ipynb",
+      "sha256": "75933895d8102c00e50fd3426b6ef2b493736059bc5a8aebedbea37beb82cdbe"
+    },
+    {
+      "path": "inputs\\private\\notebooks\\holistic-review-before-lf\\03_status_query.ipynb",
+      "sha256": "d7c891d5287d425863a853699a2387327ee1b884041d2f2f1f5aba5ae20c3f74"
+    },
+    {
+      "path": "inputs\\private\\notebooks\\holistic-review-before-lf\\04_settings.ipynb",
+      "sha256": "30365adceb808ae5ca7315f6ac3fa6972394d48ca196177c1f8c7dfabb84dbf6"
+    },
+    {
+      "path": "inputs\\private\\notebooks\\holistic-review-before-lf\\05_shutter_modes.ipynb",
+      "sha256": "41d06f4d88ba4e8cc736564c509ab7bdf4cfa902cbd0654f6111a6c7484c92be"
+    },
+    {
+      "path": "inputs\\private\\notebooks\\holistic-review-before-lf\\06_on_off.ipynb",
+      "sha256": "96cb616b771431c09ff1d37f0c72d071b99a155a6f1b6928bf325b4c5c264499"
+    }
+  ],
+  "normalized_files": [
+    "PROJECT.md",
+    "README.md",
+    "STATE.md",
+    "config/shutter.ethernet.toml",
+    "config/shutters.example.toml",
+    "docs/HARDWARE_VALIDATION.md",
+    "docs/INTERFACE.md",
+    "docs/architecture.md",
+    "docs/controller-reference-review.md",
+    "docs/cutover.md",
+    "docs/diamondgui.md",
+    "docs/ethernet-assessment.md",
+    "docs/examples/01_device_discovery.ipynb",
+    "docs/examples/02_connection.ipynb",
+    "docs/examples/03_status_query.ipynb",
+    "docs/examples/04_settings.ipynb",
+    "docs/examples/06_on_off.ipynb",
+    "docs/examples/README.md",
+    "docs/getting-started.md",
+    "docs/gui.md",
+    "docs/hardware.md",
+    "docs/keh3-offline-validation.md",
+    "docs/python-api.md",
+    "docs/sources.md",
+    "docs/state-zero-investigation.md",
+    "outputs/REPORT.md",
+    "records/RECORDS.md",
+    "records/direct-validation.json",
+    "records/ethernet-control-baseline.json",
+    "records/ethernet-control-final-status.json",
+    "records/ethernet-control-live.json",
+    "records/ethernet-control-manual-preparation.json",
+    "records/ethernet-control-validation.json",
+    "records/manuals-verification.json",
+    "records/notebook-validation.json",
+    "records/notebook3-api-corrected-live.json",
+    "records/notebook3-state-zero-fix-live.json",
+    "records/package-consistency-review.json",
+    "records/sh05r-manual-reference.json",
+    "records/source-api-review.json",
+    "records/source-review-baseline.json",
+    "records/source-review-live-notebook-1.json",
+    "records/source-review-live-notebook-2-collector-failure.json",
+    "records/source-review-live-notebook-2.json",
+    "records/source-review-live-notebook-3.json",
+    "records/source-review-notebook-backups.json",
+    "records/source-review-raw-diagnostic.json",
+    "records/state-zero-hardware-investigation.json",
+    "records/state-zero-statusbits-investigation.json"
+  ]
+}

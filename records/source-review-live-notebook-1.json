@@ -1,0 +1,69 @@
+{
+  "timestamp_utc": "2026-11-06T20:50:31.177939+00:00",
+  "scope": "Actual fresh Jupyter notebook 1; 68800777/1.0.7 at 192.168.1.19:40305; no simulator",
+  "method": "Original cells plus unsaved query-only request audit and result collector; actual TCP, no transport injection",
+  "runtime_sha256": {
+    "src/thorlabs_shutter_control/__init__.py": "1ccce0c1685f148a540122793eb3b876392fe5c95c69a13c635fa46c9e5fe973",
+    "src/thorlabs_shutter_control/__main__.py": "418d760fb7147fe2a5fe8d2022d934170cda53ba7b278e6a3b19077dd2fa36da",
+    "src/thorlabs_shutter_control/config.py": "919d62f3246c3c4c655cd1ba002d5ba946d27b58cde654331274507141e5375a",
+    "src/thorlabs_shutter_control/controller.py": "a8949a379e38c6c5e04317fc1df99979d347cf2ac8ce5f47c40a1c8a62539a04",
+    "src/thorlabs_shutter_control/device.py": "ef95a0a30daa6515ec97af244315590fc5aa489e89e61c8ddfcd8a08110483b6",
+    "src/thorlabs_shutter_control/discovery.py": "d0c1d84b6761d6fb6534f3afa6f2b3000ea922804270facec7f7e3565a87ca30",
+    "src/thorlabs_shutter_control/errors.py": "f2f4ff77dbba39142b992d047b4ce7a0a93e32f7cdcccd8536a47307cb48d86f",
+    "src/thorlabs_shutter_control/ethernet.py": "82e0583d3bc134ec1bd5e807c7bc653045bccf09b55056f152d6dea479157ac2",
+    "src/thorlabs_shutter_control/gui.py": "664f0cbd30545267a03a95b32482e45be33ec384f76b7c5f06896b758295bdce",
+    "src/thorlabs_shutter_control/ownership.py": "7fb46ab790bd7bb633d157d6ed1547ff1bb7f7c335be7dfa17ecce8ea77f9a1d",
+    "src/thorlabs_shutter_control/protocol.py": "4aa123b577acce11ccef53a9e77f594a6fcbc6ec47baa063f04293dd601d676f",
+    "src/thorlabs_shutter_control/transport.py": "061b749506eb088accf038561a3fb29c4e21175be164a7351e5a60aad4a013ee"
+  },
+  "config_sha256": "14d2acdca9149218deff1621225d3dda166de42f103632bbfb2e2cc98704f2f5",
+  "verdict": "PASS real hardware, exact identity and expected readback; resources released",
+  "result": {
+    "serial_number": "68800777",
+    "model": "KSC101",
+    "firmware": "1.0.7",
+    "hardware_version": 3,
+    "channels": 1
+  },
+  "connection_after_release": {
+    "name": "shutter",
+    "channel": 0,
+    "serial_number": "68800777",
+    "endpoint": "192.168.1.19:40305",
+    "connection": "disconnected",
+    "has_device": false,
+    "identity_verified": false,
+    "observed_serial_number": null,
+    "description": null,
+    "generation": 1,
+    "observed_at": null,
+    "feedback_freshness": "unknown",
+    "feedback": {
+      "shutter_state": "unknown",
+      "operating_mode": "unknown",
+      "operating_state": "unknown",
+      "key_enabled": null,
+      "interlock_enabled": null,
+      "channel_enabled": null,
+      "status_bits": null,
+      "electrical_state": "unknown",
+      "electrical_observed_at": null
+    },
+    "requested_state": null,
+    "transition_confirmed": false,
+    "error": null,
+    "cleanup": null,
+    "optical_observed_at": null,
+    "optical_provenance": null,
+    "optical_observed_state": "unknown",
+    "identity": null
+  },
+  "retained_claim": false,
+  "sent_frames": [
+    "050000005001"
+  ],
+  "kernel_python": "C:\\repo\\thorlabs-shutter-control\\.venv\\Scripts\\python.exe",
+  "mode_output_commands_sent": 0,
+  "notebook_sha256": "245463276190cd31e561e6669f696642b6b277909fd2507e67170e7a771a1eb3",
+  "elapsed_s": 1.115450299999793
+}

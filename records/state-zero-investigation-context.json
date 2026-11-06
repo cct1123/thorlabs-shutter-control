@@ -1,0 +1,17 @@
+{
+  "date": "2026-11-06",
+  "human_observations": [
+    {
+      "source": "User message",
+      "value": "solenoid off mode is trigger"
+    },
+    {
+      "source": "Reply to current display question",
+      "value": "OFF"
+    }
+  ],
+  "scope": "Same human-reported current OFF/Trigger observation; not optical/electrical measurement or permission to actuate",
+  "notebook_backup": "inputs\\private\\notebooks\\03-status-before-state-zero-fix-0472ebe61c4a.ipynb",
+  "notebook_sha256": "0472ebe61c4a3a804a581289faf538d932ba577a447d6e12635bd2cfeba6f683",
+  "source_conclusion": "No published firmware-1.0.7 definition for 0 found; preserve as undocumented legacy value. Independent actual status-bit reply = 0x2000, output bit0 clear, consistent with human OFF display and historical same-controller 0x2000 closed/0x2001 open records."
+}

@@ -1,0 +1,88 @@
+{
+  "timestamp_utc": "2026-11-06T00:44:03.646229+00:00",
+  "scope": "Actual Ethernet candidate identity only; no simulator, output or mode commands",
+  "authorization": "User: try ethernet instead",
+  "physical_precondition": {
+    "provenance": "current human report",
+    "report": "Yes\u2014powered, Ethernet connected, USB IN disconnected"
+  },
+  "endpoint_provenance": {
+    "source": "inputs/private/notebooks/shutter_lan_tutorial-fc609ca6e6fc.ipynb",
+    "sha256": "fc609ca6e6fcd9017f87abd4b62b978db7bae157eab90d2a49909d671159b1a9",
+    "scope": "historical saved LAN endpoint and controller; not current hub verification"
+  },
+  "config": {
+    "name": "shutter_ethernet_candidate",
+    "channel": 0,
+    "role": "Read-only identity candidate; physical role/hub identity unverified",
+    "serial_number": "68800777",
+    "firmware": [
+      "1.0.7"
+    ],
+    "route": {
+      "kind": "keh3",
+      "port": null,
+      "hub_serial": "UNKNOWN (diagnostic only)",
+      "host": "192.168.1.19",
+      "bay": "left",
+      "hub_firmware": "UNKNOWN (diagnostic only)"
+    },
+    "policy": null
+  },
+  "unknown_fields": [
+    "hub_serial",
+    "hub_firmware"
+  ],
+  "firmware_provenance": "1.0.7 historical expectation; verify against actual reply",
+  "candidate_destination": "0x50; generic APT device hypothesis",
+  "timeout_s": 5.0,
+  "request_expected_hex": "050000005001",
+  "script_sha256": "e682e22b5f176b08b5afb05172bdeef7be6e12c8697bd291e1ae6252c06304fc",
+  "observation": {
+    "endpoint": "192.168.1.19:40304",
+    "expected_controller": "68800777",
+    "expected_hub": "UNKNOWN (diagnostic only)",
+    "candidate_address": 80,
+    "verdict": "probe-unconfirmed",
+    "raw_hex": "",
+    "request_hex": "",
+    "frames": [],
+    "identity": null,
+    "error": "[WinError 10061] No connection could be made because the target machine actively refused it",
+    "cleanup_error": null,
+    "first_byte_after_s": null,
+    "hub_identity_verified": false,
+    "operational_route_available": false,
+    "route": {
+      "kind": "keh3",
+      "port": null,
+      "hub_serial": "UNKNOWN (diagnostic only)",
+      "host": "192.168.1.19",
+      "bay": "left",
+      "hub_firmware": "UNKNOWN (diagnostic only)"
+    },
+    "expected_firmware": [
+      "1.0.7"
+    ]
+  },
+  "result": "FAIL shutter-bay TCP connection; controller identity NOT RUN",
+  "elapsed_s": 2.0469001999954344,
+  "retained_transport": false,
+  "retained_claim": false,
+  "current_user_mapping": {
+    "SHUTTERHUB_IP": "192.168.1.19",
+    "SHUTTERHUB_PORT": 40303,
+    "SHUTTER_CH_MAP": {
+      "verdi shutter": {
+        "CH": 0,
+        "SN": 68800777,
+        "IP_PORT": 40304
+      }
+    }
+  },
+  "current_endpoint_provenance": "User explicitly supplied 192.168.1.19 and the complete hub/channel mapping in this session.",
+  "command": "uv run --locked --offline --no-sync python tmp/read_only_ethernet.py",
+  "diagnosis": "TCP connection to shutter bay port 40304 was actively refused (WinError 10061); no application request was sent. Root cause unestablished; hub management connectivity tested separately.",
+  "mode_output_commands_sent": 0,
+  "retries": 0
+}

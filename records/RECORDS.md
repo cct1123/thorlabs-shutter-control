@@ -1921,3 +1921,26 @@ inside a new fenced example; both were corrected before the passing full run.
 Hardware E181 and manual/package E182 retain their original hashes. This review
 changes controller/GUI runtime code, so the old live result is historical evidence
 for its recorded revision; current software checks do not requalify physical use.
+
+## E184 - TEST-223 documentation and publication preparation (6 November 2026)
+
+Reviewed current documentation and migration replacements. Corrected stale E179
+live-control references to E181; E179 itself remains the original manual-copy
+record with its historical ID collision. The example name is consistently shutter;
+the notebook guide now shows the actual SHUTTER configuration API instead of a
+retired route dictionary. Removed repeated mode-protection prose. External
+DiamondGUI availability and current-vs-historical validation are explicit.
+
+Repository audit: 113 local Markdown targets exist; all 49 current JSON evidence
+files and all 5 XML files parse. The four manufacturer PDF byte counts/SHA-256
+values match manuals-verification.json. A targeted credential-pattern scan of
+the pending text files found no private-key/token patterns. This is a focused
+publication check, not a claim of a comprehensive secret audit.
+
+Normalized only reviewed changed text to the repository's LF policy and reran the
+integrated 160 source / 160 wheel and six static-notebook checks. All manifest
+input hashes were verified against the exact staged Git blobs before stage 1,
+b9b2309. Six byte-exact notebook snapshots before normalization are retained
+under inputs/private/notebooks/holistic-review-before-lf; hashes and normalized
+paths are recorded in records/holistic-normalization.json. Saved outputs were
+not cleared. Four original PDFs remain binary/unchanged. No new physical test.

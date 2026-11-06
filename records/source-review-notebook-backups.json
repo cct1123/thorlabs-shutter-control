@@ -1,0 +1,26 @@
+{
+  "docs/examples/01_device_discovery.ipynb": {
+    "backup": "inputs/private/notebooks/before-source-api-review/01_device_discovery.ipynb",
+    "sha256": "29bee8cd81677903995ed91f114823a7b53057a454e4818d100bc9017dd017d7"
+  },
+  "docs/examples/02_connection.ipynb": {
+    "backup": "inputs/private/notebooks/before-source-api-review/02_connection.ipynb",
+    "sha256": "44f25cc1c5279c8d28a76944dfddea89089c00b192800d381b18b6ea91eadde7"
+  },
+  "docs/examples/03_status_query.ipynb": {
+    "backup": "inputs/private/notebooks/before-source-api-review/03_status_query.ipynb",
+    "sha256": "f64a078837ef6f366a72b99a4c8ce79ff24f3e35676bb2e4fe491bcaf6c677cb"
+  },
+  "docs/examples/04_settings.ipynb": {
+    "backup": "inputs/private/notebooks/before-source-api-review/04_settings.ipynb",
+    "sha256": "d5bc8934a52daaff166b7dad09504ade5c76add01be7c35e86c7fd4e87699552"
+  },
+  "docs/examples/05_shutter_modes.ipynb": {
+    "backup": "inputs/private/notebooks/before-source-api-review/05_shutter_modes.ipynb",
+    "sha256": "6670dcc1dbbdf2776ba8816ca7d76d6111c845585c5219c610af57b56494b4e1"
+  },
+  "docs/examples/06_on_off.ipynb": {
+    "backup": "inputs/private/notebooks/before-source-api-review/06_on_off.ipynb",
+    "sha256": "241580933456509c71fe94c5838675a0cef9e4c72f390c0a55d1b1a1da9e248c"
+  }
+}

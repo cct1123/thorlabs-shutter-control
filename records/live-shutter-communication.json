@@ -1,0 +1,76 @@
+{
+  "timestamp_utc": "2026-11-05T23:56:04.370481+00:00",
+  "scope": "Actual exact-serial USB identity/status only; no mode/output commands",
+  "expected_config": {
+    "name": "shutter",
+    "channel": 0,
+    "role": "Read-only commissioning; physical role unverified",
+    "serial_number": "68800777",
+    "firmware": [
+      "1.0.7"
+    ],
+    "route": {
+      "kind": "d2xx",
+      "port": null,
+      "hub_serial": null,
+      "host": null,
+      "bay": null,
+      "hub_firmware": null
+    },
+    "policy": null
+  },
+  "firmware_provenance": "1.0.7 is historical expectation, not current measurement",
+  "device_presence": {
+    "source": "Get-PnpDevice -PresentOnly",
+    "instance_id": "USB\\VID_0403&PID_FAF0\\68800777",
+    "name": "Kinesis Solenoid Controller",
+    "status": "OK",
+    "signed_driver_metadata": "provider/version/INF/driver blank",
+    "pnp_driver_properties": {
+      "service": null,
+      "driver_inf_path": null,
+      "driver_version": null,
+      "driver": null,
+      "problem_code": 0,
+      "devnode_status": 25190400,
+      "parent": "USB\\VID_0424&PID_2514\\7&22314d84&0&4"
+    },
+    "pnputil": {
+      "command": "pnputil /enum-devices /instanceid \"USB\\VID_0403&PID_FAF0\\68800777\" /drivers /services /stack",
+      "class_name": "Unknown",
+      "class_guid": "Unknown",
+      "manufacturer": "Unknown",
+      "status": "Stopped",
+      "stack": [
+        "CSDeviceControl",
+        "USBHUB3"
+      ]
+    }
+  },
+  "connect_timeout_s": 5.0,
+  "query_timeout_s": 3.0,
+  "output_commands": "NONE",
+  "result": "FAIL native USB open; controller identity/status NOT RUN",
+  "failed_stage": "connect",
+  "error": {
+    "type": "DeviceError",
+    "message": "DEVICE_NOT_OPENED",
+    "notes": []
+  },
+  "communication_release": "completed; not evidence of optical closure",
+  "elapsed_s": 0.05634319999808213,
+  "command": "uv run --locked --offline --no-sync python tmp/read_only_shutter.py",
+  "attempt_script_sha256": "24bf827b8f262022526faba4bcba580e6cf558c15f9c1d9d92b669af4fb5826e",
+  "device_control_component": {
+    "name": "CSDeviceControl",
+    "display_name": "CrowdStrike Device Control Service",
+    "state": "Running",
+    "start_mode": "Manual",
+    "path": "C:\\Windows\\system32\\drivers\\CSDeviceControl.sys"
+  },
+  "diagnosis": "Present USB device is not accessible through D2XX. Windows reports Stopped with no function-driver service/INF. CrowdStrike device-control filter is in the stack; whether a policy decision caused the condition is not established.",
+  "retries": 0,
+  "driver_changes": "NONE",
+  "security_changes": "NONE",
+  "network_operations": "NONE"
+}
