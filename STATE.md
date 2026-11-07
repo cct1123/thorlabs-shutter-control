@@ -23,8 +23,11 @@ The new passive preview is at127.0.0.1:9860 (owned exec session14309, final sour
 started with -B; no device connection).
 Earlier9857 server was not taken over. Recheck transient state before future work.
 
-Implementation checkpoint: ab80236. Next: publish documentation/evidence;
-full parity resumes only with a trustworthy
+E195: implementation ab80236 and documentation/evidence8c1e1f4 pushed to
+origin/main; remote tip8c1e1f4 and clean working tree verified before this final
+checkpoint. Final source/evidence hashes match the staged Git blobs. This
+publication checkpoint follows those commits; final remote parity is checked
+again after its push. Full parity resumes only with a trustworthy
 manufacturer KSC101 display/trigger/status contract and separately approved tests.
 
 ## Latest single-cycle follow-up (6 November 2026, local date)
@@ -192,7 +195,7 @@ Human criteria remain in PROJECT.md. PASS is scoped to its stated method/revisio
 
 ## Short plan and human action required
 
-The supported APT WebUI implementation is validated; staged publication is next.
+The supported APT WebUI implementation is validated and published (E195).
 Full GUI functionality needs one specific external contract: manufacturer-confirmed
 KSC101 MMI0x0520/trigger0x0523 payload fields/lengths/units/enums and Key/Ready status
 mapping, including firmware applicability. Existing APT42.1 detail conflicts with

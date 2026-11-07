@@ -31,6 +31,10 @@ qualification is claimed; historical Manual runs below retain their original
 revision/configuration scope. Full parity needs the manufacturer-specific
 display/trigger/status contract recorded in STATE.md.
 
+Delivery E195: implementation ab80236 and documentation/evidence8c1e1f4 were
+pushed to origin/main and remote parity verified. The final checkpoint records
+that delivery without upgrading software-only results to physical acceptance.
+
 ---
 
 # Actual hardware WebUI validation (historical revision)

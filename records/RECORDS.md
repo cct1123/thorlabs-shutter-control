@@ -2198,3 +2198,22 @@ The preview was passively restarted on final source with -B (owned session14309)
 140 local Markdown targets, five manual hashes, saved artifact hashes and final
 source/configuration hashes PASS in webui-apt-validation.json. Stage1 implementation
 commit ab80236; documentation/evidence publication is the next checkpoint.
+
+## E195 - Staged WebUI delivery and remote verification
+
+Stage1 ab80236 contains the canonical APT owner/driver extensions, revised panel
+and CSS, regressions and exact CSS-wheel verification. Stage2 8c1e1f4 contains
+the unchanged RevF manual, API/GUI/README/source docs, checkpoint/report and
+software/passive-browser evidence. Reviewed explicit staging allowlists and
+cached diff checks; all verified source and artifact hashes matched exact staged
+Git blobs. Current SH05R TOML and four prior manual hashes remain unchanged.
+Only generated review/test material and the one-off aggregation script were
+removed; .venv, downloads, ownership state, wheel and all bench records remain.
+
+git push origin main succeeded from238f9b3 to8c1e1f4. git ls-remote origin
+refs/heads/main returned8c1e1f45033abfe6c21fc8e8478622dacf6144dd, matching HEAD;
+git status --porcelain was empty. This final publication checkpoint follows
+those two observed published commits; final parity is checked again after push.
+No device operation was performed for publication. Full REQ-225 parity remains
+PARTIAL/BLOCKED on the specific wire contracts in STATE.md; all new physical
+mode/settings/Identify functions remain UNTESTED.
