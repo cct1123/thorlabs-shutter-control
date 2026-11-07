@@ -35,7 +35,12 @@ def execute_action(hub, action, target, *, source_inhibited=False, parameters=No
             hub.connect(target)
         return hub.get_status(target), "Connected to the exact controller; fresh feedback received."
     if action in ("read", "poll"):
-        return hub.get_status(target), "Readback updated."
+        sample = hub.get_status(target)
+        return sample, (
+            "Readback updated."
+            if sample.has_device
+            else "Disconnected; no device feedback was requested."
+        )
     if action == "release":
         if hub.connection_snapshot(target).requested_state in ("on", "start"):
             raise ShutterError("Stop / OFF before releasing an active output or native sequence")
@@ -561,7 +566,8 @@ def create_app(hub):
                 parameters=parameters,
                 persist="persist" in (persist or []),
             )
-            return asdict(sample), message
+            # A background status refresh must not erase a command/refusal message.
+            return asdict(sample), no_update if ctx.triggered_id == "poll" else message
         except Exception as exc:
             snapshot = no_update
             if target in {c.name for c in hub.configs}:
@@ -699,7 +705,7 @@ def create_app(hub):
                 or sample.get("requested_state") == "start",
                 not (connected and controllable),
                 not (connected and controllable),
-                not (ready and mode == "manual"),
+                not (ready and mode == "manual" and feedback.get("electrical_state") == "off"),
                 not (connected and not fault),
                 not (connected and not fault),
                 not (ready and policy and policy.allow_device_settings and mode == "manual"),

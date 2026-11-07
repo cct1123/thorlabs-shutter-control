@@ -1,4 +1,4 @@
-"""Verify the full source suite and exact wheel without instruments or lab networking.
+"""Verify software tests and the exact wheel without instruments or lab networking.
 
 Run: uv run --locked --offline --group dev --extra gui python scripts/verify.py
 All dependencies must be cached. TCP tests use local loopback only.
@@ -8,6 +8,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -38,7 +39,27 @@ def hashes():
 
 
 def main():
-    argparse.ArgumentParser(description=__doc__).parse_args()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--test-path",
+        action="append",
+        type=Path,
+        help="Select a test file/directory under tests (repeatable); default is the full suite",
+    )
+    parser.add_argument(
+        "--record-prefix",
+        default="",
+        help="Prefix record filenames to preserve earlier campaigns (letters/digits/dashes only)",
+    )
+    args = parser.parse_args()
+    if args.record_prefix and not re.fullmatch(r"[a-z0-9-]{1,48}", args.record_prefix):
+        parser.error("--record-prefix must contain1..48 lowercase letters/digits/dashes")
+    selected = [path.resolve() for path in (args.test_path or [ROOT / "tests"])]
+    for path in selected:
+        if not path.is_relative_to(ROOT / "tests") or not path.exists():
+            parser.error("--test-path must be an existing path under this repository's tests")
+        if path.is_file() and path.suffix != ".py":
+            parser.error("--test-path files must be Python tests")
     before = hashes()
     uv = shutil.which("uv")
     if uv is None:
@@ -79,11 +100,11 @@ def main():
             label + " tests",
             python,
             "-m pytest -q --tb=short -p no:cacheprovider",
-            ROOT / "tests",
+            *selected,
             "--basetemp",
             work / label,
             "--junitxml",
-            ROOT / f"records/{label}-tests.xml",
+            ROOT / f"records/{args.record_prefix}{label}-tests.xml",
             cwd=work,
         )
 
@@ -187,16 +208,16 @@ print(json.dumps({'python': sys.version, 'package': package.__file__}))
     (ROOT / "dist").mkdir(exist_ok=True)
     shutil.copyfile(wheel, ROOT / "dist" / wheel.name)
     report = dict(
-        scope="offline/simulated and TCP loopback only; no instruments or lab network",
+        scope="Software checks for the listed paths only; no instruments or lab network",
         python=sys.version,
         deadline_clock=vars(time.get_clock_info("perf_counter")),
-        tested_paths=["tests"],
+        tested_paths=[path.relative_to(ROOT).as_posix() for path in selected],
         source_sha256=before,
         wheel_sha256=hashlib.sha256(wheel.read_bytes()).hexdigest(),
         wheel_source_parity="PASS",
         results=results,
     )
-    (ROOT / "records/direct-validation.json").write_text(
+    (ROOT / f"records/{args.record_prefix}direct-validation.json").write_text(
         json.dumps(report, indent=2) + "\n", encoding="utf-8"
     )
     # Preserve failed-run diagnostics, but remove this successful disposable environment.
