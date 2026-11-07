@@ -1,4 +1,4 @@
-"""Manufacturer-style localhost panel; all device actions use the canonical APT owner."""
+"""Localhost control panel; all device actions use the canonical APT owner."""
 
 import json
 import math
@@ -155,6 +155,7 @@ def create_app(hub):
                         [
                             html.Div(
                                 [
+                                    html.H2("Operating mode", className="panel-heading"),
                                     html.Div(
                                         [
                                             html.Button(
@@ -212,6 +213,7 @@ def create_app(hub):
                             ),
                             html.Div(
                                 [
+                                    html.H2("Output control", className="panel-heading"),
                                     html.Div(
                                         [
                                             html.Button(
@@ -220,7 +222,7 @@ def create_app(hub):
                                                     html.Span("Open / ON", id="on-label"),
                                                 ],
                                                 id="on",
-                                                className="round-action open-action",
+                                                className="output-action open-action",
                                                 title="Open / Start in the current mode",
                                             ),
                                             html.Button(
@@ -229,7 +231,7 @@ def create_app(hub):
                                                     html.Span("Close / OFF", id="off-label"),
                                                 ],
                                                 id="off",
-                                                className="round-action close-action",
+                                                className="output-action close-action",
                                                 title="Priority OFF; mode unchanged",
                                             ),
                                         ],
@@ -260,6 +262,7 @@ def create_app(hub):
                             ),
                             html.Div(
                                 [
+                                    html.H2("Controller status", className="panel-heading"),
                                     led(
                                         "Key Enabled",
                                         "key-lamp",
