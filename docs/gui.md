@@ -1,5 +1,11 @@
 # Local GUI
 
+The current panel uses a modern minimalist style: white surfaces, slate text,
+a restrained teal accent, flat controls, subtle borders and consistent spacing.
+Operating mode, Output control and Controller status have explicit section
+headings. The manufacturer GUI defines functional references, not the current
+visual skin. All APT functions, policy gates and unknown-state labels are retained.
+
 ```powershell
 uv sync --locked --extra gui
 uv run --locked shutter-control --config config/shutter.ethernet.toml gui --port 9857
@@ -145,3 +151,27 @@ warning/error was observed and no hardware Connect/Identify/write was clicked.
 [phone panel](../records/webui-apt-panel-phone.png).
 TEST-225 software/packaging evidence is separate from TEST-224's earlier actual
 hardware runs. The new panel and native operations have no new physical PASS.
+
+## Minimalist visual refinement
+
+REQ-226 / TEST-226 supersedes the original manufacturer appearance. The current
+skin removes red chrome, bevels, gradients and circular mechanical buttons;
+selection uses a muted teal accent while unknown/error/requested states retain
+their distinct text and indicators. System typography requires no external font
+or network dependency. Controls include visible keyboard focus, readable disabled
+states and reduced-motion support. Settings uses three columns on desktop and
+one on phones; Stop/OFF remains in its sticky header while the content scrolls.
+
+The real app was reviewed disconnected at1100,768,390 and320px widths, with no
+horizontal overflow. Phone Settings scrolling retained visible Stop/OFF and
+Close controls. There were no browser console warnings/errors. No Connect,
+Identify, output or device-settings action was used. The initial Read state
+confirmed has_device=false/generation0 before restarting the owned preview.
+
+[Current desktop](../records/webui-modern-desktop.png),
+[phone](../records/webui-modern-phone.png),
+[Settings](../records/webui-modern-settings.png),
+[scrolled phone Settings](../records/webui-modern-settings-phone.png).
+The original TEST-225 screenshots above remain historical appearance evidence.
+Current presentation/source/wheel validation is recorded separately in
+[webui-modern-validation.json](../records/webui-modern-validation.json).

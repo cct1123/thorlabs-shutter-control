@@ -1,6 +1,24 @@
 # Engineering state
 
-## Active manufacturer-style APT WebUI
+## Active visual refinement
+
+REQ-226 / TEST-226 PASS (PROJECT.md current user design request), E196.
+Flat white/slate/teal design, semantic section headings, consistent spacing,
+subtle borders, system typography and responsive Settings replace the literal
+manufacturer skin. Desktop/tablet/phone review at1100/768/390/320px found no
+horizontal overflow. Phone Settings Stop/OFF stayed visible after626.4px scroll.
+201 source +201 isolated-wheel tests, lint/format and exact Python/CSS parity PASS.
+Device dispatch/callback function ASTs and the real TOML are byte/structure unchanged.
+No hardware command; no fabricated connected/readiness state. REQ-225's protocol
+and physical gaps remain unchanged. E194 evidence remains historical and preserved.
+Evidence: records/webui-modern-validation.json, separate modern software XML/JSON
+and four screenshots. Current preview127.0.0.1:9860, disconnected, owned exec
+session67798 started with -B; viewport reset. E197: implementation66bc05e is
+published and remote-verified. Documentation/evidence are included in this final
+checkpoint; final remote parity is checked after its push. No further visual
+work or hardware action is pending. REQ-225's specific contract gaps remain open.
+
+## APT functionality and unresolved contracts
 
 REQ-225 / TEST-225: PARTIAL; supported software paths validated, full GUI parity
 BLOCKED on KSC101-specific display/trigger wire contracts and Key/Ready feedback.
@@ -19,8 +37,8 @@ Evidence: records/webui-apt-validation.json and desktop/settings/phone screensho
 Native timing, priming, Identify flash, settings persistence and the revised
 panel's physical operation remain UNTESTED. Old E191/E192 qualify their exact
 historical Manual cycle only. No new live output/configuration authority exists.
-The new passive preview is at127.0.0.1:9860 (owned exec session14309, final source
-started with -B; no device connection).
+E194's preview session14309 was superseded by the verified-disconnected visual
+refinement restart above; it is no longer the active server.
 Earlier9857 server was not taken over. Recheck transient state before future work.
 
 E195: implementation ab80236 and documentation/evidence8c1e1f4 pushed to
@@ -192,6 +210,7 @@ Human criteria remain in PROJECT.md. PASS is scoped to its stated method/revisio
 | REQ-223 | Holistic review, prune, naming, staged push (derived) | TEST-223; E183-E187 and holistic-review/publication manifests | PASS prior scoped repository delivery; external deployment blockers documented |
 | REQ-224 | Actual WebUI user flow, fixes and scripts | TEST-224; E188/E189, E191/E192 and passive checks | PASS selected WebUI/controller path and E192 human-observed opening/return closed; calibrated optics and full fault matrix open |
 | REQ-225 | Manufacturer-style APT panel (derived; PROJECT.md active request) | TEST-225; E193/E194, feature matrix in docs/gui.md | PARTIAL: supported software paths and passive browser PASS; display/trigger I/O and Key/Ready contracts BLOCKED; new physical functions UNTESTED |
+| REQ-226 | Modern minimalist presentation (PROJECT.md latest user request) | TEST-226; E196, modern validation manifest/screenshots | PASS presentation, software and installed CSS; no new physical acceptance |
 
 ## Short plan and human action required
 

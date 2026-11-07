@@ -4,6 +4,16 @@ Date: 4 November 2026
 Status: Engineering requirements
 Project management: uv
 
+## Modern minimalist WebUI (user request, 6 November 2026)
+
+Use a modern, minimalist UI with a cohesive color palette, flat controls,
+refined typography, consistent spacing, subtle borders, responsive layouts and
+clear visual hierarchy. This supersedes the literal manufacturer appearance;
+retain the previous APT functions and qualification boundaries. Derive
+REQ-226 / TEST-226: presentation-only restyle, readable truthful states,
+desktop/phone/settings browser review and packaged CSS validation. No new
+hardware action, device configuration or qualification is authorized.
+
 ## Manufacturer-style APT WebUI (user request, 6 November 2026)
 
 Learn the GUI design/functions from the supplied KSC101 ETN017648-D03 manual

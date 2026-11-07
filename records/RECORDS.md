@@ -2217,3 +2217,54 @@ those two observed published commits; final parity is checked again after push.
 No device operation was performed for publication. Full REQ-225 parity remains
 PARTIAL/BLOCKED on the specific wire contracts in STATE.md; all new physical
 mode/settings/Identify functions remain UNTESTED.
+
+## E196 - Modern minimalist visual refinement, REQ-226 / TEST-226
+
+The user requested a modern minimalist palette, flat design, refined typography,
+consistent spacing, subtle borders, responsive layouts and intuitive hierarchy.
+This supersedes the literal manufacturer appearance, preserving its supported
+functions. Replaced red chrome/gradients/bevels/mechanical circles with white
+surfaces, slate text, muted teal accents and flat output controls. Added semantic
+Operating mode / Output control / Controller status headings, consistent field
+groups, visible keyboard focus and reduced-motion support. Renamed the obsolete
+round-action style to output-action. No new dependencies/fonts/network assets.
+
+Before restarting the owned preview, Read state returned disconnected,
+has_device=false, generation0 and no requested output. No hardware request was
+dispatched. Restarted only that owned localhost9860 app, now session67798/-B.
+Reviewed the actual production app disconnected at1100/768/390/320px widths;
+observed scroll widths1100/753/375/305px respectively, no horizontal overflow.
+Selected only the profile and opened/closed/scrolled Settings. Mobile dialog
+client/scroll width334px; after626.4px scroll, header top43px and Stop/OFF bounds
+93.4..135.4px remained visible. Zero browser console warnings/errors. Reset
+viewport and left the modern preview open/disconnected. No Connect/Identify,
+output, mode or Apply action and no simulator/backend substitution.
+
+Requirement -> method -> result: visual clarity/responsiveness -> desktop/tablet/
+phone screenshots and bounds/scroll inspection -> PASS. Retained control behavior
+-> AST comparison of all GUI functions except layout constructor, byte-unchanged
+hardware TOML and full existing source/wheel suite -> PASS software. No new
+implementation-mirroring tests were added for this presentation-only change.
+Command: uv run --locked --offline --group dev --extra gui python -B scripts/verify.py.
+201 source +201 isolated installed-wheel tests PASS, zero failures/errors/skips;
+lint/format, locked build/install/import/help and exact Python/CSS wheel parity PASS.
+148 local Markdown targets PASS. Prior direct-validation/XML artifacts were
+restored byte-for-byte after retaining the new run under webui-modern-* names;
+their historical evidence/hashes are preserved. No bench result was reclassified.
+
+Artifacts: records/webui-modern-validation.json, webui-modern-direct-validation.json,
+webui-modern-offline-tests.xml, webui-modern-wheel-tests.xml and desktop/phone/
+Settings/scrolled-phone PNGs. README, GUI guide, PROJECT/STATE and report updated.
+REQ-226 PASS within presentation/software scope. REQ-225 remains partial on its
+specific missing KSC101 contracts; native physical qualification remains UNTESTED.
+
+## E197 - Visual implementation publication checkpoint
+
+Committed only gui.py's presentation headings/class names and shutter.css in
+66bc05e, after cached-diff checks and the E196 source/wheel/browser validation.
+git push origin main succeeded from44a9db6 to66bc05e; git ls-remote returned
+66bc05e21d61e486f349a5839e2c75e2c8f9783c, matching the implementation checkpoint.
+Documentation, current state/report and separately preserved modern evidence are
+included in this following checkpoint; final staged source/artifact hashes and
+remote parity are checked before/after its publication respectively. No device
+operation or expansion of qualification occurred for publication.

@@ -1,4 +1,30 @@
-# Manufacturer-style direct APT WebUI
+# Modern minimalist WebUI refinement
+
+REQ-226 / TEST-226: presentation refined to white surfaces, slate typography,
+muted teal accents, flat controls, subtle borders and consistent spacing. Added
+section headings and responsive desktop/tablet/phone arrangements; Settings has
+a sticky Stop/OFF header and clear groups. No device-control logic or policy
+changed. The manufacturer reference still defines functions, not visual styling.
+
+The real preview stayed disconnected while reviewing1100,768,390 and320px widths
+and scrolling mobile Settings; no overflow or console warning/error was observed.
+No new physical operation was performed. Native-function/protocol gaps described
+below remain unchanged. Current validation: records/webui-modern-validation.json.
+Preview: http://127.0.0.1:9860.
+
+E196 confirms201 source +201 isolated installed-wheel tests PASS, lint/format,
+locked build/install/import/help and exact Python/CSS parity PASS. Device dispatch
+and callback function ASTs and the real configuration are unchanged. New validation
+is retained under webui-modern-* names; earlier software records remain intact.
+Visual implementation66bc05e is published and remote-verified (E197); this
+documentation/evidence checkpoint completes the scoped visual delivery.
+
+[Desktop](../records/webui-modern-desktop.png), [phone](../records/webui-modern-phone.png),
+[Settings](../records/webui-modern-settings.png).
+
+---
+
+# Manufacturer-reference direct APT functionality
 
 REQ-225 / TEST-225: supported software features validated; full GUI parity remains
 partial. Rebuilt the panel using the supplied KSC101 RevF manual/screenshot as a

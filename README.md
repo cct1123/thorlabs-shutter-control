@@ -56,9 +56,11 @@ automatic fallback or takeover. Connect verifies identity and reads fresh mode,
 interlock configuration and electrical output. Fresh OFF starts the configured
 rest interval, so ON does not need a preliminary failed click. Qualified D2XX and docked
 KEH3 Manual ON/OFF and host holds use the same owner and reviewed load policy.
-The revised [manufacturer-style panel](docs/gui.md) provides four mode selectors,
+The [modern minimalist panel](docs/gui.md) provides four mode selectors,
 Open/Close or Start/Stop, timing readout, cycle settings and Identify through our
 APT driver/shared owner. Kinesis is a visual reference only: no SDK is used.
+White surfaces, slate typography, a restrained teal accent and flat controls
+provide a consistent desktop/phone layout with clearly separated control groups.
 Real mode transitions require the explicit source-protection assertion and
 separate persistent-mode permission. The selected SH05R configuration stays
 Manual-only, with device settings and EEPROM writes disabled by default.
