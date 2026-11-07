@@ -11,14 +11,15 @@ or silently switches ports. Startup is passive and local-only. Select an exact c
 name, then explicitly Connect. Connect verifies identity and reads fresh mode,
 interlock configuration and output feedback. Every control, including Release, requires that
 exact selection; an empty selection never releases all routes. Read state obtains controller replies; no background
-polling is started. Manual selection, ON, priority OFF and passive Release are
-separate controls. An omitted qualification policy blocks every write.
+polling is started until **Live readback** is explicitly enabled. Mode selection,
+Open/Start, priority Close/Stop and passive Release are separate controls. An omitted
+qualification policy blocks output/mode/settings writes. Identify flashes LEDs only.
 The Manual control states that mode changes are remembered at power-up. A real
 transition requires separate `allow_persistent_mode_changes` policy permission;
 an already Manual/OFF state is queried without a mode write.
-Trigger->Manual also requires explicit source-protection confirmation, which this
-GUI does not supply. Establish protection and use the Python API or CLI
-`manual --source-inhibited` for that transition. Qualified D2XX and docked KEH3
+Every real mode transition also requires the **Source independently blocked;
+external triggers isolated** assertion. It is an operator condition, not a sensor.
+An already selected mode can be queried without a write. Qualified D2XX and docked KEH3
 output commands otherwise share the same owner; VCP/external USB OUT remain unavailable.
 
 The page displays the full structured result, including requested electrical
@@ -46,9 +47,9 @@ conditions. The tracked configuration is not authorization for a new physical ru
 
 1. Select shutter and click Connect. Expect serial 68800777, firmware 1.0.7,
    endpoint 192.168.1.19:40305 and actual mode/output. Establish Manual/OFF within
-   the approved procedure before continuing; the GUI cannot authorize Trigger exit.
-2. Wait at least the configured 2 s OFF rest, then click Solenoid ON once. Inspect
-   fresh electrical ON and status bit 0 set. Click Cancel / qualified OFF promptly
+   the approved procedure before continuing; checking a UI box is not physical authority.
+2. Wait at least the configured 2 s OFF rest, then click Open / ON once. Inspect
+   fresh electrical ON and status bit 0 set. Click Close / OFF promptly
    within the approved hold window; inspect fresh electrical OFF and bit 0 clear.
 3. An immediate ON during the OFF interval must be refused. Read state must still
    show OFF without a new fault. Do not repeat cycles to obtain missing observations.
@@ -90,3 +91,57 @@ Browser-tab closure
 does not terminate the server or establish closure. Process failure cannot run
 cleanup reliably; the persistent uncertainty marker prevents a new process from
 silently restoring ON.
+
+## Manufacturer reference and implemented functions
+
+The user's supplied ETN017648-D03 URL returned the unchanged
+[HA0368T Rev F September 2026 manual](manuals/KSC101_Kinesis_UI_Manual_HA0368T_Rev_F.pdf),
+41 pages. Sections 6.2-6.3 (printed pp28-33) and the supplied screenshot define
+the visual/function reference. They do not authorize running Kinesis. Every
+device action routes WebUI -> ShutterHub -> KSC101 -> APT Session -> transport.
+Opening Settings, selecting a configured target and editing draft fields are local.
+
+| Panel function | Implementation and limit | New validation |
+| --- | --- | --- |
+| Four named modes | APT 0x04C0/C1/C2; Manual=1, Single=2, Auto=3, Triggered=4. Only policy-qualified modes selectable; changes persist at power-up | Software frame/owner checks; native modes not bench-qualified |
+| Open/Close, Start/Stop | 0x04CB ON=1/OFF=2; labels follow actual mode. Manual retains its existing owner checks. Native Start reads cycle parameters and sends ON once; Stop sends OFF without changing mode | Software guard/dispatch/stop checks; no new actuation |
+| On/Off duration, cycles | Explicit Read device settings, 0x04C4/C5; no guessed device defaults | Software literal payload and callback checks |
+| Cycle settings | 0x04C3, channel1 + uint32 On ms/Off ms/count; 100..10000 ms, count0..1000000. Count0 requires explicit Continuous permission; load rest/count limits also apply | Software validation/readback mismatch/cleanup checks |
+| Store cycle settings | Separately permitted 0x04B9 with channel1/message0x04C3. Fresh RAM readback is checked; there is no EEPROM ACK | Software frames only; persistence requires protected restart/readback qualification |
+| Identify | 0x0223 channel1, flash request; no output command or flash ACK | Literal frame and no-output-cleanup software checks |
+| Key Enabled / Is Ready | Unknown; no verified KSC101 wire mapping. Interlock requirement is configuration, not continuity | Unknown-state renderer checks |
+| Error / Output ON / Activity | Fault report, electrical bit0, and explicitly labelled Start requested. Never infer blade position or native activity/completion from OFF | Software renderer checks; earlier physical evidence only for its original Manual revision |
+| Display intensity/dimming/timeout | Visible disabled controls; no device read/write | Blocked on KSC101-specific APT layout |
+| Trigger1/2 I/O mode/polarity | Visible disabled controls; no device read/write. Triggered start is only level-mode priming with count0 and separate permission | Configuration blocked on KSC101-specific APT layout; priming software-only |
+
+APT Issue42.1 lists 0x0520 MMI / 0x0523 trigger messages for KSC101 in its model
+table, but the detailed sections describe motor controllers, motor positions and
+conflicting lengths. Those layouts are not safe evidence for KSC101 settings.
+See [SRC-010 and the protocol gaps](sources.md#src-010---ksc101-kinesis-ui-manual-6-november-2026).
+KSC-specific level-trigger behavior takes precedence over generic solenoid-cycle
+prose. There is no guessed trigger implementation or hidden SDK fallback.
+
+New optional Policy fields default to `qualified_modes=("manual",)`,
+`allow_device_settings=False`, `allow_persistent_settings=False`,
+`allow_continuous_cycles=False`, `max_cycle_count=1`. These are conservative
+software permissions, not load ratings. TOML uses `qualified_modes=["manual"]`.
+Adding modes or write permissions requires separate deployment qualification;
+the real Ethernet configuration was not broadened. Finite exposure/duty loads
+still require an independently qualified cutoff and remain unavailable for Start.
+Settings apply requires Manual/OFF, preserved interlock requirement, source
+assertion, explicit permissions and exact readback. Opening the panel writes nothing.
+
+Native Single can finish before a status reply. Native Auto may be in its OFF
+interval while active. Start therefore remains a request requiring explicit Stop
+before Release or another Start, even when the latest output sample is OFF.
+Activity remains Unknown, with an amber request indicator; Stop's electrical
+OFF is not a measured optical state or independent native-inactivity signal.
+
+The new panel was reviewed disconnected at 1100px desktop and 390px phone widths;
+the selector grid and scrolling Settings header were corrected. No browser
+warning/error was observed and no hardware Connect/Identify/write was clicked.
+[Desktop panel](../records/webui-apt-panel-desktop.png),
+[settings](../records/webui-apt-settings-desktop.png),
+[phone panel](../records/webui-apt-panel-phone.png).
+TEST-225 software/packaging evidence is separate from TEST-224's earlier actual
+hardware runs. The new panel and native operations have no new physical PASS.

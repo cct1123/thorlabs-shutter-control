@@ -1,5 +1,32 @@
 # Engineering state
 
+## Active manufacturer-style APT WebUI
+
+REQ-225 / TEST-225: PARTIAL; supported software paths validated, full GUI parity
+BLOCKED on KSC101-specific display/trigger wire contracts and Key/Ready feedback.
+E193/D061: RevF GUI is reference only. Four mode selectors, Open/Start and
+Close/Stop, timing/count, Settings and Identify use the canonical APT owner.
+Cycle edits/storage and native modes have separate permission/qualification gates;
+the real SH05R TOML remains unchanged, Manual-only with settings writes disabled.
+MMI/trigger layouts conflict with KSC101 applicability text; disabled controls and
+Unknown lamps disclose the gap instead of guessing motor layouts or using an SDK.
+
+E194: 201 source + 201 isolated installed-wheel tests PASS; Python/CSS parity,
+lint/format/locked install/import/help PASS, six notebooks static PASS.
+Browser review at1100px desktop/390px phone was disconnected, no device command;
+responsive selector and scrolling Settings header corrected, zero console warnings/errors.
+Evidence: records/webui-apt-validation.json and desktop/settings/phone screenshots.
+Native timing, priming, Identify flash, settings persistence and the revised
+panel's physical operation remain UNTESTED. Old E191/E192 qualify their exact
+historical Manual cycle only. No new live output/configuration authority exists.
+The new passive preview is at127.0.0.1:9860 (owned exec session14309, final source
+started with -B; no device connection).
+Earlier9857 server was not taken over. Recheck transient state before future work.
+
+Implementation checkpoint: ab80236. Next: publish documentation/evidence;
+full parity resumes only with a trustworthy
+manufacturer KSC101 display/trigger/status contract and separately approved tests.
+
 ## Latest single-cycle follow-up (6 November 2026, local date)
 
 E191 / REQ-224: exactly one newly authorized1s host-hold cycle completed through
@@ -161,11 +188,19 @@ Human criteria remain in PROJECT.md. PASS is scoped to its stated method/revisio
 | REQ-222 | Earlier manual/package review | TEST-222; E182 | Historical scoped PASS; current software revalidated in E183 |
 | REQ-223 | Holistic review, prune, naming, staged push (derived) | TEST-223; E183-E187 and holistic-review/publication manifests | PASS prior scoped repository delivery; external deployment blockers documented |
 | REQ-224 | Actual WebUI user flow, fixes and scripts | TEST-224; E188/E189, E191/E192 and passive checks | PASS selected WebUI/controller path and E192 human-observed opening/return closed; calibrated optics and full fault matrix open |
+| REQ-225 | Manufacturer-style APT panel (derived; PROJECT.md active request) | TEST-225; E193/E194, feature matrix in docs/gui.md | PARTIAL: supported software paths and passive browser PASS; display/trigger I/O and Key/Ready contracts BLOCKED; new physical functions UNTESTED |
 
 ## Short plan and human action required
 
-The requested repository work is delivered. No further implementation or physical
-command is planned here. Keep the external dirty integration intact until its
+The supported APT WebUI implementation is validated; staged publication is next.
+Full GUI functionality needs one specific external contract: manufacturer-confirmed
+KSC101 MMI0x0520/trigger0x0523 payload fields/lengths/units/enums and Key/Ready status
+mapping, including firmware applicability. Existing APT42.1 detail conflicts with
+its model table (SRC-010); software checks cannot resolve the hardware contract.
+Return the authoritative layouts/reference or packet evidence under a separately
+approved capture procedure. Then implement those fields through the same APT
+owner and rerun framing/settings/browser tests before any approved bench test.
+No extra physical command is planned. Keep the external dirty integration intact until its
 intended restoration/mapping is agreed. Full-project BLOCKED is not validated
 deployment completion.
 

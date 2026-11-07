@@ -10,8 +10,9 @@ queries with no simulator, scan or USB fallback. Docked KEH3 bays use the same
 qualified Manual ON/OFF commands as D2XX; VCP and external USB OUT control remain
 unavailable. Notebooks 5 and 6 contain physical commands, as described in their
 instructions. The selected middle-bay SH05R passed real ON/OFF controller
-readback; independent blade motion, optical timing and broader qualification
-remain unverified. The test left Manual/OFF and released ownership.
+readback. The user independently observed the blade open and return closed in
+the later single-cycle WebUI test (E191/E192); optical timing and broader
+qualification remain unverified. The test left Manual/OFF and released ownership.
 That is dated evidence for its recorded revision; this software review does not
 repeat the cycle or establish the controller's present state.
 
@@ -55,9 +56,14 @@ automatic fallback or takeover. Connect verifies identity and reads fresh mode,
 interlock configuration and electrical output. Fresh OFF starts the configured
 rest interval, so ON does not need a preliminary failed click. Qualified D2XX and docked
 KEH3 Manual ON/OFF and host holds use the same owner and reviewed load policy.
-Leaving Trigger mode requires explicit source protection through the Python API
-or CLI; the GUI does not supply that confirmation. Changed modes persist and
-require separate policy opt-in.
+The revised [manufacturer-style panel](docs/gui.md) provides four mode selectors,
+Open/Close or Start/Stop, timing readout, cycle settings and Identify through our
+APT driver/shared owner. Kinesis is a visual reference only: no SDK is used.
+Real mode transitions require the explicit source-protection assertion and
+separate persistent-mode permission. The selected SH05R configuration stays
+Manual-only, with device settings and EEPROM writes disabled by default.
+Display/trigger-I/O settings remain visibly unavailable pending a verified
+KSC101 wire contract; Key/Ready feedback stays Unknown.
 Context exit/close release communication; explicit output cleanup is separate.
 GUI shutdown sends OFF only for targets with prior output or mode attempts;
 read-only faults remain visible without incidental actuation. Every GUI control
@@ -96,6 +102,11 @@ Minimum OFF rest starts with electrical OFF readback. Host holds and rest period
 are not calibrated optical timings.
 See [the real ON/OFF notebook](docs/examples/06_on_off.ipynb) and
 [actual hardware result](records/ethernet-control-live.json). The test left Manual/OFF.
+
+The revised panel's browser review was disconnected and issued no device command.
+Native mode/settings behavior has software-only coverage; earlier physical
+Manual-cycle evidence does not qualify the new functions. See the
+[feature/validation matrix](docs/gui.md#manufacturer-reference-and-implemented-functions).
 
 The [migration guide](docs/cutover.md) lists retired entry points and their
 replacements. The verification command checks source and an isolated installed

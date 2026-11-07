@@ -1,4 +1,39 @@
-# Actual hardware WebUI validation
+# Manufacturer-style direct APT WebUI
+
+REQ-225 / TEST-225: supported software features validated; full GUI parity remains
+partial. Rebuilt the panel using the supplied KSC101 RevF manual/screenshot as a
+visual reference. Four modes, Open/Start and Close/Stop, cycle timing/count,
+Settings and Identify all route through our shared APT owner. No Kinesis/SDK is
+used. The tracked SH05R profile remains Manual-only; native modes, settings writes,
+continuous cycles and cycle-only EEPROM requests require explicit qualification.
+
+E193/D061 documents the frame contracts and gaps. Display/dimming and trigger-I/O
+controls are disabled because the available protocol's KSC101 applicability and
+layouts conflict. Key/Ready stays Unknown; electrical OFF never becomes optical
+closure or native Inactive. EEPROM has no acknowledgement and requires later
+protected restart/readback verification. See the [feature matrix](../docs/gui.md#manufacturer-reference-and-implemented-functions)
+and [new unchanged manufacturer PDF](../docs/manuals/KSC101_Kinesis_UI_Manual_HA0368T_Rev_F.pdf).
+
+E194: 201 source and 201 isolated installed-wheel tests PASS, including literal
+frames, qualification gates, settings readback mismatch/cleanup, native Start/Stop
+dispatch, release guards and truthful rendering. Locked install/build/import/help,
+Ruff and exact Python/CSS wheel parity PASS; six notebooks static PASS. These are
+software-only tests, not bench proof. Browser inspection of the real app stayed
+disconnected at desktop/phone widths; no Connect/Identify/device command was used.
+Fixed the narrow selector grid and kept Stop visible in scrolling Settings.
+
+[Desktop preview](../records/webui-apt-panel-desktop.png),
+[settings preview](../records/webui-apt-settings-desktop.png),
+[phone preview](../records/webui-apt-panel-phone.png),
+[validation manifest](../records/webui-apt-validation.json).
+New passive preview: http://127.0.0.1:9860, disconnected. No new physical
+qualification is claimed; historical Manual runs below retain their original
+revision/configuration scope. Full parity needs the manufacturer-specific
+display/trigger/status contract recorded in STATE.md.
+
+---
+
+# Actual hardware WebUI validation (historical revision)
 
 Single-cycle follow-up E191: the user requested one additional cycle to watch the
 blade, with the same protected setup. Clicked the new explicit timed button once:

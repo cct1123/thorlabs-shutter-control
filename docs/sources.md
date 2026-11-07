@@ -56,7 +56,8 @@ See docs/keh3-offline-validation.md for the bounded findings and remaining quest
 
 The generic protocol describes triggered cycling while the KSC101 manual
 describes logic-level operation with priming. TTL, cycle starts and EEPROM
-configuration remain unavailable. SRC-002 p20 says mode changes are automatically
+configuration require the separate qualification gates described in SRC-010 below;
+trigger-I/O configuration remains unavailable. SRC-002 p20 says mode changes are automatically
 remembered at power-up; they now require separate policy permission. APT has no
 transaction IDs; even a post-request
 reply cannot distinguish an arbitrarily delayed same-type unsolicited reply
@@ -132,3 +133,38 @@ command0x04CB ON1/OFF2; KEH3/SRC-003 section4.3 gives per-bay routing. The exact
 192.168.1.19:40305/68800777/1.0.7 path now has real command/readback evidence.
 The configured2s OFF pause is a commissioning choice, not a rated minimum.
 No custom voltage, EEPROM, trigger configuration or interlock bypass was used.
+
+## SRC-010 - KSC101 Kinesis UI manual, 6 November 2026
+
+User-supplied [official ETN017648-D03 PDF](https://media.thorlabs.com/globalassets/items/k/ks/ksc/ksc101/etn017648-d03.pdf?v=0918071407)
+retrieved as HA0368T Rev F, September 2026, 41 pages / 26,149,045 bytes.
+Unchanged local [PDF](manuals/KSC101_Kinesis_UI_Manual_HA0368T_Rev_F.pdf), SHA-256
+007d604c718378b3b8b6bc6f46876f00f91c6a4e4d839c2a175681ac3c122597.
+Inspected sections4.3,5.2,6.2-6.3 and visually rendered GUI/settings pp28/31.
+The manual/screenshot are design references, not instructions to run vendor
+software or permission for physical operations. No Kinesis/SDK runtime is used.
+
+RevF pp28-30 define four modes, Open/Close or Start/Stop, On/Off durations,
+Key Enabled/Is Ready/Error/Open lamps, Settings and Identify. pp31-33 specify
+cycle On/Off100..10000 ms, count0..1000000 (0 continuous), display brightness,
+timeout/dimming and two trigger-port modes/polarities. Section4.3 describes
+level-trigger priming, unlike the generic APT solenoid cycling prose. The GUI's
+motor Jog/Home keyboard list does not define shutter commands and was omitted.
+
+APT Issue42.1 pp43,99,184-190 supplies the implemented raw Identify, cycle-only
+storage, mode/cycle query/set and ON/OFF frames. Cycle commands use channel1
+and integer milliseconds. The application's conservative100..10000 ms bound
+follows the KSC101 manual rather than the inconsistent generic timing upper
+bound prose. NoEEPROM ACK exists; success is only a storage request, with later
+restart/readback verification required. Current hardware qualification remains
+Manual-only; software contracts do not qualify native timing, priming or storage.
+
+Unresolved: the protocol's model table lists KSC101 for MMI0x0520 and trigger
+0x0523, but detailed sections name motor KST/KDC/KBD families and contain motor
+positions/velocities and conflicting lengths. That is insufficient to implement
+KSC101 display/trigger configuration. No confirmed Key/Ready mapping was found.
+Those controls stay disabled/Unknown; no motor-layout guess or SDK fallback.
+A newer official APT URL attempt returned1313-byte HTML, not a PDF; it is not
+used as protocol evidence. The [WebUI matrix](gui.md#manufacturer-reference-and-implemented-functions)
+and records/webui-apt-validation.json distinguish implemented software paths,
+passive browser checks and unresolved physical/wire-contract acceptance.

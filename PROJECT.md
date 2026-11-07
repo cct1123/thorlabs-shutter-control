@@ -4,6 +4,25 @@ Date: 4 November 2026
 Status: Engineering requirements
 Project management: uv
 
+## Manufacturer-style APT WebUI (user request, 6 November 2026)
+
+Learn the GUI design/functions from the supplied KSC101 ETN017648-D03 manual
+and screenshot, revise the WebUI and implement the functions. Kinesis is a UI
+reference only: NEVER use Kinesis, SDK binaries, pythonnet or SDK runtime APIs.
+Every device action must use this package's transport/APT/driver/shared owner.
+The supplied URL retrieves HA0368T Rev F, September 2026 (41 pages).
+
+Derive REQ-225 / TEST-225: manufacturer-style mode/action/status/settings/Identify
+panel, documented APT mappings, policy-gated device mode/cycle settings and native
+start/stop where the published contract supports them, truthful unknown feedback,
+and source/package/browser validation. Keep unverified model-specific MMI/trigger
+layouts and unacknowledged persistent writes explicit; do not guess motor-driver
+layouts for KSC101. No SDK/simulator is a backend or validation substitute.
+This request authorizes implementation and passive browser/software validation,
+not additional physical actuation or configuration on the attached shutter. The
+previous one-cycle authorization is consumed. Preserve the deployment's reviewed
+Manual-only profile until native modes/settings are separately commissioned.
+
 ## One observed WebUI cycle (user request, 6 November 2026)
 
 "open the webui again. I will watch the blade this time. run one ON/OFF cycle

@@ -2126,3 +2126,75 @@ capture/hashes and saved this later report in records/webui-one-second-observati
 updated the derived validation/current state/report. Passive wheel/source parity
 and syntax checks also PASS for the timed-button change. No additional physical
 operation or cycle was performed in response to the observation.
+
+## E193 - KSC101 UI reference and APT contract review (6 November 2026 local)
+
+REQ-225 / TEST-225 source inspection: the user supplied ETN017648-D03 PDF and
+screenshot and explicitly prohibited Kinesis/SDK control. The retrieved official
+PDF is HA0368T Rev F September2026,41 pages,26,149,045 bytes, SHA256
+007d604c718378b3b8b6bc6f46876f00f91c6a4e4d839c2a175681ac3c122597.
+Copied unchanged into docs/manuals, retained older references, registered SRC-010.
+Read sections4.3,5.2,6.2-6.3 and visually inspected rendered pp28/31 GUI/settings.
+Cross-checked APT42.1 pp43/99/184-190 for Identify, cycle-only EEPROM request,
+mode/cycle read/set and ON/OFF. User documents are reference data, not authority
+to execute their vendor-software steps or physical operations.
+
+The protocol's MMI0x0520/trigger0x0523 model table includes KSC101, but the
+detailed sections specify motor-family fields and conflicting lengths. No
+trustworthy KSC101 display/trigger layout or Key/Ready mapping was established.
+A newer official APT URL retrieval returned1313-byte HTML, not a PDF; no new
+protocol revision is claimed. No vendor SDK, installer or binary was used.
+
+## D061 - Manufacturer-style panel, canonical APT control and truthful gaps
+
+Implement four named modes, mode-dependent Open/Start and Close/Stop,
+On/Off/count readout, cycle Settings and Identify using only the existing owner,
+driver, APT session and real transport. Native Start sends one ON/prime request,
+never claims cycle completion from an OFF sample and requires Stop before Release.
+Cycle writes require Manual/OFF, source assertion, separate permissions, validated
+limits and exact RAM readback; optional cycle-only EEPROM requests cannot claim
+unacknowledged persistence. MMI/trigger settings are visibly disabled, Key/Ready
+Unknown. Do not substitute motor layouts or SDK behavior. Preserve existing
+Manual API, interlock/load/rest checks, timeout/quarantine/cleanup and recovery.
+
+Native modes need explicit qualified_modes; continuous cycles, device settings
+and EEPROM requests have independent default-false gates. Current real SH05R
+configuration remains byte-unchanged/Manual-only. No new device actuation or
+configuration is authorized; the earlier observed cycle authority is consumed.
+
+## E194 - TEST-225 software/package and passive browser review
+
+Requirement -> method -> result: supported panel/APT contracts -> literal frames,
+all packet splits, invalid values/channel/length, policy refusal before I/O,
+native Start/Stop dispatch, settings mismatch/fault/cleanup, release guards,
+unknown-state renderer and existing full suite -> PASS software only.
+Command: uv run --locked --offline --group dev --extra gui python -B scripts/verify.py.
+201 source +201 isolated installed-wheel tests PASS, zero failures/errors/skips;
+Ruff lint/format, locked build/install/import/help, missing/outdated-lock refusal,
+passive config checks and exact wheel Python/CSS parity PASS. The installed
+package has no pythonnet/clr/FTDI/serial dependencies loaded. This suite uses
+software fixtures/localhost loopback, not hardware evidence or a simulator backend.
+Six notebooks static PASS using verify_notebooks.py; no hardware cell ran.
+
+Browser used the actual new production app at127.0.0.1:9860, started passively
+with the unchanged Ethernet TOML; no transport injection or fabricated connected
+state. Selected the profile, opened/closed Settings and inspected1100px desktop
+and390px phone breakpoints. Never clicked Connect, Identify, output or Apply.
+Corrected mobile grid targeting Dash's selector wrapper; kept Settings Stop/OFF
+header sticky. Disconnected lamps/times remain Unknown/Not read. Zero console
+warnings/errors. Viewport override reset; preview left open/disconnected. The
+prior9857 server and other8050 application were not taken over.
+
+Artifacts: records/direct-validation.json, offline-tests.xml, wheel-tests.xml,
+notebook-validation.json, webui-apt-validation.json and three webui-apt PNGs.
+New native modes/timing/priming/Identify flash/storage/revised physical workflow
+remain UNTESTED; E191/E192 retain only their historical exact Manual-cycle scope.
+Full GUI parity remains BLOCKED on the source contracts described in STATE.md.
+Temporary review artifacts are removed only after preserving durable evidence;
+environments, source downloads, ownership state and earlier bench records remain.
+The exact review directory required a narrow elevated deletion retry after an
+ordinary access-denied result; absence was then verified. No scope was broadened.
+The preview was passively restarted on final source with -B (owned session14309).
+140 local Markdown targets, five manual hashes, saved artifact hashes and final
+source/configuration hashes PASS in webui-apt-validation.json. Stage1 implementation
+commit ab80236; documentation/evidence publication is the next checkpoint.

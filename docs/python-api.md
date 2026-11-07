@@ -18,7 +18,9 @@ does not actuate OFF. Explicit connect/get_status/release is also supported.
 | --- | --- |
 | connect(target) | Open exact route, claim serial/endpoint, verify identity |
 | identify_device(target) | Request and verify identity again; no flashing/identify command |
+| blink_identify(target) | APT identify LED-flash request only; no flash acknowledgement or shutter output |
 | get_status(target) | Request identity, mode, interlock requirement and fresh status bits |
+| get_cycle_parameters(target) | Explicit APT cycle read; returns dated cycle_parameters in ShutterStatus |
 | get_solenoid_state_reply(target) | Explicit raw 0x04CD byte, without output/operating-state interpretation |
 | connection_snapshot(target) | Host metadata only; no hardware polling |
 | disconnect(target=None), close() | Release communication; no output command |
@@ -55,7 +57,9 @@ with ShutterHub("qualified.local.toml") as hub:
 
 | Command | Effect / limit |
 | --- | --- |
-| set_operating_mode(target, "manual", source_inhibited=False), set_manual_mode(target, source_inhibited=False) | Explicit Manual selection; changed modes persist; Trigger exit requires True |
+| set_operating_mode(target, mode, source_inhibited=False), set_manual_mode(target, source_inhibited=False) | Policy-qualified mode selection; every changed mode requires True and persistent-mode permission |
+| start(target, source_inhibited=False) | Manual ON or one qualified native Start/prime; native modes require True and a qualified continuous-duty load |
+| set_cycle_parameters(target, parameters, source_inhibited=False, persist=False) | Validated CycleParameters, Manual/OFF, source assertion and separate write/storage permissions; fresh RAM readback |
 | set_solenoid(target, True), open_shutter(target) | Qualified continuous-duty Manual ON with fresh electrical readback |
 | set_solenoid(target, False), close_shutter(target), safe_state(target) | Priority qualified OFF with electrical readback |
 | pulse(target, seconds) | ON/host hold/OFF; not calibrated optical exposure |
@@ -79,7 +83,8 @@ Optical open/close names are requests using the reviewed load mapping; they
 do not report independently measured blade motion. The selected SH05R commissioning
 policy uses its manufacturer closed-on-deenergization design and user-protected setup. `set_solenoid(target, bool)` uses the same policy boundary. No public
 output method bypasses it. Invalid arguments/modes fail before output writes;
-nonfinite durations fail before any I/O. Unsupported cycles/TTL are unavailable.
+nonfinite durations fail before any I/O. Native modes are separately gated and
+unqualified on the current physical profile; trigger-I/O configuration is unavailable.
 `enable_device()` rejects explicitly because the protocol aliases channel enable
 to solenoid output. It must not act as a harmless setup call.
 `validate_pulse(target, duration)` checks the same duration/load constraints as
@@ -87,16 +92,26 @@ to solenoid output. It must not act as a harmless setup call.
 a transport. Finite exposure/duty loads remain unavailable for both ON and pulse.
 
 SRC-002 p20 specifies that the last used mode is remembered across power cycles.
-Changing to Manual therefore requires `allow_persistent_mode_changes = true` in
+Changing any mode therefore requires `allow_persistent_mode_changes = true` in
 the reviewed qualification policy, in addition to electrical OFF and the preserved
-interlock requirement. The default is false. Leaving Trigger additionally requires source_inhibited=True
+interlock requirement. The default is false. Every actual transition requires source_inhibited=True
 after independently blocking the source and isolating triggers. A changed mode
-first sends OFF/deactivate and verifies output clear, then selects Manual.
-An already Manual/OFF controller is
+first sends OFF/deactivate and verifies output clear, then selects the requested mode.
+An already selected/OFF controller is
 queried without a mode write. A refused opt-in is not an ambiguous write and does
 not itself latch a fault. No separate EEPROM command is sent.
-The GUI refuses Trigger exit because it cannot supply the required protection
-confirmation. The controller cannot measure source protection.
+The GUI has an explicit source-protection assertion; the controller cannot measure it.
+
+`CycleParameters(on_ms, off_ms, cycles)` is exported from the package. Durations
+are integer 100..10000 ms; count is 0..1000000, with 0 meaning continuous.
+Read settings are dated separately from electrical feedback and cleared on release.
+`settings_persistence` reports an EEPROM request, never confirmed persistence;
+that requires separately authorized restart/readback verification. Optional policy
+fields and native Start/Stop semantics are in the [WebUI guide](gui.md#manufacturer-reference-and-implemented-functions).
+The live SH05R profile remains Manual-only with settings writes disabled. A native
+Start remains pending until Stop even if output reads OFF; operating_state and
+transition_confirmed never become inferred success. Existing Manual methods retain
+their contracts; native control does not route through set_solenoid(True).
 
 `ShutterStatus` retains the DiamondGUI owner schema. Requested state,
 `feedback.electrical_state`, and timestamped human optical observations are
@@ -139,5 +154,6 @@ The physical observation remains a dated record, not a continuing optical sensor
 
 The driver command values remain APT ON=1/OFF=2 and Manual=1. They are never
 replaced by .NET feedback Closed=0. See [command traceability](INTERFACE.md) and
-[manufacturer sources](sources.md). Cycle, trigger, EEPROM and interlock-bypass
-commands remain outside the supported application API.
+[manufacturer sources](sources.md). Qualified cycle settings and an explicitly
+permitted cycle-only EEPROM request are supported in the owner/WebUI, not new
+CLI subcommands. Trigger-I/O settings and interlock-bypass commands remain unavailable.
