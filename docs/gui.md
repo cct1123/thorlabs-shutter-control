@@ -20,6 +20,8 @@ exact selection; an empty selection never releases all routes. Read state obtain
 polling is started until **Live readback** is explicitly enabled. Mode selection,
 Open/Start, priority Close/Stop and passive Release are separate controls. An omitted
 qualification policy blocks output/mode/settings writes. Identify flashes LEDs only.
+Successful background polls refresh data without erasing the last command or
+refusal message. An explicit Read state still displays its own result.
 The Manual control states that mode changes are remembered at power-up. A real
 transition requires separate `allow_persistent_mode_changes` policy permission;
 an already Manual/OFF state is queried without a mode write.
@@ -45,6 +47,8 @@ The explicit **1-second ON, then OFF** button uses the existing owner pulse with
 a 1 s host hold after ON readback and automatic priority OFF/readback. It requires
 the same Manual/load/interlock/OFF-rest prerequisites; the browser does not time
 the hold. Use it only within the approved physical window and cycle count.
+The timed button is disabled when the displayed electrical output is ON;
+the owner independently checks fresh Manual/OFF before dispatch.
 
 ## Repeating the protected user-flow check
 
@@ -175,3 +179,52 @@ confirmed has_device=false/generation0 before restarting the owned preview.
 The original TEST-225 screenshots above remain historical appearance evidence.
 Current presentation/source/wheel validation is recorded separately in
 [webui-modern-validation.json](../records/webui-modern-validation.json).
+
+## Current modern panel hardware test
+
+REQ-227 / TEST-227, 6 November2026: real WebUI controls on localhost9860 used the
+production owner/APT/TCP for SH05R/KSC10168800777, firmware1.0.7,
+192.168.1.19:40305. No simulator, SDK or direct callback/API substitute was used
+for this live test. Connect/read returned Manual/OFF0x2000, required interlock
+configuration and no fault. Read device settings returned2000ms ON/2000ms OFF,
+5cycles before and after the fix; no settings were written. Already-Manual
+selection was a read-only no-op. Final fresh Manual/OFF was followed by Release
+and Read confirming has_device=false and unknown electrical feedback.
+
+The baseline demonstrated that live polling replaced the settings-command
+notice with "Readback updated." The fix preserves the notice while electrical
+timestamps advance; this passed on the real controller. Source review also
+found the timed button remained available during displayed ON; it now requires
+displayed OFF. A further actual released-Read check exposed a misleading
+"Readback updated" message when no handle existed; it now states that the
+controller is disconnected and no device feedback was requested.
+
+The user confirmed the protected setup and up to two Manual cycles. Exactly two
+were executed through visible controls on the final source: Open/Close returned
+0x2001 ->0x2000 with0.748307s between readbacks, within the5s window. Release
+while active was refused without dropping the owner or latching a fault; the
+timed button was disabled during ON. After more than2s OFF, the1s timed button
+completed and returned Manual/OFF. Final settings remained2000/2000ms/count5.
+Final fresh Manual/OFF at2026-11-07T01:10:10.710233UTC was followed by Release
+and Read showing disconnected/no handle/unknown feedback and the corrected
+message. The protection checkbox was cleared locally after the window ended.
+The two-cycle authority is consumed; no third ON, mode/settings/EEPROM or other
+device action is authorized by it. This is PASS for the selected real operator
+flow, not calibrated optical timing. Independent blade observation is pending.
+
+[Actual observations](../records/webui-modern-hardware-live.json),
+[final actual OFF screenshot](../records/webui-modern-hardware-final-off.png),
+[final released screenshot](../records/webui-modern-hardware-final-released.png).
+The updated saved-evidence checker validates identity, unchanged settings,
+polling-message preservation, release and (when present) bounded authorized
+control cycles. Missing cycles produce PARTIAL and exit2; it never operates hardware.
+
+```powershell
+uv run --locked python scripts/verify_webui_evidence.py records/webui-modern-hardware-live.json --output records/webui-modern-hardware-evidence-validation.json
+uv run --locked --group dev --extra gui python -B scripts/verify.py --test-path tests/test_webui_live_regressions.py --record-prefix webui-hardware-final-
+```
+
+The selected software path uses saved actual samples only, with no emulated
+device/transport. The packaging script defaults to the full suite; selection is
+explicit in the output's tested_paths. --record-prefix preserves prior campaigns.
+Software callback checks are separate from live hardware acceptance.

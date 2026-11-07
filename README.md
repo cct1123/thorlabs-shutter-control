@@ -71,6 +71,14 @@ GUI shutdown sends OFF only for targets with prior output or mode attempts;
 read-only faults remain visible without incidental actuation. Every GUI control
 requires an exact selected target.
 
+The latest real-hardware review of the modern panel verified connection,
+Manual/OFF, unchanged cycle readback, polling and release. It exposed background
+polling overwriting operator messages; successful polls now preserve them.
+Timed holds are disabled while electrical ON is displayed, and disconnected
+Read no longer claims fresh feedback. Two newly approved real cycles passed:
+Open/Close with active-release refusal, then a1s host hold, final OFF and release.
+See [the current WebUI test](docs/gui.md#current-modern-panel-hardware-test).
+
 The separate DiamondGUI checkout currently fails its page integration tests
 because its shutter page is commented out and its route metadata is stale.
 See [the integration findings](docs/diamondgui.md) before deploying there.

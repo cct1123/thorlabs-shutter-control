@@ -2268,3 +2268,133 @@ Documentation, current state/report and separately preserved modern evidence are
 included in this following checkpoint; final staged source/artifact hashes and
 remote parity are checked before/after its publication respectively. No device
 operation or expansion of qualification occurred for publication.
+
+## E198 - Current real modern-WebUI baseline and supported finding
+
+REQ-227 / TEST-227: the new user request calls for real WebUI hardware testing,
+operator-like control, fixes and script updates. Read-only actions proceeded;
+a new bounded output confirmation was requested because the prior1s-cycle scope
+was consumed. No answer has been received in this checkpoint. The proposed scope
+is up to two protected Manual cycles, Open/Close within5s and one1s host hold,
+at least2s OFF between, then OFF/readback/release. This is not granted by elapsed time.
+
+Visible localhost9860 production controls connected to actual SH05R/KSC101
+68800777, firmware1.0.7/hardware3/channel1, endpoint192.168.1.19:40305. Connect
+returned Manual/OFF0x2000, interlock requirement true and no fault. Read device
+settings returned2000ms ON,2000ms OFF,5cycles. Live readback advanced timestamps
+but replaced "Device cycle settings read. No defaults were written." with
+"Readback updated." Confirmed the message-loss finding in actual browser captures.
+Released the real handle before restarting the owned server for the fix.
+No SDK, simulator, direct callback substitute or output/configuration write.
+
+## D062 - Preserve operator messages and isolate campaign evidence
+
+Successful background polling updates sample data but leaves the last command/
+refusal notice intact; explicit Read still reports its own result. Timed pulse
+requires displayed Manual/OFF as well as independent fresh owner preflight.
+The owner, APT frames and live qualification TOML remain unchanged. Verification
+may select explicit paths under tests and prefix safe filenames under records,
+while retaining full-suite defaults. Always record selected coverage, never
+promote omitted physical tests to PASS and preserve older campaign artifacts.
+
+## E199 - Real read-only verification of fixes and scoped package checks
+
+Restarted the verified-released app on9860, owned session45170/-B. Reconnected
+and re-read real identity/Manual/OFF and unchanged2000/2000ms/count5. Actual
+polling after the fix advanced the electrical timestamp while preserving the
+settings-command message. Already-Manual selection followed the existing no-op
+query path. No new mode/EEPROM/trigger/output command. Final actual read at
+2026-11-07T01:01:25.564769UTC was Manual/OFF0x2000/no fault; Release and Read
+then returned disconnected, has_device=false, no requested output and unknown
+feedback. Browser console warnings/errors empty; viewport reset, preview retained.
+
+Method -> result: actual browser/production TCP read flow and command-message
+retention -> PASS for exact configuration; new Manual ON/OFF and timed cycle ->
+UNTESTED/BLOCKED pending physical safeguards/cycle confirmation. No new blade
+observation, calibrated timing or broader native-mode qualification is claimed.
+
+Four offline UI cases use preserved actual ON/OFF observations, no emulated
+device or byte transport: poll preserves notice, explicit Read supplies a notice,
+OFF enables the timed button and ON disables it while OFF remains available.
+4 source +4 isolated installed-wheel cases PASS. Command:
+uv run --locked --offline --group dev --extra gui python -B scripts/verify.py
+--test-path tests/test_webui_live_regressions.py --record-prefix webui-hardware-.
+Lint/format, locked build/install/import/help, Python/CSS parity and config checks
+PASS. Invalid test paths and path-like prefixes are refused before verification.
+The broader201-case simulated/fault suite was not run in this campaign; previous
+records remain intact. The historical saved-evidence checker still PASS; the new
+record intentionally returns PARTIAL and exit2 because recorded cycles=0.
+
+Artifacts: webui-modern-hardware-live.json, settings/OFF/released screenshots,
+webui-modern-hardware-evidence-validation.json, webui-hardware-direct-validation.json,
+webui-hardware-offline-tests.xml, webui-hardware-wheel-tests.xml and the hardware
+validation manifest under records. Current session is blocked only for physical
+control; no additional action is authorized by a pending unanswered prompt.
+
+## E200 - Approved actual two-cycle flow on final GUI source
+
+The user answered "Confirmed; up to two protected cycles" to the exact setup,
+source-blocked/trigger-isolated/key-interlock question and proposed5s Manual,
+1s host hold,2s minimum OFF, final OFF/release limits. Recorded the renewed scope
+before actuation. Finished the third supported UI fix: released Read must state
+disconnected/no device feedback, rather than claim "Readback updated." Restarted
+the verified-released owner to final GUI source, localhost9860/session57830/-B.
+
+Rechecked the new disconnected message, then actual68800777/1.0.7/Manual/OFF.
+Used visible controls only, no injected transport/API/callback/SDK substitute.
+Checked the human-confirmed protection assertion. After initial OFF rest and
+an announced3s viewing delay, clicked Open/ON once. Fresh ON0x2001 at
+2026-11-07T01:09:20.350605UTC; timed pulse was disabled. Clicked Release while
+active: refused with Stop/OFF guidance, has_device=true/requestedON/no fault.
+In a finally-protected browser sequence clicked Close/OFF; fresh OFF0x2000 at
+01:09:21.098912UTC. Readback interval0.748307s, ON-click to OFF-click0.708s,
+both within5s. These are host/controller observations, not calibrated optical time.
+
+After28.177088s from OFF readback to the next click (>=2s), clicked the1s timed
+button exactly once at01:09:49.276UTC. Existing owner completed its internal
+ON/readback/1s host hold/OFF and returned Manual/OFF at01:09:50.631357UTC.
+No transient ON screenshot is claimed for this timed cycle; the separate first
+cycle captured fresh ON. No third ON or hidden retry. Read cycle settings again:
+2000ms ON/2000ms OFF/count5 unchanged. Final fresh Manual/OFF/no fault at
+01:10:10.710233UTC, then Release/Read confirmed disconnected, no handle and
+unknown feedback with the corrected disconnected message. Cleared the local
+protection checkbox, reset viewport and retained the released WebUI. Console
+warnings/errors empty. Authority for those two cycles is consumed.
+
+TEST-227 requirement -> actual browser/production-controller method -> PASS for
+the selected flow: ON/OFF, timed hold, active-release refusal, ON-state pulse
+gating, settings unchanged, final OFF/release and truthful disconnected read.
+Independent blade observation was requested separately and is pending; no optics
+or native-mode/EEPROM qualification is inferred. Existing broader gaps remain.
+
+Final5 saved-real-sample UI cases PASS from source and5 from an isolated wheel;
+Python/CSS parity, lint/format, locked build/install/import/help/config checks PASS.
+Command: verify.py --test-path tests/test_webui_live_regressions.py
+--record-prefix webui-hardware-final-. No emulated device/transport test ran.
+The initial4/4 software results remain under webui-hardware-* and final5/5 under
+webui-hardware-final-*. The live-evidence checker now PASS with recorded_cycles2;
+it previously returned PARTIAL/exit2 while cycles were missing. Final raw captures
+and final OFF/released screenshots remain distinct from the read-only phase.
+The final checker also rejects three altered saved-data cases without device
+I/O: missing cycles remains PARTIAL/exit2, unconfirmed output authority fails,
+and an inconsistent ON observation fails. Results are in
+records/webui-hardware-checker-negatives.json. Capture provenance clarifies that
+early read-phase captured_at values mark capture start; controller feedback
+timestamps, not those capture-start values, define the recorded readback intervals.
+
+## E201 - Current WebUI fixes and evidence delivery
+
+Implementation43e80a4 includes the three GUI fixes, five saved-real-sample UI
+regressions and scoped/prefixed verification plus strict live-evidence checking.
+Reviewed the explicit staged allowlist/cached diff; final source/package checks
+are recorded in webui-hardware-final-direct-validation.json. The preserved real
+fixture records/webui-final-live.json remains unchanged and is hashed separately
+from the new real capture; it is offline regression input, not a new bench result.
+
+git push origin main succeeded38f006a ->43e80a4. Bounded git ls-remote returned
+43e80a4804143978203efce75b0c8281312cac66, matching the published implementation.
+This following checkpoint contains docs, state/report, raw real observations,
+both software phases, validator results and actual screenshots. Final staged
+source/artifact hashes and remote parity are checked before/after publication.
+No additional device action is associated with delivery. Independent blade
+observation for this run remains pending; consumed two-cycle scope is not renewed.

@@ -1,0 +1,23 @@
+{
+  "requirement_id": "REQ-227",
+  "result": "PASS selected real WebUI/control evidence consistency",
+  "scope": "Saved observations; no hardware access or independent capture authentication",
+  "evidence": "records\\webui-modern-hardware-live.json",
+  "sha256": "9be34094762264cbe566454218c2f7749cfafa5fcac3d2793fb30717f39a6c4b",
+  "checks": [
+    "exact identity/route",
+    "real cycle readback unchanged",
+    "fresh polling",
+    "operator notice retained",
+    "final Manual/OFF",
+    "released/unknown feedback",
+    "visible ON/OFF within5s",
+    "pulse disabled during ON",
+    "active release refused",
+    "second cycle1s host hold",
+    "2s OFF rests"
+  ],
+  "recorded_cycles": 2,
+  "optical_observation": "No independent observation for this run reported yet",
+  "timing_scope": "Controller/host timestamps, not calibrated optical timing"
+}

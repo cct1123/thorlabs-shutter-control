@@ -1,3 +1,41 @@
+# Actual modern WebUI hardware test
+
+REQ-227 / TEST-227 selected real operator flow and final package checks PASS.
+The user confirmed the protected setup and up to two Manual cycles. The visible
+production WebUI connected to SH05R/KSC10168800777/1.0.7 at192.168.1.19:40305,
+returned Manual/OFF0x2000/interlock-required/no fault and read2000ms ON/2000ms
+OFF/count5 unchanged before/after the fix. No simulator, SDK or direct callback
+substitute was used for the live flow; no settings were written.
+
+Found and fixed background polling erasing the last operator message. Real
+readback now advances while retaining the settings-command notice. Also disabled
+the timed-pulse button during displayed ON, and corrected released Read claiming
+"Readback updated" with no device handle. All three have actual browser checks.
+Exactly two approved cycles completed: Open/Close0x2001 ->0x2000 with0.748307s
+between readbacks, then the1s timed hold after the OFF rest. Active Release
+was refused without losing the owner; the timed button was disabled during ON.
+Five targeted source and five isolated installed-wheel UI cases PASS, with exact
+Python/CSS parity, lint/format, locked build/install/import/help and config checks.
+No emulated-device test ran in this campaign.
+The earlier full201/201 result is historical, not repeated by these selected checks.
+
+Updated verification scripts support explicit tested paths and prefixed records,
+preserving prior campaigns. Saved live-evidence checking reports PARTIAL with
+exit2 when required control cycles are missing. Final actual read was Manual/OFF
+at2026-11-07T01:10:10.710233UTC, followed by Release/Read confirming disconnected
+with the corrected no-feedback message. Independent blade observation is pending;
+host/readback timing is not calibrated optical exposure. Cycle authority is consumed.
+
+[Live observations](../records/webui-modern-hardware-live.json),
+[OFF screenshot](../records/webui-modern-hardware-final-off.png),
+[released screenshot](../records/webui-modern-hardware-final-released.png),
+[validation](../records/webui-modern-hardware-validation.json).
+No further cycle is planned. Broader native/optical/driver acceptance remains separate.
+E201: implementation43e80a4 is published and remote-verified; the following
+documentation/evidence checkpoint completes the scoped delivery.
+
+---
+
 # Modern minimalist WebUI refinement
 
 REQ-226 / TEST-226: presentation refined to white surfaces, slate typography,

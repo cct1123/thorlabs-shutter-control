@@ -4,6 +4,23 @@ Date: 4 November 2026
 Status: Engineering requirements
 Project management: uv
 
+## Actual modern WebUI hardware test (user request, 6 November 2026)
+
+Run the actual WebUI against real hardware, control it as an operator would,
+identify/fix issues and update scripts. Derive REQ-227 / TEST-227 for the current
+modern panel and production APT owner/TCP on SH05R/KSC10168800777/1.0.7 at
+192.168.1.19:40305. Browser actions must provide live evidence; no fake transport,
+SDK, direct callback or API substitute for the user-flow test. Reads are in scope.
+Before outputs, confirm present source protection, isolated external triggers,
+intact key/interlock and a bounded new run: proposed maximum two Manual cycles,
+one Open/Close with OFF within5s and one1s host hold, minimum2s OFF between,
+then fresh Manual/OFF and release. The previous single-cycle approval is consumed.
+Do not broaden mode/settings policy or operate another device. Preserve raw
+observations and qualify blade motion only by independent observation.
+The user subsequently confirmed "Confirmed; up to two protected cycles" for the
+exact proposed safeguards/window. This renews authority only for those two
+Manual cycles and associated OFF/release checks, not further retries or modes.
+
 ## Modern minimalist WebUI (user request, 6 November 2026)
 
 Use a modern, minimalist UI with a cohesive color palette, flat controls,

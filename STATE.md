@@ -1,5 +1,50 @@
 # Engineering state
 
+## Active actual-hardware WebUI test
+
+REQ-227 / TEST-227 PASS for the selected real WebUI/controller workflow,
+E198-E200. The user confirmed "Confirmed; up to two protected cycles"; exactly
+two were completed, with actual Manual ON0x2001/OFF0x2000 and a1s host hold.
+Cycle1 readback interval0.748307s (within5s); cycle2 started after28.177088s OFF.
+Active Release refused without losing ownership/faulting; timed pulse disabled
+during displayed ON. No simulator, SDK or direct callback substitute for live work.
+E198/E199: actual visible browser/production APT/TCP verified68800777/1.0.7,
+Manual/OFF0x2000/interlock-required/no fault, unchanged2000ms ON/2000ms OFF/count5,
+fresh live polling and release. No simulator, SDK or direct callback/API substitute
+for the live run. E198/E199 were read-only; E200 adds exactly the approved two
+cycles. No mode, settings, EEPROM or other-device configuration was written.
+
+Fixed successful background polling erasing operator notices; actual polling now
+advances feedback while retaining the settings-command message. Timed pulse now
+requires displayed Manual/OFF; its ON gating passed in the actual first cycle.
+Also fixed disconnected Read claiming fresh readback. Five final targeted UI
+cases PASS from source and installed wheel; exact Python/CSS parity, lint/format,
+lock/build/install/help PASS. The initial4/4 read-phase evidence is preserved. No
+emulated-device tests ran in this campaign; the broader201-test run is historical.
+Scripts now retain scoped/prefixed records and report PARTIAL/exit2 for missing
+control cycles. Current evidence: records/webui-modern-hardware-validation.json,
+raw live JSON, evidence-check JSON, prefixed software JSON/XML and screenshots.
+
+Final read2026-11-07T01:10:10.710233UTC: Manual/OFF/no fault, then Release/Read
+confirmed has_device=false and unknown feedback. Preview9860 remains available,
+disconnected, owned session57830/-B. Protection checkbox cleared after release.
+Independent blade observation for this run is pending; do not infer it or
+calibrated timing from controller bits. E201: implementation43e80a4 is published
+and remote-verified. Documentation and exact real-run/package evidence are in
+this following checkpoint; final remote parity is checked after its push.
+No further physical cycle is planned; native/settings qualification remains separate.
+
+### Current output authorization
+
+Known: E198/E199 record current real Manual/OFF, read-only settings/polling and
+released ownership. E191/E192 record the earlier observed blade cycle. Software cannot
+verify present source blocking, trigger isolation or key/interlock continuity.
+Resolved by the user's "Confirmed; up to two protected cycles" reply. Source
+blocked, triggers isolated and intact key/interlock are human-confirmed for this
+window. Its two-cycle budget is now consumed: Open/Close within5s and one1s host
+hold, minimum2s OFF between, final OFF/readback/release completed. No further ON,
+mode, EEPROM, trigger-I/O or other-device configuration is authorized by it.
+
 ## Active visual refinement
 
 REQ-226 / TEST-226 PASS (PROJECT.md current user design request), E196.
@@ -12,8 +57,8 @@ Device dispatch/callback function ASTs and the real TOML are byte/structure unch
 No hardware command; no fabricated connected/readiness state. REQ-225's protocol
 and physical gaps remain unchanged. E194 evidence remains historical and preserved.
 Evidence: records/webui-modern-validation.json, separate modern software XML/JSON
-and four screenshots. Current preview127.0.0.1:9860, disconnected, owned exec
-session67798 started with -B; viewport reset. E197: implementation66bc05e is
+and four screenshots. Its earlier preview session67798 was superseded by the
+current actual-test server above. E197: implementation66bc05e is
 published and remote-verified. Documentation/evidence are included in this final
 checkpoint; final remote parity is checked after its push. No further visual
 work or hardware action is pending. REQ-225's specific contract gaps remain open.
@@ -34,8 +79,8 @@ lint/format/locked install/import/help PASS, six notebooks static PASS.
 Browser review at1100px desktop/390px phone was disconnected, no device command;
 responsive selector and scrolling Settings header corrected, zero console warnings/errors.
 Evidence: records/webui-apt-validation.json and desktop/settings/phone screenshots.
-Native timing, priming, Identify flash, settings persistence and the revised
-panel's physical operation remain UNTESTED. Old E191/E192 qualify their exact
+Native timing, priming, Identify flash and settings persistence remain UNTESTED;
+the revised Manual panel is now covered by E200/REQ-227. Old E191/E192 qualify their exact
 historical Manual cycle only. No new live output/configuration authority exists.
 E194's preview session14309 was superseded by the verified-disconnected visual
 refinement restart above; it is no longer the active server.
@@ -211,6 +256,7 @@ Human criteria remain in PROJECT.md. PASS is scoped to its stated method/revisio
 | REQ-224 | Actual WebUI user flow, fixes and scripts | TEST-224; E188/E189, E191/E192 and passive checks | PASS selected WebUI/controller path and E192 human-observed opening/return closed; calibrated optics and full fault matrix open |
 | REQ-225 | Manufacturer-style APT panel (derived; PROJECT.md active request) | TEST-225; E193/E194, feature matrix in docs/gui.md | PARTIAL: supported software paths and passive browser PASS; display/trigger I/O and Key/Ready contracts BLOCKED; new physical functions UNTESTED |
 | REQ-226 | Modern minimalist presentation (PROJECT.md latest user request) | TEST-226; E196, modern validation manifest/screenshots | PASS presentation, software and installed CSS; no new physical acceptance |
+| REQ-227 | Current modern WebUI actual-hardware test | TEST-227; E198-E200, hardware validation manifest and raw captures | PASS selected real Manual/control/read/release flow and fixes; independent blade report pending; calibrated/native acceptance separate |
 
 ## Short plan and human action required
 

@@ -1,0 +1,222 @@
+{
+  "requirement_id": "REQ-227",
+  "test_id": "TEST-227",
+  "evidence_ids": [
+    "E198",
+    "D062",
+    "E199",
+    "E200"
+  ],
+  "recorded_at_utc": "2026-11-07T01:15:58.000660+00:00",
+  "result": "PASS selected real Manual WebUI/controller workflow and UI fixes; optics/native scope separate",
+  "real_hardware": {
+    "model": "KSC101",
+    "serial": "68800777",
+    "firmware": "1.0.7",
+    "hardware_version": 3,
+    "shutter": "SH05R",
+    "endpoint": "192.168.1.19:40305",
+    "apt_channel": 1,
+    "application_channel": 0,
+    "actual_cycle_readback": {
+      "on_ms": 2000,
+      "off_ms": 2000,
+      "cycles": 5
+    },
+    "settings_written": false,
+    "completed_manual_cycles": 2,
+    "manual_readback_interval_s": 0.748307,
+    "manual_on_click_to_off_click_s": 0.708,
+    "off_rest_before_timed_click_s": 28.177088,
+    "timed_host_hold_s": 1,
+    "independent_blade_observation": "No independent observation for this run reported yet"
+  },
+  "browser": {
+    "url": "http://127.0.0.1:9860",
+    "baseline_server": 67798,
+    "read_fix_server": 45170,
+    "final_server": 57830,
+    "backend": "Production ShutterHub/KSC101/APT/TCP, no injected transport",
+    "actual_events": [
+      "connect",
+      "read-settings",
+      "live-readback",
+      "baseline-release",
+      "connect-after-fix",
+      "read-settings-after-fix",
+      "poll-after-fix",
+      "manual-noop",
+      "final-manual-off",
+      "released-read",
+      "disconnected-read-after-fix",
+      "connect-for-control",
+      "manual-on",
+      "active-release-refusal",
+      "manual-off",
+      "timed-pulse",
+      "read-settings-after-control",
+      "final-manual-off",
+      "released-read"
+    ],
+    "console_warnings_errors": [],
+    "viewport_reset": true,
+    "final_state": "Fresh Manual/OFF then released; no continuing electrical claim"
+  },
+  "runtime": {
+    "baseline_revision": "38f006a",
+    "baseline_gui_sha256": "904dc1bcb4787a47f0facdc1846c23b44cca35ece51e70a03b843622b75ba33c",
+    "read_fix_gui_sha256": "b865ac40e3b504e24480de10648731ba358e42c86887227702e2ba3bdf8a0abb",
+    "final_gui_sha256": "7690830dbf40d909cdbe9d1e0b4bac9365128c1c4a261460a1f7469326f8b886",
+    "source_sha256": {
+      ".python-version": "7b55f8e67b5623c4bef3fa691288da9437d79d3aba156de48d481db32ac7d16d",
+      "config/shutter.ethernet.toml": "5bacb23cb4fbacbcebd86ffd4cdc553e9c81eca206412696500a3f183e76ccae",
+      "config/shutters.example.toml": "fe9622cee1bb3e8bdad4499b05d5b93c3758f79af3d904d0921727810ab0d9eb",
+      "docs/examples/01_device_discovery.ipynb": "e98c8ede0eb0b9c877b08f76654770008897108dc2ed4075d7869ddef728f5e4",
+      "docs/examples/02_connection.ipynb": "f54b5934e17eced3c71be015eec92b747077717e8e12c7c3b694d36ad63fdf13",
+      "docs/examples/03_status_query.ipynb": "0e40f83758b59c4a8007f25118fa581d662c6177d134683cdbf4ef74ece74e4c",
+      "docs/examples/04_settings.ipynb": "340e0c9aefe9b6300b073f9c6edc1adef79ab0f803d28dbecf3d1b8695f5f5bf",
+      "docs/examples/05_shutter_modes.ipynb": "41d06f4d88ba4e8cc736564c509ab7bdf4cfa902cbd0654f6111a6c7484c92be",
+      "docs/examples/06_on_off.ipynb": "d221adcb6da625a99585e1555ed3144dd3c1e1b2bda1b7bb6197ea6d4179d8b4",
+      "docs/examples/README.md": "3a57ebcf96383309875a77c321c7376f9c02949e69784171fa45455c3f4cc887",
+      "docs/examples/shutter_config.py": "572284d14b1bad85ee22ccaa99ceb81dccff2b122f9df9f88e82b20a282a68d5",
+      "pyproject.toml": "66fb4ef33fa9dc324e09b34e02a78a314b61419446abf8f6c61f50441bab5ea7",
+      "README.md": "2488921e0ecfb2586bfec7f9e6b69b97893f38bb8faa704357f51e6549845af3",
+      "scripts/verify.py": "1c9aa1a1373f6e014a01e260836479da5689b8d09fb891520898f7af6067cf28",
+      "scripts/verify_notebooks.py": "6caae7de5c496ccc11395cf0a534410acb419f39becde4355d07cddf26fa6a08",
+      "scripts/verify_webui_evidence.py": "b6e858359b08ee5f0198a59407f0c62d73d95adc100e34ea6313e231a5447050",
+      "src/thorlabs_shutter_control/__init__.py": "31ad61ea0eac625d90cc011c3afdf3c616b70bc1b7e4f0c5f659bc220ef267ed",
+      "src/thorlabs_shutter_control/__main__.py": "6d86421747d8851b826bdecd3c6353ea06334cd3be86669396ef8aee8a8bc821",
+      "src/thorlabs_shutter_control/assets/shutter.css": "400610b6098a6dff6bbcc1faf13dafe26534f34c3840da6d0786fbbb50612502",
+      "src/thorlabs_shutter_control/config.py": "a09e6561f2eebaf64b71de25367e6c7006740fc392a2ae978dfa03d03ed6979c",
+      "src/thorlabs_shutter_control/controller.py": "7e92bfaa2213ee00dbd9a1db551261420a915222d3a4e1177322ff33ae896a0e",
+      "src/thorlabs_shutter_control/device.py": "76307bc177f6d6abf65b33faf4391be41a0ea1c65084595027d3d6035c9d4de0",
+      "src/thorlabs_shutter_control/discovery.py": "d0c1d84b6761d6fb6534f3afa6f2b3000ea922804270facec7f7e3565a87ca30",
+      "src/thorlabs_shutter_control/errors.py": "f2f4ff77dbba39142b992d047b4ce7a0a93e32f7cdcccd8536a47307cb48d86f",
+      "src/thorlabs_shutter_control/ethernet.py": "8608c91f897f603b2cc5ebc99d528d00f61fc1b15fcee3134d6daa1a21a05ff0",
+      "src/thorlabs_shutter_control/gui.py": "7690830dbf40d909cdbe9d1e0b4bac9365128c1c4a261460a1f7469326f8b886",
+      "src/thorlabs_shutter_control/ownership.py": "7fb46ab790bd7bb633d157d6ed1547ff1bb7f7c335be7dfa17ecce8ea77f9a1d",
+      "src/thorlabs_shutter_control/protocol.py": "b947b61dcecf4450d8fcd6a24c11f1a90fd40bb836492e2b580d4a61bd1f3464",
+      "src/thorlabs_shutter_control/transport.py": "4813b39b923d0daeeb230d255f9c5b6804ab8227584b329c8be94782ea16ffd0",
+      "tests/conftest.py": "884db151e233084cf111129d053808e4b9f399af1f49e96cb073e8756e40725d",
+      "tests/test_application.py": "adb886feaa5502a84fe1ddefe18b2bded9cfd0b207123810a79e002e27bc0ac1",
+      "tests/test_discovery.py": "0934580b74e78b21ec908a30548f9d66254d04b800fc264ae5302eff9be19c88",
+      "tests/test_ethernet.py": "0705da436ba2fd4b542dd2f9cf82f7a9a5b17f00d1ebb52d81e1e51acc5a2955",
+      "tests/test_native_controls.py": "b8826640b3291977fd8cc558fb8f52c73a20a5762a50b023f75b108b9fa38c8d",
+      "tests/test_owner.py": "90a69ac91085a8d828a39cddabc053e50cc822c5e28897c4989fbac51c4cd708",
+      "tests/test_protocol.py": "43956f0b01d0b6524eb125e23186a8e41baa4ff30aaf36e8361f9b776760e7c9",
+      "tests/test_tutorial_notebooks.py": "2180024ab49c9d017d7082e32632359f383c7030c46d3886acc6b5444e18ecd6",
+      "tests/test_webui_live_regressions.py": "ec243defd7258a7f2146a38928038770107db62494fcd0bef88967b0ab94d0d9",
+      "uv.lock": "bbbca9b12e3f685d1a553dc156f76c487cbcad7334dbd5cea8a8e96b1ed72f31"
+    },
+    "unchanged_configuration_sha256": "5bacb23cb4fbacbcebd86ffd4cdc553e9c81eca206412696500a3f183e76ccae"
+  },
+  "fixes": [
+    {
+      "issue": "Background polling erased operator messages",
+      "validation": "PASS actual controller/browser"
+    },
+    {
+      "issue": "Timed pulse enabled during displayed ON",
+      "validation": "PASS actual ON browser state and saved-sample regression"
+    },
+    {
+      "issue": "Disconnected Read claimed updated device feedback",
+      "validation": "PASS actual released browser state and saved-sample regression"
+    }
+  ],
+  "software": {
+    "tested_paths": [
+      "tests/test_webui_live_regressions.py"
+    ],
+    "tests": {
+      "offline": {
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "wheel": {
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "wheel_sha256": "998d097709dcf69ad36f5a96c71f61aac7694ed7e62f2766e0901fc6057ce7ab",
+    "python_css_parity": "PASS",
+    "emulated_device_tests_run": false,
+    "scope": "Four UI callback cases with preserved actual samples only; separate from live evidence",
+    "full_201_test_suite_run": false,
+    "initial_read_phase_source_wheel_cases": 4,
+    "prior_campaign_artifact_hashes_preserved": true,
+    "saved_real_fixture": {
+      "path": "records/webui-final-live.json",
+      "sha256": "e0f8bfdc94890b5b9d416714aca60f87566146678165557068f36d0f88bf257e",
+      "scope": "Preserved actual observation used for offline UI checks only"
+    }
+  },
+  "checker": {
+    "current_result": "PASS selected real WebUI/control evidence consistency",
+    "missing_cycles_exit_code": 2,
+    "legacy_record_compatibility": "PASS",
+    "invalid_test_path_rejected": true,
+    "invalid_record_prefix_rejected": true,
+    "altered_saved_json_rejections": [
+      {
+        "case": "missing-cycles",
+        "expected_exit": 2,
+        "actual_exit": 2,
+        "result": "PASS"
+      },
+      {
+        "case": "unconfirmed-authority",
+        "expected_exit": 1,
+        "actual_exit": 1,
+        "result": "PASS"
+      },
+      {
+        "case": "inconsistent-on-state",
+        "expected_exit": 1,
+        "actual_exit": 1,
+        "result": "PASS"
+      }
+    ]
+  },
+  "output_authority": {
+    "status": "Confirmed; consumed by exactly two completed cycles",
+    "conditions": "Source independently blocked, triggers isolated, intact key/interlock",
+    "max_manual_cycles": 2,
+    "manual_on_max_s": 5,
+    "timed_host_hold_s": 1,
+    "min_off_s": 2,
+    "finish": "Fresh Manual/OFF and release completed",
+    "authority_granted": true,
+    "further_cycles_authorized": false
+  },
+  "local_markdown_links": {
+    "result": "PASS",
+    "count": 156
+  },
+  "artifact_sha256": {
+    "records/webui-modern-hardware-live.json": "9be34094762264cbe566454218c2f7749cfafa5fcac3d2793fb30717f39a6c4b",
+    "records/webui-modern-hardware-evidence-validation.json": "cead998ffeaa40e193a306d50367af2346ae8ae0ab044824a7c1764c8e7fa8d6",
+    "records/webui-modern-hardware-settings.png": "aae69391be6974ba51c0725f35610c590f3f73a341f48da05ff87490659718f0",
+    "records/webui-modern-hardware-off.png": "6f96fcda2bf93662a7d4071c7be63a2a8ca3f1287a5bd8c07859b70296e755ab",
+    "records/webui-modern-hardware-released.png": "e7b45b47b742f73f37005debb6d1f5210f1771a3f6681f32e47d11ce8e7888a0",
+    "records/webui-hardware-direct-validation.json": "60854b4bf29d47a542c3b536b876fc34237bb530e38b94d2bf648d000ec3059b",
+    "records/webui-hardware-offline-tests.xml": "acce4f01d8953296a8140364ed3b179dd925e863f496a71fb77e421baba23c4f",
+    "records/webui-hardware-wheel-tests.xml": "a707c0d8160fdd0cad4d0f0eda435d3326800e6d3c56e7a2d8f8c2aef5c51270",
+    "records/webui-modern-hardware-final-off.png": "b82088b1b981e9f3a4be1339acab2fc99d91d8de2cd0a6bf33e2a0761fc9f4ea",
+    "records/webui-modern-hardware-final-released.png": "28de92d0503357cf832b971c52fc90ad7f35ad7a538cc8b6496563caa5509b71",
+    "records/webui-hardware-final-direct-validation.json": "681c19b91324805cf6965a50d4e1f27760e865e0b5795addfe8eace6fff59bb3",
+    "records/webui-hardware-final-offline-tests.xml": "074f39654c42222029fee65f9fac06a513b034faf074a6b89e9cdc0f1925e5eb",
+    "records/webui-hardware-final-wheel-tests.xml": "77037069b785acbdabf609396a56e7845cd65fac8ba34b3bf5ae8f9390a39651",
+    "records/webui-hardware-checker-negatives.json": "f1f18ca6d322e847bc6b1802580b3eac685058dd190181dcfae8a6160d0af0b5",
+    "records/webui-final-live.json": "e0f8bfdc94890b5b9d416714aca60f87566146678165557068f36d0f88bf257e"
+  },
+  "cleanup": {
+    "verified_absent": "tmp/webui-live-regressions",
+    "preserved": "All prior evidence, .venv, downloads and ownership state"
+  },
+  "limits": "Controller/host timestamps are not calibrated optical timing; native modes/EEPROM remain unqualified"
+}

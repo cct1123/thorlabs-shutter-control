@@ -1,0 +1,24 @@
+{
+  "test_id": "TEST-227",
+  "scope": "Altered saved-JSON rejection only; no device I/O or simulation",
+  "results": [
+    {
+      "case": "missing-cycles",
+      "expected_exit": 2,
+      "actual_exit": 2,
+      "result": "PASS"
+    },
+    {
+      "case": "unconfirmed-authority",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "result": "PASS"
+    },
+    {
+      "case": "inconsistent-on-state",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "result": "PASS"
+    }
+  ]
+}
