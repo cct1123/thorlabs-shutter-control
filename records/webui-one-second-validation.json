@@ -1,0 +1,35 @@
+{
+  "evidence_id": "E191",
+  "requirement_id": "REQ-224",
+  "result": "PASS selected single WebUI timed cycle and release",
+  "requested_host_hold_s": 1.0,
+  "browser_timed_cycle_clicks": 1,
+  "browser_roundtrip_elapsed_s": 1.731,
+  "timing_scope": "Browser round-trip elapsed includes preflight, the 1-second host hold, readback and UI; not calibrated optical timing",
+  "source_sha256": {
+    "src/thorlabs_shutter_control/config.py": "919d62f3246c3c4c655cd1ba002d5ba946d27b58cde654331274507141e5375a",
+    "src/thorlabs_shutter_control/controller.py": "48d826d230265711d5612e79595ce4ce23ff706fe4c8811b35a80d65573a688e",
+    "src/thorlabs_shutter_control/device.py": "1acb497677b1e58aed54bc38376601a81ac47c7aa7cf1ce5329b0dfffa45da18",
+    "src/thorlabs_shutter_control/discovery.py": "d0c1d84b6761d6fb6534f3afa6f2b3000ea922804270facec7f7e3565a87ca30",
+    "src/thorlabs_shutter_control/errors.py": "f2f4ff77dbba39142b992d047b4ce7a0a93e32f7cdcccd8536a47307cb48d86f",
+    "src/thorlabs_shutter_control/ethernet.py": "8608c91f897f603b2cc5ebc99d528d00f61fc1b15fcee3134d6daa1a21a05ff0",
+    "src/thorlabs_shutter_control/gui.py": "95def3bf9ee80899e50eb8546f21ff48bf0e569fbcb9356c2c5a302f7cdf24a0",
+    "src/thorlabs_shutter_control/ownership.py": "7fb46ab790bd7bb633d157d6ed1547ff1bb7f7c335be7dfa17ecce8ea77f9a1d",
+    "src/thorlabs_shutter_control/protocol.py": "4aa123b577acce11ccef53a9e77f594a6fcbc6ec47baa063f04293dd601d676f",
+    "src/thorlabs_shutter_control/transport.py": "4813b39b923d0daeeb230d255f9c5b6804ab8227584b329c8be94782ea16ffd0",
+    "src/thorlabs_shutter_control/__init__.py": "1ccce0c1685f148a540122793eb3b876392fe5c95c69a13c635fa46c9e5fe973",
+    "src/thorlabs_shutter_control/__main__.py": "6d86421747d8851b826bdecd3c6353ea06334cd3be86669396ef8aee8a8bc821",
+    "config/shutter.ethernet.toml": "5bacb23cb4fbacbcebd86ffd4cdc553e9c81eca206412696500a3f183e76ccae"
+  },
+  "artifacts_sha256": {
+    "records/webui-one-second-cycle.json": "cc05aed157f845a6537dcbf47785533f8fc4ccfd23c4fc10ccd20e78c9b2e051",
+    "records/webui-one-second-off.jpg": "f7707c6a8d20fa111d2bb72226f8ce6ac31b318288283b0363f35d3d160a0f64",
+    "records/webui-one-second-observation.json": "6cf5448ca9a6ce96b2b1debb7afda2e5452eb2aa9ac657aab85c89e0ab21b888"
+  },
+  "transient_on_scope": "Successful existing owner pulse internally confirms ON before holding; no separate transient ON browser snapshot was collected",
+  "final": "Manual/OFF readback, no fault, followed by released connection",
+  "optical_observation": "E192 user reports: Yes, it opened and returned closed. PASS qualitative blade motion for the exact E191 cycle; optical extinction and timing remain uncalibrated.",
+  "server": "User-facing WebUI left open on localhost9857 with no device connection; owned exec session3080",
+  "human_report": "records/webui-one-second-observation.json",
+  "passive_checks": "Scoped Ruff lint/format, rebuilt wheel/source byte parity and wheel syntax PASS; no simulated-device tests or additional physical cycle"
+}

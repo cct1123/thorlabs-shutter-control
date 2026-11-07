@@ -1,5 +1,14 @@
 # Actual hardware WebUI validation
 
+Single-cycle follow-up E191: the user requested one additional cycle to watch the
+blade, with the same protected setup. Clicked the new explicit timed button once:
+the existing owner performed a1s host hold and returned Manual/OFF0x2000/no fault,
+then the browser released communication and confirmed disconnected. The WebUI
+remains open with no device connection. See records/webui-one-second-cycle.json
+and webui-one-second-validation.json. E192: the user confirms "Yes, it opened and
+returned closed"; qualitative blade motion PASS for this exact cycle by human
+observation. No second cycle was run; optical timing/extinction are not calibrated.
+
 6 November 2026. **PASS selected browser/controller user flow; broader deployment
 and independent optical qualification remain open.** No simulator was used.
 

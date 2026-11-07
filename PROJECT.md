@@ -4,6 +4,21 @@ Date: 4 November 2026
 Status: Engineering requirements
 Project management: uv
 
+## One observed WebUI cycle (user request, 6 November 2026)
+
+"open the webui again. I will watch the blade this time. run one ON/OFF cycle
+with a 1-second hold, then leave it OFF and release. same protected SH05R setup."
+
+This authorizes one further browser-triggered cycle on the same protected SH05R,
+KSC10168800777/1.0.7 at192.168.1.19:40305. Reuse the confirmed source protection,
+isolated triggers and intact key/interlock. Verify actual Manual/OFF and the
+configured minimum2s OFF rest, run the existing owner pulse with a1s host hold,
+then verify OFF and release. Expose that existing timed operation as a visible
+WebUI button so browser round trips do not determine the hold. No second cycle
+or mode/settings/other-device operation is authorized. Record independent blade
+observation only if the user supplies it; host hold is not calibrated optical time.
+Continue under REQ-224 / TEST-224 with separate new evidence.
+
 ## Actual WebUI user-flow test (user request, 6 November 2026)
 
 "run test with the webui. use actual hardware. no fake simulator. control the

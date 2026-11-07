@@ -2084,3 +2084,45 @@ that motion failed. Preserved original browser captures/hashes and recorded the
 human follow-up separately in records/webui-observation-followup.json. Updated
 current state, report and derived live-validation summary. No device operation,
 mode/output change or additional cycle was performed.
+
+## E191 - One explicitly requested 1-second WebUI cycle (6 November 2026 local)
+
+The user requested: "open the webui again. I will watch the blade this time.
+run one ON/OFF cycle with a 1-second hold, then leave it OFF and release. same
+protected SH05R setup." This is authority for exactly one further cycle on the
+same protected controller/load/route, not a repeat endurance or settings test.
+
+Added an explicit WebUI timed button calling the existing hub.pulse(target,1.0),
+so the server owner times the hold after internal fresh ON readback. Updated the
+existing target-guard test's callback input list for the new button. Scoped Ruff
+lint/format PASS; no fake/simulated-device test or transport was run. No new
+backend, pulse implementation or direct callback substitute was introduced.
+
+Opened the visible browser and production localhost9857 server. Connect verified
+68800777/1.0.7/hardware3, Manual/OFF0x2000, interlock requirement true and no fault.
+After the OFF rest and an announced3s viewing delay, clicked the timed button
+exactly once. It returned successful Manual/OFF/no fault with electrical OFF
+readback at2026-11-07T00:10:45.272947UTC (6 November local). The existing pulse
+confirms ON internally before the1s hold; no separate transient ON browser
+snapshot was captured. Host hold/browser duration is not calibrated optical time.
+
+Saved OFF screenshot, clicked Release, then Read reported disconnected,
+has_device=false, requestedOFF and no fault. Left the WebUI open for the user
+with no hardware connection; owned server session3080. No second ON/cycle and no
+mode/settings/other-device change. Asked for the user's independent blade
+observation; it is pending and must not be inferred from this successful return.
+Artifacts: records/webui-one-second-cycle.json, webui-one-second-off.jpg and
+webui-one-second-validation.json. Source/artifact hashes and saved-record checks
+PASS. No further actuation is planned or authorized by this consumed cycle.
+
+## E192 - User observed blade motion for E191
+
+User reply after the single timed WebUI cycle: "Yes, it opened and returned
+closed". Record this as independent human-reported qualitative blade motion PASS
+for E191's exact protected setup/cycle, separate from controller OFF readback.
+No detector/extinction or optical timing calibration is established, and broader
+local/TTL/interlock/endurance acceptance remains open. Preserved raw browser
+capture/hashes and saved this later report in records/webui-one-second-observation.json;
+updated the derived validation/current state/report. Passive wheel/source parity
+and syntax checks also PASS for the timed-button change. No additional physical
+operation or cycle was performed in response to the observation.

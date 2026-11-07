@@ -25,6 +25,7 @@ def create_app(hub):
                         ("read", "Read state"),
                         ("manual", "Set Manual (remembered at power-up)"),
                         ("on", "Solenoid ON"),
+                        ("pulse", "1-second ON, then OFF"),
                         ("off", "Cancel / qualified OFF"),
                         ("release", "Release communication"),
                     )
@@ -41,7 +42,10 @@ def create_app(hub):
 
     @app.callback(
         Output("result", "children"),
-        [Input(key, "n_clicks") for key in ("connect", "read", "manual", "on", "off", "release")],
+        [
+            Input(key, "n_clicks")
+            for key in ("connect", "read", "manual", "on", "pulse", "off", "release")
+        ],
         State("target", "value"),
         prevent_initial_call=True,
     )
@@ -55,6 +59,7 @@ def create_app(hub):
                 "read": hub.get_status,
                 "manual": hub.set_manual_mode,
                 "on": lambda name: hub.set_solenoid(name, True),
+                "pulse": lambda name: hub.pulse(name, 1.0),
                 "off": hub.safe_state,
                 "release": hub.disconnect,
             }[ctx.triggered_id]

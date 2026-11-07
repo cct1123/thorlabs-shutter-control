@@ -1,0 +1,10 @@
+{
+  "evidence_id": "E192",
+  "requirement_id": "REQ-224",
+  "recorded_at_utc": "2026-11-07T00:13:07.543600+00:00",
+  "source": "User reply after the explicitly requested single 1-second WebUI cycle E191",
+  "statement": "Yes, it opened and returned closed",
+  "result": "PASS human-reported blade opening and return to closed for this exact cycle",
+  "scope": "Qualitative human visual observation; no detector/optical-extinction or timing calibration",
+  "additional_device_operations": "NONE"
+}

@@ -34,6 +34,10 @@ Fresh OFF readback starts the configured minimum OFF interval. An ON request
 before it expires is refused with the remaining wait and an explicit message
 that ON was not dispatched. An observed ON invalidates the previous OFF interval.
 Wait the full interval after OFF; no automatic delay or repeated ON command occurs.
+The explicit **1-second ON, then OFF** button uses the existing owner pulse with
+a 1 s host hold after ON readback and automatic priority OFF/readback. It requires
+the same Manual/load/interlock/OFF-rest prerequisites; the browser does not time
+the hold. Use it only within the approved physical window and cycle count.
 
 ## Repeating the protected user-flow check
 
@@ -62,6 +66,9 @@ Connect/read/rest/first-ON/OFF path passed, as did immediate-ON refusal with
 "wait 1.66 s; ON was not dispatched" and fresh OFF readback afterward.
 No simulator, injected transport or direct callback substitute was used.
 Controller output readback does not establish independent blade motion or optics.
+In the separately requested single1s cycle E191, the user subsequently confirmed
+"Yes, it opened and returned closed" (E192). This establishes qualitative human
+observation for that exact cycle, not calibrated optical timing or extinction.
 
 See [baseline browser observations](../records/webui-baseline-live.json),
 [corrected browser observations](../records/webui-final-live.json) and

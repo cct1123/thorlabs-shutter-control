@@ -1,5 +1,21 @@
 # Engineering state
 
+## Latest single-cycle follow-up (6 November 2026, local date)
+
+E191 / REQ-224: exactly one newly authorized1s host-hold cycle completed through
+the visible WebUI timed button. Fresh initial identity68800777/1.0.7, Manual/OFF
+and interlock requirement true; configured OFF rest observed. Successful existing
+owner pulse returned Manual/OFF0x2000/no fault. Release then Read confirmed
+disconnected/has_device=false/requestedOFF. No second cycle or mode change.
+Evidence: records/webui-one-second-cycle.json, webui-one-second-off.jpg and
+webui-one-second-validation.json (source/artifact hashes and timing scope).
+The WebUI remains open at127.0.0.1:9857 (owned exec session3080), with no device
+handle/claim. Recheck its actual state before future work; do not issue more ON.
+E192: user confirms "Yes, it opened and returned closed". Qualitative blade motion
+PASS for this exact cycle by independent human report. No extinction/detector or
+optical-timing calibration is established. Follow-up: records/webui-one-second-observation.json.
+The1s setting is host hold after internal ON readback, not calibrated optical exposure.
+
 ## Latest actual WebUI validation (6 November 2026)
 
 REQ-224 / TEST-224: PASS for the selected actual WebUI/controller workflow.
@@ -129,7 +145,7 @@ Human criteria remain in PROJECT.md. PASS is scoped to its stated method/revisio
 | REQ-206 | Ownership/cancellation | TEST-206; E183 process/concurrency/priority tests | PASS software; native 250 ms target UNTESTED |
 | REQ-207 | Ambiguity and cleanup | TEST-207; E183 faults/read-only/output obligation tests | PASS software; optical safety UNTESTED |
 | REQ-208 | Direct KEH3 control | TEST-208/220; E181 exact middle-bay cycle; E183 routes | Historical selected-controller command/readback PASS; broader topology/recovery open |
-| REQ-209 | Physical/local/TTL/interlocks | TEST-209; approved measured procedure required | BLOCKED: independent observations, setup/window/limits |
+| REQ-209 | Physical/local/TTL/interlocks | TEST-209; E191/E192 selected cycle, broader approved procedure required | PARTIAL: user-observed blade opening/return closed PASS for E191; local/TTL/contact behavior and optical calibration UNTESTED |
 | REQ-210 | Drivers/persistence/endurance | TEST-210; approved deployment campaign required | BLOCKED: hardware, inventory and downtime/window |
 | REQ-211 | DiamondGUI integration | TEST-211; E185 inspected current external suite | FAIL external page: 3 owner/factory PASS, 26 page FAIL; commented page/stale metadata |
 | REQ-212 | Reproducible delivery | TEST-212; E183 source/wheel parity; E184 docs/manual hashes | PASS software; physical deployment incomplete |
@@ -144,7 +160,7 @@ Human criteria remain in PROJECT.md. PASS is scoped to its stated method/revisio
 | REQ-221 | Repository manuals | TEST-221; E179/E184 hash checks | PASS four unchanged copies; local SH05R PDF missing |
 | REQ-222 | Earlier manual/package review | TEST-222; E182 | Historical scoped PASS; current software revalidated in E183 |
 | REQ-223 | Holistic review, prune, naming, staged push (derived) | TEST-223; E183-E187 and holistic-review/publication manifests | PASS prior scoped repository delivery; external deployment blockers documented |
-| REQ-224 | Actual WebUI user flow, fixes and scripts | TEST-224; E188/E189 actual browser/controller + passive package checks | PASS selected actual WebUI/controller path; independent optics and full changed-package fault matrix open |
+| REQ-224 | Actual WebUI user flow, fixes and scripts | TEST-224; E188/E189, E191/E192 and passive checks | PASS selected WebUI/controller path and E192 human-observed opening/return closed; calibrated optics and full fault matrix open |
 
 ## Short plan and human action required
 

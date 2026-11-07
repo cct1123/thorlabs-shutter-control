@@ -153,7 +153,7 @@ def test_gui_construction_is_passive(bench):
 
 
 @pytest.mark.parametrize("target", [None, "unknown"])
-@pytest.mark.parametrize("action", ["connect", "read", "manual", "on", "off", "release"])
+@pytest.mark.parametrize("action", ["connect", "read", "manual", "on", "pulse", "off", "release"])
 def test_gui_requires_an_exact_target_for_every_action(bench, target, action):
     from thorlabs_shutter_control.gui import create_app
 
@@ -169,7 +169,7 @@ def test_gui_requires_an_exact_target_for_every_action(bench, target, action):
             "changedPropIds": [f"{action}.n_clicks"],
             "inputs": [
                 {"id": key, "property": "n_clicks", "value": int(key == action)}
-                for key in ("connect", "read", "manual", "on", "off", "release")
+                for key in ("connect", "read", "manual", "on", "pulse", "off", "release")
             ],
             "state": [{"id": "target", "property": "value", "value": target}],
         },
