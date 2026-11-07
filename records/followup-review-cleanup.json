@@ -1,0 +1,253 @@
+{
+  "root": "C:\\repo\\thorlabs-shutter-control",
+  "scope": "Verified caches and pytest work only; no backups, environments or reference artifacts",
+  "targets": [
+    {
+      "path": "src/thorlabs_shutter_control/__pycache__",
+      "kind": "generated cache",
+      "files": 11,
+      "bytes": 137108
+    },
+    {
+      "path": "tmp/diamond-current-a834a9bf582740908cda09548dcb2a55",
+      "kind": "generated pytest work",
+      "files": 0,
+      "bytes": 0
+    },
+    {
+      "path": "tmp/diamond-final-8a2d1c231db643a1b8b5b040f171cbd1",
+      "kind": "generated pytest work",
+      "files": 0,
+      "bytes": 0
+    },
+    {
+      "path": "tmp/diamond-pytest-dab89fd4c6cc4a9a9548fa5ce48c2548",
+      "kind": "generated pytest work",
+      "files": 0,
+      "bytes": 0
+    },
+    {
+      "path": "tmp/diamondgui-before/.ruff_cache",
+      "kind": "generated cache",
+      "files": 3,
+      "bytes": 282
+    },
+    {
+      "path": "tmp/discovery-tests",
+      "kind": "generated pytest work",
+      "files": 0,
+      "bytes": 0
+    },
+    {
+      "path": "tmp/followup-final-targeted",
+      "kind": "generated pytest work",
+      "files": 24,
+      "bytes": 1071
+    },
+    {
+      "path": "tmp/followup-gui-fixed",
+      "kind": "generated pytest work",
+      "files": 44,
+      "bytes": 1466
+    },
+    {
+      "path": "tmp/followup-review-baseline",
+      "kind": "generated pytest work",
+      "files": 4,
+      "bytes": 52
+    },
+    {
+      "path": "tmp/followup-review-baseline-2",
+      "kind": "generated pytest work",
+      "files": 10,
+      "bytes": 385
+    },
+    {
+      "path": "tmp/followup-review-fixed",
+      "kind": "generated pytest work",
+      "files": 84,
+      "bytes": 3742
+    },
+    {
+      "path": "tmp/followup-scope-fixed",
+      "kind": "generated pytest work",
+      "files": 44,
+      "bytes": 1466
+    },
+    {
+      "path": "tmp/followup-verification",
+      "kind": "generated pytest work",
+      "files": 11,
+      "bytes": 356
+    },
+    {
+      "path": "tmp/holistic-regressions-after",
+      "kind": "generated pytest work",
+      "files": 77,
+      "bytes": 3638
+    },
+    {
+      "path": "tmp/holistic-regressions-before",
+      "kind": "generated pytest work",
+      "files": 20,
+      "bytes": 757
+    },
+    {
+      "path": "tmp/keh3-b25d95527b954ff7aadd01f602a1cfe1",
+      "kind": "generated pytest work",
+      "files": 8,
+      "bytes": 8
+    },
+    {
+      "path": "tmp/keh3-delivery-b8b294513ff1460f9d805d80e911208f",
+      "kind": "generated pytest work",
+      "files": 15,
+      "bytes": 1011
+    },
+    {
+      "path": "tmp/keh3-final-2a585f9784e24f51b2dff7f2319b9dc6",
+      "kind": "generated pytest work",
+      "files": 15,
+      "bytes": 1011
+    },
+    {
+      "path": "tmp/keh3-final-offline",
+      "kind": "generated pytest work",
+      "files": 10,
+      "bytes": 313
+    },
+    {
+      "path": "tmp/keh3-final-offline-2",
+      "kind": "generated pytest work",
+      "files": 10,
+      "bytes": 313
+    },
+    {
+      "path": "tmp/reference-before-7975691cb84746a686bf92df3067336b",
+      "kind": "generated pytest work",
+      "files": 1,
+      "bytes": 1
+    },
+    {
+      "path": "tmp/reference-diamond-current-68621cd826d94d51acc21d3daed29d24",
+      "kind": "generated pytest work",
+      "files": 0,
+      "bytes": 0
+    },
+    {
+      "path": "tmp/reference-final-source-49ff1fbb21d24658a64648cd2fd9b611",
+      "kind": "generated pytest work",
+      "files": 38,
+      "bytes": 2400
+    },
+    {
+      "path": "tmp/reference-tests-7f3a96487836472884b3de7dec12d154",
+      "kind": "generated pytest work",
+      "files": 38,
+      "bytes": 2294
+    },
+    {
+      "path": "tmp/review-after-fixes",
+      "kind": "generated pytest work",
+      "files": 62,
+      "bytes": 3571
+    },
+    {
+      "path": "tmp/review-baseline",
+      "kind": "generated pytest work",
+      "files": 0,
+      "bytes": 0
+    },
+    {
+      "path": "tmp/review-baseline-unrestricted",
+      "kind": "generated pytest work",
+      "files": 55,
+      "bytes": 2955
+    },
+    {
+      "path": "tmp/review-diamondgui",
+      "kind": "generated pytest work",
+      "files": 0,
+      "bytes": 0
+    },
+    {
+      "path": "tmp/review-regressions-before",
+      "kind": "generated pytest work",
+      "files": 5,
+      "bytes": 286
+    },
+    {
+      "path": "tmp/review-tests-first",
+      "kind": "generated pytest work",
+      "files": 58,
+      "bytes": 7200
+    },
+    {
+      "path": "tmp/review-tests-second",
+      "kind": "generated pytest work",
+      "files": 50,
+      "bytes": 2882
+    },
+    {
+      "path": "tmp/write-boundary-before-205b91474ade4ff4aae3124136ad2984",
+      "kind": "generated pytest work",
+      "files": 2,
+      "bytes": 99
+    }
+  ],
+  "retained_tmp": [
+    "api-reference-tools",
+    "check_hub_management.py",
+    "delay-audit",
+    "delivery_audit.py",
+    "diamond-lock-before-reference.lock",
+    "diamond_final_edits.py",
+    "diamond_import.py",
+    "diamond_own_format.py",
+    "diamondgui-before",
+    "diamondgui-preimages.json",
+    "docs-preview",
+    "ethernet_manual_prepare.py",
+    "ethernet_on_off_notebook.py",
+    "final-review",
+    "finalize_diamond.py",
+    "gui-feedback",
+    "integration_contract.py",
+    "investigate_state_zero.py",
+    "investigate_status_bits.py",
+    "ipython",
+    "ipython-verified",
+    "latency",
+    "manual-review",
+    "migrate_diamond.py",
+    "notebook-ipython",
+    "notebook-simplification-before.json",
+    "package-review-pytest",
+    "pdfs",
+    "read_only_ethernet.py",
+    "read_only_ethernet_middle.py",
+    "read_only_shutter.py",
+    "readability",
+    "reference_audit.py",
+    "register_sources.py",
+    "review_audit.py",
+    "review_live_notebook.py",
+    "validate_and_save_notebook3.py",
+    "validate_ethernet_status_notebook.py",
+    "validate_tutorials.py",
+    "verify_manuals.py",
+    "write_tutorials.py"
+  ],
+  "removal_status": "COMPLETE: all inventoried generated targets removed",
+  "removed_count": 32,
+  "removed_files": 699,
+  "removed_bytes": 174667,
+  "tracked_deletions": [],
+  "venv_preserved": true,
+  "local_configuration_unchanged": true,
+  "removed_review_helpers": [
+    "tmp/followup_cleanup_inventory.py",
+    "tmp/followup_audit.py"
+  ],
+  "helper_removal_scope": "Exact review-owned files, separate from generated directory totals; audit helper removes itself after success"
+}

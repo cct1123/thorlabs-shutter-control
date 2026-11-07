@@ -1,250 +1,75 @@
-# Actual modern WebUI hardware test
+# Follow-up holistic review
 
-REQ-227 / TEST-227 selected real operator flow and final package checks PASS.
-The user confirmed the protected setup and up to two Manual cycles. The visible
-production WebUI connected to SH05R/KSC10168800777/1.0.7 at192.168.1.19:40305,
-returned Manual/OFF0x2000/interlock-required/no fault and read2000ms ON/2000ms
-OFF/count5 unchanged before/after the fix. No simulator, SDK or direct callback
-substitute was used for the live flow; no settings were written.
+REQ-228 / TEST-228: repository implementation, validation and generated cleanup
+PASS. Implementation 460286f is pushed with remote parity verified; this checkpoint
+delivers final documentation and evidence. Full hardware/deployment acceptance remains
+blocked on the explicit gaps below. No device operation occurred in this review.
 
-Found and fixed background polling erasing the last operator message. Real
-readback now advances while retaining the settings-command notice. Also disabled
-the timed-pulse button during displayed ON, and corrected released Read claiming
-"Readback updated" with no device handle. All three have actual browser checks.
-Exactly two approved cycles completed: Open/Close0x2001 ->0x2000 with0.748307s
-between readbacks, then the1s timed hold after the OFF rest. Active Release
-was refused without losing the owner; the timed button was disabled during ON.
-Five targeted source and five isolated installed-wheel UI cases PASS, with exact
-Python/CSS parity, lint/format, locked build/install/import/help and config checks.
-No emulated-device test ran in this campaign.
-The earlier full201/201 result is historical, not repeated by these selected checks.
+## Findings and fixes
 
-Updated verification scripts support explicit tested paths and prefixed records,
-preserving prior campaigns. Saved live-evidence checking reports PARTIAL with
-exit2 when required control cycles are missing. Final actual read was Manual/OFF
-at2026-11-07T01:10:10.710233UTC, followed by Release/Read confirming disconnected
-with the corrected no-feedback message. Independent blade observation is pending;
-host/readback timing is not calibrated optical exposure. Cycle authority is consumed.
-
-[Live observations](../records/webui-modern-hardware-live.json),
-[OFF screenshot](../records/webui-modern-hardware-final-off.png),
-[released screenshot](../records/webui-modern-hardware-final-released.png),
-[validation](../records/webui-modern-hardware-validation.json).
-No further cycle is planned. Broader native/optical/driver acceptance remains separate.
-E201: implementation43e80a4 is published and remote-verified; the following
-documentation/evidence checkpoint completes the scoped delivery.
-
----
-
-# Modern minimalist WebUI refinement
-
-REQ-226 / TEST-226: presentation refined to white surfaces, slate typography,
-muted teal accents, flat controls, subtle borders and consistent spacing. Added
-section headings and responsive desktop/tablet/phone arrangements; Settings has
-a sticky Stop/OFF header and clear groups. No device-control logic or policy
-changed. The manufacturer reference still defines functions, not visual styling.
-
-The real preview stayed disconnected while reviewing1100,768,390 and320px widths
-and scrolling mobile Settings; no overflow or console warning/error was observed.
-No new physical operation was performed. Native-function/protocol gaps described
-below remain unchanged. Current validation: records/webui-modern-validation.json.
-Preview: http://127.0.0.1:9860.
-
-E196 confirms201 source +201 isolated installed-wheel tests PASS, lint/format,
-locked build/install/import/help and exact Python/CSS parity PASS. Device dispatch
-and callback function ASTs and the real configuration are unchanged. New validation
-is retained under webui-modern-* names; earlier software records remain intact.
-Visual implementation66bc05e is published and remote-verified (E197); this
-documentation/evidence checkpoint completes the scoped visual delivery.
-
-[Desktop](../records/webui-modern-desktop.png), [phone](../records/webui-modern-phone.png),
-[Settings](../records/webui-modern-settings.png).
-
----
-
-# Manufacturer-reference direct APT functionality
-
-REQ-225 / TEST-225: supported software features validated; full GUI parity remains
-partial. Rebuilt the panel using the supplied KSC101 RevF manual/screenshot as a
-visual reference. Four modes, Open/Start and Close/Stop, cycle timing/count,
-Settings and Identify all route through our shared APT owner. No Kinesis/SDK is
-used. The tracked SH05R profile remains Manual-only; native modes, settings writes,
-continuous cycles and cycle-only EEPROM requests require explicit qualification.
-
-E193/D061 documents the frame contracts and gaps. Display/dimming and trigger-I/O
-controls are disabled because the available protocol's KSC101 applicability and
-layouts conflict. Key/Ready stays Unknown; electrical OFF never becomes optical
-closure or native Inactive. EEPROM has no acknowledgement and requires later
-protected restart/readback verification. See the [feature matrix](../docs/gui.md#manufacturer-reference-and-implemented-functions)
-and [new unchanged manufacturer PDF](../docs/manuals/KSC101_Kinesis_UI_Manual_HA0368T_Rev_F.pdf).
-
-E194: 201 source and 201 isolated installed-wheel tests PASS, including literal
-frames, qualification gates, settings readback mismatch/cleanup, native Start/Stop
-dispatch, release guards and truthful rendering. Locked install/build/import/help,
-Ruff and exact Python/CSS wheel parity PASS; six notebooks static PASS. These are
-software-only tests, not bench proof. Browser inspection of the real app stayed
-disconnected at desktop/phone widths; no Connect/Identify/device command was used.
-Fixed the narrow selector grid and kept Stop visible in scrolling Settings.
-
-[Desktop preview](../records/webui-apt-panel-desktop.png),
-[settings preview](../records/webui-apt-settings-desktop.png),
-[phone preview](../records/webui-apt-panel-phone.png),
-[validation manifest](../records/webui-apt-validation.json).
-New passive preview: http://127.0.0.1:9860, disconnected. No new physical
-qualification is claimed; historical Manual runs below retain their original
-revision/configuration scope. Full parity needs the manufacturer-specific
-display/trigger/status contract recorded in STATE.md.
-
-Delivery E195: implementation ab80236 and documentation/evidence8c1e1f4 were
-pushed to origin/main and remote parity verified. The final checkpoint records
-that delivery without upgrading software-only results to physical acceptance.
-
----
-
-# Actual hardware WebUI validation (historical revision)
-
-Single-cycle follow-up E191: the user requested one additional cycle to watch the
-blade, with the same protected setup. Clicked the new explicit timed button once:
-the existing owner performed a1s host hold and returned Manual/OFF0x2000/no fault,
-then the browser released communication and confirmed disconnected. The WebUI
-remains open with no device connection. See records/webui-one-second-cycle.json
-and webui-one-second-validation.json. E192: the user confirms "Yes, it opened and
-returned closed"; qualitative blade motion PASS for this exact cycle by human
-observation. No second cycle was run; optical timing/extinction are not calibrated.
-
-6 November 2026. **PASS selected browser/controller user flow; broader deployment
-and independent optical qualification remain open.** No simulator was used.
-
-Tested the production WebUI at localhost:9857 through visible browser controls
-against SH05R/KSC10168800777, firmware1.0.7, KEH3 middle bay192.168.1.19:40305.
-The user confirmed the unchanged source-blocked/trigger-isolated/key-interlock setup.
-One baseline and one corrected short ON/OFF cycle returned0x2000 ->0x2001 ->0x2000.
-Final Manual/OFF/no fault, communication released; the test server was stopped.
-
-Fixed three observed issues: the hardcoded port prevented coexistence with an
-existing8050 application; GUI Connect showed unknown feedback; and the first ON
-unnecessarily failed because the OFF-rest timer began on that click. The GUI now
-accepts an explicit --port, reads fresh status after connection, and counts rest
-from fresh OFF. The first ON after rest succeeds. Immediate ON during the OFF
-interval is still refused, showing1.66s remaining and no dispatched ON; a fresh
-read confirmed OFF/no fault afterward. Manual was already selected and not rewritten.
-
-Updated [the WebUI guide](../docs/gui.md), README and scripts. The new saved-evidence
-checker validates exact identity/route, OFF/ON/OFF, rest refusal and release without
-connecting or fabricating a run. Passive syntax/lint/format, lock, wheel/source
-parity, clean isolated installation/import/help and invalid-port checks pass.
-No fake/simulated-device tests ran in this campaign; the earlier160/160 result
-below belongs to its older revision and is not new full-suite coverage.
-
-See [actual browser results](../records/webui-final-live.json),
-[live provenance/hashes](../records/webui-live-validation.json),
-[passive package validation](../records/webui-package-validation.json),
-[saved-evidence check](../records/webui-evidence-validation.json) and
-[final OFF screenshot](../records/webui-final-off.jpg). E188/E189 in records/RECORDS.md
-retain the baseline, corrections, commands and scope. In E190 the user reports:
-"I did not observe the blade". Independent blade motion, optical closure/calibration
-and the separate DiamondGUI deployment remain unverified. No additional cycle was
-performed; original browser evidence and its hashes are unchanged.
-No further hardware cycle is planned.
-
----
-
-The following report is the previously delivered holistic review. Its tests,
-counts and publication hashes apply to that historical revision.
-
-# Holistic review and migration delivery
-
-6 November 2026. **Package review PASS; integrated deployment remains blocked.**
-The package has one shared owner and direct APT driver for Python, CLI, GUI and
-six real Ethernet notebooks. The review performed no device operation.
-
-## Defects corrected
-
-| Finding | Correction | Evidence |
+| Supported finding | Final behavior | Evidence |
 | --- | --- | --- |
-| GUI shutdown could send OFF after a read-only session when a write policy existed | Cleanup depends on prior output/mode attempts; read-only faults are reported without actuation | E183 owner regressions, with/without policy and fault |
-| Release with no selected GUI target could disconnect every route | All six controls require an exact configured name before dispatch | E183 Flask callback cases for missing/unknown targets |
-| Minimum OFF rest started at command dispatch | Start rest after fresh electrical OFF readback | E183 delayed-transition regression; early ON refused |
-| Candidate connection manager, analyzer/probe CLI and gated example duplicated current workflows | Removed superseded paths; one owner, TOML configuration and static notebook verification | [Migration replacements](../docs/cutover.md) |
-| Generic config target and notebook-guide API differed from current usage | Consistent shutter name; guide uses shutter_config.SHUTTER | Static/passive setup and CLI checks |
-| Current guides cited the manual-copy record as the live ON/OFF result | Corrected links to E181 and separated historical/current validation | E184 documentation audit |
-| External DiamondGUI checkpoint incorrectly said its checkout was unavailable | Live inspection found a commented-out page and stale metadata; documented current deployment failure without altering the separate dirty checkout | E185: 3 owner/factory PASS, 26 page FAIL |
-| Verification accumulated disposable environments | Remove successful-run work; retain failed-run diagnostics; avoid subprocess Python/Ruff caches | Successful full verification and scoped cleanup manifest |
+| ON could leave an old OFF timer reusable when no ON poll followed | Every ON attempt invalidates prior rest; fresh external OFF starts a new interval | E203 baseline failure; E204 regression |
+| An earlier output session could cause OFF during a later read-only shutdown | Confirmed-safe release retires output history; unresolved/faulted work remains protected | Healthy/faulted reconnect regressions |
+| Protected recovery retained an old ON request/cleanup obligation | Verified recovery clears stale requests without output | Recovery/passive-shutdown regression |
+| Cycle edits ignored recorded duty limits | Timing/count/duty checks precede I/O; exact duty boundary accepted | Negative/positive policy regressions |
+| Mode/settings writes could pass despite disabling interlock requirement | Readback must retain the requirement; failure faults/retains uncertainty and attempts protective cleanup | Both write paths fault-tested |
+| Explicit mode Stop retained an old native Start request | Requested state reflects the explicit OFF | Native-to-Manual regression |
+| GUI drafts/assertions survived disconnect/reconnection | Target/generation scope clears old state; polling preserves same-connection edits | GUI callback regressions |
+| Verification omitted a frozen real fixture and trusted pytest exit alone | Fixture hashed; failed/skipped/empty required suites refused and totals retained | Provenance/report regressions |
 
-The DiamondGUI public method/status surface remains intact. No SDK backend,
-constructor shim, implicit transport fallback, command retry or ON replay remains.
-Runtime Python shrank from 1,702 to 1,588 lines relative to 9d486b3: 114 net lines
-removed (6.7%), including the superseded candidate path.
-Electrical output, operating state and optical observation stay separate. VCP and
-KEH3 external USB OUT control remain unavailable; writes require the reviewed
-load policy and Manual/interlock/identity/ownership checks.
+Removed duplicated GUI callback test plumbing in favor of one helper. Replaced
+repeated checkpoint/report history with current conclusions and links to durable
+records. Existing public owner/status names and the explicit raw diagnostic are
+retained contracts, not duplicate backends. SDK/probe/notebook-wrapper runtime
+paths were already removed and remain absent. No live policy/configuration or
+external DiamondGUI source was changed.
 
-## Final software evidence
+## Validation and cleanup
 
-**160 source tests + 160 isolated installed-wheel tests PASS**, with zero failures,
-errors or skips. Locked dependencies, lint/format, clean build/install/import/help,
-source-wheel parity, negative lock cases and passive configuration validation pass.
-All six notebooks pass schema/syntax/link checks without executing their cells.
-Tests use software byte transports and localhost; they establish no physical result.
+**228 source + 228 isolated installed-wheel tests PASS**, zero failures/errors/
+skips. Locked build/install/import/help/config checks, lint/format, exact Python/
+CSS parity and frozen-fixture provenance PASS. All six notebooks PASS static
+schema/syntax/link checks; no device cell ran. The source/fault suite uses software
+fixtures and localhost loopback and establishes no physical qualification.
 
-Commands:
+Baseline evidence records 8 failing owner cases and 4 failing GUI cases before the
+fixes. Final and baseline artifacts are separate. Command:
 
 ```powershell
-uv run --locked --offline --group dev --extra gui python scripts/verify.py
-uv run --locked --offline --group notebooks python scripts/verify_notebooks.py
+uv run --locked --offline --group dev --extra gui python -B scripts/verify.py --record-prefix followup-review-
+uv run --locked --offline --group dev --group notebooks --extra gui python -B scripts/verify_notebooks.py
 ```
 
-All verification input hashes matched the staged Git blobs. Reviewed changed text
-was normalized to the repository's LF policy, with six byte-exact notebook backups
-and saved outputs retained privately. Four manufacturer PDFs remain unchanged and
-match their registered SHA-256 values. 112 local Markdown targets exist; all
-reviewed JSON/XML evidence parses. See [E183/E184](../records/RECORDS.md),
-[source/wheel manifest](../records/direct-validation.json),
-[source tests](../records/offline-tests.xml), [wheel tests](../records/wheel-tests.xml),
-[static notebook checks](../records/notebook-validation.json),
-[manual integrity](../records/manuals-verification.json) and
-[normalization/backups](../records/holistic-normalization.json).
-The [final review manifest](../records/holistic-review.json) records the current
-package PASS and external integration FAIL together.
+Removed **32 verified generated cache/pytest directories, 699 files / 174667 bytes**.
+Every absolute target was checked for workspace containment, links, unchanged
+contents and tracked files before native PowerShell deletion. No tracked file
+was deleted. Environments, local config, manuals, reference tooling, real records,
+backups and runtime state were preserved. Ambiguous tmp history was retained.
 
-## Cleanup and delivery
+Evidence: [validation manifest](../records/followup-review-validation.json),
+[source/wheel checks](../records/followup-review-direct-validation.json),
+[static notebooks](../records/followup-review-notebooks.json),
+[cleanup inventory/results](../records/followup-review-cleanup.json),
+[records](../records/RECORDS.md).
 
-Stage 1: b9b2309, runtime migration, owner/GUI fixes, examples and operator/API docs.
-Stage 2: 2297162, manufacturer manuals, source/state interpretation and historical
-evidence. Stage 3: c6f6661, final review/checkpoint and cleanup evidence.
-All three review stages were pushed to origin/main and verified against remote
-HEAD at c6f6661 with a clean working tree (E187, records/holistic-publication.json).
-A follow-up publication checkpoint preserves that observed delivery result.
+## Migration and physical validity
 
-Only inventoried generated cache/test/build paths are removed. The environment,
-current wheel, manuals, records, private notebook backups, reference originals and
-runtime ownership state are preserved. Investigation scripts, source preimages
-and ambiguous temporary history remain available. Logical byte totals do not
-measure physical disk savings because caches and environments can share hardlinks.
-See [cleanup inventory/results](../records/holistic-cleanup.json).
-Cleanup removed 59 targets, including 178,212 generated files from the main
-inventory (5,317,497,320 logical bytes); all removals completed without failure.
+Restart the released WebUI owner and reload the browser before using the reviewed
+source. The previously running 9860 preview uses pre-review code; it was last
+observed released after E200 and was not polled or replaced here. There is no
+automatic takeover or background hardware connection. See [cutover](../docs/cutover.md).
 
-## Historical hardware evidence and remaining limits
+E200's two real Manual WebUI/controller cycles remain PASS at their recorded
+source/configuration; final Manual/OFF was followed by release. E202's user report,
+"I did not observe both cycles", leaves complete two-cycle blade motion unverified.
+The original raw capture and hashes remain intact; the human follow-up is separate.
+E191/E192's earlier individually observed cycle does not calibrate optics.
 
-[E181](../records/ethernet-control-live.json) records one real SH05R cycle on
-KSC101 68800777, firmware 1.0.7, KEH3 middle bay 192.168.1.19:40305: protected
-OFF/Manual preparation, 2 s initial OFF pause, one ON with a 1 s host hold,
-priority OFF and release. Electrical bits were 0x2000 -> 0x2001 -> 0x2000;
-ON-to-OFF host dispatch was 1.0569156 s. Final recorded state was Manual/OFF.
-The user did not observe blade motion. This is historical evidence for its recorded
-hashes; the review changed controller/GUI code and did not repeat or requalify
-physical operation. Present state, independent optical closure/timing, key/contact
-continuity, local/TTL behavior, hub identity/recovery, other topology, native
-250 ms dispatch, driver persistence, reboot and endurance remain unverified.
-A manufacturer design mapping is not an independent optical measurement.
-
-The four repository manuals cover KSC101, KEH3/KEH6 and APT Issues 36/42.1;
-[the SH05R source](../docs/sources.md) was reviewed online earlier, but its unchanged
-local PDF is still missing. The external DiamondGUI checkout is present and dirty:
-3 passive owner/factory tests PASS, but 26 page tests FAIL because its shutter
-page is entirely commented out. Its metadata still selects the old name and
-port 40304. No external edits were made. See [current integration findings](../records/diamondgui-current-integration.json)
-and [failing page tests](../records/diamondgui-current-tests.xml). The historical
-29-case PASS is superseded. In-repo owner/schema, CLI and GUI tests pass. [STATE.md](../STATE.md) records the exact human dependency
-and resumption conditions. The full engineering project is BLOCKED, not COMPLETE.
+Current owner/GUI changes have software validation only. Native timing/priming,
+EEPROM restart persistence, local/TTL/interlock behavior, optical calibration and
+broader driver/hub deployment are not newly qualified. Display/trigger-I/O and
+Key/Ready need trustworthy KSC101-specific contracts. The external DiamondGUI
+page/mapping failure is the historical E185 result and was not rechecked here.
+These remain visible in [STATE.md](../STATE.md) and the
+[physical acceptance plan](../docs/HARDWARE_VALIDATION.md).

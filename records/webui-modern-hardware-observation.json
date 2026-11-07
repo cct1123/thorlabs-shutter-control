@@ -1,0 +1,10 @@
+{
+  "evidence_id": "E202",
+  "requirement_id": "REQ-227",
+  "scope": "Human follow-up for E200 only; no new device operation",
+  "recorded_at_utc": "2026-11-07T01:23:53.019642+00:00",
+  "user_report": "I did not observe both cycles",
+  "interpretation": "Independent blade motion for the complete two-cycle run remains unverified; no motion failure is inferred",
+  "controller_evidence": "Unchanged; actual ON/OFF and final release remain as recorded",
+  "additional_cycles_authorized": false
+}

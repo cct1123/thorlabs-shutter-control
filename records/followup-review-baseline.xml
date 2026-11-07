@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="8" skipped="0" tests="8" time="0.191" timestamp="2026-11-06T19:26:31.890103-06:00" hostname="HighFieldSetup"><testcase classname="tests.test_review_regressions" name="test_successful_on_invalidates_off_rest_before_external_off" file="tests\test_review_regressions.py" line="10" time="0.008"><failure message="Failed: DID NOT RAISE ShutterError">tests\test_review_regressions.py:26: in test_successful_on_invalidates_off_rest_before_external_off
+    with pytest.raises(ShutterError, match="OFF/duty recovery"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ShutterError</failure></testcase><testcase classname="tests.test_review_regressions" name="test_completed_output_does_not_actuate_a_later_readonly_connection[False]" file="tests\test_review_regressions.py" line="30" time="0.013"><failure message="assert not [Frame(message_id=1227, param1=1, param2=2, destination=80, source=1, payload=None)]&#10; +  where [Frame(message_id=1227, param1=1, param2=2, destination=80, source=1, payload=None)] = &lt;conftest.FakeTransport object at 0x000001F4B8CB3EC0&gt;.output_frames">tests\test_review_regressions.py:48: in test_completed_output_does_not_actuate_a_later_readonly_connection
+    assert not devices[-1].output_frames
+E   assert not [Frame(message_id=1227, param1=1, param2=2, destination=80, source=1, payload=None)]
+E    +  where [Frame(message_id=1227, param1=1, param2=2, destination=80, source=1, payload=None)] = &lt;conftest.FakeTransport object at 0x000001F4B8CB3EC0&gt;.output_frames</failure></testcase><testcase classname="tests.test_review_regressions" name="test_completed_output_does_not_actuate_a_later_readonly_connection[True]" file="tests\test_review_regressions.py" line="30" time="0.010"><failure message="AssertionError: Regex pattern did not match.&#10;  Expected regex: 'Read-only fault'&#10;  Actual message: &quot;Output cleanup unconfirmed; optical state unknown: beam: No identity-verified handle; connect explicitly\nbeam: ShutterError('No identity-verified handle; connect explicitly'); notes=[]&quot;">tests\test_review_regressions.py:44: in test_completed_output_does_not_actuate_a_later_readonly_connection
+    with pytest.raises(ShutterError, match="Read-only fault"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'Read-only fault'
+E     Actual message: "Output cleanup unconfirmed; optical state unknown: beam: No identity-verified handle; connect explicitly\nbeam: ShutterError('No identity-verified handle; connect explicitly'); notes=[]"</failure></testcase><testcase classname="tests.test_review_regressions" name="test_protected_recovery_clears_active_request_without_incidental_off" file="tests\test_review_regressions.py" line="50" time="0.006"><failure message="AssertionError: assert 'on' is None&#10; +  where 'on' = ShutterStatus(name='beam', channel=0, serial_number='68000001', endpoint=None, connection='connected', has_device=True...='1.0.7', hardware_version=1, channels=1), cycle_parameters=None, settings_observed_at=None, settings_persistence=None).requested_state">tests\test_review_regressions.py:58: in test_protected_recovery_clears_active_request_without_incidental_off
+    assert recovered.requested_state is None
+E   AssertionError: assert 'on' is None
+E    +  where 'on' = ShutterStatus(name='beam', channel=0, serial_number='68000001', endpoint=None, connection='connected', has_device=True...='1.0.7', hardware_version=1, channels=1), cycle_parameters=None, settings_observed_at=None, settings_persistence=None).requested_state</failure></testcase><testcase classname="tests.test_review_regressions" name="test_cycle_settings_enforce_recorded_duty_limit_before_io" file="tests\test_review_regressions.py" line="63" time="0.006"><failure message="Failed: DID NOT RAISE ValueError">tests\test_review_regressions.py:74: in test_cycle_settings_enforce_recorded_duty_limit_before_io
+    with pytest.raises(ValueError, match="duty"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValueError</failure></testcase><testcase classname="tests.test_review_regressions" name="test_configuration_write_cannot_silently_disable_interlock[mode]" file="tests\test_review_regressions.py" line="78" time="0.005"><failure message="Failed: DID NOT RAISE ShutterError">tests\test_review_regressions.py:97: in test_configuration_write_cannot_silently_disable_interlock
+    with pytest.raises(ShutterError, match="interlock"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ShutterError</failure></testcase><testcase classname="tests.test_review_regressions" name="test_configuration_write_cannot_silently_disable_interlock[settings]" file="tests\test_review_regressions.py" line="78" time="0.005"><failure message="Failed: DID NOT RAISE ShutterError">tests\test_review_regressions.py:97: in test_configuration_write_cannot_silently_disable_interlock
+    with pytest.raises(ShutterError, match="interlock"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ShutterError</failure></testcase><testcase classname="tests.test_review_regressions" name="test_mode_stop_clears_native_start_request" file="tests\test_review_regressions.py" line="105" time="0.007"><failure message="AssertionError: assert 'start' == 'off'&#10;  &#10;  - off&#10;  + start">tests\test_review_regressions.py:117: in test_mode_stop_clears_native_start_request
+    assert result.requested_state == "off"  # Mode transition explicitly sent Stop/OFF.
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: assert 'start' == 'off'
+E
+E     - off
+E     + start</failure></testcase></testsuite></testsuites>

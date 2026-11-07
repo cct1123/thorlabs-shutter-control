@@ -2398,3 +2398,94 @@ both software phases, validator results and actual screenshots. Final staged
 source/artifact hashes and remote parity are checked before/after publication.
 No additional device action is associated with delivery. Independent blade
 observation for this run remains pending; consumed two-cycle scope is not renewed.
+
+## E202 - Human observation follow-up for the two-cycle run
+
+The user reports: "I did not observe both cycles". Independent blade motion for
+the complete E200 run remains UNVERIFIED; this is not evidence of failed motion.
+records/webui-modern-hardware-observation.json preserves the exact report and
+interpretation separately from the unchanged raw capture. The derived hardware
+summary points to this follow-up; controller readbacks and final release remain
+as recorded. E191/E192's earlier single observed cycle is a separate result.
+No new cycle authority is granted.
+
+## D063 - Connection-scoped state and explicit validation boundaries
+
+Retire confirmed-safe output history at release so a future read-only session
+does not send incidental OFF. Preserve active requests, faults and uncertainty;
+only protected verified recovery clears stale requests without output. Invalidate
+OFF rest before every ON attempt. Scope GUI drafts/assertions to target and
+connection generation, preserving same-connection edits during ordinary polls.
+Keep public owner/status contracts, APT framing, configuration and permissions.
+No SDK/compatibility backend or automatic device operation is introduced.
+
+Hash the frozen real-observation regression input and require positive executed
+JUnit counts with no failures/errors/skips. Preserve old campaigns separately.
+The new tests use software fixtures only; their PASS does not renew bench proof.
+
+## E203 - Follow-up review reproductions / TEST-228
+
+Starting checkout 547ad94 was clean. New owner regressions reproduced eight
+failures before fixes: stale OFF rest, incidental shutdown output after a healthy
+or faulted read-only reconnect, stale recovery request, duty-policy bypass,
+interlock changes after mode/settings writes and stale native Start request.
+records/followup-review-baseline.xml preserves the failing run. The later GUI
+baseline reproduced four failures and one passing control (eight deselected):
+stale settings drafts and assertions after disconnect/reconnect.
+records/followup-gui-baseline.xml preserves that separate phase.
+
+Commands used the locked offline dev/gui environment, python -B -m pytest -q
+--tb=short -p no:cacheprovider with explicit tmp basetemp and records JUnit paths.
+Owner baseline selected tests/test_review_regressions.py at its eight-case
+revision; GUI baseline selected that file with -k 'drafts or assertions'.
+These were controlled software reproductions, not hardware tests.
+
+## E204 - Final integrated software validation / TEST-228
+
+uv run --locked --offline --group dev --extra gui python -B scripts/verify.py
+--record-prefix followup-review-: 228 source and 228 isolated installed-wheel
+tests PASS, zero failures/errors/skips. Lock, lint/format, build/install/import/
+help/config checks, exact Python/CSS parity and frozen-fixture input hashes PASS.
+records/followup-review-direct-validation.json and the prefixed source/wheel XMLs
+preserve commands, totals, stdout and source/package hashes.
+
+uv run --locked --offline --group dev --group notebooks --extra gui python -B
+scripts/verify_notebooks.py: all six notebooks PASS static schema/syntax/link
+checks, no cell execution. Copied result to records/followup-review-notebooks.json
+and restored the earlier campaign's notebook-validation.json unchanged.
+No instrument connection, physical operation or running-preview replacement
+occurred. Owner/GUI changes require separate physical requalification.
+
+## E205 - Migration, provenance and generated cleanup / TEST-228
+
+Removed 32 verified generated cache/pytest directories: 699 files, 174667 bytes.
+Each absolute target was checked for workspace containment, reparse links,
+unchanged contents and absence of tracked files before native PowerShell removal.
+records/followup-review-cleanup.json preserves inventory/results. Environments,
+local config, ownership state, manuals, source preimages, backups, reference tools,
+ambiguous tmp history and real evidence were retained. Review-owned inventory/
+audit helpers were removed separately after use.
+
+README/API/GUI/architecture/cutover/acceptance instructions now explain connection
+lifetime, qualification limits and released-owner restart/browser reload.
+STATE.md and outputs/REPORT.md contain current conclusions; prior history remains
+in Git and these records. Retired SDK/probe/notebook-wrapper paths remain absent;
+public DiamondGUI owner/status names remain intentional contracts.
+records/followup-review-validation.json captures final source/fixture/manual/
+artifact checks, local Markdown links and cleanup absence checks. Full project
+acceptance remains BLOCKED on the documented physical/manufacturer/external gaps.
+
+## E206 - Follow-up implementation and checkpoint publication
+
+Commit 460286ffde8116e8f15b232f9402357d0825d648 contains the reviewed owner/GUI,
+strict verification, shared callback helper, regressions and README/API/migration
+instructions. All 43 validated inputs matched staged Git blobs before commit.
+git fetch origin main found no divergence; push advanced 547ad94 -> 460286f.
+Bounded git ls-remote returned 460286ffde8116e8f15b232f9402357d0825d648,
+matching local HEAD. No device operation accompanied publication.
+
+This following checkpoint delivers the compact state/report, acceptance notes,
+human observation, before/after software evidence and cleanup/provenance manifests.
+Explicit staged inputs/artifact hashes are checked before commit and final remote
+parity/clean status after push. Full hardware acceptance remains BLOCKED as stated;
+scoped repository-review completion does not extend any physical authorization.

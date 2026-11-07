@@ -22,6 +22,9 @@ Open/Start, priority Close/Stop and passive Release are separate controls. An om
 qualification policy blocks output/mode/settings writes. Identify flashes LEDs only.
 Successful background polls refresh data without erasing the last command or
 refusal message. An explicit Read state still displays its own result.
+Disconnect or a new owner connection clears old settings drafts, source-protection
+assertions, persistence opt-in and polling selection. Confirm physical conditions
+after Connect; ordinary polling on the same connection preserves active edits.
 The Manual control states that mode changes are remembered at power-up. A real
 transition requires separate `allow_persistent_mode_changes` policy permission;
 an already Manual/OFF state is queried without a mode write.
@@ -210,7 +213,8 @@ and Read showing disconnected/no handle/unknown feedback and the corrected
 message. The protection checkbox was cleared locally after the window ended.
 The two-cycle authority is consumed; no third ON, mode/settings/EEPROM or other
 device action is authorized by it. This is PASS for the selected real operator
-flow, not calibrated optical timing. Independent blade observation is pending.
+flow, not calibrated optical timing. In E202 the user reports "I did not observe
+both cycles"; complete two-cycle independent blade motion remains unverified.
 
 [Actual observations](../records/webui-modern-hardware-live.json),
 [final actual OFF screenshot](../records/webui-modern-hardware-final-off.png),
@@ -228,3 +232,8 @@ The selected software path uses saved actual samples only, with no emulated
 device/transport. The packaging script defaults to the full suite; selection is
 explicit in the output's tested_paths. --record-prefix preserves prior campaigns.
 Software callback checks are separate from live hardware acceptance.
+
+The follow-up repository review adds stricter OFF-rest/lifecycle/interlock/duty
+guards and connection-scoped GUI state. Restart the server and reload the browser
+to load it. E200's physical results belong to its recorded pre-review source;
+this review performs no new physical actuation or hardware qualification.

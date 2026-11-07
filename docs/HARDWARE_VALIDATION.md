@@ -1,5 +1,13 @@
 # Physical acceptance and scoped Ethernet commissioning
 
+The current follow-up review is software-only. E200's two real Manual WebUI
+cycles retain their recorded source/configuration scope; E202 reports that the
+user did not observe both cycles, so full two-cycle blade motion is unverified.
+E191/E192 records a separate earlier individually observed cycle. No calibrated
+optical timing/extinction, local/TTL/interlock or native-mode campaign is implied.
+The reviewed owner rest/cleanup/interlock guards require affected physical
+requalification in a fresh approved window; no repeat was performed here.
+
 PROJECT.md records a bounded exact-controller SH05R commissioning authorization
 for OFF/Manual preparation and one 1 s ON/OFF cycle, with a 2 s OFF pause and
 independent source/trigger protection. E181 executed that one cycle: controller
@@ -14,9 +22,10 @@ optical/electrical states, permitted commands, duty/frequency/exposure limits,
 cycle count, cleanup and operator recovery. Do not invent numeric safe limits.
 Keep one active owner and close unrelated device applications.
 
-| Test | Requirement | Procedure / expected evidence | Current result |
+| Test | Requirement | Procedure / expected evidence | Recorded result / validity |
 | --- | --- | --- | --- |
 | TEST-220 | REQ-220 | Exact middle-bay KSC10168800777/1.0.7 and SH05R, protected source, explicit Manual, one1s ON/OFF, finalOFF and release | PASS controller command/readback only; no independent blade observation |
+| TEST-227 | REQ-227 | Approved protected modern-WebUI Open/Close, active-release guard,1s host hold, final OFF/release | E200 PASS selected controller flow at its recorded revision; E202 full two-cycle independent blade motion unverified |
 | TEST-208 | REQ-208 | Manufacturer Ethernet contract; exact hub and each occupied/empty/swapped route; wrong hub/serial rejected; shared loss invalidates all affected data | BLOCKED |
 | TEST-209 | REQ-209 | Begin with authorized identity/state reads. Establish shutter model and OFF/ON optical mapping independently. Then explicit modes/output, local controls, interlocks, loss while active, power-off/restoration and optical timing | UNTESTED |
 | TEST-210 | REQ-210 | Inventory packages/loaded drivers/serial instruments and rollback. Qualify bindings, 10 reconnects, 3 reboots and representative 24-hour coexistence, finalized within actual shutter ratings | UNTESTED |

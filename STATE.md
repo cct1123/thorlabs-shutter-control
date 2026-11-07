@@ -1,285 +1,132 @@
 # Engineering state
 
-## Active actual-hardware WebUI test
+## Current checkpoint
 
-REQ-227 / TEST-227 PASS for the selected real WebUI/controller workflow,
-E198-E200. The user confirmed "Confirmed; up to two protected cycles"; exactly
-two were completed, with actual Manual ON0x2001/OFF0x2000 and a1s host hold.
-Cycle1 readback interval0.748307s (within5s); cycle2 started after28.177088s OFF.
-Active Release refused without losing ownership/faulting; timed pulse disabled
-during displayed ON. No simulator, SDK or direct callback substitute for live work.
-E198/E199: actual visible browser/production APT/TCP verified68800777/1.0.7,
-Manual/OFF0x2000/interlock-required/no fault, unchanged2000ms ON/2000ms OFF/count5,
-fresh live polling and release. No simulator, SDK or direct callback/API substitute
-for the live run. E198/E199 were read-only; E200 adds exactly the approved two
-cycles. No mode, settings, EEPROM or other-device configuration was written.
+REQ-228 / TEST-228 follow-up holistic review: scoped repository review COMPLETE.
+Implementation/software/cleanup PASS; implementation 460286f is pushed and remote
+parity verified (E206). This checkpoint contains final docs/evidence delivery.
+Full physical/deployment acceptance
+remains BLOCKED on the specific gaps below. Source: PROJECT.md latest review
+request. Starting checkout 547ad94 was clean; no hardware operation was performed.
 
-Fixed successful background polling erasing operator notices; actual polling now
-advances feedback while retaining the settings-command message. Timed pulse now
-requires displayed Manual/OFF; its ON gating passed in the actual first cycle.
-Also fixed disconnected Read claiming fresh readback. Five final targeted UI
-cases PASS from source and installed wheel; exact Python/CSS parity, lint/format,
-lock/build/install/help PASS. The initial4/4 read-phase evidence is preserved. No
-emulated-device tests ran in this campaign; the broader201-test run is historical.
-Scripts now retain scoped/prefixed records and report PARTIAL/exit2 for missing
-control cycles. Current evidence: records/webui-modern-hardware-validation.json,
-raw live JSON, evidence-check JSON, prefixed software JSON/XML and screenshots.
+E203 reproduced 8 owner/policy failures and 4 GUI-state failures before fixes.
+E204: 228 source + 228 isolated installed-wheel tests PASS, zero failures/errors/
+skips; exact Python/CSS parity, locked build/install/import/help and frozen fixture
+hashes PASS. Six notebooks PASS static checks; no hardware cells executed.
+E205: 32 verified generated cache/pytest directories, 699 files / 174667 bytes removed;
+no tracked deletions, .venv/local configuration/backups/reference tooling retained.
+Evidence: records/followup-review-validation.json, prefixed test/XML/notebook
+records, baseline failure XMLs and records/followup-review-cleanup.json.
 
-Final read2026-11-07T01:10:10.710233UTC: Manual/OFF/no fault, then Release/Read
-confirmed has_device=false and unknown feedback. Preview9860 remains available,
-disconnected, owned session57830/-B. Protection checkbox cleared after release.
-Independent blade observation for this run is pending; do not infer it or
-calibrated timing from controller bits. E201: implementation43e80a4 is published
-and remote-verified. Documentation and exact real-run/package evidence are in
-this following checkpoint; final remote parity is checked after its push.
-No further physical cycle is planned; native/settings qualification remains separate.
+### Corrected behavior
 
-### Current output authorization
+- Every ON attempt invalidates prior OFF rest, including ON without a later poll.
+- A confirmed-safe released output session cannot authorize OFF in a later reader.
+  Faulted/active uncertainty still survives release and process boundaries.
+- Protected recovery clears stale requests/cleanup obligations without output.
+- Mode Stop updates requested OFF; settings/mode readback must retain interlock
+  requirement. Cycle writes enforce recorded duty as well as timing/count limits.
+- GUI drafts and assertions are scoped to target/connection generation. Disconnect
+  and reconnect clear stale state; ordinary polling preserves active edits.
+- Verification hashes frozen real-observation input and refuses failed/skipped/
+  empty required suites. GUI callback test plumbing has one shared helper.
 
-Known: E198/E199 record current real Manual/OFF, read-only settings/polling and
-released ownership. E191/E192 record the earlier observed blade cycle. Software cannot
-verify present source blocking, trigger isolation or key/interlock continuity.
-Resolved by the user's "Confirmed; up to two protected cycles" reply. Source
-blocked, triggers isolated and intact key/interlock are human-confirmed for this
-window. Its two-cycle budget is now consumed: Open/Close within5s and one1s host
-hold, minimum2s OFF between, final OFF/readback/release completed. No further ON,
-mode, EEPROM, trigger-I/O or other-device configuration is authorized by it.
+The current running preview, last observed at 127.0.0.1:9860 (session 57830), uses the
+pre-review source. It was released after E200; its transient state has not been
+polled during this review. Restart the released owner and reload the browser to
+load reviewed code. No server takeover, device connection or driver change here.
 
-## Active visual refinement
+## Architecture and fixed configuration
 
-REQ-226 / TEST-226 PASS (PROJECT.md current user design request), E196.
-Flat white/slate/teal design, semantic section headings, consistent spacing,
-subtle borders, system typography and responsive Settings replace the literal
-manufacturer skin. Desktop/tablet/phone review at1100/768/390/320px found no
-horizontal overflow. Phone Settings Stop/OFF stayed visible after626.4px scroll.
-201 source +201 isolated-wheel tests, lint/format and exact Python/CSS parity PASS.
-Device dispatch/callback function ASTs and the real TOML are byte/structure unchanged.
-No hardware command; no fabricated connected/readiness state. REQ-225's protocol
-and physical gaps remain unchanged. E194 evidence remains historical and preserved.
-Evidence: records/webui-modern-validation.json, separate modern software XML/JSON
-and four screenshots. Its earlier preview session67798 was superseded by the
-current actual-test server above. E197: implementation66bc05e is
-published and remote-verified. Documentation/evidence are included in this final
-checkpoint; final remote parity is checked after its push. No further visual
-work or hardware action is pending. REQ-225's specific contract gaps remain open.
+Device -> transport -> APT Session -> KSC101 driver -> ShutterHub -> Python/CLI/
+WebUI/notebooks. One owner; no SDK backend, compatibility connection manager,
+automatic retry/fallback, automatic startup connection or ON replay.
 
-## APT functionality and unresolved contracts
+Canonical target: shutter / application CH0 / APT channel 1 / SH05R /
+KSC101 68800777 / firmware 1.0.7 / KEH3 middle bay 192.168.1.19:40305.
+Hub serial/firmware remain unknown. config/shutter.ethernet.toml is unchanged:
+Manual-only, continuous-duty load, 2 s OFF rest, separately permitted persistent
+Manual preparation; native mode/settings/EEPROM permissions stay disabled.
+VCP and KEH3 external USB OUT output remain unavailable. Identity/status bit 0
+does not measure blade position, key contact, readiness or native activity.
 
-REQ-225 / TEST-225: PARTIAL; supported software paths validated, full GUI parity
-BLOCKED on KSC101-specific display/trigger wire contracts and Key/Ready feedback.
-E193/D061: RevF GUI is reference only. Four mode selectors, Open/Start and
-Close/Stop, timing/count, Settings and Identify use the canonical APT owner.
-Cycle edits/storage and native modes have separate permission/qualification gates;
-the real SH05R TOML remains unchanged, Manual-only with settings writes disabled.
-MMI/trigger layouts conflict with KSC101 applicability text; disabled controls and
-Unknown lamps disclose the gap instead of guessing motor layouts or using an SDK.
+Public DiamondGUI owner names/status fields remain contracts. Retired probe/SDK/
+notebook-wrapper paths remain absent; historical reports/evidence are retained.
+Current instructions: README.md, docs/python-api.md, docs/gui.md, docs/cutover.md.
+Manufacturer/source contracts: docs/INTERFACE.md and docs/sources.md.
 
-E194: 201 source + 201 isolated installed-wheel tests PASS; Python/CSS parity,
-lint/format/locked install/import/help PASS, six notebooks static PASS.
-Browser review at1100px desktop/390px phone was disconnected, no device command;
-responsive selector and scrolling Settings header corrected, zero console warnings/errors.
-Evidence: records/webui-apt-validation.json and desktop/settings/phone screenshots.
-Native timing, priming, Identify flash and settings persistence remain UNTESTED;
-the revised Manual panel is now covered by E200/REQ-227. Old E191/E192 qualify their exact
-historical Manual cycle only. No new live output/configuration authority exists.
-E194's preview session14309 was superseded by the verified-disconnected visual
-refinement restart above; it is no longer the active server.
-Earlier9857 server was not taken over. Recheck transient state before future work.
+## Physical evidence and authority
 
-E195: implementation ab80236 and documentation/evidence8c1e1f4 pushed to
-origin/main; remote tip8c1e1f4 and clean working tree verified before this final
-checkpoint. Final source/evidence hashes match the staged Git blobs. This
-publication checkpoint follows those commits; final remote parity is checked
-again after its push. Full parity resumes only with a trustworthy
-manufacturer KSC101 display/trigger/status contract and separately approved tests.
+E200 / TEST-227: two real visible-WebUI cycles on the exact setup above passed
+at their recorded pre-review source. Manual ON 0x2001 -> OFF 0x2000, 0.748307 s
+between readbacks; then 1 s host hold after 28.177088 s OFF. Active Release refused,
+timed pulse disabled during ON, settings 2000/2000 ms/count 5 unchanged. Final
+Manual/OFF/no fault at 2026-11-07T01:10:10.710233 UTC, then released/no handle.
+Raw record: records/webui-modern-hardware-live.json; source/artifact hashes and
+scope: records/webui-modern-hardware-validation.json. This is not current live
+state or physical validation of the review's owner/GUI changes.
 
-## Latest single-cycle follow-up (6 November 2026, local date)
+E202: user reports "I did not observe both cycles". Complete E200 two-cycle
+blade motion remains unverified; failed motion is not inferred. Separate human
+report: records/webui-modern-hardware-observation.json. E191/E192 records an
+earlier single cycle whose opening/return closed was independently reported.
+Neither establishes optical timing/extinction calibration.
 
-E191 / REQ-224: exactly one newly authorized1s host-hold cycle completed through
-the visible WebUI timed button. Fresh initial identity68800777/1.0.7, Manual/OFF
-and interlock requirement true; configured OFF rest observed. Successful existing
-owner pulse returned Manual/OFF0x2000/no fault. Release then Read confirmed
-disconnected/has_device=false/requestedOFF. No second cycle or mode change.
-Evidence: records/webui-one-second-cycle.json, webui-one-second-off.jpg and
-webui-one-second-validation.json (source/artifact hashes and timing scope).
-The WebUI remains open at127.0.0.1:9857 (owned exec session3080), with no device
-handle/claim. Recheck its actual state before future work; do not issue more ON.
-E192: user confirms "Yes, it opened and returned closed". Qualitative blade motion
-PASS for this exact cycle by independent human report. No extinction/detector or
-optical-timing calibration is established. Follow-up: records/webui-one-second-observation.json.
-The1s setting is host hold after internal ON readback, not calibrated optical exposure.
-
-## Latest actual WebUI validation (6 November 2026)
-
-REQ-224 / TEST-224: PASS for the selected actual WebUI/controller workflow.
-The user confirmed the unchanged protected SH05R setup. Visible browser actions
-used the production owner/TCP at 192.168.1.19:40305, KSC10168800777/1.0.7;
-no simulator, injected transport or direct callback substitute. Two short ON/OFF
-cycles total (baseline and corrected), plus explicit OFF/rest-guard checks.
-The final live read was Manual/OFF/no fault; Release then Read showed disconnected,
-has_device=false and requestedOFF. The test server on9857 was stopped after
-release; the separate8050 listener was left alone. No further actuation is planned.
-
-E188 exposed default-port collision, unknown feedback after GUI Connect and a
-first-ON rest-timer bug. E189 fixes gui --port, fresh feedback on WebUI Connect,
-OFF-rest timing beginning at fresh OFF rather than a failed ON attempt, and a
-remaining-wait message. First ON after the rest now succeeds; immediate ON during
-rest is refused with1.66s remaining, followed by fresh OFF/no fault. Already-Manual
-selection remained a read-only no-op. Library connect remains identity-only.
-
-Evidence: records/webui-baseline-live.json, webui-final-live.json, the two JPEGs,
-webui-live-validation.json (runtime/config/artifact hashes), webui-evidence-validation.json
-and webui-package-validation.json. scripts/verify_webui_evidence.py checks saved
-observations without operating or simulating hardware. Passive compile/lint/format,
-lock, exact wheel parity, isolated install/import/help and invalid-port checks PASS.
-No simulated-device tests ran in this campaign. The previous160+160 full suite is
-historical for its recorded revision; affected full fault/deadline/cancellation
-regressions are not claimed as newly revalidated by this selected happy path.
-E190: the user reports "I did not observe the blade". Independent blade motion
-and optical closure remain UNTESTED; controller readback results are unchanged.
-Follow-up: records/webui-observation-followup.json. No additional actuation.
-
-## Previously delivered holistic review
-
-Updated 6 November 2026. **REQ-223 repository review/delivery COMPLETE.
-Full physical/deployment qualification remains BLOCKED.**
-That prior review performed no device operation; E188/E189 above are the separately
-authorized current live WebUI work. No driver, firmware or network setting changed.
-
-## Current architecture and configuration
-
-Device -> byte transport -> APT Session -> KSC101 driver -> ShutterHub ->
-Python / CLI / GUI / notebooks. One owner, exact identity/route selection,
-bounded single-flight I/O, persistent ambiguity and explicit protected recovery.
-No candidate connection manager, SDK backend, automatic retry/fallback or ON replay.
-DiamondGUI method/status names are retained public contracts, not duplicate backends.
-
-The configured target is shutter, application CH 0, KSC101 serial 68800777,
-firmware allowlist 1.0.7, KEH3 middle bay 192.168.1.19:40305. APT channel is 1;
-management port 40303 is unused. Hub serial/firmware are explicitly unknown.
-config/shutter.ethernet.toml records the user-selected SH05R commissioning policy;
-all notebooks load it through docs/examples/shutter_config.py. The generic
-config/shutters.example.toml uses the same logical name and fictional identity,
-with no write policy. Ignored local configuration/backups remain private.
-
-D2XX and docked KEH3 use the same Manual/load/interlock/ownership checks. VCP
-and KEH3 external USB OUT remain read-only. A protected Trigger-to-Manual change
-requires explicit source_inhibited=True and persistent-mode policy permission,
-sends OFF first, then confirms Manual/OFF. Interlock readback is configuration,
-not measured contact continuity. Optical state is never inferred from output bits.
-
-## Previous review validation (historical revision)
-
-E183 / TEST-223: 160 source + 160 isolated installed-wheel tests PASS, zero
-failures/errors/skips. Locked dependencies/build/install/import/help, source-wheel
-parity, lint/format, missing/outdated lock refusal and passive config checks PASS.
-All six notebooks PASS static schema/syntax/link checks; no hardware cells run.
-records/direct-validation.json contains current source/config/tutorial hashes;
-all inputs matched exact staged Git blobs before stage 1. E184 verifies 113 local
-Markdown targets, four unchanged manuals, and JSON/XML evidence readability.
-E186's final review manifest verifies 112 current local links, the wheel's current
-README, six preserved notebook backups and absence of all 59 scoped cleanup targets.
-
-Fixed incidental read-only shutdown OFF, unselected GUI Release affecting all
-routes, and rest timing beginning before electrical OFF readback. Read-only faults
-remain visible without actuation. Prior output/mode attempts retain explicit
-cleanup obligations; passive close never sends OFF. Verification removes its own
-successful disposable environment and retains failed-run diagnostics.
-
-Stage 1: b9b2309 runtime, regression fixes, examples, migration/API/operator docs.
-Stage 2: 2297162 manufacturer manuals, source/state interpretation and preserved
-hardware evidence. Stage 3: c6f6661 final review/checkpoint and cleanup record.
-E187 verifies all three stages published to origin/main at c6f6661, matching local
-HEAD with a clean working tree. This follow-up checkpoint preserves that observed
-result; final remote parity is checked again after its publication.
-Publication is explicitly authorized by the current user request in PROJECT.md.
-
-E185 supersedes the old unavailable-checkout assumption: the external DiamondGUI
-checkout exists. Its 3 passive owner/factory tests PASS; all 26 isolated page tests
-FAIL because the existing dirty shutter page is entirely commented out. Its
-metadata still uses the old logical key and left-bay port 40304. No external
-source/configuration was changed; restoring those edits is a separate user choice.
-See records/diamondgui-current-integration.json and diamondgui-current-tests.xml.
-
-## Historical hardware evidence and validity
-
-E181 records one real SH05R ON/OFF cycle on 68800777/1.0.7 at the exact middle-bay
-endpoint: OFF/Manual preparation, 2 s initial OFF pause, one ON with 1 s host hold,
-priority OFF and release. Readback 0x2000 -> 0x2001 -> 0x2000; host ON-to-OFF
-dispatch 1.0569156 s. Final recorded Manual/OFF, no journal fault and released
-socket/claims. The user reported: "I did not observe it". Independent blade motion,
-optical closure/timing and present transient state remain unknown.
-
-This review changed controller/GUI code and normalized reviewed text to LF;
-E181's hashes identify its historical revision, not the current package. Its
-recorded physical result is preserved; current software tests do not requalify
-physical operation. No repeat cycle is requested or planned. All six pre-normalized
-notebook snapshots/outputs are preserved privately with hashes in
-records/holistic-normalization.json. Existing earlier backups remain intact.
-
-KSC101 Rev D, KEH3/KEH6 Rev E and APT Issues 36/42.1 are unchanged under
-docs/manuals.
-SRC-009 identifies the previously reviewed SH05R manual online; a local unchanged
-SH05R PDF is still missing. E179's historical documentation ID collision is
-resolved by current REQ-221; E181 is the exact control result, E182 the previous
-manual/package review. Do not rewrite historical records to imply new tests.
+All prior cycle allowances are consumed. No further ON, mode/settings/EEPROM,
+trigger-I/O, driver, network or other-device operation is authorized by them.
+The current repository review grants no new device operation.
 
 ## Requirements
 
-Human criteria remain in PROJECT.md. PASS is scoped to its stated method/revision.
+Human criteria remain in PROJECT.md. PASS applies only to its method/configuration/
+revision. E204 revalidates software, not the dated physical records.
 
-| ID | Source / short criterion | Method / evidence | Current result |
+| ID | Short criterion / source | Method/evidence | Result |
 | --- | --- | --- | --- |
-| REQ-201 | Objective: uv and SDK independence | TEST-201; E183 source/clean-wheel imports/help | PASS software; USB native deployment unqualified |
-| REQ-202 | Exact identity and routes | TEST-202; E183 regressions; E170/E172 historical reads | PASS software; historical middle-bay identity; hub identity open |
-| REQ-203 | Communication/framing | TEST-203; E183 framing/status tests; E181 historical control | PASS software; physical requalification open |
-| REQ-204 | Modes and load limits | TEST-204; E183 policy/transition/rest regressions | PASS software; other modes/loads unqualified |
-| REQ-205 | Freshness/deadlines | TEST-205; E183 stale/late/partial/quarantine tests | PASS tested cases; arbitrary same-type reply ordering unresolved |
-| REQ-206 | Ownership/cancellation | TEST-206; E183 process/concurrency/priority tests | PASS software; native 250 ms target UNTESTED |
-| REQ-207 | Ambiguity and cleanup | TEST-207; E183 faults/read-only/output obligation tests | PASS software; optical safety UNTESTED |
-| REQ-208 | Direct KEH3 control | TEST-208/220; E181 exact middle-bay cycle; E183 routes | Historical selected-controller command/readback PASS; broader topology/recovery open |
-| REQ-209 | Physical/local/TTL/interlocks | TEST-209; E191/E192 selected cycle, broader approved procedure required | PARTIAL: user-observed blade opening/return closed PASS for E191; local/TTL/contact behavior and optical calibration UNTESTED |
-| REQ-210 | Drivers/persistence/endurance | TEST-210; approved deployment campaign required | BLOCKED: hardware, inventory and downtime/window |
-| REQ-211 | DiamondGUI integration | TEST-211; E185 inspected current external suite | FAIL external page: 3 owner/factory PASS, 26 page FAIL; commented page/stale metadata |
-| REQ-212 | Reproducible delivery | TEST-212; E183 source/wheel parity; E184 docs/manual hashes | PASS software; physical deployment incomplete |
+| REQ-201 | uv / SDK independence | TEST-201; E204 locked source/wheel | PASS software; USB deployment unqualified |
+| REQ-202 | Exact identity/routes | TEST-202; E204, historical E200 | PASS software; hub identity unknown |
+| REQ-203 | Framing/communication | TEST-203; E204 | PASS software; current physical revision UNTESTED |
+| REQ-204 | Modes/load limits | TEST-204; E203/E204 guards | PASS software; native modes/other loads unqualified |
+| REQ-205 | Freshness/deadlines | TEST-205; E204 | PASS tested cases; arbitrary same-type reply ordering unresolved |
+| REQ-206 | Ownership/cancellation | TEST-206; E204 | PASS software; native 250 ms target UNTESTED |
+| REQ-207 | Ambiguity/cleanup | TEST-207; E203/E204 | PASS software; optical safety unqualified |
+| REQ-208 | Docked KEH3 | TEST-208/220; E200 historical | Selected route historical PASS; broader topology/recovery open |
+| REQ-209 | Physical/local/TTL/interlocks | TEST-209; E191/E192/E202 | PARTIAL historical qualitative observation; broader physical acceptance UNTESTED |
+| REQ-210 | Drivers/persistence/endurance | TEST-210; approved campaign required | BLOCKED: inventory, hardware/window and calibration |
+| REQ-211 | External DiamondGUI | TEST-211; E185 last recorded external check | FAIL historical page check: 3 owner/factory PASS, 26 page FAIL; not rerun here |
+| REQ-212 | Reproducible delivery | TEST-212; E204/E205 | PASS software/docs; physical deployment incomplete |
 | REQ-213 | Controller reference review | TEST-213; E161/E162 | Historical source review PASS |
-| REQ-214 | QMI discovery review | TEST-214; E163 | Historical source review PASS |
-| REQ-215 | Exact Ethernet notebooks/name | TEST-215; E183 six static/passive checks | PASS software; saved hardware outputs are historical |
-| REQ-216 | Explicit D2XX/VCP inventory | TEST-216; E183 offline; E169/E170 native history | PASS software/enumeration history; USB open failed historically |
-| REQ-217 | Bounded Ethernet diagnosis | TEST-217; E172/E178 historical live reads | Historical exact-controller read PASS; hub qualification open |
-| REQ-218 | Earlier review/commit | TEST-218; E168 and checkpoint 9d486b3 | Historical scoped PASS |
-| REQ-219 | Earlier source/API slimming | TEST-219; E178 | Historical scoped PASS; current software revalidated in E183 |
-| REQ-220 | Exact Ethernet ON/OFF | TEST-220; E181 | PASS recorded controller cycle/release only; optics unobserved; current physical revision UNTESTED |
-| REQ-221 | Repository manuals | TEST-221; E179/E184 hash checks | PASS four unchanged copies; local SH05R PDF missing |
-| REQ-222 | Earlier manual/package review | TEST-222; E182 | Historical scoped PASS; current software revalidated in E183 |
-| REQ-223 | Holistic review, prune, naming, staged push (derived) | TEST-223; E183-E187 and holistic-review/publication manifests | PASS prior scoped repository delivery; external deployment blockers documented |
-| REQ-224 | Actual WebUI user flow, fixes and scripts | TEST-224; E188/E189, E191/E192 and passive checks | PASS selected WebUI/controller path and E192 human-observed opening/return closed; calibrated optics and full fault matrix open |
-| REQ-225 | Manufacturer-style APT panel (derived; PROJECT.md active request) | TEST-225; E193/E194, feature matrix in docs/gui.md | PARTIAL: supported software paths and passive browser PASS; display/trigger I/O and Key/Ready contracts BLOCKED; new physical functions UNTESTED |
-| REQ-226 | Modern minimalist presentation (PROJECT.md latest user request) | TEST-226; E196, modern validation manifest/screenshots | PASS presentation, software and installed CSS; no new physical acceptance |
-| REQ-227 | Current modern WebUI actual-hardware test | TEST-227; E198-E200, hardware validation manifest and raw captures | PASS selected real Manual/control/read/release flow and fixes; independent blade report pending; calibrated/native acceptance separate |
+| REQ-214 | QMI reference review | TEST-214; E163 | Historical source review PASS |
+| REQ-215 | Ethernet notebooks/naming | TEST-215; E204 static checks | PASS static; saved execution historical |
+| REQ-216 | Explicit USB inventory | TEST-216; E169/E170/E204 | Software/history only; USB open failed historically |
+| REQ-217 | Bounded Ethernet diagnosis | TEST-217; E172/E178 | Historical exact-controller read PASS; hub qualification open |
+| REQ-218 | Earlier review/delivery | TEST-218; E168 | Historical scoped PASS |
+| REQ-219 | Earlier API slimming | TEST-219; E178/E204 | Historical review/current software PASS |
+| REQ-220 | Exact Ethernet ON/OFF | TEST-220; E181 | Historical controller cycle PASS; its optics unobserved |
+| REQ-221 | Repository manuals | TEST-221; E179/E193/E205 hashes | PASS five unchanged PDFs; local SH05R PDF still missing |
+| REQ-222 | Earlier manual/package review | TEST-222; E182/E204 | Historical source review/current software PASS |
+| REQ-223 | Earlier holistic delivery | TEST-223; E183-E187 | Historical repository delivery PASS |
+| REQ-224 | Earlier WebUI flow | TEST-224; E188-E192 | Historical scoped controller flow PASS; E192 one observed blade cycle |
+| REQ-225 | Manufacturer-reference functions | TEST-225; E193/E194 | PARTIAL; display/trigger/Key/Ready contracts BLOCKED; native bench work UNTESTED |
+| REQ-226 | Minimalist presentation | TEST-226; E196/E204 | Historical visual/current software PASS; no new visual/physical bench run |
+| REQ-227 | Modern real WebUI cycles | TEST-227; E198-E202 | Historical selected controller flow PASS; complete two-cycle blade observation unverified |
+| REQ-228 | Follow-up holistic review (derived) | TEST-228; E203-E206 | PASS scoped repository review; implementation published, docs/evidence in this checkpoint |
 
-## Short plan and human action required
+## Next action and external dependencies
 
-The supported APT WebUI implementation is validated and published (E195).
-Full GUI functionality needs one specific external contract: manufacturer-confirmed
-KSC101 MMI0x0520/trigger0x0523 payload fields/lengths/units/enums and Key/Ready status
-mapping, including firmware applicability. Existing APT42.1 detail conflicts with
-its model table (SRC-010); software checks cannot resolve the hardware contract.
-Return the authoritative layouts/reference or packet evidence under a separately
-approved capture procedure. Then implement those fields through the same APT
-owner and rerun framing/settings/browser tests before any approved bench test.
-No extra physical command is planned. Keep the external dirty integration intact until its
-intended restoration/mapping is agreed. Full-project BLOCKED is not validated
-deployment completion.
+No repository implementation gap remains for this scoped review. Staged hashes
+are checked before final checkpoint publication and remote parity afterward.
+Further implementation testing is needed only after a source change or new failure.
 
-For the broader deployment, provide one approved commissioning handoff: the exact
-current setup, independent source protection, allowed commands/rated limits and
-window, independent blade/optical observation method (timing in seconds with clock/
-detector calibration if required), hub identity/topology, and the intended
-DiamondGUI page/configuration restoration decision. E181 establishes controller bits only; software cannot supply
-these physical observations or decide whether to restore the externally edited page. Return
-the agreed procedure/limits and measured results with units or explicit initial
-state confirmation. Then revalidate affected software integration and perform only
-the specifically authorized physical tests, recording fresh revision/configuration
-and calibration validity. Driver/reboot/endurance work needs its own approved
-all-instrument downtime/window. BLOCKED is not full-project completion.
+For full GUI parity, obtain manufacturer-confirmed KSC101 MMI 0x0520/trigger 0x0523
+payload layouts and Key/Ready mapping with firmware applicability. The existing
+APT model table conflicts with motor-specific details; do not guess or use SDKs.
+Then implement through the same APT owner and revalidate before an approved bench test.
+
+For physical/deployment acceptance, provide a separate approved commissioning
+handoff: current setup/protection, exact allowed commands/limits/window, calibrated
+optical method/results, hub identity/topology and intended external DiamondGUI
+page/mapping restoration. Software cannot establish those physical facts or
+authorize restoring another checkout. Driver/reboot/endurance work needs an
+all-instrument inventory and its own downtime/rollback window. These gaps keep
+the full project BLOCKED; they do not negate scoped repository-review results.

@@ -1,0 +1,177 @@
+{
+  "requirement_id": "REQ-228",
+  "test_id": "TEST-228",
+  "evidence_ids": [
+    "E202",
+    "D063",
+    "E203",
+    "E204",
+    "E205",
+    "E206"
+  ],
+  "recorded_at_utc": "2026-11-07T01:49:15.031200+00:00",
+  "result": "PASS scoped repository review: implementation/software validation/cleanup and documented delivery",
+  "full_project": "BLOCKED: manufacturer-specific wire contracts, physical qualification, hub/driver deployment and external DiamondGUI gaps remain in STATE.md",
+  "baseline_commit": "547ad94d2f2affb70966921c07bdeb465aa7f03c",
+  "source_sha256": {
+    ".python-version": "7b55f8e67b5623c4bef3fa691288da9437d79d3aba156de48d481db32ac7d16d",
+    "config/shutter.ethernet.toml": "5bacb23cb4fbacbcebd86ffd4cdc553e9c81eca206412696500a3f183e76ccae",
+    "config/shutters.example.toml": "fe9622cee1bb3e8bdad4499b05d5b93c3758f79af3d904d0921727810ab0d9eb",
+    "docs/examples/01_device_discovery.ipynb": "e98c8ede0eb0b9c877b08f76654770008897108dc2ed4075d7869ddef728f5e4",
+    "docs/examples/02_connection.ipynb": "f54b5934e17eced3c71be015eec92b747077717e8e12c7c3b694d36ad63fdf13",
+    "docs/examples/03_status_query.ipynb": "0e40f83758b59c4a8007f25118fa581d662c6177d134683cdbf4ef74ece74e4c",
+    "docs/examples/04_settings.ipynb": "340e0c9aefe9b6300b073f9c6edc1adef79ab0f803d28dbecf3d1b8695f5f5bf",
+    "docs/examples/05_shutter_modes.ipynb": "41d06f4d88ba4e8cc736564c509ab7bdf4cfa902cbd0654f6111a6c7484c92be",
+    "docs/examples/06_on_off.ipynb": "d221adcb6da625a99585e1555ed3144dd3c1e1b2bda1b7bb6197ea6d4179d8b4",
+    "docs/examples/README.md": "3a57ebcf96383309875a77c321c7376f9c02949e69784171fa45455c3f4cc887",
+    "docs/examples/shutter_config.py": "572284d14b1bad85ee22ccaa99ceb81dccff2b122f9df9f88e82b20a282a68d5",
+    "pyproject.toml": "66fb4ef33fa9dc324e09b34e02a78a314b61419446abf8f6c61f50441bab5ea7",
+    "README.md": "00d948ea423f3f507100a100ac0de3bb15b2ae657b54c6b0f81bda4f44919761",
+    "records/webui-final-live.json": "e0f8bfdc94890b5b9d416714aca60f87566146678165557068f36d0f88bf257e",
+    "scripts/verify.py": "046ecbe5f7734700e23e608e544ec0b55774fb0ad27deaf118a36ebe774f3bc1",
+    "scripts/verify_notebooks.py": "6caae7de5c496ccc11395cf0a534410acb419f39becde4355d07cddf26fa6a08",
+    "scripts/verify_webui_evidence.py": "b6e858359b08ee5f0198a59407f0c62d73d95adc100e34ea6313e231a5447050",
+    "src/thorlabs_shutter_control/__init__.py": "31ad61ea0eac625d90cc011c3afdf3c616b70bc1b7e4f0c5f659bc220ef267ed",
+    "src/thorlabs_shutter_control/__main__.py": "6d86421747d8851b826bdecd3c6353ea06334cd3be86669396ef8aee8a8bc821",
+    "src/thorlabs_shutter_control/assets/shutter.css": "400610b6098a6dff6bbcc1faf13dafe26534f34c3840da6d0786fbbb50612502",
+    "src/thorlabs_shutter_control/config.py": "a09e6561f2eebaf64b71de25367e6c7006740fc392a2ae978dfa03d03ed6979c",
+    "src/thorlabs_shutter_control/controller.py": "a8a8b0bdc82fe57abd52db13bb794504279cb457b27cd977edef52b8afb7a9c8",
+    "src/thorlabs_shutter_control/device.py": "76307bc177f6d6abf65b33faf4391be41a0ea1c65084595027d3d6035c9d4de0",
+    "src/thorlabs_shutter_control/discovery.py": "d0c1d84b6761d6fb6534f3afa6f2b3000ea922804270facec7f7e3565a87ca30",
+    "src/thorlabs_shutter_control/errors.py": "f2f4ff77dbba39142b992d047b4ce7a0a93e32f7cdcccd8536a47307cb48d86f",
+    "src/thorlabs_shutter_control/ethernet.py": "8608c91f897f603b2cc5ebc99d528d00f61fc1b15fcee3134d6daa1a21a05ff0",
+    "src/thorlabs_shutter_control/gui.py": "56444536b2456f65166ce4be98535a59712c03072013603449612e6aebab8519",
+    "src/thorlabs_shutter_control/ownership.py": "7fb46ab790bd7bb633d157d6ed1547ff1bb7f7c335be7dfa17ecce8ea77f9a1d",
+    "src/thorlabs_shutter_control/protocol.py": "b947b61dcecf4450d8fcd6a24c11f1a90fd40bb836492e2b580d4a61bd1f3464",
+    "src/thorlabs_shutter_control/transport.py": "4813b39b923d0daeeb230d255f9c5b6804ab8227584b329c8be94782ea16ffd0",
+    "tests/conftest.py": "884db151e233084cf111129d053808e4b9f399af1f49e96cb073e8756e40725d",
+    "tests/test_application.py": "20b0f6b2a354747c3b2763cd8669c01ffa800378538d5550f8888c63b259ba79",
+    "tests/test_discovery.py": "0934580b74e78b21ec908a30548f9d66254d04b800fc264ae5302eff9be19c88",
+    "tests/test_ethernet.py": "0705da436ba2fd4b542dd2f9cf82f7a9a5b17f00d1ebb52d81e1e51acc5a2955",
+    "tests/test_native_controls.py": "5e56a68af3ec6e7229c2c00dc5c68bbbfde146a35e9457dd89d979f1c47730a5",
+    "tests/test_owner.py": "90a69ac91085a8d828a39cddabc053e50cc822c5e28897c4989fbac51c4cd708",
+    "tests/test_protocol.py": "43956f0b01d0b6524eb125e23186a8e41baa4ff30aaf36e8361f9b776760e7c9",
+    "tests/test_review_regressions.py": "7e719816af35bc792366bf6334f72f1216ec5b7168ff3690cb8b3da14f8b4a32",
+    "tests/test_tutorial_notebooks.py": "2180024ab49c9d017d7082e32632359f383c7030c46d3886acc6b5444e18ecd6",
+    "tests/test_verification.py": "538477e7e7f85622db07cb62d55857f3cba563f4bb63d89587a2ec10f29857dc",
+    "tests/test_webui_live_regressions.py": "7df5a6992dbb6c7a05c62c4030e2cd67c3053fd077e9459aff3b1994918c5034",
+    "tests/ui_helpers.py": "47d9f7c72ffad769ca186c7b2c56ade63e3187c3f4c19991a41f4b9fad69a182",
+    "uv.lock": "bbbca9b12e3f685d1a553dc156f76c487cbcad7334dbd5cea8a8e96b1ed72f31"
+  },
+  "wheel_sha256": "543be751c920517d9a4120b5da6e3bf335e5acc77faa8e48023b34d6a5fdbfaf",
+  "test_totals": {
+    "followup-review-baseline.xml": {
+      "tests": 8,
+      "failures": 8,
+      "errors": 0,
+      "skipped": 0
+    },
+    "followup-gui-baseline.xml": {
+      "tests": 5,
+      "failures": 4,
+      "errors": 0,
+      "skipped": 0
+    },
+    "followup-review-offline-tests.xml": {
+      "tests": 228,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "followup-review-wheel-tests.xml": {
+      "tests": 228,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "notebook_static_checks": "PASS all six; no cell execution",
+  "hardware_operations": "NONE",
+  "current_review_physical_validation": "UNTESTED; E200 is historical at its recorded source",
+  "sdk_runtime_used": false,
+  "public_api_and_live_policy_unchanged": true,
+  "manual_integrity": [
+    {
+      "path": "docs/manuals/KSC101_Manual_HA0368T_Rev_D.pdf",
+      "sha256": "b51ac9ca1aa53b02b554dfd5b1c0bd4b99d73e4ba092e47170a64a3f4bab34f5"
+    },
+    {
+      "path": "docs/manuals/KEH3_KEH6_Manual_DOC-103012_Rev_E.pdf",
+      "sha256": "c768e4e3f2317ae29f7bfcdf8b18f750d7adc688d324c55550cdfa9a31a0489b"
+    },
+    {
+      "path": "docs/manuals/APT_Communications_Protocol_Issue_36.pdf",
+      "sha256": "96668e05c353269d59390d3e00e4e7237c881707b3a947057dd08ead13191966"
+    },
+    {
+      "path": "docs/manuals/APT_Communications_Protocol_Issue_42.1.pdf",
+      "sha256": "b2a6badd7c00b3042ba383e291667e7eab10746c14c4f92cea45fc480c7304ed"
+    },
+    {
+      "path": "docs/manuals/KSC101_Kinesis_UI_Manual_HA0368T_Rev_F.pdf",
+      "sha256": "007d604c718378b3b8b6bc6f46876f00f91c6a4e4d839c2a175681ac3c122597"
+    }
+  ],
+  "prior_campaign_artifacts_preserved": {
+    "records/direct-validation.json": "69aaec1fc960fcb3a751abdb6fee8fec93775c3782ba4202f0e6f18ef7a10b81",
+    "records/offline-tests.xml": "9694565f0203a2715feb886eb30752f7f4d76110887805d015e366d45e108d00",
+    "records/wheel-tests.xml": "8ea40a8d337a26bcb95ca6e5ec1e72ed8e4b64948097b60a345e1a1a207f322d",
+    "records/notebook-validation.json": "1629a0a50d559abb737c786aade5fce0a0477b17b7b2c874deb81e7476b5006b",
+    "records/webui-apt-panel-desktop.png": "57898ec444b0ac7e56213c722316f6c073dd2e6a220b5bf9b2a6fba7d3ce49a1",
+    "records/webui-apt-settings-desktop.png": "534f50c1c4597d1a914a2d495310f4cfbd1a9f91297b59ff66cb20741fa334d3",
+    "records/webui-apt-panel-phone.png": "569900ea67c4df6903df880c04101b922346d6fbacb0f705e18a5ea8d37df748",
+    "records/webui-modern-direct-validation.json": "67c4a58e3d13db2cc2298b176a571f1bc3efe80856ef4b78e5f564c5457d3b47",
+    "records/webui-modern-offline-tests.xml": "e831b77f75acd21625e1e641203a87655d020a72e280e841c0b4762d0306cb73",
+    "records/webui-modern-wheel-tests.xml": "cb661ecd694c1c90ee8691ec6d866bebba3d77934a68eab0b875366721d472cf",
+    "records/webui-modern-desktop.png": "5f8a73aaadd43b1cdf4702d72af779d6d5667423e902474b4e9dffd9a34e1634",
+    "records/webui-modern-phone.png": "95d2b723dce75deb0d9e35eed0b4dda43705751bb1e61adc76d2c3e4e1fe8c51",
+    "records/webui-modern-settings.png": "5fd56739fecde720ea10f6c6911e5778662e8d9a12185803e6c12e69fed3d984",
+    "records/webui-modern-settings-phone.png": "8286c400ee933b2d26da678508f38516f760291603222326f6ebf68588eaeca4",
+    "records/webui-modern-hardware-live.json": "9be34094762264cbe566454218c2f7749cfafa5fcac3d2793fb30717f39a6c4b",
+    "records/webui-modern-hardware-evidence-validation.json": "cead998ffeaa40e193a306d50367af2346ae8ae0ab044824a7c1764c8e7fa8d6",
+    "records/webui-modern-hardware-settings.png": "aae69391be6974ba51c0725f35610c590f3f73a341f48da05ff87490659718f0",
+    "records/webui-modern-hardware-off.png": "6f96fcda2bf93662a7d4071c7be63a2a8ca3f1287a5bd8c07859b70296e755ab",
+    "records/webui-modern-hardware-released.png": "e7b45b47b742f73f37005debb6d1f5210f1771a3f6681f32e47d11ce8e7888a0",
+    "records/webui-hardware-direct-validation.json": "60854b4bf29d47a542c3b536b876fc34237bb530e38b94d2bf648d000ec3059b",
+    "records/webui-hardware-offline-tests.xml": "acce4f01d8953296a8140364ed3b179dd925e863f496a71fb77e421baba23c4f",
+    "records/webui-hardware-wheel-tests.xml": "a707c0d8160fdd0cad4d0f0eda435d3326800e6d3c56e7a2d8f8c2aef5c51270",
+    "records/webui-modern-hardware-final-off.png": "b82088b1b981e9f3a4be1339acab2fc99d91d8de2cd0a6bf33e2a0761fc9f4ea",
+    "records/webui-modern-hardware-final-released.png": "28de92d0503357cf832b971c52fc90ad7f35ad7a538cc8b6496563caa5509b71",
+    "records/webui-hardware-final-direct-validation.json": "681c19b91324805cf6965a50d4e1f27760e865e0b5795addfe8eace6fff59bb3",
+    "records/webui-hardware-final-offline-tests.xml": "074f39654c42222029fee65f9fac06a513b034faf074a6b89e9cdc0f1925e5eb",
+    "records/webui-hardware-final-wheel-tests.xml": "77037069b785acbdabf609396a56e7845cd65fac8ba34b3bf5ae8f9390a39651",
+    "records/webui-hardware-checker-negatives.json": "f1f18ca6d322e847bc6b1802580b3eac685058dd190181dcfae8a6160d0af0b5",
+    "records/webui-final-live.json": "e0f8bfdc94890b5b9d416714aca60f87566146678165557068f36d0f88bf257e"
+  },
+  "cleanup": {
+    "result": "PASS",
+    "directories": 32,
+    "files": 699,
+    "bytes": 174667,
+    "all_targets_absent": true,
+    "tracked_deletions": [],
+    "environments_and_local_configuration_preserved": true,
+    "ambiguous_history_retained": true
+  },
+  "local_markdown_links": {
+    "result": "PASS",
+    "count": 101
+  },
+  "artifact_sha256": {
+    "records/followup-review-cleanup.json": "2e39a2bd753a8d4c04efd7fe1dfaf99fa6b9b2352982166900f0c64b8f7ab0ad",
+    "records/followup-review-direct-validation.json": "7bc3600fd71ff68a9b49e19becb91347454385a4728db322d861e26763041de1",
+    "records/followup-review-notebooks.json": "1629a0a50d559abb737c786aade5fce0a0477b17b7b2c874deb81e7476b5006b",
+    "records/followup-gui-baseline.xml": "a476a9229285a36c9e4395d751890a31003e22cb2cb98f96311ab9bb2cc48390",
+    "records/followup-review-baseline.xml": "b0135c12cc67064c3128f135052c1fd5f1663f9856b9d3c2ee195b4567a03a71",
+    "records/followup-review-offline-tests.xml": "3ed2293da2214602245024f09f3a01955bce14b140ceedfe5facde113386f05b",
+    "records/followup-review-wheel-tests.xml": "f6a6915cfe35ea8d106df48ca852b03250a288ddd334b1d152bd94c28d1106ad",
+    "records/webui-modern-hardware-observation.json": "f7a6bb350ca32fe11bb94313483fab30bb803703a8608565b87a7a1431e2d0cd",
+    "records/webui-modern-hardware-validation.json": "735836f9de1417e2a5c7939e9ab68302e7b78d512ca062647de45e3744fe8fbe"
+  },
+  "publication": {
+    "implementation_commit": "460286ffde8116e8f15b232f9402357d0825d648",
+    "implementation_push": "PASS; remote parity verified",
+    "checkpoint": "Final docs/evidence in containing commit; staged hashes checked before publication and remote parity after push"
+  },
+  "generated_record_normalization": "New review records use LF; trailing blank traceback whitespace removed from baseline XML. Historical raw captures untouched."
+}

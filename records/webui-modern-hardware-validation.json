@@ -5,7 +5,8 @@
     "E198",
     "D062",
     "E199",
-    "E200"
+    "E200",
+    "E202"
   ],
   "recorded_at_utc": "2026-11-07T01:15:58.000660+00:00",
   "result": "PASS selected real Manual WebUI/controller workflow and UI fixes; optics/native scope separate",
@@ -29,7 +30,8 @@
     "manual_on_click_to_off_click_s": 0.708,
     "off_rest_before_timed_click_s": 28.177088,
     "timed_host_hold_s": 1,
-    "independent_blade_observation": "No independent observation for this run reported yet"
+    "independent_blade_observation": "User reports: I did not observe both cycles. Complete two-cycle observation remains unverified.",
+    "observation_followup": "records/webui-modern-hardware-observation.json"
   },
   "browser": {
     "url": "http://127.0.0.1:9860",
@@ -218,5 +220,10 @@
     "verified_absent": "tmp/webui-live-regressions",
     "preserved": "All prior evidence, .venv, downloads and ownership state"
   },
-  "limits": "Controller/host timestamps are not calibrated optical timing; native modes/EEPROM remain unqualified"
+  "limits": "Controller/host timestamps are not calibrated optical timing; native modes/EEPROM remain unqualified",
+  "human_observation_followup": {
+    "path": "records/webui-modern-hardware-observation.json",
+    "sha256": "f7a6bb350ca32fe11bb94313483fab30bb803703a8608565b87a7a1431e2d0cd",
+    "scope": "Complete two-cycle independent blade observation UNVERIFIED; no motion failure inferred"
+  }
 }

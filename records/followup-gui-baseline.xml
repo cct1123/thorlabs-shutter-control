@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="5" time="0.343" timestamp="2026-11-06T19:28:29.024982-06:00" hostname="HighFieldSetup"><testcase classname="tests.test_review_regressions" name="test_settings_drafts_do_not_survive_release_or_reconnection[False-1]" file="tests\test_review_regressions.py" line="147" time="0.097"><failure message="KeyError: 'cycle-on'">tests\test_review_regressions.py:157: in test_settings_drafts_do_not_survive_release_or_reconnection
+    assert rendered["cycle-on"]["value"] is None
+           ^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'cycle-on'</failure></testcase><testcase classname="tests.test_review_regressions" name="test_settings_drafts_do_not_survive_release_or_reconnection[True-2]" file="tests\test_review_regressions.py" line="147" time="0.024"><failure message="KeyError: 'cycle-on'">tests\test_review_regressions.py:157: in test_settings_drafts_do_not_survive_release_or_reconnection
+    assert rendered["cycle-on"]["value"] is None
+           ^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'cycle-on'</failure></testcase><testcase classname="tests.test_review_regressions" name="test_polling_does_not_erase_same_connection_drafts" file="tests\test_review_regressions.py" line="162" time="0.023" /><testcase classname="tests.test_review_regressions" name="test_protection_assertions_end_at_actual_disconnect[False]" file="tests\test_review_regressions.py" line="173" time="0.032"><failure message="AssertionError: assert 'sample' in {'target'}">tests\test_review_regressions.py:178: in test_protection_assertions_end_at_actual_disconnect
+    assert "sample" in {item["id"] for item in app.callback_map[key]["inputs"]}
+E   AssertionError: assert 'sample' in {'target'}</failure></testcase><testcase classname="tests.test_review_regressions" name="test_protection_assertions_end_at_actual_disconnect[True]" file="tests\test_review_regressions.py" line="173" time="0.019"><failure message="AssertionError: assert 'sample' in {'target'}">tests\test_review_regressions.py:178: in test_protection_assertions_end_at_actual_disconnect
+    assert "sample" in {item["id"] for item in app.callback_map[key]["inputs"]}
+E   AssertionError: assert 'sample' in {'target'}</failure></testcase></testsuite></testsuites>

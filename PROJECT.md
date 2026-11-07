@@ -4,6 +4,19 @@ Date: 4 November 2026
 Status: Engineering requirements
 Project management: uv
 
+## Follow-up holistic review (user request, 6 November 2026)
+
+Repeat the holistic review on the current native-mode/modern-WebUI migration:
+identify and fix supported flaws, prune obsolete implementation and generated
+cache/temp artifacts, keep naming consistent, update documentation/README,
+validate the integrated package and commit/push in focused stages. Derived
+REQ-228 / TEST-228: regressions for demonstrated findings, full source/isolated
+wheel software checks, static notebooks, source/fixture/package provenance,
+current concise state/report, migration/retention audit and clean publication.
+Preserve public owner contracts, actual evidence, manuals, environments, local
+configuration and runtime ownership state. No new device action, policy expansion,
+driver change or external DiamondGUI edit is authorized by this repository review.
+
 ## Actual modern WebUI hardware test (user request, 6 November 2026)
 
 Run the actual WebUI against real hardware, control it as an operator would,

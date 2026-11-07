@@ -1,0 +1,65 @@
+{
+  "scope": "static notebook validation only; no cell execution or hardware substitute",
+  "results": [
+    {
+      "notebook": "01_device_discovery.ipynb",
+      "sha256": "e98c8ede0eb0b9c877b08f76654770008897108dc2ed4075d7869ddef728f5e4",
+      "python_syntax": "PASS",
+      "markdown_links": "PASS",
+      "saved_output_cells": 2,
+      "hardware_execution": "NOT RUN",
+      "code_cells": 2,
+      "schema": "PASS"
+    },
+    {
+      "notebook": "02_connection.ipynb",
+      "sha256": "f54b5934e17eced3c71be015eec92b747077717e8e12c7c3b694d36ad63fdf13",
+      "python_syntax": "PASS",
+      "markdown_links": "PASS",
+      "saved_output_cells": 2,
+      "hardware_execution": "NOT RUN",
+      "code_cells": 2,
+      "schema": "PASS"
+    },
+    {
+      "notebook": "03_status_query.ipynb",
+      "sha256": "0e40f83758b59c4a8007f25118fa581d662c6177d134683cdbf4ef74ece74e4c",
+      "python_syntax": "PASS",
+      "markdown_links": "PASS",
+      "saved_output_cells": 2,
+      "hardware_execution": "NOT RUN",
+      "code_cells": 2,
+      "schema": "PASS"
+    },
+    {
+      "notebook": "04_settings.ipynb",
+      "sha256": "340e0c9aefe9b6300b073f9c6edc1adef79ab0f803d28dbecf3d1b8695f5f5bf",
+      "python_syntax": "PASS",
+      "markdown_links": "PASS",
+      "saved_output_cells": 0,
+      "hardware_execution": "NOT RUN",
+      "code_cells": 2,
+      "schema": "PASS"
+    },
+    {
+      "notebook": "05_shutter_modes.ipynb",
+      "sha256": "41d06f4d88ba4e8cc736564c509ab7bdf4cfa902cbd0654f6111a6c7484c92be",
+      "python_syntax": "PASS",
+      "markdown_links": "PASS",
+      "saved_output_cells": 0,
+      "hardware_execution": "NOT RUN",
+      "code_cells": 2,
+      "schema": "PASS"
+    },
+    {
+      "notebook": "06_on_off.ipynb",
+      "sha256": "d221adcb6da625a99585e1555ed3144dd3c1e1b2bda1b7bb6197ea6d4179d8b4",
+      "python_syntax": "PASS",
+      "markdown_links": "PASS",
+      "saved_output_cells": 2,
+      "hardware_execution": "NOT RUN",
+      "code_cells": 2,
+      "schema": "PASS"
+    }
+  ]
+}
