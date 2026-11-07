@@ -16,7 +16,15 @@ from threading import Event
 from .errors import Cancelled, ControllerFault, DeadlineExceeded, ProtocolError
 
 MAX_PAYLOAD = 255  # SRC-001 p34: documented bound for this supported protocol revision.
-REPLIES = {0x0006: 84, 0x042A: 6, 0x04C2: None, 0x04C8: None, 0x04CD: None, 0x0212: None}
+REPLIES = {
+    0x0006: 84,
+    0x042A: 6,
+    0x04C2: None,
+    0x04C5: 14,
+    0x04C8: None,
+    0x04CD: None,
+    0x0212: None,
+}
 MESSAGE_LENGTHS = {**REPLIES, 0x0002: None, 0x0080: None, 0x0081: 68}
 
 

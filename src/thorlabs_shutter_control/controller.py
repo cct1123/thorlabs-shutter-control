@@ -12,7 +12,7 @@ from os import PathLike
 from threading import Event, Lock, RLock
 
 from .config import load_config, positive, text, validate_configs
-from .device import KSC101, Identity
+from .device import KSC101, MODES, CycleParameters, Identity
 from .errors import Cancelled, IdentityMismatch, ShutterError
 from .ownership import Claim
 from .protocol import Deadline, Session, clock
@@ -59,6 +59,9 @@ class ShutterStatus:
     optical_provenance: str | None = None
     optical_observed_state: str = "unknown"
     identity: Identity | None = None
+    cycle_parameters: CycleParameters | None = None
+    settings_observed_at: str | None = None
+    settings_persistence: str | None = None
 
 
 @dataclass
@@ -81,6 +84,9 @@ class _Channel:
     optical_at: str | None = None
     optical_evidence: str | None = None
     output_attempts: int = 0
+    cycle_parameters: CycleParameters | None = None
+    settings_observed_at: str | None = None
+    settings_persistence: str | None = None
 
 
 class ShutterHub:
@@ -168,6 +174,9 @@ class ShutterHub:
             optical_observed_at=c.optical_at,
             optical_provenance=c.optical_evidence,
             optical_observed_state=c.optical,
+            cycle_parameters=c.cycle_parameters,
+            settings_observed_at=c.settings_observed_at,
+            settings_persistence=c.settings_persistence,
         )
 
     def connection_snapshot(self, target):
@@ -281,6 +290,83 @@ class ShutterHub:
                 self._fault(c, exc)
                 raise
 
+    def blink_identify(self, target):
+        """Request the selected controller's identify LEDs, not a shutter output."""
+        c, d = self._channel(target), Deadline(self.query_timeout)
+        with self._locked(c, d):
+            self._ready(c)
+            try:
+                c.identity = c.driver.identity(d)
+                c.driver.blink_identify(d)  # APT defines no identify acknowledgement.
+                return self._snapshot(c, self._feedback(c, d))
+            except BaseException as exc:
+                self._fault(c, exc)
+                raise
+
+    def get_cycle_parameters(self, target):
+        c, d = self._channel(target), Deadline(self.query_timeout)
+        with self._locked(c, d):
+            self._ready(c)
+            try:
+                c.identity = c.driver.identity(d)
+                c.cycle_parameters = c.driver.cycle_parameters(d)
+                c.settings_observed_at = utc_now()
+                return self._snapshot(c, self._feedback(c, d))
+            except BaseException as exc:
+                self._fault(c, exc)
+                raise
+
+    @staticmethod
+    def _cycle_limits(policy, parameters, *, repeated=True):
+        if parameters.off_ms / 1000 < policy.min_off_s:
+            raise ValueError("Device OFF duration is shorter than the qualified minimum OFF rest")
+        if policy.max_on_s is not None and parameters.on_ms / 1000 > policy.max_on_s:
+            raise ValueError("Device ON duration exceeds the load policy")
+        if repeated:
+            if parameters.cycles == 0 and not policy.allow_continuous_cycles:
+                raise ShutterError("Continuous cycles require separate load-policy permission")
+            if parameters.cycles > policy.max_cycle_count:
+                raise ValueError("Cycle count exceeds the qualified max_cycle_count")
+
+    def set_cycle_parameters(self, target, parameters, *, source_inhibited=False, persist=False):
+        if not isinstance(parameters, CycleParameters):
+            raise ValueError("parameters must be validated CycleParameters")
+        if type(source_inhibited) is not bool or type(persist) is not bool:
+            raise ValueError("source_inhibited and persist must be boolean")
+        c, d = self._channel(target), Deadline(self.query_timeout)
+        policy = self._policy(c)
+        if not policy.allow_device_settings:
+            raise ShutterError("Device settings require allow_device_settings qualification")
+        if not source_inhibited:
+            raise ShutterError(
+                "Settings require independently inhibited source and isolated triggers"
+            )
+        if persist and not policy.allow_persistent_settings:
+            raise ShutterError(
+                "EEPROM storage requires separate allow_persistent_settings permission"
+            )
+        self._cycle_limits(policy, parameters)
+        with self._locked(c, d), self._output_operation(c):
+            self._preflight(c, d)  # Settings edits require Manual/OFF, not an active cycle.
+            if c.driver.output_state(d) != "off":
+                raise ShutterError("Device settings require electrical OFF")
+            c.claim.mark_uncertain("Cycle settings write pending; output must remain OFF")
+            c.output_attempts += 1
+            c.driver.set_cycle_parameters(parameters, d)
+            observed = c.driver.cycle_parameters(d)
+            if observed != parameters:
+                raise ShutterError("Cycle settings readback differs from the requested values")
+            c.cycle_parameters, c.settings_observed_at = observed, utc_now()
+            c.settings_persistence = "Not requested"
+            if persist:
+                c.driver.persist_cycle_parameters(d)
+                c.settings_persistence = "EEPROM request sent; restart verification required"
+            feedback = self._feedback(c, d)
+            if feedback.electrical_state != "off" or feedback.operating_mode != "manual":
+                raise ShutterError("Cycle settings changed output/mode unexpectedly")
+            c.claim.clear_uncertain()
+            return self._snapshot(c, feedback)
+
     @staticmethod
     def _policy(c):
         require_control_route(c.config)
@@ -291,7 +377,10 @@ class ShutterHub:
     def _preflight(self, c, d):
         self._ready(c)
         self._policy(c)
-        feedback = self._feedback(c, d)
+        return self._manual_feedback(self._feedback(c, d))
+
+    @staticmethod
+    def _manual_feedback(feedback):
         if feedback.operating_mode != "manual":
             raise ShutterError("Manual mode required; no hidden mode change or trigger priming")
         if not feedback.interlock_enabled:
@@ -299,13 +388,15 @@ class ShutterHub:
         return feedback
 
     def set_operating_mode(self, target, mode, *, source_inhibited=False):
-        """Select Manual explicitly; SRC-002 p20 says changed modes persist at power-up."""
-        if mode != "manual":
-            raise ValueError("Cycle/TTL modes unavailable until their limits and contracts qualify")
+        """Explicit APT mode selection; changed modes persist at power-up."""
+        if mode not in MODES.values():
+            raise ValueError("mode must be manual, single, auto or triggered")
         if type(source_inhibited) is not bool:
             raise ValueError("source_inhibited must be boolean")
         c, d = self._channel(target), Deadline(self.query_timeout)
         policy = self._policy(c)
+        if mode not in policy.qualified_modes:
+            raise ShutterError(f"Mode {mode} is absent from the load policy's qualified_modes")
         with self._locked(c, d):
             self._ready(c)
             try:
@@ -313,9 +404,9 @@ class ShutterHub:
             except BaseException as exc:
                 self._fault(c, exc)
                 raise
-            if before.operating_mode == "triggered" and not source_inhibited:
+            if before.operating_mode != mode and not source_inhibited:
                 raise ShutterError(
-                    "Trigger->Manual requires independently inhibited source and isolated "
+                    "Mode transition requires independently inhibited source and isolated "
                     "trigger control; pass source_inhibited=True after establishing them"
                 )
             if before.electrical_state != "off" or not before.interlock_enabled:
@@ -332,10 +423,10 @@ class ShutterHub:
                 c.output_attempts += 1  # Mode changes can also affect output.
                 c.driver.set_output(False, d)  # OFF/deactivate before changing operating mode.
                 c.driver.wait_output(False, d)
-                c.driver.set_operating_mode("manual", d)
+                c.driver.set_operating_mode(mode, d)
                 after = self._feedback(c, d)
-                if after.operating_mode != "manual" or after.electrical_state != "off":
-                    raise ShutterError("Manual mode transition unconfirmed or changed output")
+                if after.operating_mode != mode or after.electrical_state != "off":
+                    raise ShutterError("Mode transition unconfirmed or changed output")
                 c.next_on = clock() + policy.min_off_s
                 c.claim.clear_uncertain()
                 return self._snapshot(c, after)
@@ -361,11 +452,11 @@ class ShutterHub:
                 self._fault(c, exc)
             raise
 
-    def _on(self, c, d):
+    def _on(self, c, d, *, feedback=None):
         policy = self._policy(c)
         if not policy.continuous_on_allowed:
             raise ShutterError("Finite exposure/duty loads need a qualified independent cutoff")
-        feedback = self._preflight(c, d)
+        feedback = self._preflight(c, d) if feedback is None else self._manual_feedback(feedback)
         if feedback.electrical_state != "off":
             raise ShutterError("Output already active; timing/ownership is unknown")
         remaining = c.next_on - clock()  # Fresh OFF preflight establishes this interval.
@@ -410,6 +501,51 @@ class ShutterHub:
     def close_shutter(self, target):
         return self.safe_state(target)
 
+    def start(self, target, *, source_inhibited=False):
+        """Manual ON or one native Start/prime request; never infer cycle completion."""
+        if type(source_inhibited) is not bool:
+            raise ValueError("source_inhibited must be boolean")
+        c, d = self._channel(target), Deadline(self.query_timeout)
+        policy = self._policy(c)
+        with self._locked(c, d), self._output_operation(c):
+            self._ready(c)
+            feedback = self._feedback(c, d)
+            mode = feedback.operating_mode
+            if mode == "manual":
+                return self._on(c, d, feedback=feedback)
+            if mode not in policy.qualified_modes:
+                raise ShutterError(f"Mode {mode} is absent from the load policy's qualified_modes")
+            if not source_inhibited:
+                raise ShutterError(
+                    "Native Start/prime requires source protection and isolated triggers"
+                )
+            if not policy.continuous_on_allowed or not feedback.interlock_enabled:
+                raise ShutterError(
+                    "Native operation requires qualified load and interlock requirement"
+                )
+            if feedback.electrical_state != "off" or c.requested == "start":
+                raise ShutterError("Stop/OFF before starting another native sequence")
+            parameters = c.driver.cycle_parameters(d)
+            self._cycle_limits(policy, parameters, repeated=mode == "auto")
+            if mode == "triggered" and (
+                parameters.cycles != 0 or not policy.allow_continuous_cycles
+            ):
+                raise ShutterError(
+                    "KSC101 level-triggered priming requires cycles=0 "
+                    "and explicit continuous permission"
+                )
+            if clock() < c.next_on:
+                raise ShutterError("Minimum OFF interval has not elapsed; Start was not dispatched")
+            c.claim.mark_uncertain("Native Start/prime requested; Stop/OFF remains required")
+            c.requested, c.cleanup = "start", None
+            c.optical = "unknown"
+            c.optical_at = c.optical_evidence = None
+            c.output_attempts += 1
+            c.driver.set_output(True, d)
+            # A short Single cycle can finish before this reply. Do not require
+            # an ON bit or pretend an OFF sample confirms native inactivity.
+            return self._snapshot(c, self._feedback(c, d))
+
     def _safe(self, c, d):
         policy = self._policy(c)
         self._ready(c, allow_fault=True)
@@ -430,8 +566,11 @@ class ShutterHub:
         c.driver.wait_output(False, d, protective=True)
         c.next_on = clock() + policy.min_off_s  # Rest begins with observed OFF, not dispatch.
         feedback = self._feedback(c, d, protective=True)
-        if feedback.electrical_state != "off" or feedback.operating_mode != "manual":
-            raise ShutterError("OFF unconfirmed or external/cycle authority remains active")
+        if (
+            feedback.electrical_state != "off"
+            or feedback.operating_mode not in policy.qualified_modes
+        ):
+            raise ShutterError("OFF unconfirmed or mode lacks a qualified Stop contract")
         c.cleanup = f"Electrical OFF readback; dispatch monotonic={dispatched:.6f}; optical unknown"
         # Do not clear an existing fault. Only protected recover() can clear lockout.
         if c.fault is None:
@@ -533,6 +672,7 @@ class ShutterHub:
             c.transport.close()  # If this fails, retain handle and claims.
         c.transport = c.driver = c.identity = None
         c.next_on = None
+        c.cycle_parameters = c.settings_observed_at = c.settings_persistence = None
         c.optical = "unknown"
         c.optical_at = c.optical_evidence = None
         if c.claim:
@@ -575,7 +715,7 @@ class ShutterHub:
                     self.safe_state(c.config.name)
                 except BaseException as exc:
                     failures.append((c.config.name, exc))
-            elif c.requested == "on" or c.fault:
+            elif c.requested in ("on", "start") or c.fault:
                 failures.append(
                     (
                         c.config.name,

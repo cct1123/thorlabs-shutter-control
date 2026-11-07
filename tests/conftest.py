@@ -17,6 +17,7 @@ class FakeTransport:
         self.model = "KSC101"
         self.firmware = (7, 0, 1)
         self.mode, self.state, self.interlock = 1, 2, 1
+        self.cycle = (1000, 2000, 1)
         self.rx = deque()
         self.history = []
         self.closed = False
@@ -37,6 +38,9 @@ class FakeTransport:
                 return 3  # Possibly applied, even though transport reports short write.
         elif frame.message_id == 0x04C0:
             self.mode = frame.param2
+        elif frame.message_id == 0x04C3:
+            _, *values = struct.unpack("<HIII", frame.payload)
+            self.cycle = tuple(values)
         if frame.message_id in self.silent:
             return len(raw)
         reply = None
@@ -48,6 +52,10 @@ class FakeTransport:
             struct.pack_into("<H", p, 78, 1)
             struct.pack_into("<H", p, 82, 1)
             reply = Frame(6, destination=1, source=0x50, payload=bytes(p))
+        elif frame.message_id == 0x04C4:
+            reply = Frame(
+                0x04C5, destination=1, source=0x50, payload=struct.pack("<HIII", 1, *self.cycle)
+            )
         elif frame.message_id == 0x0429:
             bits = 0x2001 if self.state == 1 else 0x2000
             reply = Frame(0x042A, destination=1, source=0x50, payload=struct.pack("<HI", 1, bits))

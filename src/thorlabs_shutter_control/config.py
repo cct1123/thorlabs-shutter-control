@@ -77,6 +77,11 @@ class Policy:
     max_on_s: float | None = None
     max_duty_fraction: float = 1.0
     allow_persistent_mode_changes: bool = False
+    qualified_modes: tuple[str, ...] = ("manual",)
+    allow_device_settings: bool = False
+    allow_persistent_settings: bool = False
+    allow_continuous_cycles: bool = False
+    max_cycle_count: int = 1  # Conservative software default, not a manufacturer load rating.
 
     def __post_init__(self):
         text(self.evidence, "qualification evidence")
@@ -88,6 +93,29 @@ class Policy:
             raise ValueError("continuous_on_allowed must be boolean")
         if type(self.allow_persistent_mode_changes) is not bool:
             raise ValueError("allow_persistent_mode_changes must be boolean")
+        for name in (
+            "allow_device_settings",
+            "allow_persistent_settings",
+            "allow_continuous_cycles",
+        ):
+            if type(getattr(self, name)) is not bool:
+                raise ValueError(f"{name} must be boolean")
+        if (
+            not isinstance(self.qualified_modes, tuple)
+            or "manual" not in self.qualified_modes
+            or any(
+                not isinstance(mode, str) or mode not in ("manual", "single", "auto", "triggered")
+                for mode in self.qualified_modes
+            )
+            or len(set(self.qualified_modes)) != len(self.qualified_modes)
+        ):
+            raise ValueError(
+                "qualified_modes must be a unique tuple of supported modes including manual"
+            )
+        if type(self.max_cycle_count) is not int or not 1 <= self.max_cycle_count <= 1000000:
+            raise ValueError("max_cycle_count must be an integer in 1..1000000")
+        if self.allow_persistent_settings and not self.allow_device_settings:
+            raise ValueError("Persistent settings require device-settings permission")
         positive(self.max_duty_fraction, "max_duty_fraction")
         if self.max_duty_fraction > 1:
             raise ValueError("max_duty_fraction must be <= 1")
@@ -171,6 +199,9 @@ def load_config(path):
         item["route"] = Route(**item["route"])
         item["firmware"] = tuple(item["firmware"])
         if "policy" in item:
-            item["policy"] = Policy(**item["policy"])
+            policy = dict(item["policy"])
+            if "qualified_modes" in policy:
+                policy["qualified_modes"] = tuple(policy["qualified_modes"])
+            item["policy"] = Policy(**policy)
         result.append(ControllerConfig(**item))
     return validate_configs(result)

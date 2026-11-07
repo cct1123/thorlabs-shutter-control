@@ -149,33 +149,66 @@ def test_gui_construction_is_passive(bench):
     assert client.get("/_dash-layout").status_code == 200
     assert client.get("/_dash-dependencies").status_code == 200
     assert not devices
-    assert "Solenoid ON" in client.get("/_dash-layout").get_data(as_text=True)
+    assert "Open / ON" in json.dumps(client.get("/_dash-layout").get_json())
+    assert client.get("/assets/shutter.css").status_code == 200
 
 
 @pytest.mark.parametrize("target", [None, "unknown"])
-@pytest.mark.parametrize("action", ["connect", "read", "manual", "on", "pulse", "off", "release"])
+@pytest.mark.parametrize(
+    "action",
+    [
+        "connect",
+        "read",
+        "manual",
+        "single",
+        "auto",
+        "triggered",
+        "on",
+        "pulse",
+        "off",
+        "settings-stop",
+        "release",
+        "identify",
+        "read-settings",
+        "apply-settings",
+    ],
+)
 def test_gui_requires_an_exact_target_for_every_action(bench, target, action):
     from thorlabs_shutter_control.gui import create_app
 
     hub, devices, _, _ = bench
     hub.connect("beam")
     before = len(devices[0].history)
-    client = create_app(hub).server.test_client()
+    app = create_app(hub)
+    key, callback = next(
+        (key, value) for key, value in app.callback_map.items() if "notice.children" in key
+    )
+    client = app.server.test_client()
     response = client.post(
         "/_dash-update-component",
         json={
-            "output": "result.children",
-            "outputs": {"id": "result", "property": "children"},
-            "changedPropIds": [f"{action}.n_clicks"],
-            "inputs": [
-                {"id": key, "property": "n_clicks", "value": int(key == action)}
-                for key in ("connect", "read", "manual", "on", "pulse", "off", "release")
+            "output": key,
+            "outputs": [
+                {"id": "sample", "property": "data"},
+                {"id": "notice", "property": "children"},
             ],
-            "state": [{"id": "target", "property": "value", "value": target}],
+            "changedPropIds": [f"{action}.n_clicks"],
+            "inputs": [dict(item, value=int(item["id"] == action)) for item in callback["inputs"]],
+            "state": [
+                dict(
+                    item,
+                    value=target
+                    if item["id"] == "target"
+                    else []
+                    if item["id"] in ("source-inhibited", "continuous", "persist")
+                    else None,
+                )
+                for item in callback["state"]
+            ],
         },
     )
     assert response.status_code == 200
-    message = response.get_json()["response"]["result"]["children"]
+    message = response.get_json()["response"]["notice"]["children"]
     assert "Select an exact configured target" in message
     assert not devices[0].closed and len(devices[0].history) == before
 

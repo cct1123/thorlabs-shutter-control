@@ -263,11 +263,14 @@ def test_mode_transition_requires_separate_persistent_permission(config, tmp_pat
     try:
         hub.connect("beam")
         if allowed:
-            assert hub.set_manual_mode("beam").feedback.operating_mode == "manual"
+            assert (
+                hub.set_manual_mode("beam", source_inhibited=True).feedback.operating_mode
+                == "manual"
+            )
             assert [f.message_id for f in device.output_frames] == [0x04CB, 0x04C0]
         else:
             with pytest.raises(ShutterError, match="persistent"):
-                hub.set_manual_mode("beam")
+                hub.set_manual_mode("beam", source_inhibited=True)
             assert not device.output_frames
             assert not hub.connection_snapshot("beam").error
     finally:
@@ -319,7 +322,7 @@ def test_failed_mode_transition_uses_the_output_cleanup_guard(config, tmp_path):
     ) as hub:
         hub.connect("beam")
         with pytest.raises(ShutterError, match="changed output"):
-            hub.set_manual_mode("beam")
+            hub.set_manual_mode("beam", source_inhibited=True)
         assert [(f.message_id, f.param2) for f in device.output_frames] == [
             (0x04CB, 2),
             (0x04C0, 1),
@@ -352,7 +355,7 @@ def test_pulse_validation_is_passive_and_shared_with_execution(bench):
 
 def test_invalid_mode_and_on_value_before_io(bench):
     hub, devices, _, _ = bench
-    with pytest.raises(ValueError):
+    with pytest.raises(ShutterError, match="qualified_modes"):
         hub.set_operating_mode("beam", "triggered")
     with pytest.raises(ValueError):
         hub.set_solenoid("beam", 1)

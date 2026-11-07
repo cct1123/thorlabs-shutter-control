@@ -21,7 +21,14 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def hashes():
-    patterns = ("src/**/*.py", "tests/*.py", "scripts/*.py", "docs/examples/*", "config/*.toml")
+    patterns = (
+        "src/**/*.py",
+        "src/**/*.css",
+        "tests/*.py",
+        "scripts/*.py",
+        "docs/examples/*",
+        "config/*.toml",
+    )
     files = {ROOT / name for name in ("pyproject.toml", "uv.lock", ".python-version", "README.md")}
     files.update(p for pattern in patterns for p in ROOT.glob(pattern) if p.is_file())
     return {
@@ -102,11 +109,16 @@ def main():
     with ZipFile(wheel) as archive:
         expected = {
             p.relative_to(ROOT / "src").as_posix(): p.read_bytes()
-            for p in (ROOT / "src").rglob("*.py")
+            for p in (ROOT / "src").rglob("*")
+            if p.is_file() and p.suffix in (".py", ".css")
         }
-        actual = {name: archive.read(name) for name in archive.namelist() if name.endswith(".py")}
+        actual = {
+            name: archive.read(name)
+            for name in archive.namelist()
+            if name.endswith((".py", ".css"))
+        }
         if actual != expected:
-            raise RuntimeError("Wheel Python files differ from source")
+            raise RuntimeError("Wheel runtime Python/CSS files differ from source")
     clean = work / "clean"
     run("clean venv", uv, "venv --offline --python 3.12", clean)
     python = clean / ("Scripts/python.exe" if os.name == "nt" else "bin/python")

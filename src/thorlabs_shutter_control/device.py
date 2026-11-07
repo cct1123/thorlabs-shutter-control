@@ -11,6 +11,33 @@ MODES = {1: "manual", 2: "single", 3: "auto", 4: "triggered"}
 
 
 @dataclass(frozen=True)
+class CycleParameters:
+    """Rev F section6.3.2 bounds; APT0x04C3/5 uses integer milliseconds."""
+
+    on_ms: int
+    off_ms: int
+    cycles: int
+
+    def __post_init__(self):
+        for name in ("on_ms", "off_ms"):
+            value = getattr(self, name)
+            if type(value) is not int or not 100 <= value <= 10000:
+                raise ValueError(f"{name} must be an integer in 100..10000 ms")
+        if type(self.cycles) is not int or not 0 <= self.cycles <= 1000000:
+            raise ValueError("cycles must be an integer in 0..1000000; 0 means continuous")
+
+    def encode(self):
+        return struct.pack("<HIII", 1, self.on_ms, self.off_ms, self.cycles)
+
+    @classmethod
+    def decode(cls, payload):
+        channel, on_ms, off_ms, cycles = struct.unpack("<HIII", payload)
+        if channel != 1:
+            raise ValueError("Wrong cycle-parameter response channel")
+        return cls(on_ms, off_ms, cycles)
+
+
+@dataclass(frozen=True)
 class Identity:
     serial_number: str
     model: str
@@ -113,3 +140,23 @@ class KSC101:
         if type(on) is not bool:
             raise ValueError("on must be boolean")
         self.session.send(Frame(0x04CB, 1, 1 if on else 2), deadline, protective=protective)
+
+    def cycle_parameters(self, deadline):
+        reply = self.session.query(Frame(0x04C4, 1), 0x04C5, deadline)
+        try:
+            return CycleParameters.decode(reply.payload)
+        except (struct.error, TypeError, ValueError) as exc:
+            self.session.poisoned = True
+            raise ProtocolError(f"Invalid cycle parameters: {exc}") from exc
+
+    def set_cycle_parameters(self, parameters, deadline):
+        if not isinstance(parameters, CycleParameters):
+            raise ValueError("parameters must be validated CycleParameters")
+        self.session.send(Frame(0x04C3, payload=parameters.encode()), deadline)
+
+    def persist_cycle_parameters(self, deadline):
+        """APT p99: request storage of cycle parameters only; no persistence ACK exists."""
+        self.session.send(Frame(0x04B9, payload=struct.pack("<HH", 1, 0x04C3)), deadline)
+
+    def blink_identify(self, deadline):
+        self.session.send(Frame(0x0223, 1), deadline)
