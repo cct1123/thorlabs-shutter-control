@@ -36,6 +36,16 @@ Protective callers signal cancellation before waiting for the lock; reads use
 Read-only sessions have no incidental output-cleanup obligation, even with a
 configured write policy. Their faults remain visible without an output command.
 Minimum OFF rest starts after electrical OFF readback, not command dispatch.
+Every ON attempt invalidates the prior interval. Confirmed-safe release retires
+that connection's output history; active or faulted uncertainty survives release.
+Protected recovery verifies Manual/OFF/interlock before clearing stale requests
+without sending output. Native Stop during an explicit mode change is reflected
+in requested state, independent of the unknown native-activity feedback.
+
+The WebUI scopes settings drafts and operator assertions to target plus owner
+connection generation. New connections clear stale edits/permissions; polling
+within a connection preserves drafts. A shared software callback-test helper
+keeps HTTP test dispatch consistent without another runtime backend.
 
 End-to-end deadlines use perf_counter, including lock time. No retries, fallback,
 reconnect or ON replay occur. Framing/freshness failures quarantine the session;

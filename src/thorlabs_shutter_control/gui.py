@@ -501,7 +501,8 @@ def create_app(hub):
                 className="diagnostics",
             ),
             dcc.Store(id="sample"),
-            dcc.Store(id="settings-version"),
+            dcc.Store(id="settings-context"),
+            dcc.Store(id="confirmation-context"),
             dcc.Interval(id="poll", interval=1000, disabled=True),
         ],
         className="shutter-app",
@@ -520,10 +521,23 @@ def create_app(hub):
         Output("source-inhibited", "value"),
         Output("persist", "value"),
         Output("live-readback", "value"),
+        Output("confirmation-context", "data"),
         Input("target", "value"),
+        Input("sample", "data"),
+        State("confirmation-context", "data"),
     )
-    def target_confirmation(_target):
-        return [], [], []  # Protection/persistence assertions never carry to another target.
+    def session_confirmation(target, sample, context):
+        if (
+            ctx.triggered_id == "target"
+            or not sample
+            or sample.get("name") != target
+            or not sample.get("has_device")
+        ):
+            return [], [], [], None
+        scope = {"target": target, "generation": sample.get("generation")}
+        if context != scope:
+            return [], [], [], scope
+        return no_update, no_update, no_update, no_update
 
     @app.callback(
         Output("poll", "disabled"), Input("live-readback", "value"), Input("sample", "data")
@@ -581,25 +595,36 @@ def create_app(hub):
         Output("cycle-off", "value"),
         Output("cycles", "value"),
         Output("continuous", "value"),
-        Output("settings-version", "data"),
+        Output("settings-context", "data"),
         Input("sample", "data"),
         Input("target", "value"),
-        State("settings-version", "data"),
+        State("settings-context", "data"),
         prevent_initial_call=True,
     )
-    def settings_values(sample, target, version):
-        if ctx.triggered_id == "target" or (sample and sample.get("name") != target):
+    def settings_values(sample, target, context):
+        sample = sample or {}
+        if (
+            ctx.triggered_id == "target"
+            or sample.get("name") != target
+            or not sample.get("has_device")
+        ):
             return None, None, None, [], None
-        settings = (sample or {}).get("cycle_parameters")
-        stamp = (sample or {}).get("settings_observed_at")
-        if not settings or not stamp or stamp == version:
+        scope = {"target": target, "generation": sample.get("generation")}
+        context = context if isinstance(context, dict) else {}
+        changed = any(context.get(key) != value for key, value in scope.items())
+        settings, stamp = sample.get("cycle_parameters"), sample.get("settings_observed_at")
+        if not settings or not stamp:
+            if changed:
+                return None, None, None, [], {**scope, "stamp": None}
+            return no_update, no_update, no_update, no_update, no_update
+        if not changed and stamp == context.get("stamp"):
             return no_update, no_update, no_update, no_update, no_update
         return (
             settings["on_ms"],
             settings["off_ms"],
             settings["cycles"] or None,
             [] if settings["cycles"] else ["continuous"],
-            stamp,
+            {**scope, "stamp": stamp},
         )
 
     mode_outputs = [

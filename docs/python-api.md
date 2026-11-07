@@ -64,7 +64,7 @@ with ShutterHub("qualified.local.toml") as hub:
 | set_solenoid(target, False), close_shutter(target), safe_state(target) | Priority qualified OFF with electrical readback |
 | pulse(target, seconds) | ON/host hold/OFF; not calibrated optical exposure |
 | cancel(target) | Cancel active work and attempt qualified OFF |
-| shutdown_outputs() | Attempt OFF for targets with prior output/mode attempts; report read-only faults without actuating those targets; aggregate failures |
+| shutdown_outputs() | Attempt OFF for current/unresolved output work; a confirmed-safe released session cannot authorize output in a later reader; report read-only faults and aggregate failures |
 
 For direct calls, first establish Manual/OFF and the configured minimum OFF pause;
 then set_solenoid(name, True) requests ON and set_solenoid(name, False) requests OFF.
@@ -75,6 +75,8 @@ not a measured optical closure time.
 Fresh OFF from get_status also starts that interval; an ON click is not required
 to start it. Any observed ON invalidates the previous OFF interval. Library
 connect remains identity-only; the WebUI Connect additionally reads fresh status.
+An ON attempt itself also invalidates prior rest, even if no subsequent poll
+sees ON. A later externally imposed OFF therefore starts a new interval.
 Mode-write failures share the output ambiguity/cleanup guard. ON and pulse also
 preserve the original failure and any separate cleanup outcome. Output methods
 remain unavailable on VCP, KEH3 external USB OUT and without the reviewed load policy.
@@ -105,6 +107,11 @@ The GUI has an explicit source-protection assertion; the controller cannot measu
 `CycleParameters(on_ms, off_ms, cycles)` is exported from the package. Durations
 are integer 100..10000 ms; count is 0..1000000, with 0 meaning continuous.
 Read settings are dated separately from electrical feedback and cleared on release.
+Cycle writes enforce `on_ms / (on_ms + off_ms) <= max_duty_fraction`, alongside
+ON/OFF/count limits. Finite-load settings do not qualify finite-load activation.
+Mode/settings readback must preserve the interlock requirement; unexpected
+disablement faults the owner and retains uncertainty. A mode transition's
+explicit Stop/OFF replaces an older native Start request.
 `settings_persistence` reports an EEPROM request, never confirmed persistence;
 that requires separately authorized restart/readback verification. Optional policy
 fields and native Start/Stop semantics are in the [WebUI guide](gui.md#manufacturer-reference-and-implemented-functions).
@@ -150,6 +157,8 @@ hub.recover("beam", source_inhibited=True, optical_closed=True,
 Recovery reopens only the exact route, verifies identity/firmware and fresh
 OFF/Manual/interlock replies, records the human observation and clears the
 persistent uncertainty marker. It never sends ON or replays a trigger cycle.
+Successful protected recovery also clears stale output requests and cleanup
+obligations; subsequent read-only shutdown does not send an incidental OFF.
 The physical observation remains a dated record, not a continuing optical sensor.
 
 The driver command values remain APT ON=1/OFF=2 and Manual=1. They are never

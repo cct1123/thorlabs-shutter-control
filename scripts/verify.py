@@ -16,6 +16,7 @@ import time
 import tomllib
 import uuid
 from pathlib import Path
+from xml.etree import ElementTree
 from zipfile import ZipFile
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -31,11 +32,23 @@ def hashes():
         "config/*.toml",
     )
     files = {ROOT / name for name in ("pyproject.toml", "uv.lock", ".python-version", "README.md")}
+    files.add(ROOT / "records/webui-final-live.json")  # Frozen input to the UI regressions.
     files.update(p for pattern in patterns for p in ROOT.glob(pattern) if p.is_file())
     return {
         p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
         for p in sorted(files)
     }
+
+
+def read_test_totals(path):
+    """A successful pytest process alone cannot turn skipped/uncollected tests into PASS."""
+    totals = dict(tests=0, failures=0, errors=0, skipped=0)
+    for suite in ElementTree.parse(path).getroot().iter("testsuite"):
+        for key in totals:
+            totals[key] += int(suite.get(key, 0))
+    if totals["tests"] <= 0 or any(totals[key] for key in ("failures", "errors", "skipped")):
+        raise RuntimeError(f"Required tests were not all executed and passed: {totals}")
+    return totals
 
 
 def main():
@@ -71,6 +84,7 @@ def main():
     environment.pop("PYTHONPATH", None)
     environment["PYTHONDONTWRITEBYTECODE"] = "1"
     results = []
+    summaries = {}
 
     def run(label, prefix, flags, *arguments, cwd=ROOT, reject=False):
         """Split only our static flags; keep paths/code as separate argv values."""
@@ -96,6 +110,7 @@ def main():
             )
 
     def tests(label, python):
+        report = ROOT / f"records/{args.record_prefix}{label}-tests.xml"
         run(
             label + " tests",
             python,
@@ -104,9 +119,10 @@ def main():
             "--basetemp",
             work / label,
             "--junitxml",
-            ROOT / f"records/{args.record_prefix}{label}-tests.xml",
+            report,
             cwd=work,
         )
+        summaries[label] = read_test_totals(report)
 
     run("lock current", uv, "lock --check --offline")
     for check in ("check", "format --check"):
@@ -212,6 +228,7 @@ print(json.dumps({'python': sys.version, 'package': package.__file__}))
         python=sys.version,
         deadline_clock=vars(time.get_clock_info("perf_counter")),
         tested_paths=[path.relative_to(ROOT).as_posix() for path in selected],
+        test_totals=summaries,
         source_sha256=before,
         wheel_sha256=hashlib.sha256(wheel.read_bytes()).hexdigest(),
         wheel_source_parity="PASS",

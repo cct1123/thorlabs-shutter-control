@@ -19,12 +19,23 @@ TOML before deploying; retired CLI commands fail rather than falling back.
 Saved notebook outputs, older JSON field names and historical reports preserve
 their original evidence. Their existence does not make them current runtime APIs.
 
-The selected Ethernet controller's E181 commissioning and local software checks
-are recorded separately. Current external DiamondGUI checks pass 3 owner/factory
-cases and fail 26 page cases: its dirty page is entirely commented out and its
-metadata still selects the old name/port. Restore the intended page and migrate
+Restart an existing WebUI process and reload its browser after upgrading. Its
+in-memory owner is not replaced by editing Python files. Draft settings and
+protection/persistence/polling assertions now end at disconnect or a new owner
+connection generation; confirm physical conditions after Connect. Internal GUI
+store IDs are not a persistent/public configuration format. Python owner names,
+status fields, TOML identity/route names and APT command values are preserved.
+The follow-up review changes rest/cleanup/recovery guards and GUI state lifetime;
+earlier bench results retain their exact recorded revision rather than validating
+these changes physically. Software-only tests cannot complete that cutover.
+
+The selected Ethernet controller's commissioning and local software checks are
+recorded separately. The last external DiamondGUI check, E185, passed 3 owner/
+factory cases and failed 26 page cases: its dirty page was commented out and its
+metadata selected the old name/port. Restore the intended page and migrate
 the deployment mapping before claiming integrated cutover; see
 [the integration findings](diamondgui.md).
+That external checkout is not modified or revalidated by the current repository review.
 
 1. Keep independent source protection engaged. Stop tasks and release all shutter
    owners. Confirm optical state independently. Record the old source revision and

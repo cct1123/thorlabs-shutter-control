@@ -322,6 +322,9 @@ class ShutterHub:
             raise ValueError("Device OFF duration is shorter than the qualified minimum OFF rest")
         if policy.max_on_s is not None and parameters.on_ms / 1000 > policy.max_on_s:
             raise ValueError("Device ON duration exceeds the load policy")
+        duty = parameters.on_ms / (parameters.on_ms + parameters.off_ms)
+        if repeated and duty > policy.max_duty_fraction:
+            raise ValueError("Device cycle duty fraction exceeds the load policy")
         if repeated:
             if parameters.cycles == 0 and not policy.allow_continuous_cycles:
                 raise ShutterError("Continuous cycles require separate load-policy permission")
@@ -362,8 +365,12 @@ class ShutterHub:
                 c.driver.persist_cycle_parameters(d)
                 c.settings_persistence = "EEPROM request sent; restart verification required"
             feedback = self._feedback(c, d)
-            if feedback.electrical_state != "off" or feedback.operating_mode != "manual":
-                raise ShutterError("Cycle settings changed output/mode unexpectedly")
+            if (
+                feedback.electrical_state != "off"
+                or feedback.operating_mode != "manual"
+                or not feedback.interlock_enabled
+            ):
+                raise ShutterError("Cycle settings changed output/mode/interlock unexpectedly")
             c.claim.clear_uncertain()
             return self._snapshot(c, feedback)
 
@@ -421,12 +428,17 @@ class ShutterHub:
             with self._output_operation(c):
                 c.claim.mark_uncertain("Explicit mode transition pending")
                 c.output_attempts += 1  # Mode changes can also affect output.
+                c.requested = "off"  # This transition explicitly sends Stop/OFF first.
                 c.driver.set_output(False, d)  # OFF/deactivate before changing operating mode.
                 c.driver.wait_output(False, d)
                 c.driver.set_operating_mode(mode, d)
                 after = self._feedback(c, d)
-                if after.operating_mode != mode or after.electrical_state != "off":
-                    raise ShutterError("Mode transition unconfirmed or changed output")
+                if (
+                    after.operating_mode != mode
+                    or after.electrical_state != "off"
+                    or not after.interlock_enabled
+                ):
+                    raise ShutterError("Mode transition unconfirmed or changed output/interlock")
                 c.next_on = clock() + policy.min_off_s
                 c.claim.clear_uncertain()
                 return self._snapshot(c, after)
@@ -471,6 +483,7 @@ class ShutterHub:
         c.optical = "unknown"
         c.optical_at = c.optical_evidence = None
         c.output_attempts += 1
+        c.next_on = None  # An ON attempt invalidates every previously observed OFF interval.
         c.driver.set_output(True, d)
         bits = c.driver.wait_output(True, d)
         return self._snapshot(
@@ -541,6 +554,7 @@ class ShutterHub:
             c.optical = "unknown"
             c.optical_at = c.optical_evidence = None
             c.output_attempts += 1
+            c.next_on = None
             c.driver.set_output(True, d)
             # A short Single cycle can finish before this reply. Do not require
             # an ON bit or pretend an OFF sample confirms native inactivity.
@@ -659,6 +673,9 @@ class ShutterHub:
                     raise ShutterError("Recovery requires OFF/manual and preserved interlock")
                 c.claim.clear_uncertain()
                 c.fault = None
+                c.requested = None
+                c.output_attempts = 0
+                c.cleanup = "Protected recovery verified Manual/OFF; no output command sent"
                 c.optical, c.optical_at, c.optical_evidence = "closed", utc_now(), evidence
                 c.next_on = clock() + (c.config.policy.min_off_s if c.config.policy else 0)
                 return self._snapshot(c, feedback)
@@ -675,6 +692,14 @@ class ShutterHub:
         c.cycle_parameters = c.settings_observed_at = c.settings_persistence = None
         c.optical = "unknown"
         c.optical_at = c.optical_evidence = None
+        if (
+            c.claim
+            and c.fault is None
+            and c.requested not in ("on", "start")
+            and not c.claim.journal.exists()
+        ):
+            # Confirmed-safe output history does not authorize a future read-only session.
+            c.output_attempts = 0
         if c.claim:
             c.claim.release()
             c.claim = None
@@ -706,7 +731,7 @@ class ShutterHub:
     def shutdown_outputs(self):
         failures = []
         for c in self._channels.values():
-            if c.output_attempts == 0 and c.requested is None:
+            if c.output_attempts == 0 and c.requested not in ("on", "start"):
                 if c.fault:
                     failures.append((c.config.name, ShutterError(f"Read-only fault: {c.fault}")))
                 continue  # A policy permits commands; it does not create a cleanup obligation.

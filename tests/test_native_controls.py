@@ -5,6 +5,7 @@ from dataclasses import replace
 
 import pytest
 from conftest import FakeTransport
+from ui_helpers import post_callback
 
 from thorlabs_shutter_control import CycleParameters, ShutterError, ShutterHub
 from thorlabs_shutter_control.device import KSC101
@@ -203,26 +204,7 @@ def test_webui_renderer_keeps_unavailable_feedback_unknown(bench):
     sample = asdict(hub.get_status("beam"))
     app = create_app(hub)
     key = next(key for key in app.callback_map if "serial-label.children" in key)
-    callback = app.callback_map[key]
-    outputs = [
-        {"id": output.component_id, "property": output.component_property}
-        for output in callback["output"]
-    ]
-    response = app.server.test_client().post(
-        "/_dash-update-component",
-        json={
-            "output": key,
-            "outputs": outputs,
-            "changedPropIds": ["sample.data"],
-            "inputs": [
-                dict(item, value=sample if item["id"] == "sample" else "beam")
-                for item in callback["inputs"]
-            ],
-            "state": [],
-        },
-    )
-    assert response.status_code == 200
-    rendered = response.get_json()["response"]
+    rendered = post_callback(app, key, {"sample": sample, "target": "beam"}, "sample.data")
     assert rendered["on"]["disabled"] is False
     assert rendered["auto"]["disabled"] is True
     assert rendered["apply-settings"]["disabled"] is True
