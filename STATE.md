@@ -2,7 +2,7 @@
 
 ## Current checkpoint
 
-2026-11-08 REQ-251 / TEST-251 final combined review: PASS software; publication pending.
+2026-11-08 REQ-251 / TEST-251 final combined review: COMPLETE software/publication (E235).
 The project remains BLOCKED for full physical/deployment acceptance; the review
 is a separate software/publication scope. The user retains the three core modules
 and authorizes the reviewed changes to be committed and pushed. No new device
@@ -122,12 +122,14 @@ Older campaign counts and structural metrics below refer to their recorded revis
 | REQ-249 | Clear documented shutter commands (PROJECT.md 8 November) | TEST-249; D083/E229; literal frames, owner/error cases, source/wheel | PASS software: 293 + 293; new hardware operations UNTESTED |
 
 | REQ-250 | GUI command exposure (PROJECT.md 8 November) | TEST-250; D084/E230 callback/desktop/phone evidence; E234 integration | PASS software/layout: 140 targeted; final 341 source + 341 wheel |
-| REQ-251 | Combined review and publication (PROJECT.md 8 November) | TEST-251; D085/E231/E234; regressions, source/wheel/docs and remote verification | PASS software/docs; publication pending |
+| REQ-251 | Combined review and publication (PROJECT.md 8 November) | TEST-251; D085/E231/E234; regressions, source/wheel/docs and remote verification | PASS software/docs/publication; E235 |
 
 ## Next action and external dependencies
 
-After final verification, commit the reviewed implementation/migration and its
-docs/evidence, push normally to origin/main, and verify remote HEAD equality.
+E235: reviewed implementation/docs/evidence committed as 2bc53e2 and pushed to
+origin/main; remote HEAD equality verified. The final checkpoint records this
+observed publication. Next engineering work is the separate physical/deployment
+campaign; no further source change is required by REQ-251.
 No device I/O is part of publication. The active earlier application environment
 was not synced or restarted because shutter-control.exe is in use; validation
 uses --no-sync and an isolated installed wheel. Deploy only after the existing

@@ -1,0 +1,19 @@
+{
+  "evidence_id": "E235",
+  "requirement_id": "REQ-251",
+  "test_id": "TEST-251",
+  "scope": "Observed publication of the reviewed implementation/docs/evidence; no hardware operation",
+  "recorded_at_utc": "2026-11-09T00:07:35.087056+00:00",
+  "result": "PASS",
+  "branch": "main",
+  "remote": "origin",
+  "published_commit": "2bc53e28f93bcacd0dce0401b67a9f3cb8e97d90",
+  "observed_remote_main": "2bc53e28f93bcacd0dce0401b67a9f3cb8e97d90",
+  "remote_head_equal": true,
+  "source_tests": 341,
+  "wheel_tests": 341,
+  "verifier_inputs": 39,
+  "verifier_record_sha256": "648cf404abfd4fc878d5ab5dc66d4032481f1b5cff2e679699dcb0b070bde36c",
+  "preserved_concurrent_work": "REQ-252 PROJECT/STATE sections and webui-command-* hardware campaign records remain outside this review publication",
+  "final_checkpoint": "Follow-up documentation commit records the observed implementation publication; verify its remote HEAD after pushing"
+}

@@ -1,7 +1,9 @@
 # Combined review and delivery
 
-8 November 2026. REQ-251 / TEST-251: **PASS software; publication pending** (D085/E231/E234).
+8 November 2026. REQ-251 / TEST-251: **COMPLETE, software/publication scope** (D085/E231/E234).
 Full physical and external deployment acceptance remains **BLOCKED**.
+Implementation/docs/evidence published as `2bc53e2`; remote HEAD equality
+verified (E235). The separate active hardware campaign remains uncommitted.
 
 The reviewed v2 package retains three core modules: controller.py owns validated
 configuration, device commands, policy and ownership; protocol.py owns APT
@@ -54,6 +56,7 @@ Evidence:
   [source tests](../records/final-review-offline-tests.xml),
   [wheel tests](../records/final-review-wheel-tests.xml).
 - [Documentation/artifact audit](../records/final-review-audit.json),
+  [observed publication](../records/final-review-publication.json),
   [decisions and observations](../records/RECORDS.md), [checkpoint](../STATE.md).
 
 The selected SH05R / 68800777 / 1.0.7 / KEH3 middle-bay configuration retains

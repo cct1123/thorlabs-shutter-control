@@ -3613,3 +3613,18 @@ the separate campaign has its own authority, observations and unfinished work.
 
 REQ-251 software/doc scope PASS. Publication evidence will identify the observed
 source commit and remote equality separately; physical acceptance remains open.
+
+## E235 - Observed review publication / TEST-251
+
+8 November 2026. Reviewed implementation/docs/evidence committed as
+2bc53e28f93bcacd0dce0401b67a9f3cb8e97d90 and pushed normally to origin/main.
+git ls-remote origin refs/heads/main returned the identical full hash.
+All 136 staged paths matched the reviewed bytes and all 39 verifier inputs
+matched the index before commit; scoped whitespace checks PASS.
+
+records/final-review-publication.json records the observed result. The follow-up
+checkpoint/report now marks REQ-251 COMPLETE in software/publication scope; full
+physical/deployment acceptance remains BLOCKED. Concurrent REQ-252 live records
+and PROJECT/STATE sections remain uncommitted and unchanged by this publication.
+The final documentation checkpoint is committed/pushed separately, then remote
+HEAD equality is checked again. No hardware operation was performed here.

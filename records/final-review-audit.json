@@ -3,7 +3,7 @@
   "test_id": "TEST-251",
   "evidence_id": "E234",
   "result": "PASS",
-  "recorded_at_utc": "2026-11-09T00:04:50.209973+00:00",
+  "recorded_at_utc": "2026-11-09T00:07:35.863736+00:00",
   "scope": "Software/document/artifact integrity only; no device or existing-server operation",
   "source_input_count": 39,
   "changed_verifier_inputs": [],
@@ -22,7 +22,7 @@
     }
   },
   "markdown_files": 21,
-  "local_links": 111,
+  "local_links": 112,
   "broken_links": [],
   "manuals": [
     {
@@ -84,8 +84,8 @@
   "document_sha256": {
     "README.md": "a504b869716e49e7cf0e562c3b5c1fa065de411d2fa6323ae1755b9acfda5b47",
     "PROJECT.md": "eeb6798a7f650dd546fcdb3da5ce60b6e22fbd68475788c27c99f6048edc248e",
-    "STATE.md": "07c665747c8dac5621a042d074f75f1d733651717232c9275753b1aff68ff873",
-    "outputs/REPORT.md": "fe6f25c70bb048568bae0ab8bf98fcb1756440ceb61125b3ec5eaea20cb925de",
+    "STATE.md": "30d5ba152aa988b1d92ebffaafaee268dfebfec67f972106110715d478414054",
+    "outputs/REPORT.md": "572ba3fde57e6a3c45806fbc9262d52c508d09946d2429c4600b6a98559826c7",
     "docs/architecture.md": "9e1a64494d266496d0e889b8c7bd7f9e104263d2f3013b9697ab5a6e8f42fefe",
     "docs/controller-reference-review.md": "27067c6c127e1d3798dc1db3d9769cf122934fa992572497d1e0dcfdd75fc032",
     "docs/cutover.md": "516440087b452ee94bed48332efd903b9d1c651ff166685d74f2c1b2f9a74903",
