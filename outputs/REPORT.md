@@ -1,74 +1,96 @@
-# Combined review and delivery
+# Reviewed shutter-control system
 
-8 November 2026. REQ-251 / TEST-251: **COMPLETE, software/publication scope** (D085/E231/E234).
-Full physical and external deployment acceptance remains **BLOCKED**.
-Implementation/docs/evidence published as `2bc53e2`; remote HEAD equality
-verified (E235). The separate active hardware campaign remains uncommitted.
+8 November 2026. REQ-273 / TEST-273 software review validated:391 source and391
+isolated-wheel tests PASS, zero failures/errors/skips. REQ-273 is COMPLETE for
+software/local publication: runtime/configuration/tests/tutorial commit ddda81d,
+documentation/evidence commit 7c2f4d4, then this final checkpoint/audit stage.
+Full physical/deployment acceptance remains BLOCKED. No hardware/lab-network
+I/O, existing-owner/server operation, external checkout edit or push occurred.
 
-The reviewed v2 package retains three core modules: controller.py owns validated
-configuration, device commands, policy and ownership; protocol.py owns APT
-framing/deadlines; transport.py owns explicit routes and byte I/O. GUI and CLI
-remain separate entry points. Retired modules have no compatibility wrappers.
+## Resulting behavior
 
-The review fixes three demonstrated flaws:
+Run `uv run shutter-control gui` from the repository root after
+`uv sync --locked --extra gui`. It loads config/shutter.ethernet.toml on
+127.0.0.1:9860. Config/port overrides remain. Startup is passive; selection and
+Connect are explicit. Release closes communication without output commands.
+Stop/Release the existing owner before deliberate restart and browser reload.
 
-- A stale reply queued behind 4096 bytes of unsolicited events could satisfy a
-  new query. Queries now drain every arrived chunk before dispatch, within the
-  original deadline. Queued replies and incomplete tails are refused; continuous
-  traffic times out. This does not solve arbitrary delayed replies without APT
-  transaction IDs.
-- WebUI Release could check an idle snapshot, wait for the lock, then close a
-  connection after another callback started output. Its pending ON/Start check
-  now runs under the same owner lock as release. Ordinary close remains passive.
-- Generic success notices could hide a persistent owner fault. Fault lockout now
-  remains visible in both main and Settings notices, including polls and Release.
-  Readable electrical data still cannot clear lockout or authorize output.
+The configured setup is SH05R / KSC10168800777 / firmware1.0.7 / KEH3 middle
+192.168.1.19:40305. Hub identity is unknown; configuration does not establish
+present physical state. controller/protocol/transport form the three core layers;
+Python, CLI, Dash GUI and tutorials use the same owner without an SDK runtime.
+External consumers need the [API/schema migration](../docs/python-api.md#status-schema-migration).
 
-Release checking has one canonical owner implementation. Cycle-duty/count
-checks share one repetition branch. The preceding pruning removes retired core
-modules, duplicate notebook verification, unsupported GUI placeholders and obsolete
-review documents. Historical evidence and notebook outputs are retained; Issue 36
-is preserved byte-for-byte in Git history while Issue 42.1 remains local.
+| Operation | Current contract |
+| --- | --- |
+| Mode selection | Manual/Single/Auto/Triggered without source confirmation or separate mode permission; changes persist; fresh OFF/interlock, Stop and readback remain |
+| Activation | Tracked profile allows all four modes; cycle/load/OFF/interlock/ownership/fault checks remain; custom qualified_modes still apply |
+| Triggered priming | Requires cycles0 and continuous-cycle permission, false in the tracked profile |
+| Settings/EEPROM | Separate permissions remain false in the tracked profile; writes require Manual/OFF/interlock and exact readback; no source checkbox |
+| OFF interval | Tracked min_off_s=0; custom positive intervals remain enforced; every ON attempt invalidates prior rest |
+| Manual ON / pulse | Continuous-duty load required; ordinary ON has no automatic shutoff; pulse has a host hold at most50s, GUI1s; neither is calibrated exposure |
+| Fault reset | Explicit Stop/OFF clears fault/journal only after fresh OFF/interlock; failed verification, reads and automatic cleanup retain faults |
+| Shutdown | Standalone button drains accepted requests, attempts output cleanup and release; retained faults produce failure even after OFF; embedded apps omit the button |
+| Hardware disconnect | Protected Python API only; ordinary GUI Release remains passive |
+| Status | Dated electrical output and literal interlock/channel flags; host Native request is separate from actual native activity |
 
-The combined GUI exposes documented channel/bay/LED reads, guarded LED settings,
-interlock enforcement, update requests/raw events and explicit hardware disconnect
-through ShutterHub. Last-read/request labels do not claim optical feedback or
-streaming acknowledgement. The UI retains one exact-target dispatch path. E230 records passive desktop/phone
-layout checks; the final review also inspected the four saved screenshots.
+## Review findings and pruning
 
-Version 2 uses a flat ShutterStatus. Repository consumers/tutorial source are
-migrated; saved notebook outputs remain historical. External DiamondGUI still
-needs the documented schema and route/page migration before deployment.
+Three before-fix regressions failed as expected; fixes pass165 affected tests:
 
-**341 source + 341 isolated-wheel tests PASS**, zero failures/errors/skips.
-All 39 verifier input hashes match. Source and installed-wheel checks use
-software transports, saved observations and localhost loopback only. They check
-identity/routing, interlocks/load policy, native permissions, cancellation,
-partial writes, cleanup/recovery, lock contention, GUI callbacks, dependency lock,
-lint/format, package parity, passive import/help/config and six static notebooks.
-No live controller was contacted; no running owner was restarted or taken over.
+- Shutdown could return successfully while retaining a prior output fault after
+  OFF. It now aggregates that fault and still cleans remaining targets.
+- Rendering re-enabled the disabled hardware-disconnect button, whose required
+  source assertion no longer existed in the GUI. Removed its widget, action and
+  callback dispatch; the protected Python API remains covered by regressions.
+- Empty-text CLI interruptions produced an empty diagnostic. They now include
+  the exception type, including KeyboardInterrupt.
 
-Evidence:
+Reconciled stale source-confirmation/mode-permission descriptions in the README,
+configuration, GUI help, API, interface, architecture, cutover and setup guides.
+Updated notebook4's current policy description and marked old screenshots and
+physical tests as historical. Saved notebook outputs and metadata are unchanged.
+Pruning also integrates the earlier reviewed convenience-API/status reduction
+and shared GUI field builder. Historical evidence and unrelated artifacts remain.
+Fourteen historical JPEG captures retain their original .png filenames for
+capture/hash references; the audit lists this non-critical archival limitation.
 
-- [Three pre-fix failures](../records/final-review-reproductions.xml),
-  [passing protection regressions](../records/final-review-regressions.xml).
-- [Final source/wheel verifier](../records/final-review-direct-validation.json),
-  [source tests](../records/final-review-offline-tests.xml),
-  [wheel tests](../records/final-review-wheel-tests.xml).
-- [Documentation/artifact audit](../records/final-review-audit.json),
-  [observed publication](../records/final-review-publication.json),
-  [decisions and observations](../records/RECORDS.md), [checkpoint](../STATE.md).
+## Validation and evidence
 
-The selected SH05R / 68800777 / 1.0.7 / KEH3 middle-bay configuration retains
-Manual-only output activation, 2 s OFF rest, protected persistent mode selection,
-and disabled native Start/priming/settings/EEPROM permissions. Interlock disable,
-unverified motor/MMI/trigger layouts, automatic ON replay and route fallback
-remain excluded. Electrical readback does not establish blade position or optical
-timing. Previous physical cycle allowances are consumed.
+Command: `uv run --locked --offline --group dev --extra gui python -B scripts/verify.py --record-prefix repo-review-final-`
 
-The existing shutter-control.exe remains in use; its environment was not synced.
-The reviewed wheel must be deployed deliberately after stopping/releasing the
-existing owner. Calibration, new physical validation, hub identity/topology,
-driver/persistence/endurance work and external DiamondGUI cutover remain open.
-See [operation/API](../docs/python-api.md), [GUI](../docs/gui.md),
-[cutover](../docs/cutover.md) and [physical acceptance](../docs/HARDWARE_VALIDATION.md).
+Source/wheel software suites each pass 391 tests. Lock/lint/format, exact Python/CSS
+wheel parity, passive import/help/config, negative lock checks and static tutorial
+checks PASS. All 41 verification input hashes match. Real localhost tests cover
+standalone shutdown without an instrument. Software transports do not prove real
+wiring, optical behavior or native driver timing. No new visual browser check ran.
+
+- [Integrated verification](../records/repo-review-final-direct-validation.json)
+- [Source tests](../records/repo-review-final-offline-tests.xml), [wheel tests](../records/repo-review-final-wheel-tests.xml)
+- [Before-fix reproductions](../records/repo-review-reproduction-tests.xml), [affected regressions](../records/repo-review-fixed-tests.xml)
+- [Documentation/manual/notebook audit](../records/repo-review-audit.json)
+- [Durable findings and decisions](../records/RECORDS.md#e254---repository-review-validation--test-273)
+
+Older validation campaigns retain their exact revisions and conditions. E252's
+389+389 status result and E253's391-source shutdown result are included in this
+new integrated verification; their old input hashes are not current validation.
+
+## Remaining acceptance gaps
+
+REQ-270's documented flag decoding passes software tests. The full vendor
+Key/Ready/actual native Activity request REQ-271 remains PARTIAL/BLOCKED. Reported
+masks0x1000/0x80000000 do not establish key position, readiness or interlock
+continuity; raw0x2000 is not repurposed as such a flag. Host-only/disconnected
+values remain None; retained healthy-refusal readings keep their original date.
+Manufacturer-confirmed firmware-specific raw definitions or an existing passive
+capture paired with vendor states are required. See the
+[status contract and exact resumption condition](../docs/status-readback.md).
+
+E239's last approved1s Manual pulse ended with Manual/OFF/interlock and release
+on its recorded revision; its cycle allowance is consumed and blade motion was
+unobserved. Earlier E191/E192 records one human-observed cycle. Neither establishes
+calibrated timing/extinction or validates the current zero-pause/all-mode profile.
+Native modes/triggered priming/settings/storage, MMI/trigger layouts, hub identity/
+recovery, USB driver/reboot/endurance and external DiamondGUI migration remain
+open. The last external check E185 failed26 page cases; that checkout was neither
+changed nor revalidated. [STATE.md](../STATE.md) preserves the exact dependencies.

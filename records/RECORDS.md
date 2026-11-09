@@ -4424,10 +4424,10 @@ Artifacts: repo-review-fixed-tests.xml, repo-review-source-tests.xml.
 
 Final command: uv run --locked --offline --group dev --extra gui python -B
 scripts/verify.py --record-prefix repo-review-final-
-Observed391 source +391 isolated installed-wheel tests PASS; zero failures,
+Observed391 source + 391 isolated installed-wheel tests PASS; zero failures,
 errors or skips. Lock, Ruff lint/format, exact wheel Python/CSS parity, passive
 imports/help/config, missing/outdated lock rejection and static tutorials PASS.
-All41 input hashes match records/repo-review-final-direct-validation.json.
+All 41 input hashes match records/repo-review-final-direct-validation.json.
 Both suites include the real localhost-only shutdown response/listener-close
 check. No instrument, SDK runtime, lab network or existing server was accessed.
 
@@ -4454,3 +4454,17 @@ REQ-271 Key/Ready/actual native-state mapping remains PARTIAL/BLOCKED; no mask
 was guessed. No live hardware qualification or new cycle authority is implied.
 Runtime stage committed as ddda81d. Later stages are recorded in Git history and
 the final STATE.md checkpoint; this record does not claim a push.
+
+## E255 - Staged local publication and final checkpoint / TEST-273
+
+Runtime/configuration/tests/tutorial consumers committed as ddda81d. Reconciled
+documentation and103 validated pending evidence artifacts committed as 7c2f4d4.
+The final stage contains STATE.md, outputs/REPORT.md, records/repo-review-audit.json
+and this publication record. Git history supplies that stage's commit identity.
+No source/test/configuration changes followed the391+391 final verification;
+the final audit rechecks all 41 input hashes and all local documentation links.
+Saved outputs/metadata and manufacturer PDF bytes are preserved. Only the two
+verified empty scratch directories were removed. REQ-273 review is COMPLETE
+for local software/publication; the broader project remains BLOCKED separately.
+No push, device/lab-network I/O, existing owner restart, new physical allowance
+or external DiamondGUI modification occurred.

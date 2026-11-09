@@ -1,0 +1,55 @@
+{
+  "requirement_id": "REQ-273",
+  "method": "TEST-273 passive source/evidence reconciliation",
+  "scope": "Local files and Git only; no hardware, SDK runtime or lab network",
+  "verification_input_count": 41,
+  "all_verification_inputs_match": true,
+  "software_tests": {
+    "offline": {
+      "tests": 391,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wheel": {
+      "tests": 391,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "markdown_documents": 22,
+  "local_links_checked": 121,
+  "missing_local_links": [],
+  "notebook_outputs_metadata_preserved_against_review_base": [
+    "docs/examples/01_device_discovery.ipynb",
+    "docs/examples/02_connection.ipynb",
+    "docs/examples/03_status_query.ipynb",
+    "docs/examples/04_settings.ipynb",
+    "docs/examples/05_shutter_modes.ipynb",
+    "docs/examples/06_on_off.ipynb"
+  ],
+  "manufacturer_pdf_sha256": {
+    "APT_Communications_Protocol_Issue_42.1.pdf": "b2a6badd7c00b3042ba383e291667e7eab10746c14c4f92cea45fc480c7304ed",
+    "KEH3_KEH6_Manual_DOC-103012_Rev_E.pdf": "c768e4e3f2317ae29f7bfcdf8b18f750d7adc688d324c55550cdfa9a31a0489b",
+    "KSC101_Kinesis_UI_Manual_HA0368T_Rev_F.pdf": "007d604c718378b3b8b6bc6f46876f00f91c6a4e4d839c2a175681ac3c122597",
+    "KSC101_Manual_HA0368T_Rev_D.pdf": "b51ac9ca1aa53b02b554dfd5b1c0bd4b99d73e4ba092e47170a64a3f4bab34f5"
+  },
+  "historical_jpeg_captures_with_png_names_preserved": [
+    "records/code-reduction-desktop.png",
+    "records/code-reduction-mobile.png",
+    "records/webui-apt-panel-desktop.png",
+    "records/webui-apt-panel-phone.png",
+    "records/webui-apt-settings-desktop.png",
+    "records/webui-modern-desktop.png",
+    "records/webui-modern-hardware-final-off.png",
+    "records/webui-modern-hardware-final-released.png",
+    "records/webui-modern-hardware-off.png",
+    "records/webui-modern-hardware-released.png",
+    "records/webui-modern-hardware-settings.png",
+    "records/webui-modern-phone.png",
+    "records/webui-modern-settings-phone.png",
+    "records/webui-modern-settings.png"
+  ],
+  "review_base": "174d23b"
+}

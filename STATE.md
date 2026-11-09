@@ -2,78 +2,141 @@
 
 ## Current checkpoint
 
-2026-11-08 REQ-251 / TEST-251 final combined review: COMPLETE software/publication (E235).
-The project remains BLOCKED for full physical/deployment acceptance; the review
-is a separate software/publication scope. The user retains the three core modules
-and authorizes the reviewed changes to be committed and pushed. No new device
-operation, policy expansion, running-owner change or external application edit.
+8 November 2026. REQ-273 / TEST-273 repository review COMPLETE for local software
+scope (D094/E254/E255). Runtime/configuration/tests/tutorial consumers committed
+as ddda81d; reconciled documentation/evidence as 7c2f4d4. This final checkpoint and
+audit form the last stage, whose identity is recorded in Git history.
+The broader engineering project remains BLOCKED on the independent physical,
+manufacturer-contract and external-integration gaps below. No push,
+hardware/lab-network I/O, existing-owner/server change or external checkout edit.
 
-D085/E231 fixes queued stale replies behind a full receive buffer and concurrent
-WebUI Release after ON/Start. It preserves passive ordinary close and all load,
-interlock, identity, ownership, deadline and uncertainty protections. Redundant
-release checking moves to the owner; cycle-duty checks share one repetition guard.
-The GUI command-exposure work (REQ-250; D084/E230) is integrated; its
-desktop/phone passive preview is complete and stopped. A subsequent fault-notice
-regression keeps persistent owner faults visible in both notices, including polls;
-readable electrical data cannot hide lockout or authorize output.
+391 source + 391 isolated-wheel tests PASS, zero failures/errors/skips; all 41
+verifier inputs match records/repo-review-final-direct-validation.json. Review
+covered all six runtime modules, both verification scripts, configuration,
+regressions, tutorials and current documentation. Historical evidence is retained.
+Three new regressions reproduced the findings before fixes (E254 / D094):
+retained output faults were suppressed after successful shutdown OFF; the GUI
+re-enabled an unusable hardware-disconnect control; empty-text CLI interruptions
+lost their exception name. All are fixed;165 affected tests and full verification pass.
 
-E234: 341 source + 341 isolated-wheel tests PASS, zero failures/errors/skips.
-Lock/lint/format/package parity/import/help/passive config and six static notebooks
-PASS. All 39 verifier input hashes match. Evidence: records/final-review-
-{direct-validation,audit}.json and source/wheel XMLs. No hardware was operated.
-Detailed earlier campaigns remain in records/RECORDS.md and their JSON/XML
-artifacts; old campaign summaries are removed from this compact checkpoint.
+Architecture: controller/protocol/transport are the three core layers, with
+package exports, CLI and Dash GUI. One exact-target shared owner controls
+identity/route claims, deadlines, readback, faults and cleanup. Removed convenience
+methods/status fields require the migration in docs/python-api.md.
 
-## Architecture and fixed configuration
+Explicit Stop/OFF clears faults only after fresh OFF/interlock verification.
+Reads and automatic cleanup/shutdown retain faults; shutdown also reports them
+after successful OFF and still attempts other targets. Failed verification
+retains the journal. A poisoned stream needs deliberate Release/Connect before
+another explicit Stop. Source confirmation is no longer required for settings,
+native Start or mode selection. Hardware disconnect is protected and API-only;
+the unusable GUI control and callback are removed. No optical state is inferred.
 
-Device -> transport -> APT Session -> KSC101 driver -> ShutterHub -> Python/CLI/
-WebUI/notebooks. One owner; no SDK backend, compatibility connection manager,
-automatic retry/fallback, automatic startup connection or ON replay.
+REQ-270 status flags remain software PASS; REQ-271 full Key/Ready/actual native
+Activity remains PARTIAL/BLOCKED. interlock_status_bit/channel_enabled_bit decode
+reported0x1000/0x80000000 from existing0x042A replies with the electrical timestamp;
+they never authorize output or establish key/readiness/optical/native activity.
+Host-only/disconnected values are None. Full contract: docs/status-readback.md.
 
-Canonical target: shutter / application CH0 / APT channel 1 / SH05R /
-KSC101 68800777 / firmware 1.0.7 / KEH3 middle bay 192.168.1.19:40305.
-Hub serial/firmware remain unknown. config/shutter.ethernet.toml records:
-Manual-only output activation, continuous-duty load, 2 s OFF rest, separately
-permitted protected selection of all four modes; native Start/priming and
-settings/EEPROM permissions stay disabled.
-VCP and KEH3 external USB OUT output remain unavailable. Identity/status bit 0
-does not measure blade position, key contact, readiness or native activity.
+REQ-272 standalone Shutdown GUI server is included in combined wheel validation.
+The localhost listener drains accepted callbacks, then runs output cleanup and
+release. Embedded create_app() omits it. Pending requests can delay exit; it is
+not an emergency Stop. No existing server was stopped/restarted by this review.
 
-Public DiamondGUI owner names/status fields remain contracts. Retired probe/SDK/
-notebook-wrapper paths remain absent; raw historical evidence is retained and
-superseded review documents remain available in Git history.
-Current instructions: README.md, docs/python-api.md, docs/gui.md, docs/cutover.md.
-Manufacturer/source contracts: docs/INTERFACE.md and docs/sources.md.
+## Status-capability evidence and remaining implementation gap
 
-## Physical evidence and authority
+E250 / TEST-268 static reference review is historical; E252 / TEST-270 implements
+the documented flags. Exact vendor API exposes KeyEnabled/OperatingState but
+neither API declarations nor RevF manual p29 supplies verified raw mappings for
+Key/Ready/actual native state. Saved firmware1.0.7 raw0x04CD value0 conflicts with
+legacy Active1/Inactive2 decoding. Static reflection-only inspection of extracted
+vendor wrapper getters delegates to native accessors and does not resolve the
+protocol mapping. No installer, vendor function, constructor or SDK runtime ran.
+Provenance/replay: records/status-readback-{native-reference,reference-replay}.json.
 
-E200 / TEST-227: two real visible-WebUI cycles on the exact setup above passed
-at their recorded pre-review source. Manual ON 0x2001 -> OFF 0x2000, 0.748307 s
-between readbacks; then 1 s host hold after 28.177088 s OFF. Active Release refused,
-timed pulse disabled during ON, settings 2000/2000 ms/count 5 unchanged. Final
-Manual/OFF/no fault at 2026-11-07T01:10:10.710233 UTC, then released/no handle.
-Raw record: records/webui-modern-hardware-live.json; source/artifact hashes and
-scope: records/webui-modern-hardware-validation.json. This is not current live
-state or physical validation of the review's owner/GUI changes.
+## Current working configuration
 
-E202: user reports "I did not observe both cycles". Complete E200 two-cycle
-blade motion remains unverified; failed motion is not inferred. Separate human
-report: records/webui-modern-hardware-observation.json. E191/E192 records an
-earlier single cycle whose opening/return closed was independently reported.
-Neither establishes optical timing/extinction calibration.
+Default GUI: uv run shutter-control gui from repository root, tracked
+config/shutter.ethernet.toml, localhost9860. Explicit --config/--port overrides
+remain. Startup is passive; no automatic selection, connect, takeover or replay.
+Other CLI commands default to shutters.local.toml.
 
-All prior cycle allowances are consumed. No further ON, mode/settings/EEPROM,
-trigger-I/O, driver, network or other-device operation is authorized by them.
-The current repository review grants no new device operation.
+Exact configured target: shutter / SH05R / KSC10168800777 / firmware1.0.7 /
+KEH3 middle192.168.1.19:40305. Hub identity remains unknown. Configuration is
+not a claim of current physical state; no live state was queried this session.
 
-## Requirements
+- min_off_s=0.0: no extra software OFF pause for this profile.
+- qualified_modes=manual/single/auto/triggered: no default-profile Manual-only gate.
+  Custom profiles still enforce their own configured activation modes.
+- Mode selection: no software source confirmation or separate mode permission;
+  persistent-mode legacy field/CLI confirmation option accepted for compatibility.
+  Selection still requires electrical OFF/interlock, sends/verifies OFF first,
+  then confirms requested mode/OFF/interlock; actual mode changes persist.
+- Native Start requires cycle/load checks, no prior
+  pending Start and explicit Stop. allow_continuous_cycles=false/max_cycle_count1;
+  Triggered priming remains blocked unless its independent conditions are met.
+- Settings and EEPROM permissions remain false. Interlock/OFF checks, identity,
+  ownership and protocol ambiguity checks remain; explicit verified Stop/OFF can reset faults.
+- Timed pulse cap50s; GUI pulse1s. Ordinary Manual ON has no automatic shutoff.
+- Healthy refusals retain only previous same-connection dated feedback with its
+  original timestamp and explicit historical label; faults/disconnects/new
+  connections do not reuse it. No extra I/O is done by refusal handling.
 
-Human criteria remain in PROJECT.md. PASS applies only to its method/configuration/
-revision. Final software evidence is E234; dated physical records retain their own scope.
-Older campaign counts and structural metrics below refer to their recorded revisions.
+## Current validation
+
+E254 / TEST-273: uv run --locked --offline --group dev --extra gui python -B
+scripts/verify.py --record-prefix repo-review-final-
+391 source + 391 isolated installed-wheel tests PASS, zero failures/errors/skips.
+Locked dependencies, Ruff lint/format, exact wheel Python/CSS parity, passive
+import/help/config, missing/outdated lock rejection and static tutorials PASS.
+All 41 hashed inputs match; see records/repo-review-final-direct-validation.json.
+The tests use simulated transports and localhost only, including real localhost
+server shutdown. No browser screenshot or physical validation is claimed.
+
+records/repo-review-audit.json checks local documentation links, all four local
+manual hashes and unchanged saved notebook outputs/metadata against review base
+174d23b. Earlier E252389+389 and E253391-source records remain historical;
+the integrated result above includes their implementation and the review fixes.
+
+## Current requirement map
+
+Human criteria: PROJECT.md. PASS is limited to the recorded method/configuration;
+source changes do not revalidate old physical measurements or consumed authority.
+
+| ID | Criterion | Method/evidence | Current result |
+| --- | --- | --- | --- |
+| REQ-273 | Whole-repository review, pruning and staged commits | TEST-273; D094/E254/E255; source/wheel/audit and Git history | COMPLETE software/local publication;391+391 |
+| REQ-272 | Standalone GUI shutdown | TEST-272; D093/E253; current E254 source/wheel | PASS software;391+391 integrated |
+| REQ-270 | Implement documented status flags | TEST-270; D092/E252; literal/fake/GUI/source/wheel | PASS software;389+389 |
+| REQ-271 | Full Key/Ready/actual native Activity | TEST-271; E252; manufacturer/raw-mapping comparison | PARTIAL/BLOCKED; no guessed mapping |
+| REQ-272 | Standalone GUI shutdown button | TEST-272; D093/E253; records/gui-shutdown-tests.xml | PASS software;391 source tests; no live hardware |
+| REQ-269 | Remove source checklist; verified explicit Stop resets fault | TEST-269; D091/E251; records/gui-fault-reset-tests.xml | PASS software;389 tests; running owner unchanged |
+| REQ-267 | Review/fix integrated consistency | TEST-267; D090/E249; full source/wheel/static tutorials | PASS software;370+370 |
+| REQ-264 | Remove default Manual-only activation gate | TEST-264; E247/E249; profile-based native simulations | PASS software; physical native behavior untested |
+| REQ-265 | Remove separate mode permission | TEST-265; E247/E249; false/true legacy flags, Stop/readback | PASS software |
+| REQ-266 | Remove interlock/electrical-OFF prerequisites | PROJECT.md annotated request | DECLINED, not implemented; prerequisites retained |
+| REQ-263 | Remaining software guardrail audit | TEST-263; E246; static/passive inventory | PASS historical audit; E247/E249 supersede mode restrictions |
+| REQ-262 | Remove extra software OFF pause | TEST-262; E245/E249; zero-pause profile/fake clock | PASS software |
+| REQ-261 | Diagnose0.94s Manual ON refusal | TEST-261; E248 alias for duplicate E244 diagnosis; fake clock | PASS diagnosis; GUI feedback loss fixed E249; tracked pause now zero |
+| REQ-260 | Remove mode source confirmation | TEST-260; E243/E249; unchecked GUI selection | PASS software |
+
+## Earlier requirements and evidence
+
+The following results are historical scoped checkpoints, preserved for
+traceability. Their test counts/revisions are not current full-system validation;
+E254 is the current complete software result. E244 refers to code reduction;
+E248 aliases the older Manual ON diagnosis that also used E244 by mistake.
 
 | ID | Short criterion / source | Method/evidence | Result |
 | --- | --- | --- | --- |
+| REQ-259 | Implement reduction (PROJECT.md 8 November) | TEST-259; D089/E244; command order, schema/API/GUI and final source/wheel | PASS software: 359 source +359 wheel; desktop/mobile passive; no hardware operation |
+| REQ-258 | Codebase reduction plan (PROJECT.md 8 November) | TEST-258; E242; E241 findings, source inventory and stage/validation review | PASS plan; subsequently implemented under REQ-259 |
+| REQ-257 | Controller redundancy review (PROJECT.md 8 November) | TEST-257; E241; full source/caller inspection, fake frames, 213 regressions | PASS scoped review; candidates reported, no implementation change |
+| REQ-256 | README/simple GUI launch (PROJECT.md 8 November) | TEST-256; D088/E240; defaults/overrides/passivity, real localhost smoke and source/wheel | PASS: 59 application, 355 source +355 wheel; no hardware operation |
+| REQ-255 | Actual WebUI redo (PROJECT.md 8 November) | TEST-255; D087/E238/E239; software regressions, source/wheel, actual bounded browser run | PASS bounded electrical/WebUI: one pulse, final Manual/OFF/no fault/released; independent motion unobserved |
+| REQ-254 | GUI electrical feedback under fault (PROJECT.md 8 November) | TEST-254; E237; callback regressions, saved actual replay, source/wheel | PASS GUI/software: 102 affected, 351 source +351 wheel; later E238 resolves controller P1 |
+| REQ-253 | Remaining-issue review (PROJECT.md 8 November) | TEST-253; E236; E237/E238 follow-up regressions | Review complete; both code findings fixed in software; physical closure open |
+| REQ-252 | Actual user-style WebUI debugging (PROJECT.md 8 November) | TEST-252; D086/E233; actual browser/TCP, regressions, final source/wheel | Historical electrical/software PASS; blade motion unobserved; later lockout recovery recorded by E239 |
 | REQ-248 | Controller readability/docstrings (derived; PROJECT.md 8 November) | TEST-248; D082/E228; 86/86 coverage, AST/public signatures, source/wheel | PASS software: 255 source + 255 wheel |
 | REQ-246 | Logical controller ordering (derived; PROJECT.md 8 November request) | TEST-246; D080/E226; AST equivalence and source/wheel checks | PASS software: 255 source + 255 wheel |
 | REQ-244 | Controller duplication pruning (derived; PROJECT.md 8 November approval) | TEST-244; D078/E224; query count/refusals, 128-case mode parity, source/wheel | PASS software: 255 source + 255 wheel |
@@ -92,7 +155,7 @@ Older campaign counts and structural metrics below refer to their recorded revis
 | REQ-204 | Modes/load limits | TEST-204; E203/E204 guards | PASS software; native modes/other loads unqualified |
 | REQ-205 | Freshness/deadlines | TEST-205; E204 | PASS tested cases; arbitrary same-type reply ordering unresolved |
 | REQ-206 | Ownership/cancellation | TEST-206; E204 | PASS software; native 250 ms target UNTESTED |
-| REQ-207 | Ambiguity/cleanup | TEST-207; E203/E204 | PASS software; optical safety unqualified |
+| REQ-207 | Ambiguity/cleanup | TEST-207; REQ-255 interruption regressions and source/wheel; E236 pre-fix evidence | PASS software for empty-error lockout/reconnect/recovery; physical safety unqualified |
 | REQ-208 | Docked KEH3 | TEST-208/220; E200 historical | Selected route historical PASS; broader topology/recovery open |
 | REQ-209 | Physical/local/TTL/interlocks | TEST-209; E191/E192/E202 | PARTIAL historical qualitative observation; broader physical acceptance UNTESTED |
 | REQ-210 | Drivers/persistence/endurance | TEST-210; approved campaign required | BLOCKED: inventory, hardware/window and calibration |
@@ -120,62 +183,59 @@ Older campaign counts and structural metrics below refer to their recorded revis
 | REQ-233 | Transport organization (derived; PROJECT.md 8 November request) | TEST-233; E215; transport-organization source/wheel and contract regressions | PASS software: 250 source + 250 wheel; no device I/O |
 | REQ-245 | APT42 command coverage audit (PROJECT.md 8 November) | TEST-245; E225; full per-ID source/manual matrix | PASS audit; complete command implementation NOT demonstrated |
 | REQ-249 | Clear documented shutter commands (PROJECT.md 8 November) | TEST-249; D083/E229; literal frames, owner/error cases, source/wheel | PASS software: 293 + 293; new hardware operations UNTESTED |
-
 | REQ-250 | GUI command exposure (PROJECT.md 8 November) | TEST-250; D084/E230 callback/desktop/phone evidence; E234 integration | PASS software/layout: 140 targeted; final 341 source + 341 wheel |
 | REQ-251 | Combined review and publication (PROJECT.md 8 November) | TEST-251; D085/E231/E234; regressions, source/wheel/docs and remote verification | PASS software/docs/publication; E235 |
 
-## Next action and external dependencies
+## Physical evidence and remaining gaps
 
-E235: reviewed implementation/docs/evidence committed as 2bc53e2 and pushed to
-origin/main; remote HEAD equality verified. The final checkpoint records this
-observed publication. Next engineering work is the separate physical/deployment
-campaign; no further source change is required by REQ-251.
-No device I/O is part of publication. The active earlier application environment
-was not synced or restarted because shutter-control.exe is in use; validation
-uses --no-sync and an isolated installed wheel. Deploy only after the existing
-owner has stopped outputs and released communication; then install/restart and
-reload deliberately, without takeover or automatic connection.
+E239 records the last bounded electrical/WebUI run on its recorded revision:
+one approved1s host pulse, final Manual/OFF0x2000/interlock required/no fault at
+2026-11-09T03:34:39.878424 UTC, followed by release/server stop. Camera No/unsure;
+blade motion was not independently observed. Source/config have since changed;
+this is historical evidence, not proof of current state or native performance.
+Earlier E191/E192 records one human-observed blade cycle; none establishes
+optical timing/extinction calibration. All earlier cycle allowances are consumed.
 
-External DiamondGUI consumers require the version-2 flat status migration in
-docs/python-api.md before upgrading. E185 remains a dated failed page/mapping
-check; the external checkout was not inspected, changed or revalidated here.
-Complete physical/driver/reboot/endurance acceptance only under the separately
-approved setup and limits described below. Existing cycle authority is consumed.
+Open acceptance: independent optical/blade measurement and timing/extinction
+calibration; native modes/triggered priming/settings/EEPROM physical validation;
+KSC101-specific MMI/trigger layouts and Key/Ready mapping; USB driver/reboot/
+endurance/deployment; hub identity; external DiamondGUI adapter/page migration.
+The external checkout was not changed or revalidated. E185's failed mapping/page
+check remains historical. Software permissions do not establish physical qualification.
+
+## Next action and authorization
+
+No further code/test action is required for the completed REQ-273 review. No
+hardware operation is pending and no push is authorized. Keep previous captures and consumed cycle
+allowances historical. A running owner may have older source/configuration.
+Deployment requires normal Stop/Release followed by deliberate restart/reload,
+with no automatic takeover; no live state was inspected here. Explicit Stop/OFF
+must verify OFF/interlock to clear a live fault. Never delete ownership journals
+to imitate verification. Broader physical acceptance remains BLOCKED separately.
 
 ## Human action required
 
-1. Known: E234 validates the final combined software checkout. E200's two-cycle
-   allowance is consumed; E202 leaves complete two-cycle blade observation
-   unverified. The latest owner/GUI revision has software validation only.
-2. Blocked: software inspection cannot establish present source protection,
-   trigger isolation, interlock condition or blade motion, nor grant actuation
-   authority. AGENTS.md Physical action and human intervention requires that
-   authority for the specific conditions.
-3. Needed: confirm the same SH05R / KSC101 68800777 / KEH3 middle bay
-   192.168.1.19:40305 is independently source-protected, external triggers
-   isolated, key/interlock intact, and approve one new Manual WebUI cycle while
-   observing the blade. Permit fresh identity/Manual/OFF checks, at least 2 s
-   confirmed OFF rest, one existing 1 s host-held pulse, final fresh Manual/OFF
-   and release. No mode/settings/EEPROM writes or further cycles. If the initial
-   state is not Manual/OFF, stop before the pulse and report it.
-4. Return: setup/window confirmation and approval; during the run, report
-   whether the blade visibly opened and returned closed. This qualitative
-   observation does not establish optical timing or extinction calibration.
-5. Next: check the local owner's identity/released state without takeover,
-   launch/reload reviewed code only when released, then use visible WebUI
-   controls with raw evidence. If release is uncertain, stop for owner resolution.
-   On ambiguity, no retry; use the existing bounded OFF cleanup, retain unknown
-   optical state, and rely on the independent source protection.
+For the active REQ-271 status gap, one precise dependency remains:
+1. Known: documented status flags are implemented/tested; vendor Key/Ready/actual
+   OperatingState exist but verified raw mappings are absent/conflicting (E252).
+2. Blocked: source, API/manual and wrapper metadata cannot establish firmware1.0.7
+   raw bytes without speculation; safe supported software work is complete.
+3. Needed: manufacturer-confirmed KSC101 firmware1.0.7 request/reply byte layouts
+   and bit/value definitions for KeyEnabled, Is Ready and actual OperatingState/
+   ToggleCount, or an existing passive vendor capture paired with those states.
+4. Return model/firmware/mode, query/reply hex, displayed-state timestamps and
+   provenance. Documentation/existing captures only; no new hardware action is
+   requested or authorized by this handoff.
+5. Next: create literal independent fixtures, implement verified driver/owner
+   mappings, then prepare a separately authorized read-only comparison.
+Details: docs/status-readback.md. This dependency is distinct from broader
+physical/deployment acceptance described below.
 
-For full GUI parity, obtain manufacturer-confirmed KSC101 MMI 0x0520/trigger 0x0523
-payload layouts and Key/Ready mapping with firmware applicability. The existing
-APT model table conflicts with motor-specific details; do not guess or use SDKs.
-Then implement through the same APT owner and revalidate before an approved bench test.
-
-For physical/deployment acceptance, provide a separate approved commissioning
-handoff: current setup/protection, exact allowed commands/limits/window, calibrated
-optical method/results, hub identity/topology and intended external DiamondGUI
-page/mapping restoration. Software cannot establish those physical facts or
-authorize restoring another checkout. Driver/reboot/endurance work needs an
-all-instrument inventory and its own downtime/rollback window. These gaps keep
-the full project BLOCKED; they do not negate scoped repository-review results.
+None for the REQ-273 software review. Full physical/deployment acceptance
+is blocked because output bits cannot establish blade position or optical timing,
+and no independent calibrated observation method/new controlled window exists.
+To resume that separate work, provide the observation interface/method, required
+units/calibration and an explicitly bounded setup/command/hold/cycle window.
+Return the measurement capability and protected setup conditions; next action is
+to prepare a concrete measurement procedure before any newly authorized motion.
+Do not reuse past cycle allowances or infer closure from a disconnected GUI.
