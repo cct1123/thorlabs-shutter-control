@@ -6,7 +6,7 @@ from dataclasses import replace
 import pytest
 from conftest import FakeTransport
 
-from thorlabs_shutter_control import ShutterError, ShutterHub
+from thorlabs_shutter_control import Route, ShutterError, ShutterHub, UnsupportedRoute
 from thorlabs_shutter_control.controller import KSC101, IdentityMismatch
 from thorlabs_shutter_control.protocol import Deadline, Decoder, Frame, ProtocolError
 
@@ -67,6 +67,28 @@ def test_bay_query_returns_raw_byte_without_channel_or_route_inference(bench, ba
     assert hub.get_hub_bay_reply("beam") == bay
     assert device.history[-1][1].encode().hex() == "650000005001"
     assert hub.configs[0].route.kind == "d2xx"
+
+
+@pytest.mark.parametrize("connected", [False, True])
+def test_keh3_legacy_bay_query_is_refused_without_io_or_fault(config, tmp_path, connected):
+    config = replace(config, route=Route("keh3", host="192.168.1.19", bay="middle"))
+    devices = []
+
+    def factory(c, d):
+        device = FakeTransport(c)
+        devices.append(device)
+        return device
+
+    with ShutterHub([config], transport_factory=factory, lock_directory=tmp_path) as hub:
+        if connected:
+            hub.connect("beam")
+        before = [len(device.history) for device in devices]
+        with pytest.raises(UnsupportedRoute, match="KEH3"):
+            hub.get_hub_bay_reply("beam")
+        assert [len(device.history) for device in devices] == before
+        snapshot = hub.connection_snapshot("beam")
+        assert snapshot.has_device is connected and snapshot.error is None
+        assert not (tmp_path / "uncertain-68000001").exists()
 
 
 def test_led_read_preserves_unknown_bits_and_has_no_output_obligation(bench):
@@ -133,7 +155,16 @@ def test_led_write_has_exact_readback_without_incidental_off(config, tmp_path):
         [config], transport_factory=lambda c, d: device, lock_directory=tmp_path
     ) as hub:
         hub.connect("beam")
+        before = len(device.history)
         assert hub.set_led_modes("beam", 9, source_inhibited=True) == 9
+        assert [f.message_id for _, f in device.history[before:]] == [
+            0x0005,
+            0x04C1,
+            0x04C7,
+            0x0429,
+            0x04B3,
+            0x04B4,
+        ]
         hub.shutdown_outputs()
         assert not device.output_frames
         assert [f.payload.hex() for _, f in device.history if f.message_id == 0x04B3] == [
@@ -207,9 +238,36 @@ def test_hardware_disconnect_is_explicit_and_ordinary_close_stays_passive(bench)
         hub.disconnect_hardware("beam")
     assert len(devices[0].history) == before
     sample = hub.disconnect_hardware("beam", source_inhibited=True)
+    assert [f.message_id for _, f in devices[0].history[before:]] == [
+        0x0005,
+        0x04C1,
+        0x04C7,
+        0x0429,
+        0x0002,
+    ]
     assert devices[0].bus_disconnected and devices[0].closed
     assert not sample.has_device and sample.identity is None
     assert not devices[0].output_frames
+
+
+@pytest.mark.parametrize("operation", ["led", "disconnect"])
+def test_full_preflight_verifies_identity_before_write(config, tmp_path, operation):
+    config = replace(config, policy=replace(config.policy, allow_device_settings=True))
+    device = FakeTransport(config)
+    with ShutterHub(
+        [config], transport_factory=lambda c, d: device, lock_directory=tmp_path
+    ) as hub:
+        hub.connect("beam")
+        device.serial = "68000002"
+        before = len(device.history)
+        with pytest.raises(IdentityMismatch):
+            if operation == "led":
+                hub.set_led_modes("beam", 9, source_inhibited=True)
+            else:
+                hub.disconnect_hardware("beam", source_inhibited=True)
+        assert [f.message_id for _, f in device.history[before:]] == [0x0005]
+        assert hub.connection_snapshot("beam").error
+        assert not device.bus_disconnected and device.led_modes == 1
 
 
 @pytest.mark.parametrize(

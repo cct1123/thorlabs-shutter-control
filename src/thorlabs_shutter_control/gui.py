@@ -3,6 +3,7 @@
 import json
 from dataclasses import asdict
 from pathlib import Path
+from threading import Event
 
 from .controller import MODES, CycleParameters
 
@@ -15,7 +16,6 @@ DETAIL_ACTIONS = (
     "start-updates",
     "stop-updates",
     "read-events",
-    "hardware-disconnect",
 )
 LED_MODES = ((1, "Identify"), (2, "Limit indication"), (8, "Activity indication"))
 
@@ -72,7 +72,7 @@ def execute_action(
         )
     if action in MODES.values():
         return (
-            hub.set_operating_mode(target, action, source_inhibited=source_inhibited),
+            hub.set_operating_mode(target, action),
             ("Mode selected and read back. Changed modes are remembered at power-up."),
             None,
         )
@@ -125,12 +125,6 @@ def execute_action(
             ("Interlock requirement confirmed. Contact continuity is not measured."),
             None,
         )
-    if action == "hardware-disconnect":
-        return (
-            hub.disconnect_hardware(target, source_inhibited=source_inhibited),
-            ("Hardware disconnect sent and communication released; no device acknowledgement."),
-            None,
-        )
     if action == "read-channel":
         details = {"channel_enabled": hub.get_channel_enabled(target)}
         notice = "Channel enable read; this does not measure blade position."
@@ -168,7 +162,8 @@ def execute_action(
     return hub.get_status(target), notice, details
 
 
-def create_app(hub):
+def create_app(hub, *, shutdown=None):
+    """Build an embeddable panel; only a standalone owner supplies server shutdown."""
     from dash import Dash, Input, Output, State, ctx, dcc, html, no_update
 
     app = Dash(
@@ -193,6 +188,20 @@ def create_app(hub):
             title=title,
         )
 
+    def number_field(label, key, minimum, maximum):
+        """Build a labeled integer setting without preselecting a device value."""
+        return [
+            html.Label(label, htmlFor=key),
+            dcc.Input(
+                id=key,
+                type="number",
+                min=minimum,
+                max=maximum,
+                step=1,
+                placeholder=f"{minimum}–{maximum}",
+            ),
+        ]
+
     app.layout = html.Main(
         [
             html.Div(
@@ -204,6 +213,15 @@ def create_app(hub):
                         ]
                     ),
                     html.Span("LOCALHOST", className="local-badge"),
+                    *(
+                        [
+                            html.Button(
+                                "Shutdown GUI server", id="shutdown-server", className="utility"
+                            )
+                        ]
+                        if shutdown is not None
+                        else []
+                    ),
                 ],
                 className="page-heading",
             ),
@@ -344,17 +362,17 @@ def create_app(hub):
                                 [
                                     html.H2("Controller status", className="panel-heading"),
                                     led(
-                                        "Key Enabled",
-                                        "key-lamp",
-                                        "Key position unavailable from verified APT feedback.",
+                                        "Interlock flag",
+                                        "interlock-lamp",
+                                        "Reported bit 0x1000; not key position or continuity.",
                                     ),
                                     led(
-                                        "Is Ready",
-                                        "ready-lamp",
-                                        "Readiness is not inferred from output or policy.",
+                                        "Channel flag",
+                                        "channel-lamp",
+                                        "Reported bit 0x80000000; not hardware readiness.",
                                     ),
                                     led(
-                                        "Error",
+                                        "Software fault",
                                         "error-lamp",
                                         "Reported fault; not all hardware faults are observable.",
                                     ),
@@ -365,9 +383,13 @@ def create_app(hub):
                                         "Electrical output; not independent blade position.",
                                     ),
                                     led(
-                                        "Activity",
+                                        "Native request",
                                         "active-lamp",
-                                        "Start requested is not confirmed Active.",
+                                        "Host request; actual activity is not decoded.",
+                                    ),
+                                    html.P(
+                                        "Key/Ready and actual native activity are not decoded.",
+                                        className="output-note",
                                     ),
                                     html.Button(
                                         [html.Span(className="identify-dot"), "Identify"],
@@ -408,19 +430,8 @@ def create_app(hub):
                 role="status",
                 className="notice",
             ),
-            dcc.Checklist(
-                id="source-inhibited",
-                options=[
-                    {
-                        "label": "Source independently blocked; external triggers isolated",
-                        "value": "protected",
-                    }
-                ],
-                value=[],
-                className="source-confirmation",
-            ),
             html.P(
-                "Mode changes persist. Source protection is an operator condition.",
+                "Changed modes are remembered at power-up.",
                 id="profile-note",
                 className="profile-note",
             ),
@@ -441,33 +452,13 @@ def create_app(hub):
                                     html.Fieldset(
                                         [
                                             html.Legend("Cycle settings"),
-                                            html.Label("On duration (ms)", htmlFor="cycle-on"),
-                                            dcc.Input(
-                                                id="cycle-on",
-                                                type="number",
-                                                min=100,
-                                                max=10000,
-                                                step=1,
-                                                placeholder="100–10000",
+                                            *number_field(
+                                                "On duration (ms)", "cycle-on", 100, 10000
                                             ),
-                                            html.Label("Off duration (ms)", htmlFor="cycle-off"),
-                                            dcc.Input(
-                                                id="cycle-off",
-                                                type="number",
-                                                min=100,
-                                                max=10000,
-                                                step=1,
-                                                placeholder="100–10000",
+                                            *number_field(
+                                                "Off duration (ms)", "cycle-off", 100, 10000
                                             ),
-                                            html.Label("Cycle count", htmlFor="cycles"),
-                                            dcc.Input(
-                                                id="cycles",
-                                                type="number",
-                                                min=1,
-                                                max=1000000,
-                                                step=1,
-                                                placeholder="1–1000000",
-                                            ),
+                                            *number_field("Cycle count", "cycles", 1, 1000000),
                                             dcc.Checklist(
                                                 id="continuous",
                                                 options=[
@@ -547,8 +538,8 @@ def create_app(hub):
                                         className="utility",
                                     ),
                                     html.P(
-                                        "Confirm source protection on the main panel "
-                                        "before settings writes. The interlock setting "
+                                        "Settings writes require policy permission and "
+                                        "Manual/OFF readback. The interlock setting "
                                         "does not measure contact continuity.",
                                         className="field-note",
                                     ),
@@ -598,19 +589,6 @@ def create_app(hub):
                         className="field-note",
                     ),
                     html.Pre("No events collected", id="event-data"),
-                    html.Div(
-                        [
-                            html.Button(
-                                "Disconnect hardware", id="hardware-disconnect", className="utility"
-                            ),
-                            html.Span(
-                                "Requires source protection and Manual/OFF. "
-                                "Release only closes communication.",
-                                className="field-note",
-                            ),
-                        ],
-                        className="diagnostic-tools",
-                    ),
                     html.Details(
                         [
                             html.Summary("Full controller readback"),
@@ -629,6 +607,19 @@ def create_app(hub):
         className="shutter-app",
     )
 
+    if shutdown is not None:
+
+        @app.callback(
+            Output("shutdown-server", "children"),
+            Output("shutdown-server", "disabled"),
+            Input("shutdown-server", "n_clicks"),
+            prevent_initial_call=True,
+        )
+        def shutdown_server(_clicks):
+            """Ask the standalone loop to exit through its normal cleanup path."""
+            shutdown()
+            return "Shutting down GUI server...", True
+
     @app.callback(
         Output("settings-dialog", "open"),
         Input("settings", "n_clicks"),
@@ -639,7 +630,6 @@ def create_app(hub):
         return ctx.triggered_id == "settings"
 
     @app.callback(
-        Output("source-inhibited", "value"),
         Output("persist", "value"),
         Output("live-readback", "value"),
         Output("confirmation-context", "data"),
@@ -654,11 +644,11 @@ def create_app(hub):
             or sample.get("name") != target
             or not sample.get("has_device")
         ):
-            return [], [], [], None
+            return [], [], None
         scope = {"target": target, "generation": sample.get("generation")}
         if context != scope:
-            return [], [], [], scope
-        return no_update, no_update, no_update, no_update
+            return [], [], scope
+        return no_update, no_update, no_update
 
     @app.callback(
         Output("poll", "disabled"), Input("live-readback", "value"), Input("sample", "data")
@@ -674,7 +664,6 @@ def create_app(hub):
         [Input(key, "n_clicks") for key in ACTIONS],
         Input("poll", "n_intervals"),
         State("target", "value"),
-        State("source-inhibited", "value"),
         State("cycle-on", "value"),
         State("cycle-off", "value"),
         State("cycles", "value"),
@@ -682,18 +671,16 @@ def create_app(hub):
         State("persist", "value"),
         State("led-modes", "value"),
         State("details", "data"),
+        State("sample", "data"),
         prevent_initial_call=True,
     )
     def act(*values):
-        target, protection, on_ms, off_ms, count, continuous, persist, led_modes, previous = values[
-            -9:
-        ]
+        target, on_ms, off_ms, count, continuous, persist, led_modes, previous, last = values[-9:]
         try:
             sample, message, details = execute_action(
                 hub,
                 ctx.triggered_id,
                 target,
-                source_inhibited="protected" in (protection or []),
                 cycle_values=(on_ms, off_ms, count, "continuous" in (continuous or [])),
                 persist="persist" in (persist or []),
                 led_modes=led_modes,
@@ -715,10 +702,12 @@ def create_app(hub):
             # Healthy polling preserves messages; a retained owner fault must stay visible.
             if sample.error:
                 notice = (
-                    (message + " " if not sample.has_device else "")
-                    + f"Controller fault remains: {sample.error}. "
-                    "Output activation is blocked; protected recovery is required."
+                    f"Controller fault remains: {sample.error}. "
+                    "Use Stop / OFF to clear the fault after verified OFF readback. "
+                    "If communication fails, Release, Connect, then Stop / OFF."
                 )
+                if not sample.has_device or ctx.triggered_id in ("off", "settings-stop"):
+                    notice = message + " " + notice
             else:
                 notice = no_update if ctx.triggered_id == "poll" else message
             return asdict(sample), notice, notice, extra
@@ -732,6 +721,29 @@ def create_app(hub):
                 + " "
                 + " ".join(getattr(exc, "__notes__", []))
             )
+            if (
+                last
+                and isinstance(snapshot, dict)
+                and snapshot["has_device"]
+                and snapshot["error"] is None
+                and last.get("has_device")
+                and last.get("error") is None
+                and last.get("name") == target
+                and last.get("generation") == snapshot["generation"]
+                and last.get("electrical_observed_at")
+            ):
+                # Keep historical feedback only; all owner metadata stays authoritative.
+                for field in (
+                    "operating_mode",
+                    "interlock_required",
+                    "status_bits",
+                    "interlock_status_bit",
+                    "channel_enabled_bit",
+                    "electrical_state",
+                    "electrical_observed_at",
+                ):
+                    snapshot[field] = last.get(field)
+                message += " Last dated feedback retained; no fresh readback is implied."
             return snapshot, message, message, no_update
 
     @app.callback(
@@ -773,7 +785,7 @@ def create_app(hub):
         led_value = no_update
         if not valid:
             led_value = []
-        elif ctx.triggered_id == "details":
+        elif "details.data" in ctx.triggered_prop_ids:
             if details.get("action") == "reset":
                 led_value = []
             elif details.get("action") in ("read-led", "apply-led"):
@@ -864,12 +876,24 @@ def create_app(hub):
         ],
         *[
             Output(key, prop)
-            for key in ("key-lamp", "ready-lamp", "error-lamp", "output-lamp", "active-lamp")
+            for key in (
+                "interlock-lamp",
+                "channel-lamp",
+                "error-lamp",
+                "output-lamp",
+                "active-lamp",
+            )
             for prop in ("className", "aria-label")
         ],
         *[
             Output(key + "-value", "children")
-            for key in ("key-lamp", "ready-lamp", "error-lamp", "output-lamp", "active-lamp")
+            for key in (
+                "interlock-lamp",
+                "channel-lamp",
+                "error-lamp",
+                "output-lamp",
+                "active-lamp",
+            )
         ],
         Input("sample", "data"),
         Input("target", "value"),
@@ -880,6 +904,11 @@ def create_app(hub):
         connected, fault = bool(sample.get("has_device")), bool(sample.get("error"))
         mode = sample.get("operating_mode", "unknown")
         ready = connected and not fault
+        electrical = (
+            sample.get("electrical_state")
+            if connected and sample.get("electrical_observed_at")
+            else "unknown"
+        )
         cycle = sample.get("cycle_parameters") or {}
         result = [
             ("Verified S/N " + sample["identity"]["serial_number"])
@@ -924,27 +953,37 @@ def create_app(hub):
                 *[not ready for _ in DETAIL_ACTIONS],
             ]
         )
+
+        def reported_flag(name):
+            """Render only dated boolean readbacks, including retained historical flags."""
+            value = sample.get(name) if connected and sample.get("electrical_observed_at") else None
+            if type(value) is not bool:
+                return "unknown", "Unknown"
+            return ("on", "Set") if value else ("off", "Clear")
+
         lamps = [
-            ("unknown", "Unknown"),
-            ("unknown", "Unknown"),
+            reported_flag("interlock_status_bit"),
+            reported_flag("channel_enabled_bit"),
             ("fault", "Reported")
             if fault
             else ("off", "None reported")
             if connected
             else ("unknown", "Unknown"),
-            ("unknown", "Unknown")
-            if fault
-            else ("on", "On")
-            if sample.get("electrical_state") == "on"
+            ("on", "On")
+            if electrical == "on"
             else ("off", "Off")
-            if sample.get("electrical_state") == "off"
+            if electrical == "off"
             else ("unknown", "Unknown"),
             ("requested", "Start requested")
-            if sample.get("requested_state") == "start"
+            if connected and sample.get("requested_state") == "start"
+            else ("off", "No pending request")
+            if connected
             else ("unknown", "Unknown"),
         ]
         for key, (kind, label) in zip(
-            ("Key Enabled", "Is Ready", "Error", "Output ON", "Activity"), lamps, strict=True
+            ("Interlock flag", "Channel flag", "Software fault", "Output ON", "Native request"),
+            lamps,
+            strict=True,
         ):
             result.extend(["lamp " + kind, key + ": " + label])
         result.extend(label for _, label in lamps)
@@ -953,16 +992,31 @@ def create_app(hub):
     return app
 
 
-def run(hub, *, port=8050):
+def run(hub, *, port=9860):
+    """Serve a standalone localhost GUI until interrupted or its shutdown button is clicked."""
+    from werkzeug.serving import make_server
+
     if type(port) is not int or not 1 <= port <= 65535:
         raise ValueError("WebUI port must be an integer in 1..65535")
-    app = create_app(hub)
+    stopped = Event()
+    server = None
     original = None
     try:
-        app.run(host="127.0.0.1", port=port, debug=False, use_reloader=False, threaded=True)
+        app = create_app(hub, shutdown=stopped.set)
+        server = make_server("127.0.0.1", port, app.server, threaded=True)
+        # Drain already accepted callbacks before final output cleanup/release.
+        server.daemon_threads = False
+        server.timeout = 0.2
+        print(f"Shutter GUI: http://127.0.0.1:{port}", flush=True)
+        while not stopped.is_set():
+            server.handle_request()
     except BaseException as exc:
         original = exc
-    for cleanup in (hub.shutdown_outputs, hub.close):
+    cleanups = ([server.server_close] if server is not None else []) + [
+        hub.shutdown_outputs,
+        hub.close,
+    ]
+    for cleanup in cleanups:
         try:
             cleanup()
         except BaseException as exc:

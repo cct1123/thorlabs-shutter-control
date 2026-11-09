@@ -67,14 +67,32 @@ def test_invalid_cli_pulse_does_not_connect(monkeypatch, capsys):
     assert "finite" in capsys.readouterr().err
 
 
+def test_cli_empty_text_interruption_reports_exception_name(monkeypatch, capsys):
+    from thorlabs_shutter_control import __main__ as cli
+
+    def interrupted_config(_path):
+        raise KeyboardInterrupt()
+
+    monkeypatch.setattr(cli, "load_config", interrupted_config)
+    assert cli.main(["status"]) == 1
+    assert "Unconfirmed: KeyboardInterrupt" in capsys.readouterr().err
+
+
 @pytest.mark.parametrize("command", ["identify", "status"])
 def test_cli_reads_share_owner_schema_and_release(bench, monkeypatch, capsys, command):
     from thorlabs_shutter_control import __main__ as cli
 
     hub, devices, _, _ = bench
-    monkeypatch.setattr(cli, "load_config", lambda path: hub.configs)
+    paths = []
+
+    def configured(path):
+        paths.append(path)
+        return hub.configs
+
+    monkeypatch.setattr(cli, "load_config", configured)
     monkeypatch.setattr(cli, "ShutterHub", lambda configs: hub)
     assert cli.main(["--target", "beam", command]) == 0
+    assert paths == ["shutters.local.toml"]
     value = json.loads(capsys.readouterr().out)
     if command == "identify":
         assert value["serial_number"] == "68000001"
@@ -189,24 +207,21 @@ def test_owner_surface_and_flat_status_schema(bench):
         "identify_device",
         "get_status",
         "connection_snapshot",
-        "open_shutter",
-        "close_shutter",
-        "set_manual_mode",
-        "enable_device",
+        "set_solenoid",
+        "start",
+        "safe_state",
+        "set_operating_mode",
+        "pulse",
         "recover",
         "disconnect",
         "close",
         "shutdown_outputs",
-        "cancel",
     )
     assert all(callable(getattr(hub, method)) for method in methods)
     hub.connect(0)
     status = asdict(hub.get_status("beam"))
     assert {
         "name",
-        "channel",
-        "serial_number",
-        "endpoint",
         "electrical_state",
         "error",
         "identity",
@@ -214,9 +229,15 @@ def test_owner_surface_and_flat_status_schema(bench):
         "has_device",
     } <= status.keys()
     assert status["electrical_observed_at"] is not None
-    assert {"feedback", "identity_verified", "connection", "transition_confirmed"}.isdisjoint(
-        status
-    )
+    assert {
+        "feedback",
+        "identity_verified",
+        "connection",
+        "transition_confirmed",
+        "channel",
+        "serial_number",
+        "endpoint",
+    }.isdisjoint(status)
 
 
 def test_gui_exit_preserves_original_error_and_each_cleanup(monkeypatch):
@@ -224,7 +245,8 @@ def test_gui_exit_preserves_original_error_and_each_cleanup(monkeypatch):
 
     calls = []
 
-    def fail_run(**kwargs):
+    def fail_run(host, port, app, **kwargs):
+        assert host == "127.0.0.1" and port == 9860
         raise OSError("original server failure")
 
     def shutdown_outputs():
@@ -235,7 +257,8 @@ def test_gui_exit_preserves_original_error_and_each_cleanup(monkeypatch):
         calls.append("release")
         raise OSError("release unavailable")
 
-    monkeypatch.setattr(gui, "create_app", lambda hub: SimpleNamespace(run=fail_run))
+    monkeypatch.setattr(gui, "create_app", lambda hub, **kw: SimpleNamespace(server=object()))
+    monkeypatch.setattr("werkzeug.serving.make_server", fail_run)
     hub = SimpleNamespace(shutdown_outputs=shutdown_outputs, close=close)
     with pytest.raises(OSError, match="original server") as caught:
         gui.run(hub)
@@ -243,15 +266,38 @@ def test_gui_exit_preserves_original_error_and_each_cleanup(monkeypatch):
     assert len(caught.value.__notes__) == 2
 
 
-def test_cli_gui_transfers_cleanup_ownership_once(bench, monkeypatch):
+@pytest.mark.parametrize(
+    "argv,config_path,port",
+    [
+        (["gui"], "config/shutter.ethernet.toml", 9860),
+        (["--config", "custom.toml", "gui", "--port", "9874"], "custom.toml", 9874),
+    ],
+)
+def test_cli_gui_transfers_cleanup_ownership_once(bench, monkeypatch, argv, config_path, port):
     from thorlabs_shutter_control import __main__ as cli
     from thorlabs_shutter_control import gui
 
     hub, devices, _, _ = bench
     releases = []
-    monkeypatch.setattr(cli, "load_config", lambda path: hub.configs)
+    paths, served = [], []
+
+    def configured(path):
+        paths.append(path)
+        return hub.configs
+
+    monkeypatch.setattr(cli, "load_config", configured)
     monkeypatch.setattr(cli, "ShutterHub", lambda configs: hub)
-    monkeypatch.setattr(gui, "create_app", lambda owner: SimpleNamespace(run=lambda **kw: None))
+
+    def app(owner, *, shutdown):
+        return SimpleNamespace(server=shutdown)
+
+    def server(host, port, stop, **kwargs):
+        served.append({"host": host, "port": port})
+        return SimpleNamespace(handle_request=stop, server_close=lambda: None)
+
+    monkeypatch.setattr(gui, "create_app", app)
+    monkeypatch.setattr("werkzeug.serving.make_server", server)
     monkeypatch.setattr(hub, "close", lambda: releases.append("release"))
-    assert cli.main(["gui"]) == 0
+    assert cli.main(argv) == 0
+    assert paths == [config_path] and served[0]["port"] == port
     assert releases == ["release"] and not devices

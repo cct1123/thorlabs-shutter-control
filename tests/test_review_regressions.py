@@ -26,12 +26,12 @@ def test_successful_on_invalidates_off_rest_before_external_off(config, tmp_path
         hub.connect("beam")
         hub.get_status("beam")
         tick[0] = 103
-        hub.open_shutter("beam")
+        hub.set_solenoid("beam", True)
         device.state = 2  # External OFF; no intervening status poll while ON.
         tick[0] = 103.1
         hub.get_status("beam")
         with pytest.raises(ShutterError, match="OFF/duty recovery"):
-            hub.open_shutter("beam")
+            hub.set_solenoid("beam", True)
         assert [frame.param2 for frame in device.output_frames] == [1]
 
 
@@ -39,7 +39,7 @@ def test_successful_on_invalidates_off_rest_before_external_off(config, tmp_path
 def test_completed_output_does_not_actuate_a_later_readonly_connection(bench, faulted):
     hub, devices, _, _ = bench
     hub.connect("beam")
-    hub.open_shutter("beam")
+    hub.set_solenoid("beam", True)
     hub.safe_state("beam")
     hub.disconnect("beam")
     hub.connect("beam")
@@ -58,7 +58,7 @@ def test_completed_output_does_not_actuate_a_later_readonly_connection(bench, fa
 def test_protected_recovery_clears_active_request_without_incidental_off(bench):
     hub, devices, _, _ = bench
     hub.connect("beam")
-    hub.open_shutter("beam")
+    hub.set_solenoid("beam", True)
     recovered = hub.recover(
         "beam", source_inhibited=True, optical_closed=True, evidence="software fixture observation"
     )
@@ -164,7 +164,7 @@ def test_mode_stop_clears_native_start_request(config, tmp_path):
         hub.connect("beam")
         hub.start("beam", source_inhibited=True)
         device.state = 2  # Native cycle's OFF interval, not proof of Inactive.
-        result = hub.set_manual_mode("beam", source_inhibited=True)
+        result = hub.set_operating_mode("beam", "manual", source_inhibited=True)
         assert result.requested_state == "off"  # Mode transition explicitly sent Stop/OFF.
         assert result.operating_mode == "manual"
 
@@ -226,9 +226,9 @@ def test_settings_read_updates_fields_once_per_read_not_every_poll(config):
 
 
 @pytest.mark.parametrize("connected,context_generation", [(False, 1), (True, 1), (True, 0)])
-def test_protection_assertions_end_at_actual_disconnect(config, connected, context_generation):
+def test_persistence_and_polling_reset_at_actual_disconnect(config, connected, context_generation):
     app = create_app(SimpleNamespace(configs=[config]))
-    key = next(key for key in app.callback_map if "source-inhibited.value" in key)
+    key = next(key for key in app.callback_map if "confirmation-context.data" in key)
     assert "sample" in {item["id"] for item in app.callback_map[key]["inputs"]}
     rendered = post_callback(
         app,
@@ -244,7 +244,6 @@ def test_protection_assertions_end_at_actual_disconnect(config, connected, conte
         assert "source-inhibited" not in rendered
         assert "live-readback" not in rendered
     else:
-        assert rendered["source-inhibited"]["value"] == []
         assert rendered["persist"]["value"] == []
         assert rendered["live-readback"]["value"] == []
 
@@ -280,7 +279,7 @@ def test_webui_release_checks_active_request_under_owner_lock(bench, monkeypatch
         with channel.lock:
             worker.start()
             assert waiting.wait(1), "Release did not reach the owner lock"
-            hub.open_shutter("beam")  # Simulate another callback winning the lock first.
+            hub.set_solenoid("beam", True)  # Simulate another callback winning the lock first.
     finally:
         worker.join(2)
     assert not worker.is_alive()

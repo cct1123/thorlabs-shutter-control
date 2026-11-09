@@ -64,14 +64,11 @@ def test_identify_and_persistence_literal_commands():
     assert sent == [bytes.fromhex("230201005001"), bytes.fromhex("b9040400d0010100c304")]
 
 
-def test_current_profile_stays_manual_only_and_settings_disabled(config):
+def test_default_policy_stays_manual_only_and_settings_disabled(config):
     assert config.policy.qualified_modes == ("manual",)
     assert not config.policy.allow_device_settings
     assert not config.policy.allow_persistent_settings
     hub = ShutterHub([config])
-    for mode in ("single", "auto", "triggered"):
-        with pytest.raises(ShutterError, match="qualified_modes"):
-            hub.set_operating_mode("beam", mode, source_inhibited=True)
     with pytest.raises(ShutterError, match="allow_device_settings"):
         hub.set_cycle_parameters("beam", CycleParameters(1000, 2000, 1), source_inhibited=True)
     assert not hub.connection_snapshot("beam").has_device
@@ -86,7 +83,7 @@ def test_invalid_qualification_lists_fail(config, modes):
 
 
 @pytest.mark.parametrize("mode", ["single", "auto", "triggered"])
-def test_protected_mode_selection_does_not_qualify_native_start(config, tmp_path, mode):
+def test_mode_selection_without_confirmation_does_not_qualify_native_start(config, tmp_path, mode):
     from thorlabs_shutter_control.gui import execute_action
 
     config = replace(config, policy=replace(config.policy, allow_persistent_mode_changes=True))
@@ -95,10 +92,16 @@ def test_protected_mode_selection_does_not_qualify_native_start(config, tmp_path
         [config], transport_factory=lambda c, d: device, lock_directory=tmp_path
     ) as hub:
         execute_action(hub, "connect", "beam")
-        with pytest.raises(ShutterError, match="independently inhibited"):
-            execute_action(hub, mode, "beam")
-        assert not device.output_frames
-        selected, _, _ = execute_action(hub, mode, "beam", source_inhibited=True)
+        from thorlabs_shutter_control.gui import create_app
+
+        app = create_app(hub)
+        key = next(key for key in app.callback_map if "notice.children" in key)
+        rendered = post_callback(
+            app, key, {"target": "beam", mode: 1, "source-inhibited": []}, f"{mode}.n_clicks"
+        )
+        assert "Mode selected and read back" in rendered["notice"]["children"]
+        assert rendered["sample"]["data"]["operating_mode"] == mode
+        selected = hub.get_status("beam")
         assert selected.operating_mode == mode
         assert selected.electrical_state == "off"
         with pytest.raises(ShutterError, match="qualified_modes"):
@@ -167,7 +170,7 @@ def test_native_start_stop_uses_one_output_request_and_preserves_mode(config, tm
     ) as hub:
         hub.connect("beam")
         hub.set_operating_mode("beam", mode, source_inhibited=True)
-        result = hub.start("beam", source_inhibited=True)
+        result = hub.start("beam")
         assert result.requested_state == "start" and result.optical_closed_at is None
         result = hub.safe_state("beam")
         assert result.operating_mode == mode and result.electrical_state == "off"
@@ -281,7 +284,7 @@ def test_webui_start_requires_stop_before_release(bench):
     assert not sample.has_device
 
 
-def test_webui_renderer_keeps_unavailable_feedback_unknown(bench):
+def test_webui_renderer_shows_documented_flags_and_host_request(bench):
     from dataclasses import asdict
 
     from thorlabs_shutter_control.gui import create_app
@@ -295,10 +298,10 @@ def test_webui_renderer_keeps_unavailable_feedback_unknown(bench):
     assert rendered["on"]["disabled"] is False
     assert rendered["auto"]["disabled"] is False
     assert rendered["apply-settings"]["disabled"] is False
-    assert rendered["key-lamp-value"]["children"] == "Unknown"
-    assert rendered["ready-lamp-value"]["children"] == "Unknown"
+    assert rendered["interlock-lamp-value"]["children"] == "Clear"
+    assert rendered["channel-lamp-value"]["children"] == "Clear"
     assert rendered["output-lamp-value"]["children"] == "Off"
-    assert rendered["active-lamp-value"]["children"] == "Unknown"
+    assert rendered["active-lamp-value"]["children"] == "No pending request"
 
 
 def test_webui_enabled_settings_still_refuse_unpermitted_write(bench):
@@ -324,3 +327,24 @@ def test_webui_enabled_settings_still_refuse_unpermitted_write(bench):
     )
     assert "allow_device_settings" in rendered["notice"]["children"]
     assert len(devices[0].history) == before
+
+
+@pytest.mark.parametrize("mode", ["single", "auto", "triggered"])
+def test_tracked_profile_allows_native_mode_activation_gate(tmp_path, mode):
+    from pathlib import Path
+
+    from thorlabs_shutter_control import load_config
+
+    (tracked,) = load_config(Path(__file__).resolve().parents[1] / "config/shutter.ethernet.toml")
+    device = FakeTransport(tracked)
+    with ShutterHub(
+        [tracked], transport_factory=lambda c, d: device, lock_directory=tmp_path
+    ) as hub:
+        hub.connect(tracked.name)
+        hub.set_operating_mode(tracked.name, mode)
+        if mode == "triggered":
+            with pytest.raises(ShutterError, match="priming requires"):
+                hub.start(tracked.name, source_inhibited=True)
+        else:
+            assert hub.start(tracked.name, source_inhibited=True).requested_state == "start"
+        assert hub.safe_state(tracked.name).electrical_state == "off"

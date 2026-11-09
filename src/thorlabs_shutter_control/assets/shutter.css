@@ -74,7 +74,6 @@ h1 { margin: 0; font-size: 30px; line-height: 1.25; font-weight: 600; letter-spa
 .readback-bar { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin: 16px 0; color: var(--muted); font-size: 11px; }
 input[type=checkbox] { accent-color: var(--accent); margin-right: 7px; }
 .notice { padding: 15px 16px; border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius); font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
-.source-confirmation { margin: 20px 0 8px; font-size: 12px; line-height: 1.6; color: #52647a; }
 .profile-note { font-size: 11px; color: var(--muted); line-height: 1.7; margin: 8px 0 0; }
 .diagnostics { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
 .diagnostics summary { cursor: pointer; }

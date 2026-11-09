@@ -107,14 +107,15 @@ def test_old_diagnostics_and_led_drafts_do_not_cross_sessions(bench, change):
     assert shown["event-data"]["children"] == "No events collected"
 
 
-def test_explicit_led_read_updates_draft_but_other_reads_preserve_it(bench):
+@pytest.mark.parametrize("changed", ["details.data", ["sample.data", "details.data"]])
+def test_explicit_led_read_updates_draft_but_other_reads_preserve_it(bench, changed):
     hub, devices, _, _ = bench
     hub.connect("beam")
     devices[0].led_modes = 0x8009
     app = create_app(hub)
     response = action(app, "read-led")
     data, sample = response["details"]["data"], response["sample"]["data"]
-    shown = details(app, data, sample)
+    shown = details(app, data, sample, changed)
     assert shown["led-modes"]["value"] == [1, 8]
     assert "Extra flags" in shown["led-reading"]["children"]
     data["action"] = "read-channel"
@@ -172,16 +173,19 @@ def test_update_collection_displays_raw_bytes_and_disconnect_clears_results(benc
     assert values["events"] and values["events"][0]["id"] == "0x0481"
     assert bytes.fromhex(values["events"][0]["frame"])[6:] == devices[0].update_payload
     action(app, "stop-updates")
-    released = action(app, "hardware-disconnect", **{"source-inhibited": ["protected"]})
+    released = action(app, "release")
     assert not released["sample"]["data"]["has_device"] and released["details"]["data"] is None
-    assert devices[0].bus_disconnected and not devices[0].output_frames
+    assert devices[0].closed and not devices[0].bus_disconnected
+    assert not devices[0].output_frames
 
 
-def test_hardware_disconnect_refusal_does_not_become_passive_release(bench):
+def test_protected_hardware_disconnect_is_api_only(bench):
     hub, devices, _, _ = bench
     hub.connect("beam")
-    response = action(create_app(hub), "hardware-disconnect")
-    assert "source_inhibited" in response["notice"]["children"]
+    app = create_app(hub)
+    client = app.server.test_client()
+    assert b"hardware-disconnect" not in client.get("/_dash-layout").data
+    assert b"hardware-disconnect" not in client.get("/_dash-dependencies").data
     assert hub.connection_snapshot("beam").has_device
     assert not devices[0].bus_disconnected
 

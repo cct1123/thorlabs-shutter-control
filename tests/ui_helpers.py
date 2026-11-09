@@ -12,7 +12,7 @@ def post_callback(app, key, values, changed):
         json={
             "output": key,
             "outputs": outputs,
-            "changedPropIds": [changed],
+            "changedPropIds": [changed] if isinstance(changed, str) else changed,
             "inputs": [dict(item, value=values.get(item["id"])) for item in callback["inputs"]],
             "state": [dict(item, value=values.get(item["id"])) for item in callback["state"]],
         },

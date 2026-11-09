@@ -13,13 +13,16 @@ def main(argv=None):
     parser = argparse.ArgumentParser(
         description="Direct KSC101 owner; optical state is independent"
     )
-    parser.add_argument("--config", default="shutters.local.toml")
+    parser.add_argument(
+        "--config",
+        help="TOML path (GUI: config/shutter.ethernet.toml; other commands: shutters.local.toml)",
+    )
     parser.add_argument("--target", help="Exact configured logical name")
     commands = parser.add_subparsers(dest="command", required=True)
     for command in ("check-config", "identify", "status", "safe-off"):
         commands.add_parser(command)
     gui = commands.add_parser("gui", help="Open the localhost WebUI without connecting")
-    gui.add_argument("--port", type=int, default=8050, help="Localhost HTTP port (default: 8050)")
+    gui.add_argument("--port", type=int, default=9860, help="Localhost HTTP port (default: 9860)")
     discover = commands.add_parser(
         "discover", help="Explicit informational inventory; never opens or selects a controller"
     )
@@ -30,7 +33,7 @@ def main(argv=None):
     manual.add_argument(
         "--source-inhibited",
         action="store_true",
-        help="Source blocked and trigger control isolated",
+        help="Compatibility option; no longer required for Manual selection",
     )
     pulse = commands.add_parser("pulse", help="Bounded hold on a continuous-duty qualified load")
     pulse.add_argument("--seconds", required=True, type=float)
@@ -49,7 +52,12 @@ def main(argv=None):
                 file=sys.stderr,
             )
             return 0
-        configs = load_config(args.config)
+        config_path = args.config
+        if config_path is None:
+            config_path = (
+                "config/shutter.ethernet.toml" if args.command == "gui" else "shutters.local.toml"
+            )
+        configs = load_config(config_path)
         if args.command == "check-config":
             print(json.dumps([asdict(c) for c in configs], indent=2))
             return 0
@@ -78,13 +86,13 @@ def main(argv=None):
             time.sleep(selected.policy.min_off_s)
             result = hub.pulse(args.target, args.seconds)
         elif args.command == "manual":
-            result = hub.set_manual_mode(args.target, source_inhibited=args.source_inhibited)
+            result = hub.set_operating_mode(args.target, "manual")
         else:
             result = action[args.command](args.target)
         print(json.dumps(asdict(result), indent=2))
     except (Exception, KeyboardInterrupt) as exc:
         original = exc
-        print(f"Unconfirmed: {exc}", file=sys.stderr)
+        print(f"Unconfirmed: {str(exc) or type(exc).__name__}", file=sys.stderr)
         for note in getattr(exc, "__notes__", []):
             print(note, file=sys.stderr)
     finally:
@@ -92,7 +100,10 @@ def main(argv=None):
             try:
                 hub.close()
             except BaseException as exc:
-                print(f"Communication release incomplete: {exc}", file=sys.stderr)
+                print(
+                    f"Communication release incomplete: {str(exc) or type(exc).__name__}",
+                    file=sys.stderr,
+                )
                 original = original or exc
     return 1 if original else 0
 

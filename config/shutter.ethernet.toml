@@ -12,11 +12,12 @@ bay = "middle"
 # Hub identity is unknown; optional metadata is omitted, not inferred from the cube.
 
 [shutters.policy]
-evidence = "PROJECT.md exact Ethernet ON/OFF request and user SH05R/safe confirmation 2026-11-06; SRC-009 SH05R manual. Source protection/trigger isolation required for physical use; optical state remains unmeasured."
+evidence = "PROJECT.md exact Ethernet ON/OFF request and user SH05R/safe confirmation 2026-11-06; SRC-009 SH05R manual. 2026-11-08 user permits software selection/activation of all four modes and removes extra OFF pause; native operation remains physically unvalidated. Source protection/trigger isolation required for physical use; optical state remains unmeasured."
 shutter_model = "SH05R"
 off_optical_state = "closed"  # Manufacturer design mapping, not a live optical measurement.
 continuous_on_allowed = true  # SH05R manual pp6-7, driven by native KSC101.
-min_off_s = 2.0  # Conservative commissioning pause, not a calibrated/rated minimum.
-allow_persistent_mode_changes = true  # Protected GUI mode selection; changes persist at power-up.
-# Mode selection does not qualify native Start/priming; output remains Manual-only.
-qualified_modes = ["manual"]
+min_off_s = 0.0  # User removed the extra software OFF pause; OFF/interlock readback remains.
+# Mode selection has no separate permission gate; changes persist at power-up.
+qualified_modes = ["manual", "single", "auto", "triggered"]
+# Native Start retains OFF/interlock readback and cycle/load limits.
+# Continuous Triggered priming remains subject to allow_continuous_cycles.

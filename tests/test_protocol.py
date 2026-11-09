@@ -82,8 +82,8 @@ def test_commands_use_protocol_values_and_validate_before_io(config):
         ("interlock_required", "c70401005001", "c80401010150", True),
         ("interlock_required", "c70401005001", "c80401020150", False),
         ("solenoid_state_reply", "cc0401005001", "cd0401000150", 0),
-        ("output_state", "290401005001", "2a0406008150010000200000", "off"),
-        ("output_state", "290401005001", "2a0406008150010001200000", "on"),
+        ("status_bits", "290401005001", "2a0406008150010000200000", 0x2000),
+        ("status_bits", "290401005001", "2a0406008150010001200000", 0x2001),
     ],
 )
 def test_driver_queries_against_literal_reference_frames(
@@ -220,7 +220,7 @@ def test_rich_fault_retains_entire_frame(config):
     transport.prefix = fault.encode()
     session = Session(transport, Event())
     with pytest.raises(ControllerFault) as caught:
-        KSC101(session, config).output_state(Deadline(1))
+        KSC101(session, config).status_bits(Deadline(1))
     assert caught.value.raw == fault.encode().hex()
 
 
@@ -229,11 +229,11 @@ def test_timeout_then_delayed_same_type_never_reused(config):
     transport.silent.add(0x0429)
     session = Session(transport, Event())
     with pytest.raises(DeadlineExceeded):
-        KSC101(session, config).output_state(Deadline(0.02))
+        KSC101(session, config).status_bits(Deadline(0.02))
     transport.rx.append(bytes.fromhex("cd 04 01 01 01 50"))
     count = len(transport.history)
     with pytest.raises(ProtocolError, match="ambiguous"):
-        KSC101(session, config).output_state(Deadline(1))
+        KSC101(session, config).status_bits(Deadline(1))
     assert len(transport.history) == count
 
 
@@ -242,7 +242,7 @@ def test_pending_stale_response_cannot_satisfy_new_query(config):
     transport.rx.append(bytes.fromhex("cd 04 01 01 01 50"))
     session = Session(transport, Event())
     with pytest.raises(ProtocolError, match="late"):
-        KSC101(session, config).output_state(Deadline(1))
+        KSC101(session, config).status_bits(Deadline(1))
     assert not transport.history
 
 
@@ -254,7 +254,7 @@ def test_stale_reply_behind_full_transport_buffer_is_rejected_before_request(con
     transport.silent.add(0x0429)  # Only the queued stale status could satisfy this query.
     session = Session(transport, Event())
     with pytest.raises(ProtocolError, match="late"):
-        KSC101(session, config).output_state(Deadline(0.1))
+        KSC101(session, config).status_bits(Deadline(0.1))
     assert session.poisoned and not transport.history
 
 
@@ -264,7 +264,7 @@ def test_continuous_pending_events_expire_without_dispatch(config):
     transport.read_nowait = lambda: event
     session = Session(transport, Event())
     with pytest.raises(DeadlineExceeded):
-        KSC101(session, config).output_state(Deadline(0.01))
+        KSC101(session, config).status_bits(Deadline(0.01))
     assert session.poisoned and not transport.history
 
 
@@ -272,7 +272,7 @@ def test_late_read_is_not_success(config):
     transport = FakeTransport(config)
     transport.delay = 0.03
     with pytest.raises(DeadlineExceeded):
-        KSC101(Session(transport, Event()), config).output_state(Deadline(0.01))
+        KSC101(Session(transport, Event()), config).status_bits(Deadline(0.01))
 
 
 def test_failed_write_never_appends_a_cleanup_frame_to_unknown_transmit_alignment(config):
@@ -335,5 +335,5 @@ def test_cancelled_query_does_not_touch_transport(config):
     from thorlabs_shutter_control.protocol import Cancelled
 
     with pytest.raises(Cancelled):
-        KSC101(session, config).output_state(Deadline(1))
+        KSC101(session, config).status_bits(Deadline(1))
     assert session.poisoned and not transport.history

@@ -1,7 +1,7 @@
 # Fictional identities. Copy to ignored shutters.local.toml and verify every field.
 # Missing policy means READ ONLY. Never copy unmeasured limits into a live policy.
-# If a qualified policy is later supplied, allow_persistent_mode_changes defaults
-# to false. Explicitly review that separate permission: KSC101 remembers modes.
+# A qualified policy permits explicit mode selection; KSC101 remembers modes.
+# The legacy allow_persistent_mode_changes field is accepted but ignored.
 [[shutters]]
 name = "shutter"
 channel = 0

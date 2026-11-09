@@ -27,6 +27,9 @@ from .protocol import Cancelled, Deadline, Frame, ProtocolError, Session, Shutte
 from .transport import Route, UnsupportedRoute, open_transport
 
 MODES = {1: "manual", 2: "single", 3: "auto", 4: "triggered"}
+# Exact KSC101 GetStatusBits reference (SRC-008); these are reported flags,
+# not independently measured key position, interlock continuity or readiness.
+STATUS_MASKS = {"interlock_status_bit": 0x00001000, "channel_enabled_bit": 0x80000000}
 
 
 # Validation and timestamps
@@ -65,8 +68,8 @@ class Policy:
 
     Evidence and shutter_model describe the operator-qualified load; this record
     cannot establish physical safety. min_off_s/max_on_s are seconds, duty is a
-    fraction in (0, 1], and qualified_modes permits output activation. Persistent
-    mode selection and settings writes require their separate permission flags.
+    fraction in (0, 1], and qualified_modes permits output activation. Settings
+    writes and EEPROM persistence require separate permissions; mode selection does not.
     Only a qualified OFF-to-closed mapping is supported. Finite-load limits may
     be recorded, but output activation still requires continuous-duty permission.
     """
@@ -78,6 +81,7 @@ class Policy:
     continuous_on_allowed: bool = False
     max_on_s: float | None = None
     max_duty_fraction: float = 1.0
+    # Accepted legacy setting; mode selection ignores it.
     allow_persistent_mode_changes: bool = False
     qualified_modes: tuple[str, ...] = ("manual",)  # Output activation, not protected selection.
     allow_device_settings: bool = False
@@ -320,18 +324,19 @@ class ShutterStatus:
     UTC timestamp. optical_closed_at/evidence record a separate human observation,
     never a conclusion from an output bit. Editing a snapshot cannot change the
     owner; locks, transports and other private resources are excluded.
+    interlock_status_bit/channel_enabled_bit decode SRC-008 status masks and
+    share electrical_observed_at; neither establishes physical key/ready state.
     """
 
     name: str
-    channel: int
-    serial_number: str
-    endpoint: str | None
     has_device: bool = False
     identity: Identity | None = None
     generation: int = 0
     operating_mode: str = "unknown"
     interlock_required: bool | None = None  # Configuration, not contact continuity.
     status_bits: int | None = None
+    interlock_status_bit: bool | None = None
+    channel_enabled_bit: bool | None = None
     electrical_state: str = "unknown"
     electrical_observed_at: str | None = None
     requested_state: str | None = None
@@ -468,10 +473,6 @@ class KSC101:
             raise ProtocolError("Wrong status-bits response channel")
         return bits
 
-    def output_state(self, deadline, *, protective=False):
-        """Read electrical on/off from status bit 0; this never measures blade position."""
-        return "on" if self.status_bits(deadline, protective=protective) & 1 else "off"
-
     def solenoid_state_reply(self, deadline):
         """Read raw 0x04CD param2 without interpreting its conflicting legacy enums."""
         return self.session.query(Frame(0x04CC, 1), 0x04CD, deadline).param2
@@ -575,7 +576,7 @@ class _Claim:
                     import fcntl
 
                     fcntl.flock(stream, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except (OSError, BlockingIOError) as exc:
+        except OSError as exc:
             self.release()
             raise ShutterError("Controller serial/route already owned or lock unavailable") from exc
 
@@ -673,14 +674,7 @@ class ShutterHub:
         self._factory = transport_factory or open_transport
         self._lock_directory = lock_directory
         self._channels = {
-            config.name: _Channel(
-                config.name,
-                config.channel,
-                config.serial_number,
-                config.route.endpoint,
-                config=config,
-            )
-            for config in self.configs
+            config.name: _Channel(config.name, config=config) for config in self.configs
         }
 
     def __enter__(self):
@@ -721,9 +715,9 @@ class ShutterHub:
         """Require a verified handle and, unless allowed for cleanup/reads, no latched fault."""
         if channel.driver is None or channel.identity is None:
             raise ShutterError("No identity-verified handle; connect explicitly")
-        if channel.error and not allow_fault:
+        if channel.error is not None and not allow_fault:
             raise ShutterError(
-                f"Fault lockout: {channel.error}; explicit protected recovery required"
+                f"Fault lockout: {channel.error}; use Stop / OFF to reset after verified readback"
             )
 
     @staticmethod
@@ -747,7 +741,7 @@ class ShutterHub:
 
         Acquire serial/endpoint claims and use the connection deadline. No enable,
         mode or output command is sent. A previous uncertainty journal remains a
-        fault lockout; connect does not recover or replay an earlier operation.
+        fault lockout until verified Stop/OFF or recovery; connect never replays output.
         """
         channel, deadline = self._channel(target), Deadline(self.connect_timeout)
         with self._locked(channel, deadline):
@@ -776,7 +770,7 @@ class ShutterHub:
                 )
         except BaseException as exc:
             channel.identity = None
-            channel.error = str(exc)
+            channel.error = str(exc) or type(exc).__name__
             try:
                 self._release(channel)
             except BaseException as cleanup:
@@ -849,7 +843,15 @@ class ShutterHub:
     def _snapshot(self, channel, **readings):
         """Copy public channel metadata plus current readings into an independent status object."""
         values = {f.name: getattr(channel, f.name) for f in fields(ShutterStatus)}
-        return ShutterStatus(**(values | {"has_device": channel.transport is not None} | readings))
+        values.update(readings)
+        bits = values["status_bits"]
+        values.update(
+            {
+                name: None if bits is None else bool(bits & mask)
+                for name, mask in STATUS_MASKS.items()
+            }
+        )
+        return ShutterStatus(**(values | {"has_device": channel.transport is not None}))
 
     def get_status(self, target):
         """Return fresh controller readings, or host-only status if disconnected.
@@ -890,13 +892,14 @@ class ShutterHub:
         )
 
     @contextmanager
-    def _read_operation(self, target):
-        """Yield (channel, deadline) with verified identity and lock; latch read faults."""
+    def _read_operation(self, target, *, verify_identity=True):
+        """Lock and latch read faults; omit identity only before a full status preflight."""
         channel, deadline = self._channel(target), Deadline(self.query_timeout)
         with self._locked(channel, deadline):
             self._ready(channel)
             try:
-                channel.identity = channel.driver.identity(deadline)
+                if verify_identity:
+                    channel.identity = channel.driver.identity(deadline)
                 yield channel, deadline
             except BaseException as exc:
                 self._fault(channel, exc)
@@ -918,7 +921,11 @@ class ShutterHub:
             return channel.driver.channel_enabled(deadline)
 
     def get_hub_bay_reply(self, target):
-        """Return the raw bay byte, including unknown values, without changing route mapping."""
+        """Return a raw legacy bay byte; refuse the unqualified KEH3 query before I/O."""
+        if self._channel(target).config.route.kind == "keh3":
+            raise UnsupportedRoute(
+                "Legacy hub-bay query is unqualified on KEH3; use the configured route"
+            )
         with self._read_operation(target) as (channel, deadline):
             return channel.driver.hub_bay_reply(deadline)
 
@@ -960,7 +967,7 @@ class ShutterHub:
         """
         if source_inhibited is not True:
             raise ShutterError("Hardware disconnect requires source_inhibited=True")
-        with self._read_operation(target) as (channel, deadline):
+        with self._read_operation(target, verify_identity=False) as (channel, deadline):
             feedback = self._manual_feedback(self._read_status(channel, deadline))
             if feedback.electrical_state != "off" or channel.requested_state in ("on", "start"):
                 raise ShutterError("Stop/OFF before hardware disconnect")
@@ -983,9 +990,9 @@ class ShutterHub:
     def set_operating_mode(self, target, mode, *, source_inhibited=False):
         """Select manual, single, auto or triggered and verify fresh mode/OFF readback.
 
-        A changed mode requires persistent-mode policy permission and
-        source_inhibited=True after independent source protection and trigger
-        isolation. The controller must be OFF with its interlock requirement enabled.
+        Mode selection requires no separate persistent-mode permission.
+        The controller must be OFF with its interlock requirement enabled.
+        source_inhibited is accepted for compatibility but is not required for mode selection.
         An actual transition sends Stop/OFF first; an already selected permitted
         mode returns status without rewriting it. Selection does not qualify Start.
         """
@@ -995,11 +1002,6 @@ class ShutterHub:
             raise ValueError("source_inhibited must be boolean")
         channel, deadline = self._channel(target), Deadline(self.query_timeout)
         policy = self._policy(channel)
-        if mode not in policy.qualified_modes and not policy.allow_persistent_mode_changes:
-            raise ShutterError(
-                f"Mode {mode} is absent from qualified_modes; protected selection requires "
-                "allow_persistent_mode_changes (this does not qualify Start/priming)"
-            )
         with self._locked(channel, deadline):
             self._ready(channel)
             try:
@@ -1007,20 +1009,10 @@ class ShutterHub:
             except BaseException as exc:
                 self._fault(channel, exc)
                 raise
-            if before.operating_mode != mode and not source_inhibited:
-                raise ShutterError(
-                    "Mode transition requires independently inhibited source and isolated "
-                    "trigger control; pass source_inhibited=True after establishing them"
-                )
             if before.electrical_state != "off" or not before.interlock_required:
                 raise ShutterError("Mode change requires electrical OFF and interlock requirement")
             if before.operating_mode == mode:
                 return before  # Do not rewrite an already selected mode.
-            if not policy.allow_persistent_mode_changes:
-                raise ShutterError(
-                    "Mode changes are persistent across power cycles (SRC-002 p20); "
-                    "explicit allow_persistent_mode_changes policy permission is required"
-                )
             with self._output_operation(channel):
                 channel.claim.mark_uncertain("Explicit mode transition pending")
                 channel.output_attempts += 1  # Mode changes can also affect output.
@@ -1040,10 +1032,6 @@ class ShutterHub:
                 channel.next_on = clock() + policy.min_off_s
                 channel.claim.clear_uncertain()
                 return after
-
-    def set_manual_mode(self, target, *, source_inhibited=False):
-        """Select Manual using the same protected persistent-mode rules as set_operating_mode."""
-        return self.set_operating_mode(target, "manual", source_inhibited=source_inhibited)
 
     @staticmethod
     def _manual_feedback(feedback):
@@ -1071,7 +1059,7 @@ class ShutterHub:
     def set_cycle_parameters(self, target, parameters, *, source_inhibited=False, persist=False):
         """Write validated CycleParameters and verify settings and Manual/OFF status.
 
-        Require device-settings permission, source_inhibited=True, Manual mode,
+        Require device-settings permission, Manual mode,
         electrical OFF and the interlock requirement. Load timing/count limits apply.
         persist=True additionally requires EEPROM permission and sends a storage
         request; the returned persistence note still requires restart verification.
@@ -1108,7 +1096,7 @@ class ShutterHub:
     def require_interlock(self, target, *, source_inhibited=False):
         """Enable the hardware-interlock requirement and verify Manual/OFF readback.
 
-        Requires device-settings permission and source protection. A currently
+        Requires device-settings permission. A currently
         disabled requirement can be repaired; disabling the interlock is not exposed.
         """
         deadline = Deadline(self.query_timeout)
@@ -1128,14 +1116,14 @@ class ShutterHub:
     def set_led_modes(self, target, modes, *, source_inhibited=False):
         """Write documented LED indication bits to RAM and return the exact readback.
 
-        Require settings permission, protection and fresh Manual/OFF/interlock.
+        Require settings permission and fresh Manual/OFF/interlock.
         LED-only writes do not create an output-cleanup obligation. No EEPROM
         request is sent and no motor status meaning is inferred from these flags.
         """
         KSC101.validate_led_modes(modes)
         self._settings_access(target, source_inhibited)
-        with self._read_operation(target) as (channel, deadline):
-            before = self._preflight(channel, deadline)
+        with self._read_operation(target, verify_identity=False) as (channel, deadline):
+            before = self._manual_feedback(self._read_status(channel, deadline))
             if before.electrical_state != "off":
                 raise ShutterError("LED settings require electrical OFF")
             channel.driver.set_led_modes(modes, deadline)
@@ -1145,17 +1133,13 @@ class ShutterHub:
             return observed
 
     def _settings_access(self, target, source_inhibited):
-        """Validate shared settings permission and operator protection before any I/O."""
+        """Validate shared settings permission before any I/O; accept legacy protection flag."""
         if type(source_inhibited) is not bool:
             raise ValueError("source_inhibited must be boolean")
         channel = self._channel(target)
         policy = self._policy(channel)
         if not policy.allow_device_settings:
             raise ShutterError("Device settings require allow_device_settings qualification")
-        if not source_inhibited:
-            raise ShutterError(
-                "Settings require independently inhibited source and isolated triggers"
-            )
         return channel, policy
 
     def _confirm_settings(self, channel, deadline):
@@ -1188,11 +1172,6 @@ class ShutterHub:
 
     # Output activation and timed pulses
 
-    def enable_device(self, target):
-        """Reject the ambiguous enable alias; use explicit output activation instead."""
-        self._channel(target)
-        raise ShutterError("Channel enable aliases solenoid output (SRC-001); use explicit ON")
-
     def set_solenoid(self, target, on):
         """Request Manual ON when on=True, or protective OFF when on=False.
 
@@ -1209,19 +1188,11 @@ class ShutterHub:
         with self._locked(channel, deadline), self._output_operation(channel):
             return self._on(channel, deadline, policy)
 
-    def open_shutter(self, target):
-        """Request qualified Manual ON through set_solenoid; optical opening is not measured."""
-        return self.set_solenoid(target, True)
-
-    def close_shutter(self, target):
-        """Request safe_state OFF; optical closure still requires independent observation."""
-        return self.safe_state(target)
-
     def start(self, target, *, source_inhibited=False):
         """Request Manual ON or one native Start/prime in the selected qualified mode.
 
-        Native operation additionally requires source_inhibited=True, qualified
-        cycle parameters and interlock/OFF/rest checks. Triggered priming requires
+        Native operation additionally requires qualified cycle parameters and
+        interlock/OFF/rest checks. Triggered priming requires
         continuous-cycle permission and cycles=0. Return fresh status without
         inferring cycle completion; explicit Stop/OFF remains required.
         """
@@ -1237,10 +1208,6 @@ class ShutterHub:
                 return self._on(channel, deadline, policy, feedback=feedback)
             if mode not in policy.qualified_modes:
                 raise ShutterError(f"Mode {mode} is absent from the load policy's qualified_modes")
-            if not source_inhibited:
-                raise ShutterError(
-                    "Native Start/prime requires source protection and isolated triggers"
-                )
             if not policy.continuous_on_allowed or not feedback.interlock_required:
                 raise ShutterError(
                     "Native operation requires qualified load and interlock requirement"
@@ -1305,14 +1272,14 @@ class ShutterHub:
     def validate_pulse(self, target, duration):
         """Return a valid host-hold duration in seconds without device I/O.
 
-        Require a positive finite duration within the configured/50 s implementation
+        Require a positive finite duration within the 50 s implementation
         limit and a qualified continuous-duty load. This checks the request only;
         it neither connects nor authorizes physical actuation by itself.
         """
         duration = positive(duration, "duration")
         policy = self._policy(self._channel(target))
-        if duration > 50 or (policy.max_on_s is not None and duration > policy.max_on_s):
-            raise ValueError("Exposure exceeds configured limit (or implementation maximum 50 s)")
+        if duration > 50:
+            raise ValueError("Exposure exceeds implementation maximum 50 s")
         if not policy.continuous_on_allowed:
             raise ShutterError(
                 "Finite exposure protection needs an independent cutoff; unqualified"
@@ -1344,10 +1311,14 @@ class ShutterHub:
         """Prioritize protective OFF and return its freshly confirmed electrical status.
 
         Signal cancellation before waiting for the owner lock, then use the separate
-        cleanup budget. Require a qualified route/load, retaining any existing fault
-        even after successful OFF. Failure latches uncertainty and is raised; no
-        communication result alone establishes optical closure.
+        cleanup budget. Require a qualified route/load. A successful explicit Stop/OFF
+        clears a prior fault after fresh OFF/interlock verification. Failure latches
+        uncertainty and is raised; communication alone does not establish optical closure.
         """
+        return self._protect(target, reset_fault=True)
+
+    def _protect(self, target, *, reset_fault):
+        """Send priority OFF; only an explicit operator Stop resets a verified fault."""
         channel, deadline = self._channel(target), Deadline(self.cleanup_timeout)
         policy = self._policy(channel)
         with channel.priority_lock:
@@ -1356,9 +1327,15 @@ class ShutterHub:
         try:
             with self._locked(channel, deadline):
                 try:
-                    return self._safe(channel, deadline, policy)
+                    feedback = self._safe(channel, deadline, policy)
+                    if reset_fault and channel.error is not None:
+                        if not feedback.interlock_required:
+                            raise ShutterError("Fault reset requires preserved interlock")
+                        channel.claim.clear_uncertain()
+                        channel.error = None
+                    return replace(feedback, error=channel.error)
                 except BaseException as exc:
-                    channel.cleanup = f"Safe state unconfirmed: {exc}"
+                    channel.cleanup = f"Safe state unconfirmed: {str(exc) or type(exc).__name__}"
                     self._fault(channel, exc)
                     raise
         finally:
@@ -1388,22 +1365,15 @@ class ShutterHub:
         channel.driver.wait_output(False, deadline, protective=True)
         channel.next_on = clock() + policy.min_off_s  # Rest begins with observed OFF, not dispatch.
         feedback = self._read_status(channel, deadline, protective=True)
-        if feedback.electrical_state != "off" or (
-            feedback.operating_mode not in policy.qualified_modes
-            and not policy.allow_persistent_mode_changes
-        ):
-            raise ShutterError("OFF unconfirmed or mode lacks a qualified Stop contract")
+        if feedback.electrical_state != "off":
+            raise ShutterError("OFF unconfirmed")
         channel.cleanup = (
             f"Electrical OFF readback; dispatch monotonic={dispatched:.6f}; optical unknown"
         )
-        # Do not clear an existing fault. Only protected recover() can clear lockout.
+        # Automatic cleanup retains faults; explicit safe_state() can reset them.
         if channel.error is None:
             channel.claim.clear_uncertain()
         return replace(feedback, cleanup=channel.cleanup)
-
-    def cancel(self, target):
-        """Cancel active work and attempt qualified OFF through safe_state; return its status."""
-        return self.safe_state(target)
 
     def recover(self, target, *, source_inhibited=False, optical_closed=False, evidence=None):
         """Reopen the exact target and clear lockout after protected passive verification.
@@ -1472,7 +1442,9 @@ class ShutterHub:
                 continue  # A policy permits commands; it does not create a cleanup obligation.
             if channel.transport is not None:
                 try:
-                    self.safe_state(channel.config.name)
+                    feedback = self._protect(channel.config.name, reset_fault=False)
+                    if feedback.error is not None:
+                        failures.append((channel.config.name, ShutterError(feedback.error)))
                 except BaseException as exc:
                     failures.append((channel.config.name, exc))
             elif channel.requested_state in ("on", "start") or channel.error:
@@ -1497,7 +1469,7 @@ class ShutterHub:
             if channel.output_attempts != attempts:
                 self._fault(channel, exc)
                 try:
-                    self.safe_state(channel.config.name)
+                    self._protect(channel.config.name, reset_fault=False)
                 except BaseException as cleanup:
                     exc.add_note(f"Separate cleanup outcome: {cleanup}; optical state unknown")
             elif isinstance(exc, IdentityMismatch) or (
@@ -1508,14 +1480,16 @@ class ShutterHub:
 
     def _fault(self, channel, exc):
         """Latch the first error, clear optical evidence and journal uncertainty if possible."""
-        channel.error = channel.error or str(exc)
+        description = str(exc) or type(exc).__name__
+        channel.error = channel.error or description
         if isinstance(exc, IdentityMismatch):
             channel.identity = None
         channel.optical_closed_at = channel.optical_evidence = None
         if channel.claim:
             try:
                 channel.claim.mark_uncertain(
-                    f"{utc_now()} original={channel.error}; latest={exc}; cleanup={channel.cleanup}"
+                    f"{utc_now()} original={channel.error}; latest={description}; "
+                    f"cleanup={channel.cleanup}"
                 )
             except OSError as journal_error:
                 exc.add_note(f"Could not persist uncertainty: {journal_error}; retain lockout")

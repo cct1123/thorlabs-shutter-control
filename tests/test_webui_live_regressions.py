@@ -78,7 +78,7 @@ def test_timed_pulse_is_available_only_for_displayed_manual_off(state):
 @pytest.mark.parametrize("state", ["off", "disconnected", "fault", "native"])
 def test_connected_controls_delegate_qualification_to_owner(state):
     owner = SimpleNamespace(configs=load_config(ROOT / "config/shutter.ethernet.toml"))
-    assert owner.configs[0].policy.qualified_modes == ("manual",)
+    assert owner.configs[0].policy.qualified_modes == ("manual", "single", "auto", "triggered")
     sample = asdict(saved_sample("disconnected" if state == "disconnected" else "off"))
     if state == "fault":
         sample["error"] = "Unconfirmed operation"

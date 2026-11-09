@@ -6,6 +6,7 @@ import subprocess
 import sys
 import time
 from dataclasses import asdict, replace
+from functools import partial
 from threading import Event, Thread
 
 import pytest
@@ -24,13 +25,13 @@ def test_connect_read_manual_on_off_and_passive_release(bench):
     device = devices[0]
     assert not device.output_frames
     assert hub.get_status("beam").electrical_state == "off"
-    hub.set_manual_mode("beam")
-    result = hub.open_shutter("beam")
+    hub.set_operating_mode("beam", "manual")
+    result = hub.set_solenoid("beam", True)
     assert result.requested_state == "on"
     assert result.electrical_state == "on"
     assert result.optical_closed_at is None
     assert result.optical_evidence is None
-    hub.close_shutter("beam")
+    hub.safe_state("beam")
     count = len(device.output_frames)
     hub.close()
     assert device.closed and len(device.output_frames) == count
@@ -93,7 +94,7 @@ def test_changed_identity_after_connect_never_receives_cleanup_output(bench):
     hub.connect("beam")
     devices[0].serial = "68000002"
     with pytest.raises(IdentityMismatch):
-        hub.open_shutter("beam")
+        hub.set_solenoid("beam", True)
     assert not hub.connection_snapshot("beam").identity
     with pytest.raises(ShutterError):
         hub.safe_state("beam")
@@ -141,7 +142,8 @@ def test_unknown_hub_metadata_keeps_exact_controller_check(config, tmp_path, mat
         [config], transport_factory=lambda c, d: device, lock_directory=tmp_path
     ) as hub:
         if matches:
-            assert hub.connect("beam").endpoint == "192.0.2.1:40305"
+            assert hub.connect("beam").identity
+            assert hub.configs[0].route.endpoint == "192.0.2.1:40305"
             assert hub.get_status("beam").electrical_state == "off"
         else:
             with pytest.raises(IdentityMismatch):
@@ -209,7 +211,11 @@ def test_external_keh3_and_vcp_control_remain_blocked(config, tmp_path):
             lock_directory=tmp_path,
         ) as hub:
             assert hub.connect("beam").identity
-            for operation in (hub.open_shutter, hub.safe_state, hub.set_manual_mode):
+            for operation in (
+                partial(hub.set_solenoid, on=True),
+                hub.safe_state,
+                partial(hub.set_operating_mode, mode="manual"),
+            ):
                 with pytest.raises(UnsupportedRoute):
                     operation("beam")
             assert not device.output_frames
@@ -234,9 +240,10 @@ def test_docked_keh3_uses_same_qualified_manual_control(config, tmp_path, bay, p
         [config], transport_factory=lambda c, d: device, lock_directory=tmp_path
     ) as hub:
         connected = hub.connect("beam")
-        assert connected.endpoint == f"192.0.2.1:{port}"
+        assert connected.identity
+        assert hub.configs[0].route.endpoint == f"192.0.2.1:{port}"
         assert not device.output_frames
-        hub.set_manual_mode("beam")
+        hub.set_operating_mode("beam", "manual")
         assert hub.set_solenoid("beam", True).electrical_state == "on"
         assert hub.set_solenoid("beam", False).electrical_state == "off"
         assert [f.encode().hex() for f in device.output_frames] == [
@@ -263,7 +270,11 @@ def test_docked_keh3_without_load_policy_cannot_actuate(config, tmp_path):
         [config], transport_factory=lambda c, d: device, lock_directory=tmp_path
     ) as hub:
         hub.connect("beam")
-        for operation in (hub.open_shutter, hub.safe_state, hub.set_manual_mode):
+        for operation in (
+            partial(hub.set_solenoid, on=True),
+            hub.safe_state,
+            partial(hub.set_operating_mode, mode="manual"),
+        ):
             with pytest.raises(ShutterError, match="unqualified"):
                 operation("beam")
         hub.shutdown_outputs()
@@ -290,7 +301,11 @@ def test_external_keh3_readback_cannot_become_output_by_injection(config, tmp_pa
         assert feedback.requested_state != "start"  # This read does not prime a trigger.
         assert not any(f.message_id == 0x04CC for _, f in device.history)
         assert hub.get_solenoid_state_reply("beam") == 0
-        for action in (hub.open_shutter, hub.safe_state, hub.set_manual_mode):
+        for action in (
+            partial(hub.set_solenoid, on=True),
+            hub.safe_state,
+            partial(hub.set_operating_mode, mode="manual"),
+        ):
             with pytest.raises(ShutterError, match="unavailable"):
                 action("beam")
         assert not device.output_frames
@@ -303,7 +318,7 @@ def test_nonmanual_on_refused_without_incidental_off(bench, mode):
     hub.connect("beam")
     devices[0].mode = mode
     with pytest.raises(ShutterError, match="Manual"):
-        hub.open_shutter("beam")
+        hub.set_solenoid("beam", True)
     assert not devices[0].output_frames
 
 
@@ -312,33 +327,27 @@ def test_disabled_interlock_requirement_refuses_on(bench):
     hub.connect("beam")
     devices[0].interlock = 2
     with pytest.raises(ShutterError, match="interlock"):
-        hub.open_shutter("beam")
+        hub.set_solenoid("beam", True)
     assert not devices[0].output_frames
 
 
 def test_manual_selection_does_not_rewrite_an_already_manual_controller(bench):
     hub, devices, _, _ = bench
     hub.connect("beam")
-    assert hub.set_manual_mode("beam").operating_mode == "manual"
+    assert hub.set_operating_mode("beam", "manual").operating_mode == "manual"
     assert not devices[0].output_frames
 
 
 @pytest.mark.parametrize("allowed", [False, True])
-def test_mode_transition_requires_separate_persistent_permission(config, tmp_path, allowed):
+def test_mode_transition_needs_no_separate_persistent_permission(config, tmp_path, allowed):
     config = replace(config, policy=replace(config.policy, allow_persistent_mode_changes=allowed))
     device = FakeTransport(config)
     device.mode = 2
     hub = ShutterHub([config], transport_factory=lambda c, d: device, lock_directory=tmp_path)
     try:
         hub.connect("beam")
-        if allowed:
-            assert hub.set_manual_mode("beam", source_inhibited=True).operating_mode == "manual"
-            assert [f.message_id for f in device.output_frames] == [0x04CB, 0x04C0]
-        else:
-            with pytest.raises(ShutterError, match="persistent"):
-                hub.set_manual_mode("beam", source_inhibited=True)
-            assert not device.output_frames
-            assert not hub.connection_snapshot("beam").error
+        assert hub.set_operating_mode("beam", "manual").operating_mode == "manual"
+        assert [f.message_id for f in device.output_frames] == [0x04CB, 0x04C0]
     finally:
         hub.close()
 
@@ -349,7 +358,7 @@ def test_mode_permission_is_boolean(config):
 
 
 @pytest.mark.parametrize("source_inhibited", [False, True])
-def test_trigger_manual_requires_explicit_protection(config, tmp_path, source_inhibited):
+def test_trigger_manual_needs_no_confirmation(config, tmp_path, source_inhibited):
     config = replace(config, policy=replace(config.policy, allow_persistent_mode_changes=True))
     device = FakeTransport(config)
     device.mode = 4
@@ -357,17 +366,13 @@ def test_trigger_manual_requires_explicit_protection(config, tmp_path, source_in
         [config], transport_factory=lambda c, d: device, lock_directory=tmp_path
     ) as hub:
         hub.connect("beam")
-        if source_inhibited:
-            result = hub.set_manual_mode("beam", source_inhibited=True)
-            assert result.operating_mode == "manual"
-            assert [(f.message_id, f.param2) for f in device.output_frames] == [
-                (0x04CB, 2),
-                (0x04C0, 1),
-            ]
-        else:
-            with pytest.raises(ShutterError, match="source_inhibited"):
-                hub.set_manual_mode("beam")
-            assert not device.output_frames
+        result = hub.set_operating_mode("beam", "manual", source_inhibited=source_inhibited)
+        assert result.operating_mode == "manual"
+        assert result.electrical_state == "off" and result.interlock_required
+        assert [(f.message_id, f.param2) for f in device.output_frames] == [
+            (0x04CB, 2),
+            (0x04C0, 1),
+        ]
 
 
 def test_failed_mode_transition_uses_the_output_cleanup_guard(config, tmp_path):
@@ -388,7 +393,7 @@ def test_failed_mode_transition_uses_the_output_cleanup_guard(config, tmp_path):
     ) as hub:
         hub.connect("beam")
         with pytest.raises(ShutterError, match="changed output"):
-            hub.set_manual_mode("beam", source_inhibited=True)
+            hub.set_operating_mode("beam", "manual", source_inhibited=True)
         assert [(f.message_id, f.param2) for f in device.output_frames] == [
             (0x04CB, 2),
             (0x04C0, 1),
@@ -421,8 +426,8 @@ def test_pulse_validation_is_passive_and_shared_with_execution(bench):
 
 def test_invalid_mode_and_on_value_before_io(bench):
     hub, devices, _, _ = bench
-    with pytest.raises(ShutterError, match="qualified_modes"):
-        hub.set_operating_mode("beam", "triggered")
+    with pytest.raises(ValueError, match="mode must"):
+        hub.set_operating_mode("beam", "unknown")
     with pytest.raises(ValueError):
         hub.set_solenoid("beam", 1)
     assert not devices
@@ -438,13 +443,13 @@ def test_off_interval_is_not_silently_waited_or_bypassed(config, tmp_path):
     )
     hub.connect("beam")
     with pytest.raises(ShutterError, match="interval"):
-        hub.open_shutter("beam")
+        hub.set_solenoid("beam", True)
     assert not device.output_frames
     time.sleep(0.11)
-    hub.open_shutter("beam")
+    hub.set_solenoid("beam", True)
     hub.safe_state("beam")
     with pytest.raises(ShutterError, match="interval"):
-        hub.open_shutter("beam")
+        hub.set_solenoid("beam", True)
     hub.close()
 
 
@@ -484,7 +489,7 @@ def test_partial_output_latches_uncertainty_and_never_replays(bench):
     device = devices[0]
     device.partial = True
     with pytest.raises(ProtocolError, match="Partial") as caught:
-        hub.open_shutter("beam")
+        hub.set_solenoid("beam", True)
     assert [f.param2 for f in device.output_frames] == [1]
     assert caught.value.__notes__
     assert any("Write framing unknown" in note for note in caught.value.__notes__)
@@ -493,20 +498,88 @@ def test_partial_output_latches_uncertainty_and_never_replays(bench):
         hub.safe_state("beam")
     before = len(device.output_frames)
     with pytest.raises(ShutterError, match="lockout"):
-        hub.open_shutter("beam")
+        hub.set_solenoid("beam", True)
     assert len(device.output_frames) == before
     assert hub.connection_snapshot("beam").error
+
+
+@pytest.mark.parametrize("error_type", [KeyboardInterrupt, ShutterError])
+def test_empty_text_pulse_failure_blocks_on_until_protected_recovery(
+    bench, monkeypatch, error_type
+):
+    hub, devices, _, path = bench
+    hub.connect("beam")
+
+    def interrupted_hold(timeout):
+        raise error_type()
+
+    with monkeypatch.context() as patch:
+        patch.setattr(hub._channel("beam").cancel, "wait", interrupted_hold)
+        with pytest.raises(error_type):
+            hub.pulse("beam", 0.001)
+    status = hub.get_status("beam")
+    before = len(devices[0].output_frames)
+    with pytest.raises(ShutterError, match="lockout"):
+        hub.set_solenoid("beam", True)
+    assert len(devices[0].output_frames) == before
+    assert status.error == error_type.__name__ and status.electrical_state == "off"
+    assert (path / "uncertain-68000001").exists()
+    hub.disconnect("beam")
+    hub.connect("beam")
+    with pytest.raises(ShutterError, match="lockout"):
+        hub.set_solenoid("beam", True)
+    recovered = hub.recover(
+        "beam",
+        source_inhibited=True,
+        optical_closed=True,
+        evidence="Software fixture independent closure observation",
+    )
+    assert recovered.error is None and not devices[-1].output_frames
+    assert hub.set_solenoid("beam", True).electrical_state == "on"
+    hub.safe_state("beam")
+
+
+def test_empty_text_connection_failure_keeps_a_visible_error(config, tmp_path):
+    def interrupted_open(config, deadline):
+        raise KeyboardInterrupt()
+
+    with ShutterHub([config], transport_factory=interrupted_open, lock_directory=tmp_path) as hub:
+        with pytest.raises(KeyboardInterrupt):
+            hub.connect("beam")
+        snapshot = hub.connection_snapshot("beam")
+        assert snapshot.error == "KeyboardInterrupt" and not snapshot.has_device
+
+
+def test_shutdown_reports_retained_fault_after_off_and_still_cleans_other_targets(
+    config, second, tmp_path
+):
+    devices = {c.name: FakeTransport(c) for c in (config, second)}
+    with ShutterHub(
+        [config, second], transport_factory=lambda c, d: devices[c.name], lock_directory=tmp_path
+    ) as hub:
+        for name in devices:
+            hub.connect(name)
+            hub.set_solenoid(name, True)
+        channel = hub._channel("beam")
+        hub._fault(channel, ShutterError("Original output uncertainty"))
+        with pytest.raises(ShutterError, match="Original output uncertainty"):
+            hub.shutdown_outputs()
+        assert all(device.state == 2 for device in devices.values())
+        assert channel.error == "Original output uncertainty"
+        assert channel.claim.journal.exists()
+        assert hub.safe_state("beam").error is None
+        assert not channel.claim.journal.exists()
 
 
 def test_process_reconnect_does_not_clear_active_output_journal(bench):
     hub, devices, factory, path = bench
     hub.connect("beam")
-    hub.open_shutter("beam")
+    hub.set_solenoid("beam", True)
     hub.close()
     hub.connect("beam")
     assert hub.connection_snapshot("beam").error
     with pytest.raises(ShutterError, match="lockout"):
-        hub.open_shutter("beam")
+        hub.set_solenoid("beam", True)
     with pytest.raises(ShutterError):
         hub.recover("beam")
     result = hub.recover(
@@ -572,8 +645,8 @@ def test_multiple_routes_never_redirect_output(config, second, tmp_path):
         hub.connect(name)
     devices["beam"].serial = "68000002"
     with pytest.raises(IdentityMismatch):
-        hub.open_shutter("beam")
-    hub.open_shutter("second")
+        hub.set_solenoid("beam", True)
+    hub.set_solenoid("second", True)
     assert not devices["beam"].output_frames
     assert [f.param2 for f in devices["second"].output_frames] == [1]
     with pytest.raises(ShutterError):
@@ -610,7 +683,7 @@ def test_protective_dispatch_interrupts_long_pulse(bench, record_property):
     assert dispatch_ms < 250
     assert done.is_set() and isinstance(errors[0], Cancelled)
     assert devices[0].state == 2
-    assert hub.connection_snapshot("beam").error
+    assert hub.connection_snapshot("beam").error is None
 
 
 def test_status_json_keeps_electrical_and_optical_separate(bench):
@@ -652,13 +725,13 @@ def test_failed_on_readback_uses_separate_cleanup_budget_and_never_replays(bench
     hub.query_timeout = 0.03
     hub.cleanup_timeout = 0.1
     with pytest.raises(ShutterError) as caught:
-        hub.open_shutter("beam")
+        hub.set_solenoid("beam", True)
     assert [f.param2 for f in device.output_frames] == [1, 2]
     assert any("Separate cleanup" in note for note in caught.value.__notes__)
     assert hub.connection_snapshot("beam").error
     before = len(device.output_frames)
     with pytest.raises(ShutterError, match="lockout"):
-        hub.open_shutter("beam")
+        hub.set_solenoid("beam", True)
     assert len(device.output_frames) == before
 
 
@@ -721,7 +794,7 @@ def test_concurrent_shutters_keep_independent_routes(config, second, tmp_path):
 def test_passive_release_does_not_erase_output_cleanup_obligation(bench):
     hub, devices, _, _ = bench
     hub.connect("beam")
-    hub.open_shutter("beam")
+    hub.set_solenoid("beam", True)
     hub.close()
     assert devices[0].state == 1  # Release was passive.
     with pytest.raises(ShutterError, match="unavailable"):
@@ -733,7 +806,7 @@ def test_new_on_does_not_reuse_a_previous_off_cleanup_result(bench):
     hub, _, _, _ = bench
     hub.connect("beam")
     assert hub.safe_state("beam").cleanup
-    assert hub.open_shutter("beam").cleanup is None
+    assert hub.set_solenoid("beam", True).cleanup is None
 
 
 def test_failed_pulse_off_reports_current_cleanup_failure(bench):
@@ -772,3 +845,20 @@ def test_recovery_never_clears_a_pending_protective_request(bench):
         assert len(devices) == count and not devices[0].closed
     finally:
         channel.cancel.clear()
+
+
+@pytest.mark.parametrize("state,interlock", [(1, 1), (2, 2)])
+def test_mode_without_confirmation_still_requires_off_and_interlock(
+    config, tmp_path, state, interlock
+):
+    config = replace(config, policy=replace(config.policy, allow_persistent_mode_changes=True))
+    device = FakeTransport(config)
+    with ShutterHub(
+        [config], transport_factory=lambda c, d: device, lock_directory=tmp_path
+    ) as hub:
+        hub.connect("beam")
+        device.state, device.interlock = state, interlock
+        with pytest.raises(ShutterError, match="electrical OFF and interlock"):
+            hub.set_operating_mode("beam", "single")
+        assert not device.output_frames
+        assert device.mode == 1
