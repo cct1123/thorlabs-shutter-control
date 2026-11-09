@@ -1,11 +1,17 @@
 # Reviewed shutter-control system
 
-8 November 2026. REQ-273 / TEST-273 software review validated:391 source and391
-isolated-wheel tests PASS, zero failures/errors/skips. REQ-273 is COMPLETE for
-software/local publication: runtime/configuration/tests/tutorial commit ddda81d,
-documentation/evidence commit 7c2f4d4, then this final checkpoint/audit stage.
+8 November 2026. REQ-274 / TEST-274 documentation refresh COMPLETE (E256):
+391 source and 391 isolated-wheel tests PASS, zero failures/errors/skips.
+README leads with installation, daily controls and the exact tracked profile,
+then links to API/protocol/recovery details. Setup includes explicit CLI defaults,
+command effects, shutdown and verification; the tutorial guide's obsolete
+source-confirmation flag description is corrected. This refresh changes no
+runtime, configuration or notebook cells. User follow-up "commit push" authorizes
+publication of this refresh and the prior review commits to origin/main.
+Prior REQ-273 local publication remains complete: runtime ddda81d,
+documentation/evidence 7c2f4d4, checkpoint 5a6ae37.
 Full physical/deployment acceptance remains BLOCKED. No hardware/lab-network
-I/O, existing-owner/server operation, external checkout edit or push occurred.
+I/O, existing-owner/server operation or external checkout edit occurred.
 
 ## Resulting behavior
 
@@ -34,9 +40,9 @@ External consumers need the [API/schema migration](../docs/python-api.md#status-
 | Hardware disconnect | Protected Python API only; ordinary GUI Release remains passive |
 | Status | Dated electrical output and literal interlock/channel flags; host Native request is separate from actual native activity |
 
-## Review findings and pruning
+## Prior repository review findings
 
-Three before-fix regressions failed as expected; fixes pass165 affected tests:
+Under REQ-273, three before-fix regressions failed as expected; fixes pass165 affected tests:
 
 - Shutdown could return successfully while retaining a prior output fault after
   OFF. It now aggregates that fault and still cleans remaining targets.
@@ -57,23 +63,29 @@ capture/hash references; the audit lists this non-critical archival limitation.
 
 ## Validation and evidence
 
-Command: `uv run --locked --offline --group dev --extra gui python -B scripts/verify.py --record-prefix repo-review-final-`
+Command: `uv run --locked --offline --group dev --extra gui python -B scripts/verify.py --record-prefix docs-refresh-`
 
 Source/wheel software suites each pass 391 tests. Lock/lint/format, exact Python/CSS
 wheel parity, passive import/help/config, negative lock checks and static tutorial
 checks PASS. All 41 verification input hashes match. Real localhost tests cover
 standalone shutdown without an instrument. Software transports do not prove real
 wiring, optical behavior or native driver timing. No new visual browser check ran.
+Documentation audit PASS: 131 local links and 10 heading anchors across 22 Markdown
+documents, guarded passive CLI/configuration checks, README Python syntax and
+exact README content in wheel metadata. Hardware examples were not executed.
 
-- [Integrated verification](../records/repo-review-final-direct-validation.json)
-- [Source tests](../records/repo-review-final-offline-tests.xml), [wheel tests](../records/repo-review-final-wheel-tests.xml)
+- [Current integrated verification](../records/docs-refresh-direct-validation.json)
+- [Source tests](../records/docs-refresh-offline-tests.xml), [wheel tests](../records/docs-refresh-wheel-tests.xml)
+- [Current documentation/README audit](../records/docs-refresh-audit.json)
+- [Prior repository verification](../records/repo-review-final-direct-validation.json)
 - [Before-fix reproductions](../records/repo-review-reproduction-tests.xml), [affected regressions](../records/repo-review-fixed-tests.xml)
 - [Documentation/manual/notebook audit](../records/repo-review-audit.json)
 - [Durable findings and decisions](../records/RECORDS.md#e254---repository-review-validation--test-273)
 
 Older validation campaigns retain their exact revisions and conditions. E252's
 389+389 status result and E253's391-source shutdown result are included in this
-new integrated verification; their old input hashes are not current validation.
+integrated verification. E254's README/tutorial-guide hashes are historical after
+this refresh; the new E256 manifest captures current inputs.
 
 ## Remaining acceptance gaps
 

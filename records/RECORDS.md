@@ -4468,3 +4468,56 @@ verified empty scratch directories were removed. REQ-273 review is COMPLETE
 for local software/publication; the broader project remains BLOCKED separately.
 No push, device/lab-network I/O, existing owner restart, new physical allowance
 or external DiamondGUI modification occurred.
+
+## E256 - Documentation refresh and packaged README / TEST-274
+
+8 November 2026. User requests "update doc readme" (REQ-274, PROJECT.md).
+Expected: README gives a usable launch/operation entry point; setup and tutorial
+guidance match the current CLI/API/profile; documentation links resolve; the
+packaged README matches source; software validation passes without device I/O.
+
+Reorganized README into quick start, daily controls, exact tracked profile,
+Python/CLI, validation/limits and a documentation table. Expanded setup with
+configuration/port overrides, command effects, standalone shutdown and separate
+software verification. Corrected the notebook guide's obsolete False/source
+flag description against current notebook 5 cells. Marked E239 GUI procedure
+as recorded rather than current. Removed duplicate REQ-272 requirement-map row;
+updated STATE/report to the new documentation/verification checkpoint. Runtime,
+configuration, test/tool source and all notebook cells remain unchanged from
+5a6ae37. Physical evidence and outstanding acceptance gaps are unchanged.
+
+Command: uv run --locked --offline --group dev --extra gui python -B
+scripts/verify.py --record-prefix docs-refresh-
+Observed: 391 source + 391 isolated installed-wheel tests PASS, zero failures,
+errors or skips. Lock/lint/format, exact Python/CSS parity, passive imports/help/
+config, negative lock checks and static tutorials PASS. All 41 verifier input
+hashes match. Initial sandbox command could not open the existing uv cache;
+approved software-only verification outside that sandbox passed. No source
+change was made to address that filesystem restriction.
+
+Documentation audit observed: 22 Markdown files, 131 local links, 10 heading
+anchors; zero missing paths or invalid anchors. Direct guarded main(argv)
+help/check-config checks return 0; the selected target/serial and passive owner
+construction match the tracked profile. README Python example compiles without
+execution. Built-wheel hash matches the verification manifest and its METADATA
+description exactly matches current README. Result: PASS for TEST-274.
+Artifact: records/docs-refresh-audit.json; integrated verification and JUnit:
+records/docs-refresh-{direct-validation.json,offline-tests.xml,wheel-tests.xml}.
+The README/example-guide hashes in E254 are historical after this refresh;
+E256 captures the current inputs. No device/SDK/lab-network I/O, existing-owner/
+server action, external checkout edit, commit or push. This documentation task
+is COMPLETE; broader physical/manufacturer/integration requirements remain BLOCKED.
+
+## E257 - Documentation publication authorization and preflight / TEST-274
+
+8 November 2026. User follow-up "commit push" authorizes local commit and push
+to origin/main of the reviewed documentation refresh and three earlier local
+review commits ddda81d, 7c2f4d4 and 5a6ae37. Fetched origin before publication;
+no remote divergence. No runtime/configuration/test/notebook-cell edits follow
+E256. Recheck all 41 verifier input hashes and documentation audit hashes;
+refresh PROJECT.md's audit hash for this explicit authorization amendment.
+Stage only the eight reviewed Markdown files and four docs-refresh evidence
+artifacts. The final documentation commit is identified by Git history; verify
+remote main equals local HEAD and the worktree is clean after push. No hardware,
+SDK, lab-network, existing-server or external-checkout operation is authorized
+or performed by publication. Physical acceptance remains BLOCKED separately.

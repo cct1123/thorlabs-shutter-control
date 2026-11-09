@@ -142,7 +142,7 @@ This is layout/software evidence, not physical command qualification.
 
 ## Bounded actual redo, 8 November 2026
 
-E239 / TEST-255 completed the current visible-browser procedure after fresh
+E239 / TEST-255 completed the recorded visible-browser procedure after fresh
 user confirmation of source protection, trigger isolation, intact key/interlock
 and initially closed blade. Passive protected recovery cleared the prior fault
 without an output command. Exactly one approved1s Manual pulse completed, followed

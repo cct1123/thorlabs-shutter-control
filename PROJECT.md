@@ -1,5 +1,19 @@
 # Engineering task for KSC101 shutter and KEH3 hub control
 
+## Documentation refresh (user request, 8 November 2026)
+
+"update doc readme". Derived REQ-274 / TEST-274: make the README a concise entry
+point for installation, launch, daily operation, configuration and further docs;
+align setup and tutorial guidance with current CLI/API/configuration; preserve
+the distinction between software tests and historical physical evidence. Check
+local documentation links, passive CLI examples and source/isolated-wheel
+verification, including the packaged README. Documentation only; no device I/O,
+existing-owner/server operation, external checkout edit, commit or push.
+
+Follow-up: "commit push" authorizes committing this documentation refresh and
+pushing the current main branch, including its three prior local review commits,
+to the configured origin. Hardware/external-checkout authority is unchanged.
+
 ## Standalone GUI shutdown button (8 November 2026)
 
 User: "add a button to shutdown gui server if running as __main__".

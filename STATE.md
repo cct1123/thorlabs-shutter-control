@@ -2,19 +2,23 @@
 
 ## Current checkpoint
 
-8 November 2026. REQ-273 / TEST-273 repository review COMPLETE for local software
-scope (D094/E254/E255). Runtime/configuration/tests/tutorial consumers committed
-as ddda81d; reconciled documentation/evidence as 7c2f4d4. This final checkpoint and
-audit form the last stage, whose identity is recorded in Git history.
+8 November 2026. REQ-274 / TEST-274 documentation refresh COMPLETE (E256).
+README now leads with launch/operation and links to detailed contracts. Setup
+documents current CLI effects/defaults/shutdown, and the notebook guide no longer
+describes a removed source-confirmation flag. No runtime/configuration/notebook
+cell change. User follow-up "commit push" authorizes publication to origin/main,
+including the three prior local review commits. Git history identifies the final
+documentation commit; equality with the remote main ref is the publication check.
+Prior REQ-273 review is complete: runtime ddda81d, docs/evidence 7c2f4d4,
+checkpoint 5a6ae37 (D094/E254/E255).
 The broader engineering project remains BLOCKED on the independent physical,
-manufacturer-contract and external-integration gaps below. No push,
-hardware/lab-network I/O, existing-owner/server change or external checkout edit.
+manufacturer-contract and external-integration gaps below. No hardware/lab-network
+I/O, existing-owner/server change or external checkout edit is part of publication.
 
 391 source + 391 isolated-wheel tests PASS, zero failures/errors/skips; all 41
-verifier inputs match records/repo-review-final-direct-validation.json. Review
-covered all six runtime modules, both verification scripts, configuration,
-regressions, tutorials and current documentation. Historical evidence is retained.
-Three new regressions reproduced the findings before fixes (E254 / D094):
+verifier inputs match records/docs-refresh-direct-validation.json. Documentation
+audit: records/docs-refresh-audit.json. Historical evidence is retained.
+The prior review reproduced three regressions before fixes (E254 / D094):
 retained output faults were suppressed after successful shutdown OFF; the GUI
 re-enabled an unusable hardware-disconnect control; empty-text CLI interruptions
 lost their exception name. All are fixed;165 affected tests and full verification pass.
@@ -84,19 +88,22 @@ not a claim of current physical state; no live state was queried this session.
 
 ## Current validation
 
-E254 / TEST-273: uv run --locked --offline --group dev --extra gui python -B
-scripts/verify.py --record-prefix repo-review-final-
+E256 / TEST-274: uv run --locked --offline --group dev --extra gui python -B
+scripts/verify.py --record-prefix docs-refresh-
 391 source + 391 isolated installed-wheel tests PASS, zero failures/errors/skips.
 Locked dependencies, Ruff lint/format, exact wheel Python/CSS parity, passive
 import/help/config, missing/outdated lock rejection and static tutorials PASS.
-All 41 hashed inputs match; see records/repo-review-final-direct-validation.json.
+All 41 hashed inputs match; see records/docs-refresh-direct-validation.json.
 The tests use simulated transports and localhost only, including real localhost
 server shutdown. No browser screenshot or physical validation is claimed.
 
-records/repo-review-audit.json checks local documentation links, all four local
-manual hashes and unchanged saved notebook outputs/metadata against review base
-174d23b. Earlier E252389+389 and E253391-source records remain historical;
-the integrated result above includes their implementation and the review fixes.
+records/docs-refresh-audit.json checks current local links/anchors, packaged
+README, passive CLI help/configuration and input parity: 131 local links and
+10 heading anchors PASS across 22 Markdown documents. No notebook cells,
+manuals or runtime/configuration files changed. Prior records/repo-review-audit.json
+preserves the E254 manual/notebook audit against review base 174d23b. E254's
+README/tutorial-guide hashes are historical after this refresh; E256 supplies
+current input evidence. Earlier E252/E253 results remain historical.
 
 ## Current requirement map
 
@@ -105,11 +112,11 @@ source changes do not revalidate old physical measurements or consumed authority
 
 | ID | Criterion | Method/evidence | Current result |
 | --- | --- | --- | --- |
+| REQ-274 | Refresh README/setup/tutorial documentation | TEST-274; E256; links/anchors, passive examples, packaged README and source/wheel | COMPLETE documentation/software;391+391 |
 | REQ-273 | Whole-repository review, pruning and staged commits | TEST-273; D094/E254/E255; source/wheel/audit and Git history | COMPLETE software/local publication;391+391 |
-| REQ-272 | Standalone GUI shutdown | TEST-272; D093/E253; current E254 source/wheel | PASS software;391+391 integrated |
+| REQ-272 | Standalone GUI shutdown | TEST-272; D093/E253; current E256 source/wheel | PASS software;391+391 integrated |
 | REQ-270 | Implement documented status flags | TEST-270; D092/E252; literal/fake/GUI/source/wheel | PASS software;389+389 |
 | REQ-271 | Full Key/Ready/actual native Activity | TEST-271; E252; manufacturer/raw-mapping comparison | PARTIAL/BLOCKED; no guessed mapping |
-| REQ-272 | Standalone GUI shutdown button | TEST-272; D093/E253; records/gui-shutdown-tests.xml | PASS software;391 source tests; no live hardware |
 | REQ-269 | Remove source checklist; verified explicit Stop resets fault | TEST-269; D091/E251; records/gui-fault-reset-tests.xml | PASS software;389 tests; running owner unchanged |
 | REQ-267 | Review/fix integrated consistency | TEST-267; D090/E249; full source/wheel/static tutorials | PASS software;370+370 |
 | REQ-264 | Remove default Manual-only activation gate | TEST-264; E247/E249; profile-based native simulations | PASS software; physical native behavior untested |
@@ -124,7 +131,7 @@ source changes do not revalidate old physical measurements or consumed authority
 
 The following results are historical scoped checkpoints, preserved for
 traceability. Their test counts/revisions are not current full-system validation;
-E254 is the current complete software result. E244 refers to code reduction;
+E256 is the current complete software result. E244 refers to code reduction;
 E248 aliases the older Manual ON diagnosis that also used E244 by mistake.
 
 | ID | Short criterion / source | Method/evidence | Result |
@@ -205,8 +212,10 @@ check remains historical. Software permissions do not establish physical qualifi
 
 ## Next action and authorization
 
-No further code/test action is required for the completed REQ-273 review. No
-hardware operation is pending and no push is authorized. Keep previous captures and consumed cycle
+No further documentation/test action is required for the completed REQ-274
+refresh. Commit/push to origin/main is authorized by the user's follow-up;
+verify the final remote ref and clean worktree after publication. No
+hardware operation is pending. Keep previous captures and consumed cycle
 allowances historical. A running owner may have older source/configuration.
 Deployment requires normal Stop/Release followed by deliberate restart/reload,
 with no automatic takeover; no live state was inspected here. Explicit Stop/OFF
@@ -231,7 +240,7 @@ For the active REQ-271 status gap, one precise dependency remains:
 Details: docs/status-readback.md. This dependency is distinct from broader
 physical/deployment acceptance described below.
 
-None for the REQ-273 software review. Full physical/deployment acceptance
+None for the REQ-274 documentation refresh. Full physical/deployment acceptance
 is blocked because output bits cannot establish blade position or optical timing,
 and no independent calibrated observation method/new controlled window exists.
 To resume that separate work, provide the observation interface/method, required

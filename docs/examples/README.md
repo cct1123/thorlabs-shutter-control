@@ -72,5 +72,7 @@ the user-confirmed SH05R load policy. The actual notebook6 run passed one cycle
 and saved its output: [real evidence](../../records/ethernet-control-live.json).
 Controller bits0x2000->0x2001->0x2000, final Manual/OFF, resources released.
 The user did not observe blade motion; independent optics remain unverified.
-Notebook5's protected mode API was exercised separately before that run; its
-False flag remains an intentional operator condition for future Trigger exit.
+Notebook 5's mode API was exercised separately before that run. Its current cells
+call `set_operating_mode(..., "manual")` without a source-confirmation flag;
+actual transitions retain OFF/interlock/readback checks and persist at power-up.
+These saved runs predate the current source/configuration and do not revalidate it.

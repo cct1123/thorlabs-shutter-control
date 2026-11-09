@@ -1,0 +1,84 @@
+{
+  "requirement_id": "REQ-274",
+  "method": "TEST-274 documentation reconciliation",
+  "date_local": "2026-11-08",
+  "timezone": "America/Chicago",
+  "scope": "Local documentation, simulated transports and localhost only; no device/SDK/lab-network/existing-server operations",
+  "base_revision": "5a6ae37",
+  "verification_record": "records/docs-refresh-direct-validation.json",
+  "verification_input_count": 41,
+  "all_verification_inputs_match": true,
+  "software_tests": {
+    "offline": {
+      "tests": 391,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wheel": {
+      "tests": 391,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "markdown_documents": 22,
+  "local_links_checked": 131,
+  "heading_anchors_checked": 10,
+  "missing_local_links": [],
+  "invalid_heading_anchors": [],
+  "passive_cli_checks": [
+    {
+      "argv": [
+        "--help"
+      ],
+      "exit_code": 0,
+      "method": "in-process CLI with connection guard"
+    },
+    {
+      "argv": [
+        "--config",
+        "config/shutter.ethernet.toml",
+        "check-config"
+      ],
+      "exit_code": 0,
+      "method": "in-process CLI with connection guard"
+    }
+  ],
+  "passive_owner_construction": "PASS; exact Ethernet profile; no connect call",
+  "readme_python_examples_compiled": 1,
+  "readme_python_examples_executed": false,
+  "installed_wheel_readme_matches_source": true,
+  "wheel_sha256": "73c5796fb73bf966ce4f6e9765c3709d2925c9e6cdf7300123bfe8ba91bb54e2",
+  "runtime_config_tests_scripts_notebook_cells_unchanged": true,
+  "document_sha256": {
+    "README.md": "09f65ef0c6d7abb7278bdb8f23f35b6b8499754f791621fbc429128a4e953f76",
+    "PROJECT.md": "86daf97305fdec5dea3c34f7816e4222ce483229dbdd4b2cd9e3530cb9c70f83",
+    "docs/architecture.md": "6980a7c32cc892cfd645c017ee03e13f7d6dfb28c1aaaa147c7c3ed88587bc36",
+    "docs/assets/README.md": "0a1d9f59826be16027e971a2bfb29fcdc36a656b2ef1c2d88b09d9e1da3bf9fe",
+    "docs/controller-reference-review.md": "7425106a9985398942709e328879b1f38f38fea0e598a8dd3b5f1f21cf4b71e9",
+    "docs/cutover.md": "84b8f888f5b589408b240140192b5c043b02d2dab218a6baa345107bc6b80c8d",
+    "docs/diamondgui.md": "b619b6f4e0e31f0f9a470180729b6072f30114f5e5e26c85d9a4fff14be520ce",
+    "docs/ethernet-assessment.md": "a86b087b04c6c9ddb46d10985417b0990117674951188fa808328761b5f44c28",
+    "docs/examples/README.md": "ba44f911bf49c238c79b340ac3b470f03b2ac7fb3b2e672fadacc2878dbc4d5f",
+    "docs/getting-started.md": "bbfb40e36a6ba14982d1d5de175cc9bcf207fdff04a29c6720468c18515760cf",
+    "docs/gui.md": "fbd49f6b7dbc5ddc73da6012f9a66a48b4c584267fb9e0660fd0b3a8f5a03370",
+    "docs/hardware.md": "c5ef4c8790761ad7bba56daabf155cd4bd5e1cbbce949e9019393a1e6aaba496",
+    "docs/HARDWARE_VALIDATION.md": "12b9a85e33a363d4284e0355bbaa76bc800125ce885212fe2538bc39c96fcf3f",
+    "docs/INTERFACE.md": "940e7a72a3ed38fb938edf8f4f06bd3d485194ce73313463422dab3dfd45ad31",
+    "docs/manuals/README.md": "422f487c9fc2e7ddf7dfb9c1932b776e7288436615d2943e0a240fd977c46fcd",
+    "docs/python-api.md": "f6f63d3b9859a71dfd1a7f7479905166eca2578ba6f6bf5edf733110e396d531",
+    "docs/qmi-discovery-review.md": "1ab6b93a107980f7d5aec6a6cd0eb10e88b3ca417d82d64ec73bb4b4bfc9e828",
+    "docs/sources.md": "22de2d44e0c32eafaed278341c28fbc9d745a3ed5405a25338615387ef001e1e",
+    "docs/state-zero-investigation.md": "689dd206f19ed74b2de48893b151c4d454d834e276bc31b21f2982f714819a9b",
+    "docs/status-readback.md": "8183b32aa6bd80a08c4144a47fbd14ad61fddc6845899f4510b0d67818bcf08e"
+  },
+  "publication_preflight": {
+    "authorization": "User follow-up: commit push; PROJECT.md",
+    "target": "origin/main",
+    "verifier_inputs_rechecked": 41,
+    "junit_totals_rechecked": true,
+    "remote_divergence": 0,
+    "prior_local_commits": 3
+  }
+}
