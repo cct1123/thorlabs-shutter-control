@@ -62,9 +62,9 @@ requested, without guessing an enum. This removes the prior firmware-specific
 zero-acceptance branch and the separate notebook state decoder. operating_state
 remains unknown; electrical OFF is not evidence of operating Inactive/unprimed.
 
-All clients use one ShutterStatus schema with nested identity and feedback.
-feedback.status_bits preserves raw bits and feedback.electrical_state uses bit0;
-feedback.shutter_state remains optical unknown. This investigation was read-only.
+The investigation used the then-current nested ShutterStatus/feedback schema.
+Version 2 exposes status_bits and electrical_state directly; bit0 interpretation
+is unchanged. Optical state is not inferred by either schema. This investigation was read-only.
 The later docked-KEH3 control implementation and current limits are described in
 [the Ethernet assessment](ethernet-assessment.md); these historical read-only
 observations do not validate physical ON/OFF.

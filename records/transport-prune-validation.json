@@ -1,0 +1,37 @@
+{
+  "requirement": "REQ-240",
+  "test": "TEST-240",
+  "scope": "Software serial-buffer substitute; no native serial or hardware I/O",
+  "source_sha256": "850583f672bc8566529b1845e84e5dd3bdb5d865cf361366c2c84e9612722da3",
+  "exact_delta_from_E218": "PASS",
+  "checks": [
+    {
+      "queued_bytes": 0,
+      "returned_bytes": 0,
+      "timeout_s": 0,
+      "result": "PASS"
+    },
+    {
+      "queued_bytes": 3,
+      "returned_bytes": 3,
+      "timeout_s": 0,
+      "result": "PASS"
+    },
+    {
+      "queued_bytes": 5000,
+      "returned_bytes": 4096,
+      "timeout_s": 0,
+      "result": "PASS"
+    }
+  ],
+  "transport_lint_format": "PASS",
+  "diff_whitespace": "PASS",
+  "full_verifier": {
+    "command": "uv run --locked --offline --no-sync --group dev --extra gui python -B scripts/verify.py --record-prefix transport-prune-",
+    "result": "BLOCKED",
+    "returncode": 1,
+    "observed_error": "Ruff E501 at src/thorlabs_shutter_control/gui.py:692:101; 102 > 100 characters",
+    "source_tests": "UNTESTED",
+    "installed_wheel_tests": "UNTESTED"
+  }
+}

@@ -1,23 +1,33 @@
 """Static checks for live tutorials; no simulated notebook execution or device I/O."""
 
 import json
-import runpy
+import re
 import socket
 import sys
 from pathlib import Path
 
+import nbformat
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 NOTEBOOKS = sorted((ROOT / "docs/examples").glob("*.ipynb"))
-inspect_notebook = runpy.run_path(str(ROOT / "scripts/verify_notebooks.py"))["inspect_notebook"]
 
 
 @pytest.mark.parametrize("path", NOTEBOOKS, ids=lambda p: p.stem)
 def test_live_notebook_static_checks(path):
-    result = inspect_notebook(path)
-    assert result["hardware_execution"] == "NOT RUN"
-    assert result["code_cells"] > 0
+    notebook = nbformat.read(path, as_version=4)
+    nbformat.validate(notebook)
+    code_cells = 0
+    for index, cell in enumerate(notebook.cells):
+        if cell.cell_type == "code":
+            compile(cell.source, f"{path}:cell-{index}", "exec")
+            code_cells += 1
+        elif cell.cell_type == "markdown":
+            for target in re.findall(r"\]\(([^)]+)\)", cell.source):
+                target = target.split("#", 1)[0]
+                if target and "://" not in target:
+                    assert (path.parent / target).is_file(), f"Broken link in {path}: {target}"
+    assert code_cells > 0
 
 
 @pytest.mark.parametrize("path", NOTEBOOKS, ids=lambda p: p.stem)

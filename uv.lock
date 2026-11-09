@@ -1422,7 +1422,7 @@ wheels = [
 
 [[package]]
 name = "thorlabs-shutter-control"
-version = "1.0.0"
+version = "2.0.0"
 source = { editable = "." }
 
 [package.optional-dependencies]
@@ -1439,6 +1439,7 @@ vcp = [
 [package.dev-dependencies]
 dev = [
     { name = "hatchling" },
+    { name = "nbformat" },
     { name = "pytest" },
     { name = "ruff" },
 ]
@@ -1458,6 +1459,7 @@ provides-extras = ["vcp", "d2xx", "gui"]
 [package.metadata.requires-dev]
 dev = [
     { name = "hatchling", specifier = ">=1.27,<2" },
+    { name = "nbformat", specifier = ">=5,<6" },
     { name = "pytest", specifier = ">=8,<10" },
     { name = "ruff", specifier = ">=0.11,<1" },
 ]

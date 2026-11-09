@@ -1,13 +1,14 @@
 # DiamondGUI integration
 
-**Current deployment is blocked:** the separate dirty checkout at
-C:/Users/HFNV/diamondgui exists, but its shutter page is entirely commented out.
-The current isolated checks pass 3 owner/factory cases and fail all 26 page cases
+**Deployment remains unverified:** the last recorded external check (E185) found
+the shutter page in C:/Users/HFNV/diamondgui entirely commented out.
+Those isolated checks passed 3 owner/factory cases and failed all 26 page cases
 because layout, summary and session exports are absent. Its hardware/config.py
 still uses the old logical key and left-bay port 40304, differing from this
-repository's shutter / middle-bay port 40305 configuration. No external source or
-local configuration was changed. The old unavailable-checkout assumption and
-historical 29-case PASS are superseded by [current evidence](../records/diamondgui-current-integration.json)
+repository's shutter / middle-bay port 40305 configuration. This review did not
+inspect, change or test that checkout; its present state may differ. The old
+unavailable-checkout assumption and historical 29-case PASS were superseded by
+[the E185 evidence](../records/diamondgui-current-integration.json)
 and [test results](../records/diamondgui-current-tests.xml).
 
 ## Adapter contract
@@ -26,10 +27,14 @@ There is no USB fallback. This repository supplies config/shutter.ethernet.toml
 for the selected controller, with hub identity/firmware explicitly unknown.
 Migrate deployment metadata deliberately; do not rename physical roles by inference.
 
-Public owner methods/status fields remain stable. Enable rejects because it
+Public owner methods remain stable. Version 2 deliberately replaces the nested
+status schema: update the external adapter/page using the
+[status migration](python-api.md#status-schema-migration) before upgrading. The
+external checkout has not been migrated or revalidated for version 2 here.
+Enable rejects because it
 aliases output; partial/unknown-count writes refuse every subsequent frame,
-including OFF, until protected recovery. Operating state stays unknown rather
-than being inferred from electrical ON/OFF. Docked KEH3 and D2XX use the same
+including OFF, until protected recovery. Native activity remains unavailable
+and is never inferred from electrical ON/OFF. Docked KEH3 and D2XX use the same
 reviewed Manual/load/interlock/ownership boundary; VCP/external USB writes remain
 restricted. Changed modes require separate persistent-mode permission, and
 Trigger exit additionally requires established source protection.
@@ -43,7 +48,7 @@ checkout. Restoring that page and migrating its stale metadata requires a
 separate decision about those existing edits; this package review preserves them.
 Do not promote a commented page as a completed application migration.
 
-The current tests were inspected before execution. They use passive construction
+The E185 tests were inspected before execution. They use passive construction
 and isolated page test doubles, redirect paths to disposable project storage,
 and resolve no live HardwareManager, runtime or device. They establish the
 adapter PASS and page FAIL only; they do not establish task/beam routing, optical

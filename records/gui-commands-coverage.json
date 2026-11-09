@@ -1,0 +1,100 @@
+{
+  "requirement": "REQ-250",
+  "test": "TEST-250",
+  "scope": "Shared-owner GUI callbacks and passive layout; no hardware commands",
+  "controls_to_shared_api": {
+    "read-channel": "get_channel_enabled",
+    "read-bay": "get_hub_bay_reply",
+    "read-led": "get_led_modes",
+    "apply-led": "set_led_modes",
+    "require-interlock": "require_interlock",
+    "start-updates": "start_updates",
+    "stop-updates": "stop_updates",
+    "read-events": "get_events",
+    "hardware-disconnect": "disconnect_hardware"
+  },
+  "targeted_final": {
+    "artifact": "records/gui-commands-targeted-final-tests.xml",
+    "tests": 140,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "integration": {
+    "artifact": "records/gui-commands-direct-validation.json",
+    "test_totals": {
+      "offline": {
+        "tests": 337,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "wheel": {
+        "tests": 337,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "input_count": 38,
+    "current_hashes_match": true
+  },
+  "passive_preview": {
+    "url": "http://127.0.0.1:9872",
+    "backend": "Production ShutterHub / config/shutter.ethernet.toml, never connected",
+    "viewports_px": [
+      [
+        1280,
+        720
+      ],
+      [
+        390,
+        844
+      ]
+    ],
+    "reviewed": [
+      "Settings",
+      "Diagnostics",
+      "scrolling dialog with Close/Stop header",
+      "disconnected command buttons disabled"
+    ],
+    "horizontal_overflow": false,
+    "browser_warnings_or_errors": [],
+    "device_action_clicked": false,
+    "server_stopped": true,
+    "existing_server_changed": false,
+    "screenshots_sha256": {
+      "records/gui-commands-diagnostics-desktop.jpg": "7b5dbb3316ac210a58099a7774877a213afad398f614877b673b7c1305dc85e4",
+      "records/gui-commands-diagnostics-phone.jpg": "4ca9f5196367e026d9989f0c23a06209cb943854cd449859b54b7719c1cafe77",
+      "records/gui-commands-settings-desktop.jpg": "d9bfcf5717f281c2871e3ba3e90bef47238c1772c126936c904f1b2050a40247",
+      "records/gui-commands-settings-phone.jpg": "233b58f14d8ef672c15e0b6e9b7bec416d4191782bdfaa9b1cfb6590fba7e039"
+    }
+  },
+  "checks": [
+    "Exact target validation before form parsing",
+    "Shared owner remains policy/interlock/disconnect authority",
+    "Reads and LED drafts scoped to target/generation",
+    "Polling preserves drafts and notices",
+    "Raw bay/events and unacknowledged requests labelled truthfully",
+    "Unknown LED bits reported before whole-mask replacement",
+    "No duplicate ON/OFF enable alias"
+  ],
+  "initial_regression": {
+    "artifact": "records/gui-commands-targeted-tests.xml",
+    "tests": 140,
+    "failures": 2,
+    "passed": 138,
+    "cause": "Cycle parsing preceded target validation after concurrent duplicate-guard removal",
+    "resolution": "Move parsing into the single dispatcher after target validation"
+  },
+  "limitations": [
+    "No controller communication or physical qualification",
+    "No existing server restart/reload",
+    "Operator protection assertion is not a sensor",
+    "External deployment/migration remains separate"
+  ],
+  "local_markdown_links": {
+    "documents_checked": 21,
+    "missing": []
+  }
+}

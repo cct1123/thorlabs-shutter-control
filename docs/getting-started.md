@@ -35,6 +35,10 @@ requires name, application channel, physical role, exact KSC101 serial, firmware
 allowlist and an explicit route. Model must read back KSC101, with one channel.
 Duplicate serials/names/channels/routes fail before connecting.
 
+For KEH3, supply host and bay. Omit hub_serial/hub_firmware when unknown;
+do not insert placeholder identities. The controller reply does not identify
+the hub. Optional known metadata is checked for consistency across its routes.
+
 `policy` is omitted by default. Writes require an operator-reviewed qualification
 record covering shutter model, wiring, OFF -> optical closed mapping, interlocks,
 continuous-duty permission and minimum OFF interval. The current implementation

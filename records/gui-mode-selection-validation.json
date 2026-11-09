@@ -1,0 +1,47 @@
+{
+  "requirement_id": "REQ-229",
+  "test_id": "TEST-229",
+  "evidence_id": "E208",
+  "decision_id": "D064",
+  "recorded_at_utc": "2026-11-08T22:27:17.6029424Z",
+  "result": "PASS software-only GUI mode selection",
+  "baseline_commit": "5d2adc1edeb93a3b827974c12ee957a2b6c9255f",
+  "integration": "User explicitly selected Integrate concurrent changes; ownership/errors/TCP consolidation and notebook pytest integration included",
+  "configuration": "config/shutter.ethernet.toml: persistent mode changes enabled; qualified output modes manual only",
+  "focused_tests": 116,
+  "test_totals": {
+    "offline": {
+      "tests": 236,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wheel": {
+      "tests": 236,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "validated_inputs": 39,
+  "input_reconciliation": "39 current source/test/config/lock/input hashes match final verifier report",
+  "wheel_source_parity": "PASS",
+  "wheel_sha256": "82e5de1eae8aa63f88cceff04d500301d1580c5a1a4978ed80b9d4c3fd0c0537",
+  "command": "UV_CACHE_DIR=C:/Users/HFNV/AppData/Local/uv/cache; uv run --offline --no-sync python -B scripts/verify.py --record-prefix gui-mode-selection-",
+  "lock_validation": "Verifier independently ran uv lock --check --offline and hash-locked isolated dependency install",
+  "environment_notes": [
+    "Windows sandbox denied pytest temporary directory access; software-only tests rerun outside sandbox",
+    "Project-local uv cache lacked locked dependencies; complete existing user cache used offline",
+    "Concurrent pyproject/lock and source edits reconciled before successful full verification",
+    "Active shutter-control.exe prevented uv project sync; --no-sync launch preserved running process and verifier independently validated lock/isolated install"
+  ],
+  "hardware_operations": "NONE",
+  "running_gui": "Not restarted; release existing owner, restart reviewed source, reload browser",
+  "physical_mode_validation": "UNTESTED; UI implementation is not live mode-write authorization",
+  "artifact_sha256": {
+    "records/gui-mode-selection-offline-tests.xml": "ba39f4af1330cf9865123261c14ea4e99fe4f77894bc163d90e15877d9fe7d3f",
+    "records/gui-mode-selection-wheel-tests.xml": "dbd7ceb2fa1f05861f1eedbceef219060415229b53c04374aface804ac2010f9",
+    "records/gui-mode-selection-targeted-tests.xml": "42d053420f3a3ebce3e81479419b6101ae879f2511cfd7450a23d387a231f11f",
+    "records/gui-mode-selection-direct-validation.json": "bc49949d300e4f5324058d7b096d7f205518921f53ead978bdc2b6b2328455cc"
+  }
+}

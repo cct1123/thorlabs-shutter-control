@@ -4,7 +4,12 @@ The current panel uses a modern minimalist style: white surfaces, slate text,
 a restrained teal accent, flat controls, subtle borders and consistent spacing.
 Operating mode, Output control and Controller status have explicit section
 headings. The manufacturer GUI defines functional references, not the current
-visual skin. All APT functions, policy gates and unknown-state labels are retained.
+visual skin. Supported APT controls and unknown-state labels are retained.
+Connected controls delegate route, qualification and settings permissions to
+ShutterHub; a disallowed request reports its refusal in the notice. Button
+availability does not indicate permission or physical qualification. Display and
+trigger-configuration placeholders have been removed; neither function has a
+verified KSC101 APT layout. Cycle inputs use the shared CycleParameters validator.
 
 ```powershell
 uv sync --locked --extra gui
@@ -20,8 +25,13 @@ exact selection; an empty selection never releases all routes. Read state obtain
 polling is started until **Live readback** is explicitly enabled. Mode selection,
 Open/Start, priority Close/Stop and passive Release are separate controls. An omitted
 qualification policy blocks output/mode/settings writes. Identify flashes LEDs only.
+Release checks pending ON/Start requests under the owner's lock, so a concurrent
+callback cannot start output between this check and communication release.
 Successful background polls refresh data without erasing the last command or
 refusal message. An explicit Read state still displays its own result.
+An owner fault overrides generic success notices in both the main panel and
+Settings, including background polling and passive Release. A readable electrical
+sample cannot clear the fault or authorize output; protected recovery is separate.
 Disconnect or a new owner connection clears old settings drafts, source-protection
 assertions, persistence opt-in and polling selection. Confirm physical conditions
 after Connect; ordinary polling on the same connection preserves active edits.
@@ -32,6 +42,16 @@ Every real mode transition also requires the **Source independently blocked;
 external triggers isolated** assertion. It is an operator condition, not a sensor.
 An already selected mode can be queried without a write. Qualified D2XX and docked KEH3
 output commands otherwise share the same owner; VCP/external USB OUT remain unavailable.
+
+The tracked SH05R profile enables all four mode buttons after Connect through
+`allow_persistent_mode_changes = true`. Confirm the protection checkbox before
+selecting a different mode; the owner checks fresh electrical OFF and the interlock
+requirement, sends OFF/deactivate, changes mode and verifies readback. The selected
+button reflects device readback, not the last click. This permission covers mode
+selection only: `qualified_modes = ["manual"]` still blocks native Start/priming.
+In Single, Auto or Triggered, Stop/OFF and return to Manual remain available.
+Restart a released GUI owner and reload the browser to load this change; opening
+the GUI or restarting it does not connect or select a device mode.
 
 The page displays the full structured result, including requested electrical
 state, dated controller feedback, fault/cleanup details and human optical evidence.
@@ -52,6 +72,51 @@ the same Manual/load/interlock/OFF-rest prerequisites; the browser does not time
 the hold. Use it only within the approved physical window and cycle count.
 The timed button is disabled when the displayed electrical output is ON;
 the owner independently checks fresh Manual/OFF before dispatch.
+
+## Additional shutter commands
+
+The main output controls are unchanged. Open **Settings** for LED indications
+and interlock configuration; expand **Readback and diagnostics** for the less
+frequent commands. Opening either section or editing fields makes no device request.
+
+| Control | Shared ShutterHub API | Result / use |
+| --- | --- | --- |
+| Read LED modes | get_led_modes | Shows the raw mask and fills the three documented indication checkboxes |
+| Apply LED modes | set_led_modes | Replaces the mask with the selected flags; checks RAM readback, without an EEPROM request |
+| Require interlock | require_interlock | Confirms or enables the requirement; never disables it or measures contact continuity |
+| Read channel enable | get_channel_enabled | Last explicit enable read; separate from electrical output and blade position |
+| Read raw bay | get_hub_bay_reply | Raw byte only; does not change routing or infer a KEH3 bay mapping |
+| Start / Stop device messages | start_updates / stop_updates | Explicit requests without acknowledgement; separate from Live readback |
+| Collect raw events | get_events | Consumes the bounded raw event queue; shows message IDs and complete frame hex without decoding motor payloads |
+| Disconnect hardware | disconnect_hardware | Sends the documented hardware-disconnect request and releases communication; requires protected Manual/OFF and no pending ON/Start |
+
+LED Apply and Require interlock use the existing device-settings permission and
+protected Manual/OFF checks. Confirm **Source independently blocked; external
+triggers isolated** on the main panel before a write. The tracked Ethernet
+profile keeps device-settings writes disabled. Settings results and refusals are
+visible inside the dialog as well as on the main panel.
+
+Read LED modes before editing the flags. An unfamiliar returned bit is reported;
+Apply replaces the entire mask with the three documented selections. Polling and
+other diagnostics preserve LED drafts. Extra readouts and drafts are scoped to
+the selected target and owner connection, and clear when that scope becomes
+invalid. Readouts are labelled as last explicit reads, not continuous measurements.
+
+Stop device messages before Release. They do not create a background reader or
+prove native activity. **Release** closes communication without a hardware
+disconnect request; **Disconnect hardware** is the separate protected command.
+Normal ON/OFF uses the existing output buttons, with no second enable alias.
+Key/Ready, optical position and ambiguous trigger/MMI layouts remain unavailable.
+
+TEST-250 checks these callbacks against the shared owner with software transport
+fixtures. A passive localhost preview was inspected disconnected at 1280 x 720
+and 390 x 844, including scrolling Settings and Diagnostics; no browser warnings,
+errors or horizontal overflow were observed. No hardware command was clicked.
+[Settings preview](../records/gui-commands-settings-desktop.jpg),
+[diagnostics preview](../records/gui-commands-diagnostics-desktop.jpg),
+[phone settings](../records/gui-commands-settings-phone.jpg),
+[phone diagnostics](../records/gui-commands-diagnostics-phone.jpg).
+This is layout/software evidence, not physical command qualification.
 
 ## Repeating the protected user-flow check
 
@@ -116,7 +181,7 @@ Opening Settings, selecting a configured target and editing draft fields are loc
 
 | Panel function | Implementation and limit | New validation |
 | --- | --- | --- |
-| Four named modes | APT 0x04C0/C1/C2; Manual=1, Single=2, Auto=3, Triggered=4. Only policy-qualified modes selectable; changes persist at power-up | Software frame/owner checks; native modes not bench-qualified |
+| Four named modes | APT 0x04C0/C1/C2; Manual=1, Single=2, Auto=3, Triggered=4. Persistent-mode permission allows protected selection of all four; changes persist at power-up. Output qualification is separate | Software frame/owner checks; native modes not bench-qualified |
 | Open/Close, Start/Stop | 0x04CB ON=1/OFF=2; labels follow actual mode. Manual retains its existing owner checks. Native Start reads cycle parameters and sends ON once; Stop sends OFF without changing mode | Software guard/dispatch/stop checks; no new actuation |
 | On/Off duration, cycles | Explicit Read device settings, 0x04C4/C5; no guessed device defaults | Software literal payload and callback checks |
 | Cycle settings | 0x04C3, channel1 + uint32 On ms/Off ms/count; 100..10000 ms, count0..1000000. Count0 requires explicit Continuous permission; load rest/count limits also apply | Software validation/readback mismatch/cleanup checks |
@@ -124,8 +189,8 @@ Opening Settings, selecting a configured target and editing draft fields are loc
 | Identify | 0x0223 channel1, flash request; no output command or flash ACK | Literal frame and no-output-cleanup software checks |
 | Key Enabled / Is Ready | Unknown; no verified KSC101 wire mapping. Interlock requirement is configuration, not continuity | Unknown-state renderer checks |
 | Error / Output ON / Activity | Fault report, electrical bit0, and explicitly labelled Start requested. Never infer blade position or native activity/completion from OFF | Software renderer checks; earlier physical evidence only for its original Manual revision |
-| Display intensity/dimming/timeout | Visible disabled controls; no device read/write | Blocked on KSC101-specific APT layout |
-| Trigger1/2 I/O mode/polarity | Visible disabled controls; no device read/write. Triggered start is only level-mode priming with count0 and separate permission | Configuration blocked on KSC101-specific APT layout; priming software-only |
+| Display intensity/dimming/timeout | Unimplemented; no placeholder controls or device read/write | Blocked on KSC101-specific APT layout |
+| Trigger1/2 I/O mode/polarity | Unimplemented; no placeholder controls or device read/write. Triggered start is only level-mode priming with count0 and separate permission | Configuration blocked on KSC101-specific APT layout; priming software-only |
 
 APT Issue42.1 lists 0x0520 MMI / 0x0523 trigger messages for KSC101 in its model
 table, but the detailed sections describe motor controllers, motor positions and
@@ -138,8 +203,10 @@ New optional Policy fields default to `qualified_modes=("manual",)`,
 `allow_device_settings=False`, `allow_persistent_settings=False`,
 `allow_continuous_cycles=False`, `max_cycle_count=1`. These are conservative
 software permissions, not load ratings. TOML uses `qualified_modes=["manual"]`.
-Adding modes or write permissions requires separate deployment qualification;
-the real Ethernet configuration was not broadened. Finite exposure/duty loads
+Adding output modes to `qualified_modes` requires separate deployment qualification;
+`allow_persistent_mode_changes` permits protected selection without qualifying
+native Start/priming. Device-settings permissions require their own review;
+the real Ethernet profile's output qualification remains Manual-only. Finite exposure/duty loads
 still require an independently qualified cutoff and remain unavailable for Start.
 Settings apply requires Manual/OFF, preserved interlock requirement, source
 assertion, explicit permissions and exact readback. Opening the panel writes nothing.
@@ -166,8 +233,10 @@ skin removes red chrome, bevels, gradients and circular mechanical buttons;
 selection uses a muted teal accent while unknown/error/requested states retain
 their distinct text and indicators. System typography requires no external font
 or network dependency. Controls include visible keyboard focus, readable disabled
-states and reduced-motion support. Settings uses three columns on desktop and
-one on phones; Stop/OFF remains in its sticky header while the content scrolls.
+states and reduced-motion support. Settings presents cycle controls in one
+column; Stop/OFF remains in its sticky header while the content scrolls. Earlier
+screenshots include the removed display/trigger placeholders and are historical
+visual evidence.
 
 The real app was reviewed disconnected at1100,768,390 and320px widths, with no
 horizontal overflow. Phone Settings scrolling retained visible Stop/OFF and

@@ -1,4 +1,7 @@
-"""APT framing and one receive path. Sources: docs/sources.md, SRC-001.
+"""APT message definitions, errors, deadlines, framing and serialized sessions.
+
+Sources: docs/sources.md, SRC-001. Device commands live in controller.py;
+transport.py owns byte I/O. This module owns the single receive path.
 
 APT has no transaction ID. A timeout, cancellation, duplicate or unexpected
 same-family reply poisons the session; no retry can turn it into fresh evidence.
@@ -13,19 +16,56 @@ from collections import deque
 from dataclasses import dataclass
 from threading import Event
 
-from .errors import Cancelled, ControllerFault, DeadlineExceeded, ProtocolError
-
 MAX_PAYLOAD = 255  # SRC-001 p34: documented bound for this supported protocol revision.
+# Expected reply payload sizes in bytes; None means a short, parameter-only frame.
 REPLIES = {
-    0x0006: 84,
-    0x042A: 6,
-    0x04C2: None,
-    0x04C5: 14,
-    0x04C8: None,
-    0x04CD: None,
-    0x0212: None,
+    0x0006: 84,  # Hardware information.
+    0x0066: None,  # Raw hub bay byte, not a channel identifier.
+    0x0212: None,  # Channel enable state.
+    0x04B5: 4,  # Channel word and LED indication-mode bits.
+    0x042A: 6,  # Status bits.
+    0x04C2: None,  # Solenoid operating mode.
+    0x04C5: 14,  # Solenoid cycle parameters.
+    0x04C8: None,  # Interlock requirement.
+    0x04CD: None,  # Solenoid state.
 }
-MESSAGE_LENGTHS = {**REPLIES, 0x0002: None, 0x0080: None, 0x0081: 68}
+MESSAGE_LENGTHS = {
+    **REPLIES,
+    0x0002: None,  # Hardware disconnect.
+    0x0080: None,  # Basic controller fault.
+    0x0081: 68,  # Extended controller fault.
+}
+
+
+# Operation and protocol errors.
+
+
+class ShutterError(RuntimeError):
+    """Rejected or failed operation; never implies optical closure."""
+
+
+class ProtocolError(ShutterError):
+    """Invalid or ambiguous stream; further queries require a new session."""
+
+
+class DeadlineExceeded(ShutterError):
+    """The end-to-end monotonic deadline expired."""
+
+
+class Cancelled(ShutterError):
+    """An active request yielded to cancellation or a protective request."""
+
+
+class ControllerFault(ShutterError):
+    """Complete manufacturer fault frame, without guessing private return codes."""
+
+    def __init__(self, frame):
+        self.frame = frame
+        self.raw = frame.encode().hex()
+        super().__init__(f"Controller fault 0x{frame.message_id:04x}: {self.raw}")
+
+
+# Shared monotonic deadline.
 
 
 def clock():
@@ -34,6 +74,8 @@ def clock():
 
 
 class Deadline:
+    """One end-to-end budget shared by all steps of an operation."""
+
     def __init__(self, seconds):
         if isinstance(seconds, bool) or not isinstance(seconds, (int, float)):
             raise ValueError("timeout must be a finite positive number of seconds")
@@ -48,8 +90,13 @@ class Deadline:
         return left
 
 
+# Wire framing.
+
+
 @dataclass(frozen=True)
 class Frame:
+    """APT header and optional payload, with unflagged 7-bit addresses."""
+
     message_id: int
     param1: int = 0
     param2: int = 0
@@ -109,9 +156,7 @@ class Decoder:
                     raise ProtocolError("Reply from wrong address; no route fallback")
                 if ident in MESSAGE_LENGTHS:
                     expected = MESSAGE_LENGTHS[ident]
-                    if (long_form and length != expected) or (
-                        not long_form and expected is not None
-                    ):
+                    if (length if long_form else None) != expected:
                         raise ProtocolError(f"Invalid form/length for APT message 0x{ident:04x}")
                 if len(self.buffer) < 6 + length:
                     break
@@ -136,6 +181,9 @@ class Decoder:
         return result
 
 
+# Single-flight request/reply handling.
+
+
 class Session:
     """Called only under the shared owner lock. No receiver thread or cache getter."""
 
@@ -147,12 +195,8 @@ class Session:
         self.poisoned = False
         self.write_desynchronized = False
 
-    def _check(self, deadline, protective):
-        deadline.remaining()
-        if self.cancel.is_set() and not protective:
-            raise Cancelled("Request cancelled; session requires explicit recovery")
-
     def send(self, frame, deadline, *, protective=False):
+        """Write once; retain whether a protective write can still be framed."""
         if self.poisoned and not protective:
             raise ProtocolError("Session ambiguous; release and explicitly recover")
         if self.write_desynchronized:
@@ -164,14 +208,12 @@ class Session:
         raw = frame.encode()
         try:
             count = self.transport.write(raw, deadline)
+            if count != len(raw):
+                raise ProtocolError(f"Partial write: {count}/{len(raw)} bytes; possibly applied")
         except BaseException:
             self.write_desynchronized = True
             self.poisoned = True
             raise
-        if count != len(raw):
-            self.write_desynchronized = True
-            self.poisoned = True
-            raise ProtocolError(f"Partial write: {count}/{len(raw)} bytes; possibly applied")
         try:
             # A complete but late write is ambiguous electrically, with intact
             # transmit alignment. A qualified protective OFF remains reachable.
@@ -180,26 +222,21 @@ class Session:
             self.poisoned = True
             raise
 
-    def _accept(self, frame):
-        # Decoder has already validated addresses and known message forms/lengths.
-        if frame.message_id in (0x0080, 0x0081):
-            raise ControllerFault(frame)
-        if frame.message_id == 0x0002:
-            raise ProtocolError("Controller disconnected")
-        if frame.message_id in REPLIES and REPLIES[frame.message_id] is None and frame.param1 != 1:
-            raise ProtocolError("Wrong response channel")
-
     def query(self, request, reply_id, deadline, *, protective=False):
+        """Reject pending traffic, send once and await one unambiguous reply."""
         if self.poisoned:
             raise ProtocolError("Session ambiguous; release and explicitly recover")
         try:
             self._check(deadline, protective)
-            # Drain only already-arrived traffic. Never reuse it to satisfy a query.
-            for old in self.decoder.feed(self.transport.read_nowait()):
-                self._accept(old)
-                if old.message_id in REPLIES:
-                    raise ProtocolError("Unsolicited/late reply before request")
-                self.events.append(old)
+            # Drain every arrived chunk, including replies behind a full receive buffer.
+            # Continuous event traffic must consume this operation's existing budget.
+            while data := self.transport.read_nowait():
+                self._check(deadline, protective)
+                for old in self.decoder.feed(data):
+                    self._accept(old)
+                    if old.message_id in REPLIES:
+                        raise ProtocolError("Unsolicited/late reply before request")
+                    self.events.append(old)
             if self.decoder.buffer:
                 raise ProtocolError("Unsolicited partial frame before request")
             self.send(request, deadline, protective=protective)
@@ -225,3 +262,22 @@ class Session:
         except BaseException:
             self.poisoned = True
             raise
+
+    def _check(self, deadline, protective):
+        deadline.remaining()
+        if self.cancel.is_set() and not protective:
+            raise Cancelled("Request cancelled; session requires explicit recovery")
+
+    def _accept(self, frame):
+        # Decoder has already validated addresses and known message forms/lengths.
+        if frame.message_id in (0x0080, 0x0081):
+            raise ControllerFault(frame)
+        if frame.message_id == 0x0002:
+            raise ProtocolError("Controller disconnected")
+        if (
+            frame.message_id in REPLIES
+            and REPLIES[frame.message_id] is None
+            and frame.message_id != 0x0066
+            and frame.param1 != 1
+        ):
+            raise ProtocolError("Wrong response channel")

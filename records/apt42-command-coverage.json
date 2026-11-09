@@ -1,0 +1,348 @@
+{
+  "requirement_id": "REQ-245",
+  "test_id": "TEST-245",
+  "evidence_id": "E225",
+  "scope": "Static command coverage; no device I/O or command implementation",
+  "recorded_at_utc": "2026-11-08T23:07:39.319194+00:00",
+  "manual": {
+    "path": "docs/manuals/APT_Communications_Protocol_Issue_42.1.pdf",
+    "revision": "42.1",
+    "date": "2025-09-09",
+    "pages": 443,
+    "sha256": "b2a6badd7c00b3042ba383e291667e7eab10746c14c4f92cea45fc480c7304ed"
+  },
+  "source_sha256": {
+    "src/thorlabs_shutter_control/controller.py": "2c3c42a8afaac3ab3e0a59486d48181f313a9ff437c2da3c0d5bdafc3a923bff",
+    "src/thorlabs_shutter_control/protocol.py": "9dee09e346b0a4d7fb4357a445d0b641381fcb5c8d376a4467b89ba6f4dcd9d9",
+    "src/thorlabs_shutter_control/transport.py": "850583f672bc8566529b1845e84e5dd3bdb5d865cf361366c2c84e9612722da3"
+  },
+  "applicability_table_entries": 39,
+  "outbound_driver_ids": [
+    "0x0005",
+    "0x0223",
+    "0x0429",
+    "0x04B9",
+    "0x04C0",
+    "0x04C1",
+    "0x04C3",
+    "0x04C4",
+    "0x04C7",
+    "0x04CB",
+    "0x04CC"
+  ],
+  "queried_reply_ids": [
+    "0x0006",
+    "0x042A",
+    "0x04C2",
+    "0x04C5",
+    "0x04C8",
+    "0x04CD"
+  ],
+  "commands": [
+    {
+      "name": "MGMSG_MOD_IDENTIFY",
+      "id": "0x0223",
+      "manual_page": 43,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted"
+    },
+    {
+      "name": "MGMSG_MOD_SET_CHANENABLESTATE",
+      "id": "0x0210",
+      "manual_page": 44,
+      "section": "TSC001/KSC101",
+      "coverage": "not implemented",
+      "limitation": "enable_device explicitly refuses this output alias; use 0x04CB"
+    },
+    {
+      "name": "MGMSG_MOD_REQ_CHANENABLESTATE",
+      "id": "0x0211",
+      "manual_page": 44,
+      "section": "TSC001/KSC101",
+      "coverage": "not implemented"
+    },
+    {
+      "name": "MGMSG_MOD_GET_CHANENABLESTATE",
+      "id": "0x0212",
+      "manual_page": 44,
+      "section": "TSC001/KSC101",
+      "coverage": "reply framing only; no query/API"
+    },
+    {
+      "name": "MGMSG_HW_DISCONNECT",
+      "id": "0x0002",
+      "manual_page": 46,
+      "section": "TSC001/KSC101",
+      "coverage": "inbound event handled",
+      "limitation": "Inbound disconnect handled; close()/disconnect() do not transmit HW_DISCONNECT"
+    },
+    {
+      "name": "MGMSG_HW_RESPONSE",
+      "id": "0x0080",
+      "manual_page": 46,
+      "section": "TSC001/KSC101",
+      "coverage": "inbound event handled"
+    },
+    {
+      "name": "MGMSG_HW_RICHRESPONSE",
+      "id": "0x0081",
+      "manual_page": 47,
+      "section": "TSC001/KSC101",
+      "coverage": "inbound event handled"
+    },
+    {
+      "name": "MGMSG_HW_START_UPDATEMSGS",
+      "id": "0x0011",
+      "manual_page": 48,
+      "section": "TSC001/KSC101",
+      "coverage": "not implemented"
+    },
+    {
+      "name": "MGMSG_HW_STOP_UPDATEMSGS",
+      "id": "0x0012",
+      "manual_page": 48,
+      "section": "TSC001/KSC101",
+      "coverage": "not implemented"
+    },
+    {
+      "name": "MGMSG_HW_REQ_INFO",
+      "id": "0x0005",
+      "manual_page": 49,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted"
+    },
+    {
+      "name": "MGMSG_HW_GET_INFO",
+      "id": "0x0006",
+      "manual_page": 49,
+      "section": "TSC001/KSC101",
+      "coverage": "queried reply decoded/returned"
+    },
+    {
+      "name": "MGMSG_HUB_REQ_BAYUSED",
+      "id": "0x0065",
+      "manual_page": 52,
+      "section": "TSC001/KSC101",
+      "coverage": "not implemented"
+    },
+    {
+      "name": "MGMSG_HUB_GET_BAYUSED",
+      "id": "0x0066",
+      "manual_page": 52,
+      "section": "TSC001/KSC101",
+      "coverage": "not implemented"
+    },
+    {
+      "name": "MGMSG_MOT_MOVE_COMPLETED",
+      "id": "0x0464",
+      "manual_page": 80,
+      "section": "TSC001/KSC101",
+      "coverage": "not implemented"
+    },
+    {
+      "name": "MGMSG_MOT_MOVE_ABSOLUTE",
+      "id": "0x0453",
+      "manual_page": 81,
+      "section": "TSC001/KSC101",
+      "coverage": "not implemented"
+    },
+    {
+      "name": "MGMSG_MOT_MOVE_STOP",
+      "id": "0x0465",
+      "manual_page": 85,
+      "section": "TSC001/KSC101",
+      "coverage": "not implemented"
+    },
+    {
+      "name": "MGMSG_MOT_SET_AVMODES",
+      "id": "0x04B3",
+      "manual_page": 92,
+      "section": "TSC001/KSC101",
+      "coverage": "not implemented"
+    },
+    {
+      "name": "MGMSG_MOT_REQ_AVMODES",
+      "id": "0x04B4",
+      "manual_page": 92,
+      "section": "TSC001/KSC101",
+      "coverage": "not implemented"
+    },
+    {
+      "name": "MGMSG_MOT_GET_AVMODES",
+      "id": "0x04B5",
+      "manual_page": 92,
+      "section": "TSC001/KSC101",
+      "coverage": "not implemented"
+    },
+    {
+      "name": "MGMSG_MOT_SET_BUTTONPARAMS",
+      "id": "0x04B6",
+      "manual_page": 97,
+      "section": "TSC001/KSC101",
+      "coverage": "not implemented"
+    },
+    {
+      "name": "MGMSG_MOT_REQ_BUTTONPARAMS",
+      "id": "0x04B7",
+      "manual_page": 97,
+      "section": "TSC001/KSC101",
+      "coverage": "not implemented"
+    },
+    {
+      "name": "MGMSG_MOT_GET_BUTTONPARAMS",
+      "id": "0x04B8",
+      "manual_page": 97,
+      "section": "TSC001/KSC101",
+      "coverage": "not implemented"
+    },
+    {
+      "name": "MGMSG_MOT_SET_EEPROMPARAMS",
+      "id": "0x04B9",
+      "manual_page": 99,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted",
+      "limitation": "Only cycle settings 0x04C3 storage is exposed; no persistence ACK/restart proof"
+    },
+    {
+      "name": "MGMSG_MOT_GET_STATUSUPDATE",
+      "id": "0x0481",
+      "manual_page": 119,
+      "section": "TSC001/KSC101",
+      "coverage": "not implemented"
+    },
+    {
+      "name": "MGMSG_MOT_SET_SOL_OPERATINGMODE",
+      "id": "0x04C0",
+      "manual_page": 184,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted"
+    },
+    {
+      "name": "MGMSG_MOT_REQ_SOL_OPERATINGMODE",
+      "id": "0x04C1",
+      "manual_page": 184,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted"
+    },
+    {
+      "name": "MGMSG_MOT_GET_SOL_OPERATINGMODE",
+      "id": "0x04C2",
+      "manual_page": 184,
+      "section": "TSC001/KSC101",
+      "coverage": "queried reply decoded/returned"
+    },
+    {
+      "name": "MGMSG_MOT_SET_SOL_CYCLEPARAMS",
+      "id": "0x04C3",
+      "manual_page": 186,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted"
+    },
+    {
+      "name": "MGMSG_MOT_REQ_SOL_CYCLEPARAMS",
+      "id": "0x04C4",
+      "manual_page": 186,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted"
+    },
+    {
+      "name": "MGMSG_MOT_GET_SOL_CYCLEPARAMS",
+      "id": "0x04C5",
+      "manual_page": 186,
+      "section": "TSC001/KSC101",
+      "coverage": "queried reply decoded/returned"
+    },
+    {
+      "name": "MGMSG_MOT_SET_SOL_INTERLOCKMODE",
+      "id": "0x04C6",
+      "manual_page": 188,
+      "section": "TSC001/KSC101",
+      "coverage": "not implemented"
+    },
+    {
+      "name": "MGMSG_MOT_REQ_SOL_INTERLOCKMODE",
+      "id": "0x04C7",
+      "manual_page": 188,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted"
+    },
+    {
+      "name": "MGMSG_MOT_GET_SOL_INTERLOCKMODE",
+      "id": "0x04C8",
+      "manual_page": 188,
+      "section": "TSC001/KSC101",
+      "coverage": "queried reply decoded/returned"
+    },
+    {
+      "name": "MGMSG_MOT_SET_SOL_STATE",
+      "id": "0x04CB",
+      "manual_page": 190,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted"
+    },
+    {
+      "name": "MGMSG_MOT_REQ_SOL_STATE",
+      "id": "0x04CC",
+      "manual_page": 190,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted"
+    },
+    {
+      "name": "MGMSG_MOT_GET_SOL_STATE",
+      "id": "0x04CD",
+      "manual_page": 190,
+      "section": "TSC001/KSC101",
+      "coverage": "queried reply decoded/returned",
+      "limitation": "Raw reply returned; no automatic 1/2 versus actual firmware-zero conversion"
+    },
+    {
+      "name": "MGMSG_MOT_SET_KCUBEMMIPARAMS",
+      "id": "0x0520",
+      "manual_page": 134,
+      "section": "KSC101-only",
+      "coverage": "not implemented",
+      "limitation": "KSC101 applicability table conflicts with detailed motor-only sections; not a verified KSC101 payload"
+    },
+    {
+      "name": "MGMSG_MOT_SET_KCUBETRIGIOCONFIG",
+      "id": "0x0523",
+      "manual_page": 137,
+      "section": "KSC101-only",
+      "coverage": "not implemented",
+      "limitation": "KSC101 applicability table conflicts with detailed motor-only sections; not a verified KSC101 payload"
+    },
+    {
+      "name": "MGMSG_MOT_SET_KCUBEPOSTRIGPARAMS",
+      "id": "0x0526",
+      "manual_page": 141,
+      "section": "KSC101-only",
+      "coverage": "not implemented",
+      "limitation": "KSC101 applicability table conflicts with detailed motor-only sections; not a verified KSC101 payload"
+    }
+  ],
+  "additional_implemented_ids_not_in_KSC101_table": [
+    "0x0429",
+    "0x042A"
+  ],
+  "documentation_conflicts": [
+    "KSC101 table versus detailed applicability for 0x0520/0523/0526",
+    "MMI lengths 36-byte prose versus 0x1C header",
+    "Trigger I/O lengths 22-byte prose versus 0x0C header",
+    "Cycle on/off upper bound 10000 s printed in Issue42.1 p186 versus 10000 ms in KSC101 RevF p31",
+    "Motor position/button commands listed for solenoid model; no shutter-specific layout",
+    "KSC101 status-bit mapping is not supplied by its Issue42.1 model table alone"
+  ],
+  "coverage_note": "39 listed IDs include generic motor/applicability conflicts; not a trustworthy count of required KSC101 operations",
+  "timing_cross_reference": {
+    "path": "docs/manuals/KSC101_Kinesis_UI_Manual_HA0368T_Rev_F.pdf",
+    "page": 31,
+    "on_off_ms_range": [
+      100,
+      10000
+    ],
+    "result": "Current code matches KSC101-specific manual; Issue42.1 p186 prints conflicting units",
+    "sha256": "007d604c718378b3b8b6bc6f46876f00f91c6a4e4d839c2a175681ac3c122597"
+  },
+  "driver_ast_sha256": "c0714b6f6aead89220b586c5d2f261ddb617f1fd1b8bace14d3fb5655720aa22",
+  "source_revision_note": "Concurrent controller edits detected; outbound/query ID sets reconciled again unchanged before final documentation"
+}

@@ -39,7 +39,7 @@ def main(argv=None):
     original = None
     try:
         if args.command == "discover":
-            from .discovery import list_d2xx_devices, list_vcp_ports
+            from .transport import list_d2xx_devices, list_vcp_ports
 
             rows = list_vcp_ports() if args.vcp else list_d2xx_devices()
             print("\n".join(rows) if rows else "(none)")

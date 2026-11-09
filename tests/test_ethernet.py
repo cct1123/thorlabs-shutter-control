@@ -8,8 +8,8 @@ from threading import Thread
 import pytest
 
 from thorlabs_shutter_control import Route, ShutterError
-from thorlabs_shutter_control.ethernet import TCPTransport
 from thorlabs_shutter_control.protocol import Deadline
+from thorlabs_shutter_control.transport import TCPTransport
 
 
 @pytest.mark.parametrize("bay,port", [("left", 40304), ("middle", 40305), ("right", 40306)])

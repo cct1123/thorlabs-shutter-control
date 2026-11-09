@@ -1,12 +1,23 @@
 """Localhost control panel; all device actions use the canonical APT owner."""
 
 import json
-import math
 from dataclasses import asdict
 from pathlib import Path
 
-from .device import MODES, CycleParameters
-from .errors import ShutterError
+from .controller import MODES, CycleParameters
+
+DETAIL_ACTIONS = (
+    "read-channel",
+    "read-bay",
+    "read-led",
+    "apply-led",
+    "require-interlock",
+    "start-updates",
+    "stop-updates",
+    "read-events",
+    "hardware-disconnect",
+)
+LED_MODES = ((1, "Identify"), (2, "Limit indication"), (8, "Activity indication"))
 
 ACTIONS = (
     "connect",
@@ -23,63 +34,138 @@ ACTIONS = (
     "identify",
     "read-settings",
     "apply-settings",
+    *DETAIL_ACTIONS,
 )
 
 
-def execute_action(hub, action, target, *, source_inhibited=False, parameters=None, persist=False):
-    """One device dispatch path for the UI; no alternate backend or cached success."""
+def execute_action(
+    hub, action, target, *, source_inhibited=False, cycle_values=None, persist=False, led_modes=()
+):
+    """Return (status, notice, optional details) through the shared controller only."""
     if target not in {c.name for c in hub.configs}:
         raise ValueError("Select an exact configured target before using a control")
     if action == "connect":
         if not hub.connection_snapshot(target).has_device:
             hub.connect(target)
-        return hub.get_status(target), "Connected to the exact controller; fresh feedback received."
+        return (
+            hub.get_status(target),
+            "Connected to the exact controller; fresh feedback received.",
+            None,
+        )
     if action in ("read", "poll"):
         sample = hub.get_status(target)
-        return sample, (
-            "Readback updated."
-            if sample.has_device
-            else "Disconnected; no device feedback was requested."
+        return (
+            sample,
+            (
+                "Readback updated."
+                if sample.has_device
+                else "Disconnected; no device feedback was requested."
+            ),
+            None,
         )
     if action == "release":
-        if hub.connection_snapshot(target).requested_state in ("on", "start"):
-            raise ShutterError("Stop / OFF before releasing an active output or native sequence")
-        hub.disconnect(target)
-        return hub.connection_snapshot(
-            target
-        ), "Communication released. Optical state is not measured."
+        hub.disconnect(target, require_stopped=True)
+        return (
+            hub.connection_snapshot(target),
+            "Communication released. Optical state is not measured.",
+            None,
+        )
     if action in MODES.values():
-        return hub.set_operating_mode(target, action, source_inhibited=source_inhibited), (
-            "Mode selected and read back. Changed modes are remembered at power-up."
+        return (
+            hub.set_operating_mode(target, action, source_inhibited=source_inhibited),
+            ("Mode selected and read back. Changed modes are remembered at power-up."),
+            None,
         )
     if action == "on":
-        return hub.start(target, source_inhibited=source_inhibited), (
-            "Open / Start sent once. Electrical feedback does not confirm activity."
+        return (
+            hub.start(target, source_inhibited=source_inhibited),
+            ("Open / Start sent once. Electrical feedback does not confirm activity."),
+            None,
         )
     if action in ("off", "settings-stop"):
-        return hub.safe_state(target), "Stop / OFF sent; fresh electrical OFF readback received."
-    if action == "pulse":
-        return hub.pulse(target, 1.0), "One 1-second host hold completed; electrical OFF read back."
-    if action == "identify":
-        return hub.blink_identify(
-            target
-        ), "Identify LED flash requested. APT provides no flash acknowledgement."
-    if action == "read-settings":
-        return hub.get_cycle_parameters(
-            target
-        ), "Device cycle settings read. No defaults were written."
-    if action == "apply-settings":
-        sample = hub.set_cycle_parameters(
-            target, parameters, source_inhibited=source_inhibited, persist=persist
+        return (
+            hub.safe_state(target),
+            "Stop / OFF sent; fresh electrical OFF readback received.",
+            None,
         )
-        return sample, "Cycle settings match fresh readback. " + sample.settings_persistence
-    raise ValueError("Unknown WebUI action")
-
-
-def _integer(value, label):
-    if type(value) not in (int, float) or not math.isfinite(value) or int(value) != value:
-        raise ValueError(f"{label} must be a whole number")
-    return int(value)
+    if action == "pulse":
+        return (
+            hub.pulse(target, 1.0),
+            "One 1-second host hold completed; electrical OFF read back.",
+            None,
+        )
+    if action == "identify":
+        return (
+            hub.blink_identify(target),
+            "Identify LED flash requested. APT provides no flash acknowledgement.",
+            None,
+        )
+    if action == "read-settings":
+        return (
+            hub.get_cycle_parameters(target),
+            "Device cycle settings read. No defaults were written.",
+            None,
+        )
+    if action == "apply-settings":
+        on_ms, off_ms, count, continuous = cycle_values
+        if continuous:
+            count = 0
+        elif count == 0:
+            raise ValueError("Select Continuous explicitly to use cycle count 0")
+        sample = hub.set_cycle_parameters(
+            target,
+            CycleParameters(on_ms, off_ms, count),
+            source_inhibited=source_inhibited,
+            persist=persist,
+        )
+        return sample, "Cycle settings match fresh readback. " + sample.settings_persistence, None
+    if action == "require-interlock":
+        return (
+            hub.require_interlock(target, source_inhibited=source_inhibited),
+            ("Interlock requirement confirmed. Contact continuity is not measured."),
+            None,
+        )
+    if action == "hardware-disconnect":
+        return (
+            hub.disconnect_hardware(target, source_inhibited=source_inhibited),
+            ("Hardware disconnect sent and communication released; no device acknowledgement."),
+            None,
+        )
+    if action == "read-channel":
+        details = {"channel_enabled": hub.get_channel_enabled(target)}
+        notice = "Channel enable read; this does not measure blade position."
+    elif action == "read-bay":
+        details = {"bay": hub.get_hub_bay_reply(target)}
+        notice = "Raw bay byte read. Configured routing is unchanged."
+    elif action == "read-led":
+        details = {"led_modes": hub.get_led_modes(target)}
+        notice = "LED indication modes read. No settings were written."
+    elif action == "apply-led":
+        flags = set(led_modes or [])
+        if not flags <= {1, 2, 8} or any(type(bit) is not int for bit in flags):
+            raise ValueError("Select only the documented LED indications")
+        details = {
+            "led_modes": hub.set_led_modes(target, sum(flags), source_inhibited=source_inhibited)
+        }
+        notice = "LED modes match device RAM readback. No EEPROM request sent."
+    elif action in ("start-updates", "stop-updates"):
+        if action == "start-updates":
+            hub.start_updates(target)
+            request = "Start requested"
+        else:
+            hub.stop_updates(target)
+            request = "Stop requested"
+        details = {"update_request": request}
+        notice = request + "; no device acknowledgement. Stop messages before Release."
+    elif action == "read-events":
+        events = hub.get_events(target)
+        details = {
+            "events": [{"id": f"0x{f.message_id:04X}", "frame": f.encode().hex()} for f in events]
+        }
+        notice = f"Collected {len(events)} raw events; payloads are not interpreted."
+    else:
+        raise ValueError("Unknown WebUI action")
+    return hub.get_status(target), notice, details
 
 
 def create_app(hub):
@@ -105,17 +191,6 @@ def create_app(hub):
             ],
             className="indicator",
             title=title,
-        )
-
-    def unavailable(label, explanation, controls):
-        return html.Fieldset(
-            [
-                html.Legend(label),
-                html.P(explanation, className="field-note"),
-                *controls,
-            ],
-            className="settings-group unavailable",
-            disabled=True,
         )
 
     app.layout = html.Main(
@@ -196,7 +271,7 @@ def create_app(hub):
                                                     "triggered",
                                                     "Triggered",
                                                     "↗",
-                                                    "Prime for qualified external trigger control",
+                                                    "External-trigger mode; priming is separate",
                                                 ),
                                             )
                                         ],
@@ -345,7 +420,7 @@ def create_app(hub):
                 className="source-confirmation",
             ),
             html.P(
-                "Native modes need a reviewed load policy. Mode changes persist.",
+                "Mode changes persist. Source protection is an operator condition.",
                 id="profile-note",
                 className="profile-note",
             ),
@@ -361,146 +436,192 @@ def create_app(hub):
                     ),
                     html.Div(
                         [
-                            html.Fieldset(
+                            html.Div(
                                 [
-                                    html.Legend("Cycle settings"),
-                                    html.Label("On duration (ms)", htmlFor="cycle-on"),
-                                    dcc.Input(
-                                        id="cycle-on",
-                                        type="number",
-                                        min=100,
-                                        max=10000,
-                                        step=1,
-                                        placeholder="100–10000",
-                                    ),
-                                    html.Label("Off duration (ms)", htmlFor="cycle-off"),
-                                    dcc.Input(
-                                        id="cycle-off",
-                                        type="number",
-                                        min=100,
-                                        max=10000,
-                                        step=1,
-                                        placeholder="100–10000",
-                                    ),
-                                    html.Label("Cycle count", htmlFor="cycles"),
-                                    dcc.Input(
-                                        id="cycles",
-                                        type="number",
-                                        min=1,
-                                        max=1000000,
-                                        step=1,
-                                        placeholder="1–1000000",
+                                    html.Fieldset(
+                                        [
+                                            html.Legend("Cycle settings"),
+                                            html.Label("On duration (ms)", htmlFor="cycle-on"),
+                                            dcc.Input(
+                                                id="cycle-on",
+                                                type="number",
+                                                min=100,
+                                                max=10000,
+                                                step=1,
+                                                placeholder="100–10000",
+                                            ),
+                                            html.Label("Off duration (ms)", htmlFor="cycle-off"),
+                                            dcc.Input(
+                                                id="cycle-off",
+                                                type="number",
+                                                min=100,
+                                                max=10000,
+                                                step=1,
+                                                placeholder="100–10000",
+                                            ),
+                                            html.Label("Cycle count", htmlFor="cycles"),
+                                            dcc.Input(
+                                                id="cycles",
+                                                type="number",
+                                                min=1,
+                                                max=1000000,
+                                                step=1,
+                                                placeholder="1–1000000",
+                                            ),
+                                            dcc.Checklist(
+                                                id="continuous",
+                                                options=[
+                                                    {
+                                                        "label": "Continuous (count 0)",
+                                                        "value": "continuous",
+                                                    }
+                                                ],
+                                                value=[],
+                                            ),
+                                            html.P(
+                                                "Milliseconds. Opening this panel writes nothing.",
+                                                className="field-note",
+                                            ),
+                                            html.Button(
+                                                "Read device settings",
+                                                id="read-settings",
+                                                className="utility",
+                                            ),
+                                        ],
+                                        className="settings-group",
                                     ),
                                     dcc.Checklist(
-                                        id="continuous",
+                                        id="persist",
                                         options=[
                                             {
-                                                "label": "Continuous (count 0)",
-                                                "value": "continuous",
-                                                "disabled": True,
+                                                "label": "Persist cycle settings to device EEPROM",
+                                                "value": "persist",
                                             }
                                         ],
                                         value=[],
                                     ),
                                     html.P(
-                                        "Milliseconds. Opening this panel writes nothing.",
+                                        "EEPROM needs separate permission "
+                                        "and restart verification.",
                                         className="field-note",
                                     ),
                                     html.Button(
-                                        "Read device settings",
-                                        id="read-settings",
-                                        className="utility",
+                                        "Apply cycle settings",
+                                        id="apply-settings",
+                                        className="apply-button",
                                     ),
-                                ],
-                                className="settings-group",
+                                ]
                             ),
-                            unavailable(
-                                "Device display",
-                                "Display settings need a verified KSC101 APT layout.",
+                            html.Fieldset(
                                 [
-                                    html.Label("Display intensity (%)"),
-                                    dcc.Input(
-                                        type="number",
-                                        min=0,
-                                        max=100,
-                                        placeholder="Not read",
-                                        disabled=True,
-                                    ),
-                                    html.Label("Dim on inactivity"),
+                                    html.Legend("Controller options"),
+                                    html.Label("LED indications"),
                                     dcc.Checklist(
+                                        id="led-modes",
                                         options=[
-                                            {
-                                                "label": "Dim display",
-                                                "value": "dim",
-                                                "disabled": True,
-                                            }
+                                            {"label": label, "value": bit}
+                                            for bit, label in LED_MODES
                                         ],
                                         value=[],
                                     ),
-                                    html.Label("Display timeout (min)"),
-                                    dcc.Input(type="number", min=1, max=480, disabled=True),
-                                    html.Label("Dimmed intensity (%)"),
-                                    dcc.Input(type="number", min=0, max=10, disabled=True),
-                                ],
-                            ),
-                            unavailable(
-                                "Trigger I/O",
-                                "Trigger settings need a verified KSC101 APT layout.",
-                                [
-                                    html.Label("Trigger 1 mode / polarity"),
-                                    dcc.Dropdown(
-                                        options=["Disabled", "Input", "Output"],
-                                        placeholder="Not read",
-                                        disabled=True,
+                                    html.P("Not read", id="led-reading", className="field-note"),
+                                    html.Div(
+                                        [
+                                            html.Button(
+                                                "Read LED modes", id="read-led", className="utility"
+                                            ),
+                                            html.Button(
+                                                "Apply LED modes",
+                                                id="apply-led",
+                                                className="utility",
+                                            ),
+                                        ],
+                                        className="diagnostic-tools",
                                     ),
-                                    dcc.Dropdown(
-                                        options=["Active high", "Active low"],
-                                        placeholder="Not read",
-                                        disabled=True,
+                                    html.P(
+                                        "Interlock requirement: Unknown", id="interlock-reading"
                                     ),
-                                    html.Label("Trigger 2 mode / polarity"),
-                                    dcc.Dropdown(
-                                        options=["Disabled", "Input", "Output"],
-                                        placeholder="Not read",
-                                        disabled=True,
+                                    html.Button(
+                                        "Require interlock",
+                                        id="require-interlock",
+                                        className="utility",
                                     ),
-                                    dcc.Dropdown(
-                                        options=["Active high", "Active low"],
-                                        placeholder="Not read",
-                                        disabled=True,
+                                    html.P(
+                                        "Confirm source protection on the main panel "
+                                        "before settings writes. The interlock setting "
+                                        "does not measure contact continuity.",
+                                        className="field-note",
                                     ),
                                 ],
+                                className="settings-group controller-options",
                             ),
                         ],
-                        className="settings-grid",
+                        className="settings-layout",
                     ),
-                    dcc.Checklist(
-                        id="persist",
-                        options=[
-                            {
-                                "label": "Persist cycle settings to device EEPROM",
-                                "value": "persist",
-                                "disabled": True,
-                            }
-                        ],
-                        value=[],
-                    ),
-                    html.P(
-                        "EEPROM requests need separate permission and restart verification.",
-                        className="field-note",
-                    ),
-                    html.Button(
-                        "Apply cycle settings", id="apply-settings", className="apply-button"
+                    html.Div(
+                        "Settings results appear here.",
+                        id="settings-notice",
+                        role="status",
+                        className="notice",
                     ),
                 ],
                 id="settings-dialog",
                 open=False,
             ),
             html.Details(
-                [html.Summary("Readback and diagnostics"), html.Pre("No sample", id="result")],
+                [
+                    html.Summary("Readback and diagnostics"),
+                    html.Div(
+                        [
+                            html.Button(label, id=key, className="utility")
+                            for key, label in (
+                                ("read-channel", "Read channel enable"),
+                                ("read-bay", "Read raw bay"),
+                                ("start-updates", "Start device messages"),
+                                ("stop-updates", "Stop device messages"),
+                                ("read-events", "Collect raw events"),
+                            )
+                        ],
+                        className="diagnostic-tools",
+                    ),
+                    html.Div(
+                        [
+                            html.Span("Channel enable: Not read", id="channel-reading"),
+                            html.Span("Raw bay: Not read", id="bay-reading"),
+                            html.Span("Device messages: No request", id="update-request"),
+                        ],
+                        className="diagnostic-readings",
+                    ),
+                    html.P(
+                        "These are last explicit reads, not optical feedback. Device messages are "
+                        "separate from Live readback; stop them before Release.",
+                        className="field-note",
+                    ),
+                    html.Pre("No events collected", id="event-data"),
+                    html.Div(
+                        [
+                            html.Button(
+                                "Disconnect hardware", id="hardware-disconnect", className="utility"
+                            ),
+                            html.Span(
+                                "Requires source protection and Manual/OFF. "
+                                "Release only closes communication.",
+                                className="field-note",
+                            ),
+                        ],
+                        className="diagnostic-tools",
+                    ),
+                    html.Details(
+                        [
+                            html.Summary("Full controller readback"),
+                            html.Pre("No sample", id="result"),
+                        ]
+                    ),
+                ],
                 className="diagnostics",
             ),
             dcc.Store(id="sample"),
+            dcc.Store(id="details"),
             dcc.Store(id="settings-context"),
             dcc.Store(id="confirmation-context"),
             dcc.Interval(id="poll", interval=1000, disabled=True),
@@ -548,6 +669,8 @@ def create_app(hub):
     @app.callback(
         Output("sample", "data"),
         Output("notice", "children"),
+        Output("settings-notice", "children"),
+        Output("details", "data"),
         [Input(key, "n_clicks") for key in ACTIONS],
         Input("poll", "n_intervals"),
         State("target", "value"),
@@ -557,38 +680,121 @@ def create_app(hub):
         State("cycles", "value"),
         State("continuous", "value"),
         State("persist", "value"),
+        State("led-modes", "value"),
+        State("details", "data"),
         prevent_initial_call=True,
     )
     def act(*values):
-        target, protection, on_ms, off_ms, count, continuous, persist = values[-7:]
+        target, protection, on_ms, off_ms, count, continuous, persist, led_modes, previous = values[
+            -9:
+        ]
         try:
-            if target not in {c.name for c in hub.configs}:
-                raise ValueError("Select an exact configured target before using a control")
-            parameters = None
-            if ctx.triggered_id == "apply-settings":
-                count = 0 if "continuous" in (continuous or []) else _integer(count, "Cycle count")
-                if count == 0 and "continuous" not in (continuous or []):
-                    raise ValueError("Select Continuous explicitly to use cycle count 0")
-                parameters = CycleParameters(
-                    _integer(on_ms, "On duration"), _integer(off_ms, "Off duration"), count
-                )
-            sample, message = execute_action(
+            sample, message, details = execute_action(
                 hub,
                 ctx.triggered_id,
                 target,
                 source_inhibited="protected" in (protection or []),
-                parameters=parameters,
+                cycle_values=(on_ms, off_ms, count, "continuous" in (continuous or [])),
                 persist="persist" in (persist or []),
+                led_modes=led_modes,
             )
-            # A background status refresh must not erase a command/refusal message.
-            return asdict(sample), no_update if ctx.triggered_id == "poll" else message
+            scope = {"target": target, "generation": sample.generation}
+            previous = previous or {}
+            same = all(previous.get(key) == value for key, value in scope.items())
+            extra = no_update
+            if not sample.has_device:
+                extra = None
+            elif not same or details is not None:
+                extra = {
+                    **scope,
+                    "values": dict(previous.get("values") or {}) if same else {},
+                    "action": ctx.triggered_id if details is not None else "reset",
+                    "observed_at": sample.electrical_observed_at,
+                }
+                extra["values"].update(details or {})
+            # Healthy polling preserves messages; a retained owner fault must stay visible.
+            if sample.error:
+                notice = (
+                    (message + " " if not sample.has_device else "")
+                    + f"Controller fault remains: {sample.error}. "
+                    "Output activation is blocked; protected recovery is required."
+                )
+            else:
+                notice = no_update if ctx.triggered_id == "poll" else message
+            return asdict(sample), notice, notice, extra
         except Exception as exc:
             snapshot = no_update
             if target in {c.name for c in hub.configs}:
                 snapshot = asdict(hub.connection_snapshot(target))
-            return snapshot, "Refused or unconfirmed: " + str(exc) + " " + " ".join(
-                getattr(exc, "__notes__", [])
+            message = (
+                "Refused or unconfirmed: "
+                + str(exc)
+                + " "
+                + " ".join(getattr(exc, "__notes__", []))
             )
+            return snapshot, message, message, no_update
+
+    @app.callback(
+        Output("channel-reading", "children"),
+        Output("bay-reading", "children"),
+        Output("update-request", "children"),
+        Output("event-data", "children"),
+        Output("led-reading", "children"),
+        Output("interlock-reading", "children"),
+        Output("led-modes", "value"),
+        Input("details", "data"),
+        Input("sample", "data"),
+        Input("target", "value"),
+    )
+    def detail_values(details, sample, target):
+        details, sample = details or {}, sample or {}
+        valid = (
+            sample.get("name") == target
+            and sample.get("has_device")
+            and not sample.get("error")
+            and details.get("target") == target
+            and details.get("generation") == sample.get("generation")
+        )
+        values = details.get("values", {}) if valid else {}
+        enabled, bay, modes = (
+            values.get("channel_enabled"),
+            values.get("bay"),
+            values.get("led_modes"),
+        )
+        required = (
+            sample.get("interlock_required")
+            if (
+                sample.get("name") == target
+                and sample.get("has_device")
+                and not sample.get("error")
+            )
+            else None
+        )
+        led_value = no_update
+        if not valid:
+            led_value = []
+        elif ctx.triggered_id == "details":
+            if details.get("action") == "reset":
+                led_value = []
+            elif details.get("action") in ("read-led", "apply-led"):
+                led_value = [bit for bit, _ in LED_MODES if modes is not None and modes & bit]
+        return (
+            "Channel enable: "
+            + ("Not read" if enabled is None else "Enabled" if enabled else "Disabled"),
+            "Raw bay: " + ("Not read" if bay is None else f"{bay} (0x{bay:02X})"),
+            "Device messages: " + values.get("update_request", "No request"),
+            json.dumps(values["events"], indent=2) if "events" in values else "No events collected",
+            "LED modes: "
+            + ("Not read" if modes is None else f"0x{modes:04X}")
+            + (
+                ". Extra flags present; Apply replaces all flags."
+                if modes is not None and modes & ~0x0B
+                else ""
+            ),
+            "Interlock requirement: "
+            + ("Unknown" if required is None else "Required" if required else "Not required"),
+            led_value,
+        )
 
     @app.callback(
         Output("cycle-on", "value"),
@@ -610,7 +816,7 @@ def create_app(hub):
         ):
             return None, None, None, [], None
         scope = {"target": target, "generation": sample.get("generation")}
-        context = context if isinstance(context, dict) else {}
+        context = context or {}
         changed = any(context.get(key) != value for key, value in scope.items())
         settings, stamp = sample.get("cycle_parameters"), sample.get("settings_observed_at")
         if not settings or not stamp:
@@ -641,7 +847,6 @@ def create_app(hub):
         Output("off-duration", "children"),
         Output("cycle-count", "children"),
         Output("readback-time", "children"),
-        Output("profile-note", "children"),
         Output("result", "children"),
         *mode_outputs,
         *[
@@ -654,10 +859,9 @@ def create_app(hub):
                 "identify",
                 "read-settings",
                 "apply-settings",
+                *DETAIL_ACTIONS,
             )
         ],
-        Output("persist", "options"),
-        Output("continuous", "options"),
         *[
             Output(key, prop)
             for key in ("key-lamp", "ready-lamp", "error-lamp", "output-lamp", "active-lamp")
@@ -673,29 +877,13 @@ def create_app(hub):
     def render(sample, target):
         config = next((c for c in hub.configs if c.name == target), None)
         sample = sample if sample and sample.get("name") == target else {}
-        feedback = sample.get("feedback", {})
-        policy = config.policy if config else None
         connected, fault = bool(sample.get("has_device")), bool(sample.get("error"))
-        mode = feedback.get("operating_mode", "unknown")
-        qualified = policy.qualified_modes if policy else ()
-        controllable = bool(
-            policy
-            and config.route.kind != "vcp"
-            and not (config.route.kind == "keh3" and config.route.bay == "external")
-        )
-        ready = connected and not fault and controllable and mode in qualified
+        mode = sample.get("operating_mode", "unknown")
+        ready = connected and not fault
         cycle = sample.get("cycle_parameters") or {}
-        note = "No controller selected."
-        if config:
-            note = "Qualified modes: " + (", ".join(qualified) or "read-only")
-            if policy:
-                note += (
-                    f" · OFF rest ≥ {policy.min_off_s:g} s · cycle limit {policy.max_cycle_count}"
-                )
-            note += ". Mode changes persist; physical protection is an operator condition."
         result = [
-            ("Verified S/N " + sample["observed_serial_number"])
-            if sample.get("identity_verified")
+            ("Verified S/N " + sample["identity"]["serial_number"])
+            if sample.get("identity")
             else ("Configured S/N " + config.serial_number if config else "S/N —"),
             "Fault" if fault else "Connected" if connected else "Disconnected",
             config.route.endpoint or "USB " + config.serial_number
@@ -712,42 +900,28 @@ def create_app(hub):
             (str(cycle["cycles"]) if cycle.get("cycles") else "Continuous")
             if cycle
             else "Not read",
-            "Last electrical read: " + (feedback.get("electrical_observed_at") or "none"),
-            note,
+            "Last electrical read: " + (sample.get("electrical_observed_at") or "none"),
             json.dumps(sample, indent=2) if sample else "No sample",
         ]
         for item in MODES.values():
             result.extend(
                 [
                     "mode-button selected" if mode == item else "mode-button",
-                    not (connected and not fault and controllable and item in qualified),
+                    not ready,
                 ]
             )
         result.extend(
             [
                 not ready
-                or feedback.get("electrical_state") == "on"
+                or sample.get("electrical_state") == "on"
                 or sample.get("requested_state") == "start",
-                not (connected and controllable),
-                not (connected and controllable),
-                not (ready and mode == "manual" and feedback.get("electrical_state") == "off"),
-                not (connected and not fault),
-                not (connected and not fault),
-                not (ready and policy and policy.allow_device_settings and mode == "manual"),
-                [
-                    {
-                        "label": "Persist cycle settings to device EEPROM",
-                        "value": "persist",
-                        "disabled": not bool(policy and policy.allow_persistent_settings),
-                    }
-                ],
-                [
-                    {
-                        "label": "Continuous (count 0)",
-                        "value": "continuous",
-                        "disabled": not bool(policy and policy.allow_continuous_cycles),
-                    }
-                ],
+                not connected,
+                not connected,
+                not (ready and mode == "manual" and sample.get("electrical_state") == "off"),
+                not ready,
+                not ready,
+                not ready,
+                *[not ready for _ in DETAIL_ACTIONS],
             ]
         )
         lamps = [
@@ -761,9 +935,9 @@ def create_app(hub):
             ("unknown", "Unknown")
             if fault
             else ("on", "On")
-            if feedback.get("electrical_state") == "on"
+            if sample.get("electrical_state") == "on"
             else ("off", "Off")
-            if feedback.get("electrical_state") == "off"
+            if sample.get("electrical_state") == "off"
             else ("unknown", "Unknown"),
             ("requested", "Start requested")
             if sample.get("requested_state") == "start"

@@ -1,0 +1,13 @@
+{
+  "requirement": "REQ-248",
+  "test": "TEST-248",
+  "before_sha256": "2c3c42a8afaac3ab3e0a59486d48181f313a9ff437c2da3c0d5bdafc3a923bff",
+  "after_sha256": "34ba66dc8843457b9331e1aa31a4a762fcb08021ced1e92d7aee0d298525acd6",
+  "documented_definitions": 86,
+  "missing_docstrings": [],
+  "baseline_input_drift": [],
+  "executable_equivalence": "PASS: only docstrings and explicit local/private c/d names excluded",
+  "scope": "Documentation/readability only; no device I/O",
+  "public_signatures": "unchanged",
+  "formatted_executable_equivalence": "PASS; only docstrings and explicit local/private-name substitutions excluded"
+}

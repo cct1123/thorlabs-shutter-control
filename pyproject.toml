@@ -1,6 +1,6 @@
 [project]
 name = "thorlabs-shutter-control"
-version = "1.0.0"
+version = "2.0.0"
 description = "Direct APT KSC101 control with explicit identity, ownership and recovery"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
@@ -19,7 +19,7 @@ requires = ["hatchling>=1.27,<2"]
 build-backend = "hatchling.build"
 
 [dependency-groups]
-dev = ["pytest>=8,<10", "ruff>=0.11,<1", "hatchling>=1.27,<2"]
+dev = ["pytest>=8,<10", "ruff>=0.11,<1", "hatchling>=1.27,<2", "nbformat>=5,<6"]
 notebooks = ["jupyterlab>=4,<5", "ipykernel>=6,<8"]
 
 [tool.pytest.ini_options]

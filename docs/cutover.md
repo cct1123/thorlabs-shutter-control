@@ -3,8 +3,10 @@
 The runtime has one implementation: `thorlabs_shutter_control.ShutterHub`.
 Current examples use the logical name `shutter`; configuration's integer
 `channel` is an application index, separate from APT channel 1. The legacy
-DiamondGUI method names and status fields remain intentional integration
-contracts; no second backend or constructor-argument shim is retained.
+DiamondGUI method names remain integration contracts. Version 2 deliberately
+changes status fields; update external consumers using the
+[status migration](python-api.md#status-schema-migration). No second backend or
+constructor-argument shim is retained.
 
 | Retired path | Current replacement |
 | --- | --- |
@@ -24,7 +26,8 @@ in-memory owner is not replaced by editing Python files. Draft settings and
 protection/persistence/polling assertions now end at disconnect or a new owner
 connection generation; confirm physical conditions after Connect. Internal GUI
 store IDs are not a persistent/public configuration format. Python owner names,
-status fields, TOML identity/route names and APT command values are preserved.
+TOML identity/route names and APT command values are preserved; status fields
+require the explicit version-2 migration.
 The follow-up review changes rest/cleanup/recovery guards and GUI state lifetime;
 earlier bench results retain their exact recorded revision rather than validating
 these changes physically. Software-only tests cannot complete that cutover.

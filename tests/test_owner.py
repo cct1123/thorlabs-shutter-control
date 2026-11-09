@@ -11,24 +11,25 @@ from threading import Event, Thread
 import pytest
 from conftest import FakeTransport
 
-from thorlabs_shutter_control import Policy, Route, ShutterError, ShutterHub
-from thorlabs_shutter_control.errors import Cancelled, IdentityMismatch, ProtocolError
+from thorlabs_shutter_control import Policy, Route, ShutterError, ShutterHub, UnsupportedRoute
+from thorlabs_shutter_control.controller import IdentityMismatch
+from thorlabs_shutter_control.protocol import Cancelled, ProtocolError
 
 
 def test_connect_read_manual_on_off_and_passive_release(bench):
     hub, devices, _, _ = bench
     assert not devices
     assert not hub.connection_snapshot("beam").has_device
-    assert hub.connect(0).identity_verified
+    assert hub.connect(0).identity
     device = devices[0]
     assert not device.output_frames
-    assert hub.get_status("beam").feedback.electrical_state == "off"
+    assert hub.get_status("beam").electrical_state == "off"
     hub.set_manual_mode("beam")
     result = hub.open_shutter("beam")
     assert result.requested_state == "on"
-    assert result.feedback.electrical_state == "on"
-    assert result.feedback.shutter_state == "unknown"
-    assert not result.transition_confirmed
+    assert result.electrical_state == "on"
+    assert result.optical_closed_at is None
+    assert result.optical_evidence is None
     hub.close_shutter("beam")
     count = len(device.output_frames)
     hub.close()
@@ -44,7 +45,7 @@ def test_readonly_shutdown_does_not_send_incidental_off(config, tmp_path, qualif
         [config], transport_factory=lambda c, d: device, lock_directory=tmp_path
     ) as hub:
         hub.connect("beam")
-        assert hub.get_status("beam").feedback.electrical_state == "off"
+        assert hub.get_status("beam").electrical_state == "off"
         if faulted:
             device.serial = "68000002"
             with pytest.raises(IdentityMismatch):
@@ -93,7 +94,7 @@ def test_changed_identity_after_connect_never_receives_cleanup_output(bench):
     devices[0].serial = "68000002"
     with pytest.raises(IdentityMismatch):
         hub.open_shutter("beam")
-    assert not hub.connection_snapshot("beam").identity_verified
+    assert not hub.connection_snapshot("beam").identity
     with pytest.raises(ShutterError):
         hub.safe_state("beam")
     assert not devices[0].output_frames
@@ -129,9 +130,67 @@ def test_noncanonical_com_aliases_rejected_before_io():
             Route("vcp", port=alias)
 
 
-def test_external_keh3_and_vcp_control_remain_blocked(config):
-    from thorlabs_shutter_control.transport import require_control_route
+@pytest.mark.parametrize("matches", [True, False])
+def test_unknown_hub_metadata_keeps_exact_controller_check(config, tmp_path, matches):
+    config = replace(config, route=Route("keh3", host="192.0.2.1", bay="middle"))
+    assert config.route.hub_serial is config.route.hub_firmware is None
+    device = FakeTransport(config)
+    if not matches:
+        device.serial = "68000002"
+    with ShutterHub(
+        [config], transport_factory=lambda c, d: device, lock_directory=tmp_path
+    ) as hub:
+        if matches:
+            assert hub.connect("beam").endpoint == "192.0.2.1:40305"
+            assert hub.get_status("beam").electrical_state == "off"
+        else:
+            with pytest.raises(IdentityMismatch):
+                hub.connect("beam")
+        assert not device.output_frames
+    assert device.closed
 
+
+@pytest.mark.parametrize("field", ["hub_serial", "hub_firmware"])
+@pytest.mark.parametrize("value", ["", " ", 7, False])
+def test_supplied_hub_metadata_must_be_nonempty_text(field, value):
+    with pytest.raises(ValueError, match=field):
+        Route("keh3", host="192.0.2.1", bay="middle", **{field: value})
+
+
+@pytest.mark.parametrize(
+    "metadata,conflict",
+    [
+        ([{}, {}, {}], False),
+        ([{"hub_serial": "H1"}, {"hub_firmware": "1.0"}, {"hub_serial": "H1"}], False),
+        ([{"hub_serial": "H1"}, {}, {"hub_serial": "H2"}], True),
+        ([{"hub_firmware": "1.0"}, {"hub_serial": "H1"}, {"hub_firmware": "2.0"}], True),
+    ],
+)
+def test_known_hub_metadata_conflicts_survive_partial_unknowns(config, metadata, conflict):
+    configs = [
+        replace(
+            config,
+            name=f"shutter-{index}",
+            channel=index,
+            serial_number=f"6800000{index + 1}",
+            route=Route("keh3", host="192.0.2.1", bay=bay, **details),
+        )
+        for index, (bay, details) in enumerate(
+            zip(("left", "middle", "right"), metadata, strict=True)
+        )
+    ]
+
+    def no_io(*args):
+        pytest.fail("Configuration validation opened a device")
+
+    if conflict:
+        with pytest.raises(ValueError, match="Conflicting hub identity"):
+            ShutterHub(configs, transport_factory=no_io)
+    else:
+        assert len(ShutterHub(configs, transport_factory=no_io).configs) == 3
+
+
+def test_external_keh3_and_vcp_control_remain_blocked(config, tmp_path):
     lan = replace(
         config,
         route=Route(
@@ -143,8 +202,18 @@ def test_external_keh3_and_vcp_control_remain_blocked(config):
         ),
     )
     for candidate in (lan, replace(config, route=Route("vcp", port="COM9"))):
-        with pytest.raises(ShutterError):
-            require_control_route(candidate)
+        device = FakeTransport(candidate)
+        with ShutterHub(
+            [candidate],
+            transport_factory=lambda c, d, device=device: device,
+            lock_directory=tmp_path,
+        ) as hub:
+            assert hub.connect("beam").identity
+            for operation in (hub.open_shutter, hub.safe_state, hub.set_manual_mode):
+                with pytest.raises(UnsupportedRoute):
+                    operation("beam")
+            assert not device.output_frames
+        assert device.closed
 
 
 @pytest.mark.parametrize("bay,port", [("left", 40304), ("middle", 40305), ("right", 40306)])
@@ -168,8 +237,8 @@ def test_docked_keh3_uses_same_qualified_manual_control(config, tmp_path, bay, p
         assert connected.endpoint == f"192.0.2.1:{port}"
         assert not device.output_frames
         hub.set_manual_mode("beam")
-        assert hub.set_solenoid("beam", True).feedback.electrical_state == "on"
-        assert hub.set_solenoid("beam", False).feedback.electrical_state == "off"
+        assert hub.set_solenoid("beam", True).electrical_state == "on"
+        assert hub.set_solenoid("beam", False).electrical_state == "off"
         assert [f.encode().hex() for f in device.output_frames] == [
             "cb0401015001",
             "cb0401025001",
@@ -216,9 +285,9 @@ def test_external_keh3_readback_cannot_become_output_by_injection(config, tmp_pa
     device.mode, device.state = 4, 0  # Actual firmware1.0.7 Trigger/OFF scalar reply.
     with ShutterHub([lan], transport_factory=lambda c, d: device, lock_directory=tmp_path) as hub:
         assert hub.connect("beam").identity.serial_number == lan.serial_number
-        feedback = hub.get_status("beam").feedback
+        feedback = hub.get_status("beam")
         assert feedback.electrical_state == "off" and feedback.status_bits == 0x2000
-        assert feedback.operating_state == "unknown"  # OFF does not prove unprimed/inactive.
+        assert feedback.requested_state != "start"  # This read does not prime a trigger.
         assert not any(f.message_id == 0x04CC for _, f in device.history)
         assert hub.get_solenoid_state_reply("beam") == 0
         for action in (hub.open_shutter, hub.safe_state, hub.set_manual_mode):
@@ -250,7 +319,7 @@ def test_disabled_interlock_requirement_refuses_on(bench):
 def test_manual_selection_does_not_rewrite_an_already_manual_controller(bench):
     hub, devices, _, _ = bench
     hub.connect("beam")
-    assert hub.set_manual_mode("beam").feedback.operating_mode == "manual"
+    assert hub.set_manual_mode("beam").operating_mode == "manual"
     assert not devices[0].output_frames
 
 
@@ -263,10 +332,7 @@ def test_mode_transition_requires_separate_persistent_permission(config, tmp_pat
     try:
         hub.connect("beam")
         if allowed:
-            assert (
-                hub.set_manual_mode("beam", source_inhibited=True).feedback.operating_mode
-                == "manual"
-            )
+            assert hub.set_manual_mode("beam", source_inhibited=True).operating_mode == "manual"
             assert [f.message_id for f in device.output_frames] == [0x04CB, 0x04C0]
         else:
             with pytest.raises(ShutterError, match="persistent"):
@@ -293,7 +359,7 @@ def test_trigger_manual_requires_explicit_protection(config, tmp_path, source_in
         hub.connect("beam")
         if source_inhibited:
             result = hub.set_manual_mode("beam", source_inhibited=True)
-            assert result.feedback.operating_mode == "manual"
+            assert result.operating_mode == "manual"
             assert [(f.message_id, f.param2) for f in device.output_frames] == [
                 (0x04CB, 2),
                 (0x04C0, 1),
@@ -408,7 +474,7 @@ def test_off_interval_begins_after_output_readback(config, tmp_path, monkeypatch
             hub.set_solenoid("beam", True)
         assert [f.param2 for f in device.output_frames] == [2]
         now[0] = 101.8
-        assert hub.set_solenoid("beam", True).feedback.electrical_state == "on"
+        assert hub.set_solenoid("beam", True).electrical_state == "on"
         hub.safe_state("beam")
 
 
@@ -449,8 +515,8 @@ def test_process_reconnect_does_not_clear_active_output_journal(bench):
         optical_closed=True,
         evidence="simulated independent human observation",
     )
-    assert not result.error and result.optical_observed_state == "closed"
-    assert result.feedback.shutter_state == "unknown"
+    assert not result.error and result.optical_closed_at is not None
+    assert result.optical_evidence == "simulated independent human observation"
     assert not devices[-1].output_frames  # Recovery is passive and never restores ON.
 
 
@@ -461,13 +527,14 @@ def test_cross_process_and_same_process_ownership(bench):
     with pytest.raises(ShutterError, match="owned"):
         other.connect("beam")
     code = """
-import json, sys
-from thorlabs_shutter_control import ControllerConfig, Route
-from thorlabs_shutter_control.ownership import Claim
-from thorlabs_shutter_control.errors import ShutterError
+import sys
+from thorlabs_shutter_control import ControllerConfig, Route, ShutterHub
+from thorlabs_shutter_control import ShutterError
 c = ControllerConfig('beam',0,'fake','68000001',('1.0.7',),Route('d2xx'))
 try:
-    Claim(c, sys.argv[1]).acquire()
+    ShutterHub(
+        [c], lock_directory=sys.argv[1], transport_factory=lambda *args: None
+    ).connect('beam')
 except ShutterError:
     print('owned')
 else:
@@ -550,9 +617,23 @@ def test_status_json_keeps_electrical_and_optical_separate(bench):
     hub, _, _, _ = bench
     hub.connect("beam")
     value = json.loads(json.dumps(asdict(hub.get_status("beam"))))
-    assert value["feedback"]["electrical_state"] == "off"
-    assert value["feedback"]["shutter_state"] == "unknown"
-    assert value["optical_observed_state"] == "unknown"
+    assert value["electrical_state"] == "off"
+    assert "shutter_state" not in value
+    assert value["optical_closed_at"] is None
+
+
+def test_status_snapshots_are_independent_and_do_not_cache_readings(bench):
+    hub, _, _, _ = bench
+    hub.connect("beam")
+    live = hub.get_status("beam")
+    assert live.status_bits == 0x2000 and live.electrical_observed_at
+    # A caller can edit its copy without mutating the owner or its identity checks.
+    live.error, live.identity, live.requested_state = "caller edit", None, "on"
+    host = hub.connection_snapshot("beam")
+    assert host.error is None and host.identity is not None and host.requested_state is None
+    assert host.status_bits is None and host.electrical_state == "unknown"
+    assert host.electrical_observed_at is None and host.operating_mode == "unknown"
+    assert {"lock", "cancel", "transport", "driver", "claim", "config"}.isdisjoint(asdict(host))
 
 
 def test_failed_on_readback_uses_separate_cleanup_budget_and_never_replays(bench):

@@ -1,0 +1,12 @@
+{
+  "requirement": "REQ-246",
+  "test": "TEST-246",
+  "before_sha256": "904c35cd7aa8e974b3ae32ce6c2d46e2fab28b2d9c6707f57bf98a6a12e3dda4",
+  "after_sha256": "2c3c42a8afaac3ab3e0a59486d48181f313a9ff437c2da3c0d5bdafc3a923bff",
+  "baseline_input_drift": [],
+  "normalized_ast": "PASS: only definition/method order and module navigation prose excluded",
+  "top_level_definitions": 15,
+  "driver_methods": 16,
+  "owner_methods": 43,
+  "scope": "Reordering and navigation comments only; no device I/O"
+}

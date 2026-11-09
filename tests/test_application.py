@@ -11,6 +11,7 @@ from ui_helpers import post_callback
 
 from thorlabs_shutter_control import load_config
 from thorlabs_shutter_control.__main__ import main
+from thorlabs_shutter_control.gui import ACTIONS
 from thorlabs_shutter_control.protocol import Deadline
 from thorlabs_shutter_control.transport import D2XXTransport, VCPTransport
 
@@ -80,8 +81,8 @@ def test_cli_reads_share_owner_schema_and_release(bench, monkeypatch, capsys, co
         assert len(devices[0].history) == 1  # Reuse the identity already verified by connect.
     else:
         assert value["identity"]["serial_number"] == "68000001"
-        assert value["feedback"]["status_bits"] == 0x2000
-        assert value["feedback"]["operating_state"] == "unknown"
+        assert value["status_bits"] == 0x2000
+        assert "operating_state" not in value
     assert devices[0].closed and not devices[0].output_frames
 
 
@@ -128,7 +129,7 @@ def test_d2xx_contract_uses_exact_serial_no_enumeration(monkeypatch):
 
 @pytest.mark.parametrize("backend", [D2XXTransport, VCPTransport])
 def test_expired_connection_budget_does_not_open_native_device(backend, monkeypatch):
-    from thorlabs_shutter_control.errors import DeadlineExceeded
+    from thorlabs_shutter_control.protocol import DeadlineExceeded
 
     def forbidden(*args, **kwargs):
         pytest.fail("Expired connection opened a device")
@@ -155,25 +156,7 @@ def test_gui_construction_is_passive(bench):
 
 
 @pytest.mark.parametrize("target", [None, "unknown"])
-@pytest.mark.parametrize(
-    "action",
-    [
-        "connect",
-        "read",
-        "manual",
-        "single",
-        "auto",
-        "triggered",
-        "on",
-        "pulse",
-        "off",
-        "settings-stop",
-        "release",
-        "identify",
-        "read-settings",
-        "apply-settings",
-    ],
-)
+@pytest.mark.parametrize("action", ACTIONS)
 def test_gui_requires_an_exact_target_for_every_action(bench, target, action):
     from thorlabs_shutter_control.gui import create_app
 
@@ -199,7 +182,7 @@ def test_gui_requires_an_exact_target_for_every_action(bench, target, action):
     assert not devices[0].closed and len(devices[0].history) == before
 
 
-def test_existing_diamond_owner_surface_and_feedback_schema(bench):
+def test_owner_surface_and_flat_status_schema(bench):
     hub, _, _, _ = bench
     methods = (
         "connect",
@@ -224,13 +207,16 @@ def test_existing_diamond_owner_surface_and_feedback_schema(bench):
         "channel",
         "serial_number",
         "endpoint",
-        "feedback",
+        "electrical_state",
         "error",
-        "identity_verified",
+        "identity",
         "generation",
         "has_device",
     } <= status.keys()
-    assert status["feedback_freshness"] == "response_after_request_no_transaction_id"
+    assert status["electrical_observed_at"] is not None
+    assert {"feedback", "identity_verified", "connection", "transition_confirmed"}.isdisjoint(
+        status
+    )
 
 
 def test_gui_exit_preserves_original_error_and_each_cleanup(monkeypatch):

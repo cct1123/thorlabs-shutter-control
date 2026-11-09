@@ -18,6 +18,9 @@ class FakeTransport:
         self.firmware = (7, 0, 1)
         self.mode, self.state, self.interlock = 1, 2, 1
         self.cycle = (1000, 2000, 1)
+        self.led_modes, self.bay = 1, 2
+        self.updates = self.bus_disconnected = False
+        self.update_payload = b"opaque update fixture"  # Not a guessed KSC101 payload layout.
         self.rx = deque()
         self.history = []
         self.closed = False
@@ -32,7 +35,7 @@ class FakeTransport:
     def write(self, raw, deadline):
         frame = Decoder().feed(raw)[0]
         self.history.append((time.perf_counter(), frame))
-        if frame.message_id == 0x04CB:
+        if frame.message_id in (0x04CB, 0x0210):
             self.state = frame.param2
             if self.partial:
                 return 3  # Possibly applied, even though transport reports short write.
@@ -41,6 +44,14 @@ class FakeTransport:
         elif frame.message_id == 0x04C3:
             _, *values = struct.unpack("<HIII", frame.payload)
             self.cycle = tuple(values)
+        elif frame.message_id == 0x04C6:
+            self.interlock = frame.param2
+        elif frame.message_id == 0x04B3:
+            _, self.led_modes = struct.unpack("<HH", frame.payload)
+        elif frame.message_id in (0x0011, 0x0012):
+            self.updates = frame.message_id == 0x0011
+        elif frame.message_id == 0x0002:
+            self.bus_disconnected = True
         if frame.message_id in self.silent:
             return len(raw)
         reply = None
@@ -59,6 +70,14 @@ class FakeTransport:
         elif frame.message_id == 0x0429:
             bits = 0x2001 if self.state == 1 else 0x2000
             reply = Frame(0x042A, destination=1, source=0x50, payload=struct.pack("<HI", 1, bits))
+        elif frame.message_id == 0x0065:
+            reply = Frame(0x0066, self.bay, 0, 1, 0x50)
+        elif frame.message_id == 0x04B4:
+            reply = Frame(
+                0x04B5, destination=1, source=0x50, payload=struct.pack("<HH", 1, self.led_modes)
+            )
+        elif frame.message_id == 0x0211:
+            reply = Frame(0x0212, 1, 1 if self.state == 1 else 2, 1, 0x50)
         elif frame.message_id in (0x04C1, 0x04CC, 0x04C7):
             ident, value = {
                 0x04C1: (0x04C2, self.mode),
@@ -67,6 +86,10 @@ class FakeTransport:
             }[frame.message_id]
             reply = Frame(ident, 1, value, 1, 0x50)
         if reply:
+            if self.updates:
+                self.rx.append(
+                    Frame(0x0481, destination=1, source=0x50, payload=self.update_payload).encode()
+                )
             self.rx.append(self.prefix + self.rewrite(reply.encode()))
         return len(raw)
 

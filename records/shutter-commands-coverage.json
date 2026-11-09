@@ -1,0 +1,363 @@
+{
+  "requirement_id": "REQ-249",
+  "test_id": "TEST-249",
+  "evidence_id": "E229",
+  "scope": "Software implementation; no live device operations",
+  "recorded_at_utc": "2026-11-08T23:36:07.050466+00:00",
+  "manual": {
+    "path": "docs/manuals/APT_Communications_Protocol_Issue_42.1.pdf",
+    "revision": "42.1",
+    "date": "2025-09-09",
+    "pages": 443,
+    "sha256": "b2a6badd7c00b3042ba383e291667e7eab10746c14c4f92cea45fc480c7304ed"
+  },
+  "source_sha256": {
+    "src/thorlabs_shutter_control/controller.py": "b5c806c611e53f2b71148a5b17df8bab490c248bbe879158119dcbbf712be6fa",
+    "src/thorlabs_shutter_control/protocol.py": "928cb19ad298b494170ce87c29e22787bbba43c2e701101059528d0165be6e96",
+    "src/thorlabs_shutter_control/transport.py": "850583f672bc8566529b1845e84e5dd3bdb5d865cf361366c2c84e9612722da3"
+  },
+  "applicability_table_entries": 39,
+  "outbound_driver_ids": [
+    "0x0002",
+    "0x0005",
+    "0x0011",
+    "0x0012",
+    "0x0065",
+    "0x0210",
+    "0x0211",
+    "0x0223",
+    "0x0429",
+    "0x04B3",
+    "0x04B4",
+    "0x04B9",
+    "0x04C0",
+    "0x04C1",
+    "0x04C3",
+    "0x04C4",
+    "0x04C6",
+    "0x04C7",
+    "0x04CB",
+    "0x04CC"
+  ],
+  "queried_reply_ids": [
+    "0x0006",
+    "0x0066",
+    "0x0212",
+    "0x042A",
+    "0x04B5",
+    "0x04C2",
+    "0x04C5",
+    "0x04C8",
+    "0x04CD"
+  ],
+  "commands": [
+    {
+      "name": "MGMSG_MOD_IDENTIFY",
+      "id": "0x0223",
+      "manual_page": 43,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted"
+    },
+    {
+      "name": "MGMSG_MOD_SET_CHANENABLESTATE",
+      "id": "0x0210",
+      "manual_page": 44,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted",
+      "limitation": "Driver encoder only; normal owner output stays on0x04CB and enable_device remains refused"
+    },
+    {
+      "name": "MGMSG_MOD_REQ_CHANENABLESTATE",
+      "id": "0x0211",
+      "manual_page": 44,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted"
+    },
+    {
+      "name": "MGMSG_MOD_GET_CHANENABLESTATE",
+      "id": "0x0212",
+      "manual_page": 44,
+      "section": "TSC001/KSC101",
+      "coverage": "queried reply decoded/returned"
+    },
+    {
+      "name": "MGMSG_HW_DISCONNECT",
+      "id": "0x0002",
+      "manual_page": 46,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted",
+      "limitation": "Explicit protected hardware disconnect and incoming handler; ordinary release remains passive"
+    },
+    {
+      "name": "MGMSG_HW_RESPONSE",
+      "id": "0x0080",
+      "manual_page": 46,
+      "section": "TSC001/KSC101",
+      "coverage": "inbound event handled"
+    },
+    {
+      "name": "MGMSG_HW_RICHRESPONSE",
+      "id": "0x0081",
+      "manual_page": 47,
+      "section": "TSC001/KSC101",
+      "coverage": "inbound event handled"
+    },
+    {
+      "name": "MGMSG_HW_START_UPDATEMSGS",
+      "id": "0x0011",
+      "manual_page": 48,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted",
+      "limitation": "Explicit request without ACK; no implicit start/stop or background thread"
+    },
+    {
+      "name": "MGMSG_HW_STOP_UPDATEMSGS",
+      "id": "0x0012",
+      "manual_page": 48,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted",
+      "limitation": "Explicit request without ACK; no implicit start/stop or background thread"
+    },
+    {
+      "name": "MGMSG_HW_REQ_INFO",
+      "id": "0x0005",
+      "manual_page": 49,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted"
+    },
+    {
+      "name": "MGMSG_HW_GET_INFO",
+      "id": "0x0006",
+      "manual_page": 49,
+      "section": "TSC001/KSC101",
+      "coverage": "queried reply decoded/returned"
+    },
+    {
+      "name": "MGMSG_HUB_REQ_BAYUSED",
+      "id": "0x0065",
+      "manual_page": 52,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted",
+      "limitation": "Raw legacy bay byte only; no KEH3 topology inference"
+    },
+    {
+      "name": "MGMSG_HUB_GET_BAYUSED",
+      "id": "0x0066",
+      "manual_page": 52,
+      "section": "TSC001/KSC101",
+      "coverage": "queried reply decoded/returned",
+      "limitation": "Raw legacy bay byte only; no KEH3 topology inference"
+    },
+    {
+      "name": "MGMSG_MOT_MOVE_COMPLETED",
+      "id": "0x0464",
+      "manual_page": 80,
+      "section": "TSC001/KSC101",
+      "coverage": "excluded: ambiguous motor-specific semantics/layout"
+    },
+    {
+      "name": "MGMSG_MOT_MOVE_ABSOLUTE",
+      "id": "0x0453",
+      "manual_page": 81,
+      "section": "TSC001/KSC101",
+      "coverage": "excluded: ambiguous motor-specific semantics/layout"
+    },
+    {
+      "name": "MGMSG_MOT_MOVE_STOP",
+      "id": "0x0465",
+      "manual_page": 85,
+      "section": "TSC001/KSC101",
+      "coverage": "excluded: ambiguous motor-specific semantics/layout"
+    },
+    {
+      "name": "MGMSG_MOT_SET_AVMODES",
+      "id": "0x04B3",
+      "manual_page": 92,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted",
+      "limitation": "LED mask words; no motor/optical interpretation;0x04B4 follows table/header over p93 diagram typo"
+    },
+    {
+      "name": "MGMSG_MOT_REQ_AVMODES",
+      "id": "0x04B4",
+      "manual_page": 92,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted",
+      "limitation": "LED mask words; no motor/optical interpretation;0x04B4 follows table/header over p93 diagram typo"
+    },
+    {
+      "name": "MGMSG_MOT_GET_AVMODES",
+      "id": "0x04B5",
+      "manual_page": 92,
+      "section": "TSC001/KSC101",
+      "coverage": "queried reply decoded/returned",
+      "limitation": "LED mask words; no motor/optical interpretation;0x04B4 follows table/header over p93 diagram typo"
+    },
+    {
+      "name": "MGMSG_MOT_SET_BUTTONPARAMS",
+      "id": "0x04B6",
+      "manual_page": 97,
+      "section": "TSC001/KSC101",
+      "coverage": "excluded: ambiguous motor-specific semantics/layout"
+    },
+    {
+      "name": "MGMSG_MOT_REQ_BUTTONPARAMS",
+      "id": "0x04B7",
+      "manual_page": 97,
+      "section": "TSC001/KSC101",
+      "coverage": "excluded: ambiguous motor-specific semantics/layout"
+    },
+    {
+      "name": "MGMSG_MOT_GET_BUTTONPARAMS",
+      "id": "0x04B8",
+      "manual_page": 97,
+      "section": "TSC001/KSC101",
+      "coverage": "excluded: ambiguous motor-specific semantics/layout"
+    },
+    {
+      "name": "MGMSG_MOT_SET_EEPROMPARAMS",
+      "id": "0x04B9",
+      "manual_page": 99,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted",
+      "limitation": "Cycle-parameter EEPROM storage only; restart verification remains open"
+    },
+    {
+      "name": "MGMSG_MOT_GET_STATUSUPDATE",
+      "id": "0x0481",
+      "manual_page": 119,
+      "section": "TSC001/KSC101",
+      "coverage": "raw events exposed; typed payload excluded"
+    },
+    {
+      "name": "MGMSG_MOT_SET_SOL_OPERATINGMODE",
+      "id": "0x04C0",
+      "manual_page": 184,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted"
+    },
+    {
+      "name": "MGMSG_MOT_REQ_SOL_OPERATINGMODE",
+      "id": "0x04C1",
+      "manual_page": 184,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted"
+    },
+    {
+      "name": "MGMSG_MOT_GET_SOL_OPERATINGMODE",
+      "id": "0x04C2",
+      "manual_page": 184,
+      "section": "TSC001/KSC101",
+      "coverage": "queried reply decoded/returned"
+    },
+    {
+      "name": "MGMSG_MOT_SET_SOL_CYCLEPARAMS",
+      "id": "0x04C3",
+      "manual_page": 186,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted"
+    },
+    {
+      "name": "MGMSG_MOT_REQ_SOL_CYCLEPARAMS",
+      "id": "0x04C4",
+      "manual_page": 186,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted"
+    },
+    {
+      "name": "MGMSG_MOT_GET_SOL_CYCLEPARAMS",
+      "id": "0x04C5",
+      "manual_page": 186,
+      "section": "TSC001/KSC101",
+      "coverage": "queried reply decoded/returned"
+    },
+    {
+      "name": "MGMSG_MOT_SET_SOL_INTERLOCKMODE",
+      "id": "0x04C6",
+      "manual_page": 188,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted",
+      "limitation": "Require interlock only (value1), idempotent owner; disable value2 intentionally excluded"
+    },
+    {
+      "name": "MGMSG_MOT_REQ_SOL_INTERLOCKMODE",
+      "id": "0x04C7",
+      "manual_page": 188,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted"
+    },
+    {
+      "name": "MGMSG_MOT_GET_SOL_INTERLOCKMODE",
+      "id": "0x04C8",
+      "manual_page": 188,
+      "section": "TSC001/KSC101",
+      "coverage": "queried reply decoded/returned"
+    },
+    {
+      "name": "MGMSG_MOT_SET_SOL_STATE",
+      "id": "0x04CB",
+      "manual_page": 190,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted"
+    },
+    {
+      "name": "MGMSG_MOT_REQ_SOL_STATE",
+      "id": "0x04CC",
+      "manual_page": 190,
+      "section": "TSC001/KSC101",
+      "coverage": "transmitted"
+    },
+    {
+      "name": "MGMSG_MOT_GET_SOL_STATE",
+      "id": "0x04CD",
+      "manual_page": 190,
+      "section": "TSC001/KSC101",
+      "coverage": "queried reply decoded/returned"
+    },
+    {
+      "name": "MGMSG_MOT_SET_KCUBEMMIPARAMS",
+      "id": "0x0520",
+      "manual_page": 134,
+      "section": "KSC101-only",
+      "coverage": "excluded: ambiguous motor-specific semantics/layout"
+    },
+    {
+      "name": "MGMSG_MOT_SET_KCUBETRIGIOCONFIG",
+      "id": "0x0523",
+      "manual_page": 137,
+      "section": "KSC101-only",
+      "coverage": "excluded: ambiguous motor-specific semantics/layout"
+    },
+    {
+      "name": "MGMSG_MOT_SET_KCUBEPOSTRIGPARAMS",
+      "id": "0x0526",
+      "manual_page": 141,
+      "section": "KSC101-only",
+      "coverage": "excluded: ambiguous motor-specific semantics/layout"
+    }
+  ],
+  "additional_implemented_ids_not_in_KSC101_table": [
+    "0x0429",
+    "0x042A"
+  ],
+  "documentation_conflicts": [
+    "KSC101 table versus detailed applicability for 0x0520/0523/0526",
+    "MMI lengths 36-byte prose versus 0x1C header",
+    "Trigger I/O lengths 22-byte prose versus 0x0C header",
+    "Cycle on/off upper bound 10000 s printed in Issue42.1 p186 versus 10000 ms in KSC101 RevF p31",
+    "Motor position/button commands listed for solenoid model; no shutter-specific layout",
+    "KSC101 status-bit mapping is not supplied by its Issue42.1 model table alone"
+  ],
+  "coverage_note": "Clear word/scalar/header commands implemented. Raw updates remain opaque. Ambiguous motor layouts and interlock disable intentionally excluded.",
+  "timing_cross_reference": {
+    "path": "docs/manuals/KSC101_Kinesis_UI_Manual_HA0368T_Rev_F.pdf",
+    "page": 31,
+    "on_off_ms_range": [
+      100,
+      10000
+    ],
+    "result": "Current code matches KSC101-specific manual; Issue42.1 p186 prints conflicting units",
+    "sha256": "007d604c718378b3b8b6bc6f46876f00f91c6a4e4d839c2a175681ac3c122597"
+  },
+  "driver_ast_sha256": "b10cf9c85237db8ba159e10afb0da29407b40a995e32f03caa0eec573aac5061"
+}

@@ -8,9 +8,8 @@ from conftest import FakeTransport
 from ui_helpers import post_callback
 
 from thorlabs_shutter_control import CycleParameters, ShutterError, ShutterHub
-from thorlabs_shutter_control.device import KSC101
-from thorlabs_shutter_control.errors import ProtocolError
-from thorlabs_shutter_control.protocol import Deadline, Decoder, Frame
+from thorlabs_shutter_control.controller import KSC101
+from thorlabs_shutter_control.protocol import Deadline, Decoder, Frame, ProtocolError
 
 
 def test_cycle_bytes_match_apt_page186_literal():
@@ -87,6 +86,71 @@ def test_invalid_qualification_lists_fail(config, modes):
 
 
 @pytest.mark.parametrize("mode", ["single", "auto", "triggered"])
+def test_protected_mode_selection_does_not_qualify_native_start(config, tmp_path, mode):
+    from thorlabs_shutter_control.gui import execute_action
+
+    config = replace(config, policy=replace(config.policy, allow_persistent_mode_changes=True))
+    device = FakeTransport(config)
+    with ShutterHub(
+        [config], transport_factory=lambda c, d: device, lock_directory=tmp_path
+    ) as hub:
+        execute_action(hub, "connect", "beam")
+        with pytest.raises(ShutterError, match="independently inhibited"):
+            execute_action(hub, mode, "beam")
+        assert not device.output_frames
+        selected, _, _ = execute_action(hub, mode, "beam", source_inhibited=True)
+        assert selected.operating_mode == mode
+        assert selected.electrical_state == "off"
+        with pytest.raises(ShutterError, match="qualified_modes"):
+            execute_action(hub, "on", "beam", source_inhibited=True)
+        # Enabled GUI controls still use the owner's qualification checks.
+        from thorlabs_shutter_control.gui import create_app
+
+        app = create_app(hub)
+        key = next(key for key in app.callback_map if "notice.children" in key)
+        rendered = post_callback(
+            app,
+            key,
+            {"target": "beam", "on": 1, "source-inhibited": ["protected"]},
+            "on.n_clicks",
+        )
+        assert "qualified_modes" in rendered["notice"]["children"]
+        assert not rendered["sample"]["data"]["error"]
+        assert not any(f.message_id == 0x04CB and f.param2 == 1 for f in device.output_frames)
+        stopped, _, _ = execute_action(hub, "off", "beam")
+        assert stopped.electrical_state == "off" and not stopped.error
+        selected, _, _ = execute_action(hub, "manual", "beam", source_inhibited=True)
+        assert selected.operating_mode == "manual"
+        assert selected.interlock_required
+        released, _, _ = execute_action(hub, "release", "beam")
+        assert not released.has_device
+
+
+def test_failed_mode_selection_retains_fault_and_can_confirm_off(config, tmp_path):
+    config = replace(config, policy=replace(config.policy, allow_persistent_mode_changes=True))
+    device = FakeTransport(config)
+    with ShutterHub(
+        [config], transport_factory=lambda c, d: device, lock_directory=tmp_path
+    ) as hub:
+        hub.connect("beam")
+        driver = hub._channels["beam"].driver
+        change_mode = driver.set_operating_mode
+
+        def wrong_mode(mode, deadline):
+            change_mode(mode, deadline)
+            device.mode = 3  # Wrong readback must fault, even though output stayed OFF.
+
+        driver.set_operating_mode = wrong_mode
+        with pytest.raises(ShutterError, match="unconfirmed"):
+            hub.set_operating_mode("beam", "single", source_inhibited=True)
+        snapshot = hub.connection_snapshot("beam")
+        assert snapshot.error and "unconfirmed" in snapshot.error
+        assert snapshot.cleanup.startswith("Electrical OFF readback")
+        assert hub._channels["beam"].claim.journal.exists()
+        assert not any(f.message_id == 0x04CB and f.param2 == 1 for f in device.output_frames)
+
+
+@pytest.mark.parametrize("mode", ["single", "auto", "triggered"])
 def test_native_start_stop_uses_one_output_request_and_preserves_mode(config, tmp_path, mode):
     policy = replace(
         config.policy,
@@ -104,10 +168,9 @@ def test_native_start_stop_uses_one_output_request_and_preserves_mode(config, tm
         hub.connect("beam")
         hub.set_operating_mode("beam", mode, source_inhibited=True)
         result = hub.start("beam", source_inhibited=True)
-        assert result.requested_state == "start"
-        assert result.feedback.operating_state == "unknown" and not result.transition_confirmed
+        assert result.requested_state == "start" and result.optical_closed_at is None
         result = hub.safe_state("beam")
-        assert result.feedback.operating_mode == mode and result.feedback.electrical_state == "off"
+        assert result.operating_mode == mode and result.electrical_state == "off"
         assert not result.error
         assert [f.param2 for f in device.output_frames if f.message_id == 0x04CB] == [2, 1, 2]
 
@@ -140,10 +203,34 @@ def test_cycle_write_readback_and_explicit_storage_request(config, tmp_path):
         result = hub.set_cycle_parameters("beam", parameters, source_inhibited=True, persist=True)
         assert result.cycle_parameters == parameters
         assert "restart verification required" in result.settings_persistence
-        assert result.feedback.electrical_state == "off"
+        assert result.electrical_state == "off"
         assert not device.output_frames
         writes = [f for _, f in device.history if f.message_id in (0x04C3, 0x04B9)]
         assert [f.message_id for f in writes] == [0x04C3, 0x04B9]
+        frames = [f.message_id for _, f in device.history]
+        # One fresh OFF read before the settings write, one after; no duplicate poll.
+        assert frames[: frames.index(0x04C3)].count(0x0429) == 1
+        assert frames.count(0x0429) == 2
+
+
+@pytest.mark.parametrize(
+    "mode,state,interlock,message",
+    [(1, 1, 1, "electrical OFF"), (2, 2, 1, "Manual mode"), (1, 2, 2, "interlock requirement")],
+)
+def test_settings_preflight_refuses_active_or_unqualified_state(
+    config, tmp_path, mode, state, interlock, message
+):
+    config = replace(config, policy=replace(config.policy, allow_device_settings=True))
+    device = FakeTransport(config)
+    device.mode, device.state, device.interlock = mode, state, interlock
+    with ShutterHub(
+        [config], transport_factory=lambda c, d: device, lock_directory=tmp_path
+    ) as hub:
+        hub.connect("beam")
+        with pytest.raises(ShutterError, match=message):
+            hub.set_cycle_parameters("beam", CycleParameters(1000, 2000, 1), source_inhibited=True)
+        assert not device.output_frames
+        assert not any(f.message_id in (0x04C3, 0x04B9) for _, f in device.history)
 
 
 def test_cycle_read_and_identify_do_not_acquire_an_output_cleanup_obligation(bench):
@@ -190,7 +277,7 @@ def test_webui_start_requires_stop_before_release(bench):
         execute_action(hub, "release", "beam")
     assert not devices[0].closed
     execute_action(hub, "off", "beam")
-    sample, _ = execute_action(hub, "release", "beam")
+    sample, _, _ = execute_action(hub, "release", "beam")
     assert not sample.has_device
 
 
@@ -206,9 +293,34 @@ def test_webui_renderer_keeps_unavailable_feedback_unknown(bench):
     key = next(key for key in app.callback_map if "serial-label.children" in key)
     rendered = post_callback(app, key, {"sample": sample, "target": "beam"}, "sample.data")
     assert rendered["on"]["disabled"] is False
-    assert rendered["auto"]["disabled"] is True
-    assert rendered["apply-settings"]["disabled"] is True
+    assert rendered["auto"]["disabled"] is False
+    assert rendered["apply-settings"]["disabled"] is False
     assert rendered["key-lamp-value"]["children"] == "Unknown"
     assert rendered["ready-lamp-value"]["children"] == "Unknown"
     assert rendered["output-lamp-value"]["children"] == "Off"
     assert rendered["active-lamp-value"]["children"] == "Unknown"
+
+
+def test_webui_enabled_settings_still_refuse_unpermitted_write(bench):
+    from thorlabs_shutter_control.gui import create_app
+
+    hub, devices, _, _ = bench
+    hub.connect("beam")
+    before = len(devices[0].history)
+    app = create_app(hub)
+    key = next(key for key in app.callback_map if "notice.children" in key)
+    rendered = post_callback(
+        app,
+        key,
+        {
+            "target": "beam",
+            "apply-settings": 1,
+            "cycle-on": 1000,
+            "cycle-off": 2000,
+            "cycles": 1,
+            "source-inhibited": ["protected"],
+        },
+        "apply-settings.n_clicks",
+    )
+    assert "allow_device_settings" in rendered["notice"]["children"]
+    assert len(devices[0].history) == before

@@ -58,7 +58,7 @@ from static verification. Review their instructions and
 Static verification checks schema, syntax and links without executing hardware:
 
 ```powershell
-uv run --locked --group notebooks python scripts/verify_notebooks.py
+uv run --locked --group dev pytest tests/test_tutorial_notebooks.py
 ```
 
 Saved outputs are dated evidence, not continuing live state. The original user

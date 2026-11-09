@@ -4,6 +4,213 @@ Date: 4 November 2026
 Status: Engineering requirements
 Project management: uv
 
+## Expose documented commands in the GUI (user request, 8 November 2026)
+
+"update gui.py to expose the newly implemented shutter commands. keep it simple,
+consistent, and happy path focused. use the shared controller api."
+Derived REQ-250 / TEST-250: settings for LED indications/interlock enforcement;
+diagnostics for channel/bay, update requests/raw events and explicit hardware
+disconnect; exact-target shared-owner dispatch, truthful last-read/request labels,
+connection-scoped results/drafts and unchanged primary controls. Validate HTTP
+callbacks, passive browser layout and source/installed-wheel software. A separate
+passive preview is allowed; no device I/O or existing-server takeover/restart.
+
+## Final combined review and publication (user request, 8 November 2026)
+
+"review all changes again. identify and fix remaining flaws, prune redundant
+logic, keep it readable and in one script. preserve hardware protections. update
+docs and README, commit and push." Clarification: "Keep the current three core
+modules" (controller, protocol, transport); retain the GUI and CLI entry points.
+Derived REQ-251 / TEST-251: review the complete pending migration, fix demonstrated
+flaws with software regressions, prune redundant logic within the existing modules,
+preserve qualification/interlocks/ownership/deadlines/cleanup/passive startup,
+reconcile current docs and checkpoint, validate source and isolated wheel, and
+commit/push the reviewed repository changes. No live device/server operation,
+hardware policy expansion or external DiamondGUI change is authorized.
+
+## Clearly documented shutter commands (user request, 8 November 2026)
+
+"implement the missing shutter commands that are clearly documented for KSC101.
+keep the code simple and happy path focused. do not guess the ambiguous motor
+command layouts." Derived REQ-249 / TEST-249: typed documented channel/bay/LED
+queries, interlock enforcement, LED configuration, update start/stop with raw
+events, explicit bus disconnect and the low-level output-enable alias. Retain
+one canonical owner ON/OFF path, interlocks, write policy, ownership/deadlines,
+failure recovery and passive ordinary close. Do not decode ambiguous motor
+status/position/MMI/trigger/button layouts. Validate literal frames, owner behavior,
+error paths and source/isolated-wheel software. No live hardware/server operation.
+
+## Controller readability and API docstrings (user request, 8 November 2026)
+
+"improve the human readability of the script. put docstring to each api
+function/class". Derived REQ-248 / TEST-248: document every explicit controller
+class/function, explain API inputs/results/units and hardware effects, and replace
+terse channel/deadline local names. Preserve public signatures, executable logic,
+command ordering, schema and qualification/cleanup behavior. Validate docstring
+coverage, executable equivalence under the documented renames and complete
+source/isolated-wheel software. No device/server/external application operation
+or publication; preserve unrelated changes and historical evidence.
+
+## APT Issue 42 coverage audit (user request, 8 November 2026)
+
+"examine if all the apt commands for the shutter are implemented. use the apt
+communication protocol issue 42 as reference." Derived REQ-245 / TEST-245:
+compare all KSC101 table entries in the bundled Issue42.1 with typed driver/
+protocol implementations; distinguish commands, replies, events, partial
+coverage and model/specification conflicts. Record a complete coverage matrix.
+This is a static audit and continues the happy-path redundancy review; it grants
+no new command implementation, physical action or external application change.
+
+## Logical controller ordering (user request, 8 November 2026)
+
+"reorganize the controller.py in logical order." Derived REQ-246 / TEST-246:
+order configuration, data models, APT driver, internal ownership and the shared
+controller; arrange each operation group with its related helpers. Preserve all
+executable bodies, signatures, decorators, dataclass field order and public API.
+Validate structural equivalence and complete source/isolated-wheel software.
+No device I/O, running-server change, external application edit or publication;
+preserve unrelated working changes.
+
+## Controller duplication pruning (user approval, 8 November 2026)
+
+"prune" after the controller review approves three changes: reuse the fresh
+settings preflight OFF reading, remove repeated policy checks in nested private
+operations, and remove the already-guaranteed supported-mode check in protective
+OFF. Derived REQ-244 / TEST-244: preserve qualification before device I/O, all
+Manual/interlock/OFF guards, failure diagnostics and independent cleanup; validate
+one pre-write status sample, rejection before writes, safe-mode predicate parity
+and the complete source/isolated-wheel suite. Preserve other pending work.
+No device operation, running-server change, external application edit or publication.
+
+## GUI pruning (user request, 8 November 2026)
+
+"pruning the gui.py reduce guardrails. happy path focus." Derived REQ-242 /
+TEST-242: simplify GUI dispatch/rendering and remove unsupported settings
+placeholders; delegate route/qualification/settings permissions to the canonical
+owner instead of duplicating them in button availability. Preserve working
+controls, exact-target dispatch, session-scoped confirmations/drafts, truthful
+feedback, Stop-before-Release and shutdown cleanup. Validate source/isolated-wheel
+software and quantify reduction. Local implementation only; no device I/O,
+running-server operation, external application edit, commit or push.
+
+## Dataclass simplification (user request, 8 November 2026)
+
+"vastly simplify them", "code reduction substantially", following the dataclass
+review. User explicitly selected "Simplify the schema; update repo consumers"
+after being told external users of the old fields/serialized format need updating.
+This supersedes earlier status-schema preservation for this migration only.
+Derived REQ-241 / TEST-241: materially reduce status/state model declarations and
+snapshot mapping; remove redundant fields/unsupported placeholders and the nested
+feedback class, update repository consumers/docs/tutorial source, preserve
+configuration/qualification, command guards, ownership and optical/electrical
+separation. Validate snapshot isolation and complete source/isolated-wheel software.
+Historical captures/outputs remain unchanged. No external application edit,
+device operation, server restart, commit or push.
+
+## Transport pruning (user request, 8 November 2026)
+
+"prune" after the remaining-duplication review: replace VCP read_nowait's
+duplicated timeout/read logic with read(0). Derived REQ-240 / TEST-240: retain
+nonblocking empty reads, queued-byte delivery and the 4096-byte cap; preserve
+other transport behavior and validate source/isolated-wheel software. No new
+abstraction, device I/O, running-server change or publication.
+
+## Protocol pruning (user approval, 8 November 2026)
+
+"prune" after the protocol review: consolidate duplicate failed/partial-write
+flag handling and simplify known message form/length comparison. Derived
+REQ-239 / TEST-239: preserve reply validation, write ambiguity/late-complete
+cleanup distinction, error messages, diagnostics and the retained helpers;
+validate existing source/isolated-wheel software. Preserve other pending work.
+No device I/O, running-server change or publication.
+
+## Transport logic simplification (user approval, 8 November 2026)
+
+"yes" after the transport logic review approves its recommended first changes:
+remove redundant TCP readiness polling, select TCP host/port directly and inline
+route qualification into the owner's policy check. Derived REQ-238 / TEST-238:
+preserve no-data/fragment/disconnect behavior, exact bay mapping, both write
+restrictions, error types/messages and public package API; validate source and
+isolated wheel. Keep USB implementations/initialization unchanged, preserve
+pending work, and perform no device I/O, running-server change or publication.
+
+## Protocol helper cleanup (user request, 8 November 2026)
+
+"inline _drain_pending and _wait_for_reply into query. keep _check, _accept and
+clock. validate the changes." Derived REQ-237 / TEST-237: inline those two private
+helpers without changing transaction order, guards, errors or public interfaces;
+retain _check, _accept and clock unchanged, and validate source/isolated-wheel
+software. Preserve other pending work. No device I/O or running-server change.
+
+## Controller helper cleanup (user request, 8 November 2026)
+
+"clean up the codes" following the controller helper review. Derived REQ-236 /
+TEST-236: inline the single-use cleanup wrapper and remove the text validator's
+unused return value. Preserve shared validation, public owner methods, protective
+cleanup, original errors and separate cleanup diagnostics. Validate the complete
+source and installed-wheel software; preserve unrelated working changes. No
+device operation, server restart, external application edit or publication.
+
+## Protocol organization (user request, 8 November 2026)
+
+"organize protocol.py": reorganize the existing protocol module for readability.
+Derived REQ-235 / TEST-235: clarify message definitions and responsibility groups,
+make the session query flow easier to follow, preserve public interfaces and
+framing/deadline/cancellation/fault/freshness/write-recovery behavior, and validate
+affected software and package integration. Preserve pending work. No device I/O,
+running-server change, external application edit, commit or push is in scope.
+
+## Controller organization (user request, 8 November 2026)
+
+"organize the controller.py". Derived REQ-234 / TEST-234: group configuration,
+device commands, application models and ownership within the existing module;
+group public ShutterHub operations before internal helpers. Preserve public API,
+method bodies, safety guards and the three-module core. Validate structural
+equivalence and source/isolated-wheel software behavior. Preserve existing work;
+no device operation, server restart, external application edit or publication.
+
+## Transport organization (user request, 8 November 2026)
+
+"organize the transport.py": derived REQ-233 / TEST-233 groups route selection,
+byte transports and explicit inventory within the existing module, documents
+their contract and names shared constants. Preserve public names, route mappings,
+initialization order, deadlines, partial-write behavior and qualification guards.
+Validate with existing source and isolated-wheel software checks. Preserve pending
+working changes; no device operation or running-owner restart is included.
+
+## Three-module core migration (user request, 8 November 2026)
+
+User approved implementation of the prune/migration plan: integrate configuration
+and device commands into controller/transport/protocol, simplify repeated logic,
+remove config.py/device.py and integrate discovery into transport when compatible.
+Derived REQ-231 / TEST-231: three core modules, preserved public package/owner API,
+optional unknown hub metadata without placeholders, retained validation and
+control limits, updated consumers/docs, full source/isolated-wheel software checks.
+Preserve existing working changes, records, notebooks, manuals and runtime state.
+No hardware operation, server takeover/restart or external application edit.
+
+## Cowork repository slimming (user request, 8 November 2026)
+
+"slim down the repo. remove unnecessary structure, scaffolding, codes or scripts"
+with explicit follow-ups to remove ownership.py (handled in controller.py) and
+the separate errors.py. Derived REQ-230 / TEST-230: consolidate internal modules
+and duplicate verification, remove superseded documentation, preserve public
+owner behavior, actual evidence and unrelated working changes, and validate the
+source and installed wheel with software-only tests. No new device operation.
+
+## GUI operation-mode selection (user request, 8 November 2026)
+
+"allow operation mode selection on gui", with a screenshot of the connected
+panel's disabled Single/Auto/Triggered buttons. Enable selection of Manual,
+Single, Auto and Triggered through the existing APT driver/shared owner.
+Derived REQ-229 / TEST-229: separate persistent mode-selection permission from
+native output qualification, retain source-protection/OFF/interlock/readback
+guards and Stop/return-to-Manual/release, verify GUI availability and unchanged
+native Start restrictions, document configuration and validate source/wheel.
+This authorizes local implementation/configuration, not a live mode write,
+new output cycle, native Start/priming or physical qualification. Earlier
+consumed cycle approvals remain consumed.
+
 ## Follow-up holistic review (user request, 6 November 2026)
 
 Repeat the holistic review on the current native-mode/modern-WebUI migration:

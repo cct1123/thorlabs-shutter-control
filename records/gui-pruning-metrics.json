@@ -1,0 +1,15 @@
+{
+  "requirement": "REQ-242",
+  "test": "TEST-242",
+  "before_lines": 806,
+  "after_lines": 682,
+  "removed_lines": 124,
+  "before_sha256": "5db98168164f5ec1440cef312356fdd32a68672e0d9e67d6b772822dd3784c4b",
+  "after_sha256": "05fbced794106cdec4ca5f7e20a2fc2fefb4d9fbd52b452a6dee9f9d35bf51a7",
+  "execute_action_ast_unchanged": true,
+  "run_cleanup_ast_unchanged": true,
+  "controller_bytes_unchanged": false,
+  "controller_before_sha256": "466fb1a57f9a475f0c38b0797ea8ed1955d302a9c9e1e192217bd4db249fb13e",
+  "controller_after_sha256": "904c35cd7aa8e974b3ae32ce6c2d46e2fab28b2d9c6707f57bf98a6a12e3dda4",
+  "concurrent_change": "Controller duplication pruning REQ-244 changed controller.py independently; this GUI task did not edit it. Full verification includes the combined final source."
+}

@@ -186,7 +186,7 @@ LAN discovery, ambiguous GUI `active` naming and missing state/error explanation
 Passive app construction with one/three panels confirms 51/147 callback outputs:
 3 shared and 48 per panel; no SDK or device handle loaded. Existing useful comments
 and thin public wrappers support understanding and should remain. See the
-[review addendum](../outputs/REVIEW.md#beginner-development-handoff-governing-criterion).
+[review addendum](https://github.com/cct1123/thorlabs-shutter-control/blob/5d2adc1edeb93a3b827974c12ee957a2b6c9255f/outputs/REVIEW.md#beginner-development-handoff-governing-criterion).
 PASS review scope only. No novice developer exercise was performed; independent
 beginner takeover remains unvalidated. No production, test, config or hardware
 change; no additional functional test run was needed for this documentation review.
@@ -214,7 +214,7 @@ confirm500ms Manual Open,250ms Close,750ms Trigger Start,750ms Apply TTL and
 no sleep to configured Connect. Unified discovery with a found host adds5s;
 its SDK-list builds number2 without configured routes or3 with one route.
 38 tracked files;1952 physical production Python lines. See
-[review](../outputs/REVIEW.md) for source locations, method, qualifications and
+[review](https://github.com/cct1123/thorlabs-shutter-control/blob/5d2adc1edeb93a3b827974c12ee957a2b6c9255f/outputs/REVIEW.md) for source locations, method, qualifications and
 prioritized recommendations. PASS review only; fake timing cannot establish
 real SDK/native/network/optical latency. No production/test/config change or
 hardware/network operation. No new physical qualification claim.
@@ -360,7 +360,7 @@ Method: run tmp/delay-audit/probe.py with .venv/Scripts/python.exe -B; installs 
 existing bench.__wrapped__(pytest.MonkeyPatch) fixture and timestamps device/manager
 calls around actual Dash Flask callback HTTP. Source hashes, call counts and
 observed virtual waits: [delay-audit.json](delay-audit.json). Full findings and
-remaining opportunities: [audit](../outputs/DELAY_AUDIT.md). Raw traces and probe
+remaining opportunities: [audit](https://github.com/cct1123/thorlabs-shutter-control/blob/5d2adc1edeb93a3b827974c12ee957a2b6c9255f/outputs/DELAY_AUDIT.md). Raw traces and probe
 are ignored local diagnostics. The following authorized change supersedes only
 feedback-wait values, not discovery policy or physical qualification.
 
@@ -2489,3 +2489,1127 @@ human observation, before/after software evidence and cleanup/provenance manifes
 Explicit staged inputs/artifact hashes are checked before commit and final remote
 parity/clean status after push. Full hardware acceptance remains BLOCKED as stated;
 scoped repository-review completion does not extend any physical authorization.
+
+## E207 - Cowork resumption reconciliation / TEST-228
+
+2026-11-08 (hash inspection at 22:18 UTC), HEAD
+5d2adc1edeb93a3b827974c12ee957a2b6c9255f. Starting working tree clean.
+Read PROJECT.md, STATE.md, current report, source register, physical validation
+plan and the final review records. PowerShell Get-FileHash SHA256 checked every
+entry in followup-review-validation.json source_sha256, artifact_sha256,
+prior_campaign_artifacts_preserved and manual_integrity: 86 checks, 0 mismatches.
+Parsed saved source/wheel JUnit XML: each 228 tests, 0 failures/errors/skips.
+This is artifact reconciliation, not newly executed test or hardware evidence;
+no source change or new failure justifies repeating the satisfied software suite.
+
+git rev-parse HEAD and git rev-parse @{upstream} both returned the revision
+above. git -c credential.interactive=never ls-remote --exit-code origin
+refs/heads/main failed before remote access: Git usr/bin/sh CreateFileMapping,
+Win32 error 5, then "Could not read from remote repository". Current live remote
+parity is UNVERIFIED; no remote divergence is inferred from this local failure.
+
+No device operation, preview/server replacement or transient-state inspection.
+Full acceptance remains BLOCKED. STATE.md now gives one concrete request for a
+fresh protected, observed Manual WebUI cycle; prior consumed approvals are not
+renewed by the user's "cowork session" request. No actuation is scheduled or
+authorized by this checkpoint. External manufacturer, calibration, broader
+deployment and DiamondGUI gaps remain unchanged.
+
+## D064 - Separate mode selection from native activation / REQ-229
+
+8 November 2026 user request: "allow operation mode selection on gui". The
+connected SH05R screenshot showed Single/Auto/Triggered disabled because the
+GUI and set_operating_mode used output qualified_modes as a selection gate.
+Use the existing allow_persistent_mode_changes opt-in for protected selection
+of all four published APT modes. Keep qualified_modes as the independent native
+Start/priming gate; do not fabricate physical qualification or add another policy
+field. Fresh OFF, interlock requirement, source inhibition, explicit OFF before
+mode change, persistent-change permission and exact readback remain enforced.
+Stop/OFF and failure cleanup accept supported selectable modes so selecting one
+cannot strand the operator behind an activation-qualification refusal. No ON is
+sent by mode selection. The tracked profile explicitly keeps qualified_modes
+manual-only; settings/EEPROM permissions are unchanged. No live device operation
+is authorized by this UI implementation request or performed here.
+
+Concurrent edits consolidated ownership, errors and transports while this change
+was being tested. The user explicitly chose "Integrate concurrent changes";
+preserve those edits and validate the combined files. Focused callback/owner
+checks passed (116 tests). Final software evidence will identify the integrated
+source; earlier full-suite PASS evidence is historical after these source edits.
+
+## D065 - Keep ownership and exceptions with their implementation / REQ-230
+
+8 November 2026 user asks to slim repository structure and explicitly remove
+ownership.py (handled in controller.py) and errors.py. Keep the existing OS lock
+keys, directory, acquisition/release rules and persistent uncertainty journal
+inside controller.py as a private implementation. Put shared/protocol errors
+in protocol.py, identity mismatch in device.py and route rejection in transport.py.
+Keep the package-level public exception imports. Consolidate TCP with the other
+byte transports; do not add compatibility wrappers for removed internal modules.
+
+Fold notebook schema/syntax/link checks into pytest, preserving actual notebook
+files/outputs and passive exact-route tests. nbformat is now an explicit dev
+dependency at its already locked version; no package version changed. Remove
+the superseded Kinesis REVIEW/DELAY_AUDIT/CHANGE_REVIEW documents and the retired
+KEH3 probe stub; historical evidence links point at immutable Git content.
+Raw records, PDFs, backups, environments, local configuration and ownership
+state remain. The independent mode-selection edits are retained and included
+in combined software validation; no device I/O or server restart is authorized.
+
+## E208 - GUI mode-selection integrated software validation / TEST-229
+
+8 November 2026, final verification reconciled at 22:26 UTC. D064 implements
+protected selection of Manual/Single/Auto/Triggered using the existing persistent
+mode permission while retaining Manual-only activation qualification. Regression
+coverage checks refused unprotected transitions before writes, OFF/readback,
+all native selections, blocked native Start with no ON frame, Stop, return to
+Manual, release, wrong-mode readback fault/cleanup, and GUI connected/disconnected/
+faulted/native states. 116 focused tests PASS. The GUI's selected styling follows
+actual readback; the Triggered tooltip no longer implies selection primes output.
+
+Final command (existing complete user uv cache):
+uv run --offline --no-sync python -B scripts/verify.py
+--record-prefix gui-mode-selection-
+
+236 source and 236 exact isolated-wheel tests PASS, zero failures/errors/skips.
+Lock current/rejected-missing/rejected-outdated, lint/format, Python/CSS wheel
+parity, hash-locked clean dependency install, SDK/native-free imports, CLI/WebUI
+help and passive config checks PASS. Static notebook checks are now in pytest
+under the user-authorized concurrent consolidation. All 39 verifier input hashes
+matched current files after completion. Source edits in both sessions are
+included; no changes were discarded. Detailed commands, stdout, test totals and
+source/wheel hashes: records/gui-mode-selection-direct-validation.json, source/
+wheel XMLs, focused XML and records/gui-mode-selection-validation.json.
+
+Environment failures were resolved without touching hardware: Windows sandbox
+pytest-directory access denied; project-local cache lacked locked dependencies;
+concurrent dependency edits briefly invalidated the lock; active GUI executable
+prevented project-environment sync. Outside-sandbox software execution with the
+existing user cache and a --no-sync launch succeeded. The verifier independently
+checks the lock and builds/installs/tests a clean wheel. The initial 489868-byte
+generated untracked environment-error XML was removed after its access-denied
+diagnosis was summarized here; final passing records are retained.
+
+No device read/write, browser hardware exercise, server takeover, restart or new
+physical qualification occurred. Existing GUI still requires a released-owner
+restart and browser reload. Physical/deployment gaps and consumed cycle limits
+are unchanged. REQ-229 PASS applies to software, not a live mode transition.
+
+## E209 - Combined slimming validation / TEST-230
+
+8 November 2026; D065 / REQ-230. Removed ownership.py, errors.py and ethernet.py
+as separate internal modules; retained their behavior in controller.py,
+protocol.py/device.py and transport.py respectively. Updated imports and the
+cross-process test to exercise public ShutterHub ownership. Package-level
+ShutterError/UnsupportedRoute names and owner/status contracts remain intact.
+Runtime Python modules: 12 -> 9. Maintained scripts: 3 -> 2, with notebook
+schema/syntax/link checks integrated into pytest. nbformat uses its existing
+locked version; the lockfile adds only dev-group membership/metadata, with no
+package version changes. Removed superseded outputs/REVIEW.md,
+outputs/DELAY_AUDIT.md, outputs/CHANGE_REVIEW.md and the retired
+KEH3-probe documentation stub; historical links use immutable Git content.
+The current report now summarizes the resulting system rather than older reviews.
+
+Command, using the existing complete user uv cache and installed environment:
+uv run --locked --offline --no-sync --group dev --extra gui python -B
+scripts/verify.py --record-prefix slimming-
+
+Observed: 236 source + 236 isolated installed-wheel tests, zero failures/errors/
+skips. PASS: current/rejected-missing/rejected-outdated lock checks, lint/format,
+locked build/install, exact Python/CSS wheel parity, SDK/native-free imports,
+CLI/WebUI help, passive config and all six notebooks' static checks. No notebook
+hardware cell was run. Commands/stdout, source/fixture hashes, totals and wheel
+hash are in records/slimming-direct-validation.json; source/wheel JUnit records
+are records/slimming-offline-tests.xml and records/slimming-wheel-tests.xml.
+Source inputs remained unchanged during verification. Concurrent mode-selection
+work is retained and included (E208); this does not qualify a live mode write.
+
+Initial attempts hit Windows sandbox access denial for pytest-created temporary
+folders and incomplete project-local uv build metadata. The passing run used
+normal filesystem permissions, the existing complete user cache and --no-sync;
+the verifier itself checks the lock and constructs a clean isolated install.
+Removed only tmp/slimming-owner-tests, .ruff_cache and
+src/thorlabs_shutter_control/__pycache__: each absolute target was verified inside
+the workspace, without tracked files or reparse links before PowerShell removal.
+Raw evidence, PDFs, user notebook outputs/backups, .venv, local configuration,
+ambiguous historical tmp contents and runtime locks/journals were preserved.
+Final audit PASS: all 39 verifier input hashes still match, local links in 23
+Markdown documents exist, and the lock differs only by nbformat dev membership/
+metadata. Git confirms raw evidence, PDFs and notebook files are unchanged.
+No device operation, server restart, commit or push.
+REQ-230 is COMPLETE for software; full physical acceptance remains BLOCKED.
+
+## D066 - Three-module core migration / REQ-231
+
+8 November 2026: user says "implement" after the prune/migration plan. Preserve
+public package-level ControllerConfig/Policy/Route/CycleParameters/owner/error
+names and existing safety checks. Put Route, connection validation and explicit
+inventory in transport.py; configuration, KSC101 driver, ownership and normalized
+control in controller.py; retain APT framing/deadlines in protocol.py. Remove
+config.py/device.py/discovery.py with no compatibility wrappers. Internal imports
+are updated; the inspected external DiamondGUI adapter imports the package root.
+No external application edit or device operation is included.
+
+Allow absent hub serial/firmware metadata rather than explanatory placeholder
+strings. Validate supplied metadata and reject conflicts between known values,
+even when another route to the same host leaves one field unknown. Preserve
+exact serial/firmware, duplicate mapping, operating permissions and load limits.
+Consolidate equivalent read/fault handling and repeated parameter checks without
+changing output, cleanup, freshness or persistence semantics. Current baseline
+is the 39 reconciled E209 input hashes and its saved 236 source/wheel tests.
+
+## E210 - Three-module core validation / TEST-231
+
+8 November 2026; D066 / REQ-231. Implemented the approved plan. Removed
+config.py/device.py/discovery.py, leaving controller/protocol/transport as the
+control core plus GUI and package/CLI entry points. Configuration/load policy,
+TOML loading and KSC101 driver now reside in controller; Route, route validation
+and explicit inventory reside in transport. Package-level constructors, error
+names and owner/status contracts remain. Internal old module paths have no
+wrappers. The inspected external DiamondGUI hardware adapter and its canonical-
+owner test import from the package root; no external application was edited.
+
+Unknown hub serial/firmware are optional None and omitted from the tracked live
+TOML. Known metadata still validates as nonempty text and conflicts are checked
+per field across routes to the same host, including partial/unknown entries.
+New software regressions cover actual expected-controller verification with
+missing metadata, wrong-serial refusal without output, malformed optional values
+and mixed known/unknown hub conflicts before I/O. Existing load/mode/ownership/
+framing/deadline/recovery guards remain. Four read operations now share fresh
+identity, serialization and fault recording. Repeated numeric/boolean/mode
+checks are consolidated. Path-based owner construction avoids double collection
+validation. Public parameter models and remaining TOML keys are preserved.
+
+Baseline: all 39 E209 input hashes matched before edits; saved suites each
+contained 236 passing tests. Runtime modules 9 -> 6; runtime Python lines
+2568 -> 2550 (18 fewer, primarily structural consolidation). Driver KSC101,
+Identity, CycleParameters and IdentityMismatch class ASTs match the original Git
+implementation. A mechanical move briefly introduced GUI symbol encoding errors;
+they were restored to UTF-8 before the passing test run and checked explicitly.
+
+Final command with existing user cache/environment and normal filesystem access:
+uv run --locked --offline --no-sync --group dev --extra gui python -B
+scripts/verify.py --record-prefix core-migration-
+
+Observed: 250 source + 250 isolated installed-wheel tests PASS, zero failures,
+errors or skips. Current/rejected-missing/rejected-outdated lock checks,
+lint/format, locked wheel build/install, exact Python/CSS parity, SDK/native-free
+imports, CLI/WebUI help and passive config PASS. All six notebooks pass static
+schema/syntax/links and passive exact-route setup; no hardware cells ran.
+Commands/stdout, test totals and source/fixture/wheel hashes are preserved in
+records/core-migration-direct-validation.json, with source/wheel JUnit evidence
+in records/core-migration-offline-tests.xml and records/core-migration-wheel-tests.xml.
+
+Final audit: all 36 verifier input hashes match, local links in 23 Markdown
+documents pass and GUI Unicode symbols are intact. Raw records/manual PDFs/
+notebook files are unchanged. Earlier pending mode-selection/slimming changes
+are retained. No dependency or native driver change, device I/O, server restart,
+external application edit, commit or push. REQ-231 COMPLETE is software-only;
+full physical/deployment acceptance remains BLOCKED as documented in STATE.md.
+
+
+## D069 - Organize controller responsibilities / REQ-234
+
+8 November 2026: user requests organization of controller.py. Keep the approved
+three-module core and use sections inside the existing file. Order validation,
+configuration, KSC101 models/commands, application status, internal ownership
+and the shared owner. Group public owner methods by lifecycle, reads, settings,
+outputs and protection/recovery; place internal helpers afterward. Preserve all
+method bodies, signatures, decorators, command order and safety checks. No new
+abstractions, dependencies or hardware operation. REQ-234 / TEST-234 avoids the
+REQ-232 identifier concurrently allocated by other organization work.
+
+## E213 - Controller organization validation / TEST-234
+
+8 November 2026; REQ-234 / D069. All 36 E210 verifier input hashes matched before
+this edit. records/controller-organization-structure.json records exact before/
+after controller hashes and PASS AST comparison: all 16 top-level definitions
+and 44 ShutterHub methods preserved; comparison excludes only definition/method
+order and the module navigation docstring. Section comments improve navigation.
+
+Expected: unchanged API and executable method content, passing source and exact
+installed-wheel regressions, no changed verifier inputs during the accepted run.
+Command: uv run --locked --offline --no-sync --group dev --extra gui python -B
+scripts/verify.py --record-prefix controller-organization-
+
+The sandbox-only launch could not access the existing uv cache; the authorized
+normal-access offline run proceeded. Its 250 source + 250 wheel tests passed,
+but final provenance checking correctly rejected the run because concurrent
+protocol.py/transport.py work changed inputs. No PASS campaign is inferred from
+that rejected attempt. Failed-run diagnostics remain under tmp/verification-*.
+A fresh complete run on the combined checkout PASSed: 250 source + 250 installed-
+wheel tests; zero failures/errors/skips. Lock checks (including missing/outdated
+rejection), Ruff lint/format, exact wheel Python/CSS parity, clean install/import,
+CLI/WebUI help and passive config checks PASS. Notebook checks are static and
+passive only. No hardware cells, lab networking or device commands executed.
+
+Evidence: records/controller-organization-direct-validation.json with commands,
+stdout, source/fixture/wheel hashes and test totals; records/controller-organization-
+offline-tests.xml and records/controller-organization-wheel-tests.xml. All 36
+successful-run input hashes match at final audit; controller hash also matches
+the structural comparison. Existing unrelated/concurrent work is preserved.
+No server takeover/restart, external application edit, commit or push. Scoped
+controller organization COMPLETE; full physical/deployment acceptance remains
+BLOCKED on the existing dependencies. Software results do not qualify hardware.
+
+## D070 - Organize protocol responsibilities without changing behavior
+
+8 November 2026; user request "organize protocol.py", REQ-235 / TEST-235.
+Keep the existing three-module core and public protocol names/signatures. Clarify
+the message table and group definitions by responsibility. Extract the existing
+pending-traffic check and reply polling into Session private helpers, keeping
+send/query visible before their helpers. Preserve the order of transport access,
+deadline/cancellation checks, decoder validation, event retention and poisoning
+on any query failure. Reuse existing regressions rather than add tests that
+mirror a behavior-preserving extraction. No device I/O is needed or authorized.
+REQ-235/TEST-235 replaces this task's initially colliding REQ-232/TEST-232;
+concurrent controller/transport organization tasks retain separate conclusions.
+
+## E214 - Protocol organization validation / TEST-235
+
+8 November 2026; D070 / REQ-235. Message IDs and payload sizes are annotated;
+errors, deadlines, framing and serialized sessions have clear responsibility
+groups. Session.query delegates pre-request traffic validation to _drain_pending
+and reply polling to _wait_for_reply. Frame/Decoder logic, wire values, public
+signatures and error strings remain unchanged. Existing pending core migration,
+mode-selection, slimming and concurrent organization work is preserved.
+
+Expected: existing software regressions pass in source and the isolated installed
+wheel, with zero skips/failures/errors; lint/format and package parity pass.
+Command: uv run --locked --offline --no-sync --group dev --extra gui python -B
+scripts/verify.py --record-prefix protocol-organization-
+
+The initial sandboxed invocation failed before executing the verifier because
+uv could not read its existing user cache (Access is denied, os error 5).
+Rerunning the same offline software-only command with approved cache access
+succeeded. Observed: 250 source + 250 isolated installed-wheel tests PASS, zero
+failures/errors/skips. Coverage includes fragmentation, malformed frames, wrong
+addresses/channels, faults, stale/duplicate replies, cancellation, deadline expiry,
+partial/late writes, cleanup, owner/driver integration and static notebooks.
+Lock checks (including rejected missing/outdated locks), Ruff lint/format,
+locked build/install, exact Python/CSS parity, SDK/native-free imports, CLI/WebUI
+help and passive configuration PASS. git diff --check PASS. All 36 verification
+input hashes matched the working tree at final audit, including concurrent
+controller/transport edits. This is combined software evidence, not authority to
+claim those independently managed tasks complete.
+
+Commands, results, input and wheel hashes:
+records/protocol-organization-direct-validation.json. JUnit reports:
+records/protocol-organization-offline-tests.xml and
+records/protocol-organization-wheel-tests.xml.
+REQ-235 PASS / COMPLETE in software scope. E214 revalidates affected earlier
+software behavior on this revision; it does not extend physical evidence.
+No device I/O, server restart/takeover, dependency change, external application
+edit, commit or push occurred. Full physical/deployment acceptance remains
+BLOCKED on the separate dependencies in STATE.md.
+
+
+## E215 - Transport organization / TEST-233
+
+8 November 2026; REQ-233 derived from the user's request to organize transport.py.
+Grouped route configuration/selection before the TCP/VCP/D2XX byte backends,
+followed by explicit informational inventory. Named the shared KEH3 bay-port
+mapping and 4096-byte read limit. Documented the backend interface, route model,
+USB initialization helper and USB backend constraints. Kept existing public names,
+route mappings, lazy imports, initialization sequence, deadline checks, single-
+send/partial-write behavior, cleanup and qualification guards. Existing regression
+tests suffice for this structural change; none were added. Concurrent protocol/
+controller work is preserved. The initially allocated REQ/TEST-232 collided with
+protocol organization; transport uses REQ/TEST-233.
+
+Command: uv run --locked --offline --no-sync --group dev --extra gui python -B
+scripts/verify.py --record-prefix transport-organization-
+
+The first sandboxed launch failed before verification because uv could not open
+its existing user-cache sdists-v9/.git. The same offline software-only command
+then completed with approved normal filesystem access to that cache.
+Observed: 250 source + 250 isolated installed-wheel tests PASS, zero failures,
+errors or skips. Existing tests cover exact bay selection, loopback TCP fragments/
+disconnect, exact-serial USB initialization, expired budgets, passive discovery
+and owner/qualification guards. Lock/lint/format, exact wheel Python/CSS parity,
+clean install/import/help, passive config and six static notebooks PASS.
+Expected missing/outdated-lock rejection checks passed; no hardware cells ran.
+
+Commands, results, source and wheel hashes:
+records/transport-organization-direct-validation.json. Test evidence:
+records/transport-organization-offline-tests.xml and
+records/transport-organization-wheel-tests.xml. git diff --check PASS.
+E215 revalidates combined pending software after E210; E210 remains historical.
+Final audit: all 36 recorded verifier input hashes match the working tree.
+No device I/O, server restart, external application edit, commit or push.
+REQ-233 COMPLETE is software-only; full physical/deployment acceptance remains
+BLOCKED on the separate dependencies in STATE.md.
+
+
+## D071 - Remove unnecessary controller indirection / REQ-236
+
+8 November 2026; user requests "clean up the codes" after the helper review.
+Inline the single-use _cleanup_after_error into _output_operation and remove
+text()'s unused return. Keep positive/text/utc_now and the shared policy/preflight
+helpers: they avoid repeated validation and retain a useful operation boundary.
+Preserve original exceptions, separate cleanup notes, protective OFF's independent
+budget, uncertainty lockout and public owner methods. No hardware action.
+
+## E216 - Controller helper cleanup validation / TEST-236
+
+8 November 2026; D071 / REQ-236. All 36 E215 input hashes matched before editing.
+Expected: only the planned controller edits, original-error/cleanup regressions
+pass, unchanged public owner contract, and exact source/wheel integration PASS.
+Reverse substitution of the two approved edits reconstructs E215's exact
+controller SHA-256; this confirms no unrelated controller delta. Static AST check:
+all five text() calls discard its return. Controller 1163 -> 1159 lines.
+
+Command: uv run --locked --offline --no-sync --group dev --extra gui python -B
+scripts/verify.py --record-prefix controller-cleanup-
+Ran with approved uv-cache access. Observed: 250 source + 250 installed-wheel
+tests PASS, zero failures/errors/skips, including failed output/partial write,
+separate cleanup budget, retained original error/cleanup note, cancellation and
+fault lockout regressions. Lock checks, Ruff lint/format, exact wheel Python/CSS
+parity, clean install/import, CLI/WebUI help, passive config and static notebooks
+PASS. Existing regression tests suffice for this focused cleanup; no new tests
+or dependencies. No notebook hardware cells, devices or lab network accessed.
+
+Commands, stdout, source/fixture/wheel hashes and totals:
+records/controller-cleanup-direct-validation.json; JUnit evidence:
+records/controller-cleanup-offline-tests.xml and controller-cleanup-wheel-tests.xml.
+All 36 input hashes match at final audit. REQ-236 COMPLETE, software scope.
+Earlier organization evidence remains historical; this campaign revalidates the
+combined software. Unrelated pending changes preserved. No server takeover/
+restart, external application edit, commit or push; physical acceptance remains
+BLOCKED on the existing dependencies in STATE.md.
+
+## D072 - Inline single-use protocol helpers / REQ-237
+
+8 November 2026; user explicitly requests inlining _drain_pending and
+_wait_for_reply into query while keeping _check, _accept and clock. Remove
+only the two single-use methods and their calls, retaining the transaction's
+order, outer exception/poisoning boundary, errors, deadlines, cancellation,
+event retention and reply ambiguity checks. Existing regressions cover the
+behavior; no implementation-mirroring tests or device operation are needed.
+
+## E217 - Protocol helper cleanup validation / TEST-237
+
+8 November 2026; D072 / REQ-237. Inlined both helper bodies into query and
+removed their definitions. _check, _accept and clock are unchanged. AST
+comparison against Git HEAD confirms those three functions are identical;
+query's executable AST matches the original committed transaction (excluding
+the added explanatory docstring). Neither removed helper remains defined.
+Other pending source, configuration, evidence and documentation are preserved.
+
+Expected: existing protocol/owner regressions and source/isolated-wheel software
+checks pass with zero skips/failures/errors and exact package parity.
+Command, run with approved access to the existing uv cache:
+uv run --locked --offline --no-sync --group dev --extra gui python -B
+scripts/verify.py --record-prefix protocol-cleanup-
+
+Observed: 250 source + 250 isolated installed-wheel tests PASS, zero failures,
+errors or skips. Coverage includes fragmented/malformed frames, interleaved
+events, wrong addresses/channels, rich faults, stale/duplicate replies,
+cancellation, expired/late I/O, ambiguous writes and protective cleanup.
+Lock checks, Ruff lint/format, exact Python/CSS wheel parity, clean install,
+SDK/native-free imports, CLI/WebUI help, passive config and static notebooks
+PASS. git diff --check PASS. All 36 verifier input hashes match at final audit.
+Commands/results/hashes: records/protocol-cleanup-direct-validation.json.
+JUnit: records/protocol-cleanup-offline-tests.xml and
+records/protocol-cleanup-wheel-tests.xml.
+
+REQ-237 COMPLETE in software scope. This revalidates affected prior software
+behavior on the final configuration, not physical acceptance. No device I/O,
+lab network, running-server operation, external application edit, dependency
+change, commit or push. Full physical/deployment acceptance remains BLOCKED
+on the independent conditions in STATE.md.
+
+
+## D073 - Simplify transport logic without weakening route guards / REQ-238
+
+8 November 2026; user approved the transport review's recommended first changes.
+Use TCP read(0) directly for nonblocking reads, relying on existing no-data/EOF
+handling; pass configured host and the shared bay-port mapping directly to TCP.
+Inline the single-caller require_control_route checks into ShutterHub._policy,
+keeping external-USB/VCP restrictions, order, exception types and messages.
+Retain UnsupportedRoute in transport and at the public package root. Exercise
+both restrictions through public owner operations rather than the removed helper.
+Keep all three backend classes, USB waits/initialization, VCP/D2XX reads and
+single-send handling unchanged. No new base class, device action or server change.
+REQ/TEST-238 and D073 are allocated for this transport task; protocol helper work
+is concurrent under REQ/TEST-237. Expected final evidence: E218.
+
+
+## E218 - Transport logic simplification validation / TEST-238
+
+8 November 2026; D073 / REQ-238. Removed TCP's redundant select readiness check
+and import; read_nowait delegates to read(0), which already handles no-data and
+EOF. Factory selection now passes route.host and the shared bay-port value
+without an endpoint text round trip. Moved both route-write restrictions into
+ShutterHub._policy in their original order, preserving UnsupportedRoute and
+error messages before load-policy checks. Removed require_control_route without
+a wrapper. UnsupportedRoute remains in transport and the public package root.
+USB implementations, initialization, deadline checks and single-write semantics
+are unchanged. Architecture documentation describes owner-side route guards.
+
+Updated the existing restriction regression to connect through the public owner
+using software transports for VCP and KEH3 external routes, attempt ON, safe_state
+and Manual selection, require UnsupportedRoute, and assert no output frames and
+released handles. Existing loopback tests cover no-data, fragmented receive and
+peer disconnection; route tests cover exact docked-bay TCP selection without USB.
+No new test file or dependency. Initial focused lint found an unbound lambda loop
+variable and then a long line; both were corrected before the full passing run.
+
+Command: uv run --locked --offline --no-sync --group dev --extra gui python -B
+scripts/verify.py --record-prefix transport-cleanup-
+Ran with approved access to existing uv-cache dependencies. Observed: 250 source
++ 250 isolated installed-wheel tests PASS, zero failures/errors/skips. Lock
+checks, Ruff lint/format, exact wheel Python/CSS parity, clean install/import,
+CLI/WebUI help, passive config and six static notebook checks PASS. Expected
+missing/outdated-lock rejection checks PASS. No hardware notebook cells ran.
+Commands/stdout, source/fixture/wheel hashes and totals:
+records/transport-cleanup-direct-validation.json. JUnit evidence:
+records/transport-cleanup-offline-tests.xml and transport-cleanup-wheel-tests.xml.
+Final audit: all 36 recorded input hashes match; git diff --check PASS.
+
+E218 revalidates the combined pending software, including concurrent protocol
+cleanup; prior campaigns remain historical for their recorded revisions.
+Unrelated working changes are preserved. No device I/O, lab-network access,
+server operation, external application edit, commit or push. REQ-238 COMPLETE
+is software-only; full physical/deployment acceptance remains BLOCKED on the
+separate dependencies in STATE.md.
+
+## D074 - Prune duplicate protocol logic / REQ-239
+
+8 November 2026; user says "prune" after the protocol review. Put short-write
+rejection inside the transport-write try so one handler sets the two ambiguity
+flags. Keep late-complete-write handling separate to retain protective cleanup.
+Simplify known message form/length comparison using None for short frames.
+Retain diagnostics, _check, _accept and clock; no new helper or device operation.
+
+## E219 - Protocol pruning validation / TEST-239
+
+8 November 2026; D074 / REQ-239. Two focused source edits implemented. Expected:
+same framing/write behavior and passing source/isolated-wheel checks. Protocol
+Ruff lint/format PASS. Using the exact protocol module from the E218 wheel,
+verified its source hash against E218, then compared old/new form predicates for
+both forms, all 65536 length values and expected sizes None/6/14/68/84: 655360
+comparisons PASS. Ten transport outcomes (counts -1/0/1/5/6/7/None, exception,
+complete and late-complete writes) give identical error text/types and flags.
+
+Existing tests/test_protocol.py: 41 PASS, zero skips/failures/errors; JUnit:
+records/protocol-pruning-targeted-tests.xml. Command: .venv/Scripts/python.exe -B
+-m pytest tests/test_protocol.py -q --tb=short -p no:cacheprovider --basetemp
+tmp/protocol-pruning-targeted-retry --junitxml records/protocol-pruning-targeted-tests.xml.
+The initial sandboxed targeted run could not access its pytest temporary
+directory; the same tests passed with approved normal fixture-directory access.
+
+Full verifier command: uv run --locked --offline --no-sync --group dev --extra
+gui python -B scripts/verify.py --record-prefix protocol-pruning-
+Initial full run stopped at concurrent controller.py:743 indentation and
+gui.py:692 Ruff errors. These unrelated active edits were preserved and repaired
+by the concurrent task. The same full verifier then PASSed: 251 source + 251
+isolated installed-wheel tests, zero failures/errors/skips. Lock checks, Ruff
+lint/format, exact Python/CSS wheel parity, isolated install/import/CLI/WebUI
+help, passive config and six static notebooks PASS. No hardware cells executed.
+Commands/results/hashes: records/protocol-pruning-direct-validation.json; JUnit:
+records/protocol-pruning-offline-tests.xml and protocol-pruning-wheel-tests.xml.
+All 36 verifier input hashes match at final audit; git diff --check PASS.
+E219 revalidates the combined software, including concurrent transport/controller
+changes, and resolves the earlier shared lint blocker. REQ-239 COMPLETE in
+software scope. No device I/O, lab network, running-server operation, external
+application edit, dependency change, commit or push. Physical/deployment
+acceptance remains BLOCKED on its independent conditions in STATE.md.
+
+
+## E220 - VCP read pruning / TEST-240
+
+8 November 2026; REQ-240. User says "prune" after the transport duplication review.
+Replaced VCPTransport.read_nowait's timeout/queue-read body with return self.read(0).
+No other transport code changed: reversing this single-method replacement gives
+E218's exact transport SHA-256. Kept the route-validation tuple, all three backends,
+USB initialization/waits, D2XX queue semantics, cleanup and public interface.
+
+Scoped software checks PASS: a serial byte-buffer substitute with 0/3/5000 queued
+bytes returns 0/3/4096 bytes respectively, with timeout 0 s in each case. Normal
+package import passes after a concurrent controller indentation repair. Initial
+checks could not import because controller.py:743 had unexpected indentation;
+an isolated transport import separately passed before that repair. No controller
+change from this transport task was applied. Transport Ruff lint/format and
+whitespace checks PASS. No permanent test or helper was added for this one-line
+prune; the software buffer check does not establish native USB timing.
+
+Full command attempted with approved cached-dependency access:
+uv run --locked --offline --no-sync --group dev --extra gui python -B
+scripts/verify.py --record-prefix transport-prune-
+Lock check PASS, then Ruff stopped at concurrent gui.py:692:101 E501 (102 > 100).
+Its display string has mojibake. Rechecks show the same blocker; no source/wheel
+suite was reached, and their earlier PASS results are not claimed for this revision.
+Evidence: records/transport-prune-validation.json records scoped results, exact
+transport hash/delta and the full-verifier failure. REQ-240 is implemented but
+integration BLOCKED, not COMPLETE. Resumption condition: finish the concurrent
+GUI repair, rerun the full verifier and require passing source/wheel/provenance
+checks. Preserve other active changes; no hardware I/O, server change, external
+application edit, commit or push was performed.
+
+
+## D075 - Simplify status and shared channel metadata / REQ-241
+
+8 November 2026: user requests "vastly simplify them" and "code reduction
+substantially" after the controller dataclass review. Asked whether the existing
+status-schema preservation constraint could change; user explicitly selected
+"Simplify the schema; update repo consumers" after being told external consumers
+would need updating. This supersedes prior status-schema preservation within
+this migration; public owner operations and configuration/control guards remain.
+REQ-241 / TEST-241 replaces the initially colliding REQ-238 identifier.
+
+Merge ShutterFeedback into a flat ShutterStatus, remove derived identity display
+fields and unsupported constant placeholders, name the interlock setting
+interlock_required, and record human closure as optical_closed_at/evidence.
+Have the private channel reuse status metadata and add only owner resources;
+copy the explicit public dataclass fields into independent snapshots. Electrical
+readings remain absent from host-only snapshots. Frozen configuration/identity/
+cycle values remain; public status snapshots are independently mutable copies.
+Version 2.0.0 marks the break. Update repo consumers, docs and notebook source;
+retain historical captures/outputs. Do not edit the external DiamondGUI checkout
+or operate devices/servers. Its consumers require migration before deployment.
+
+## E221 - Dataclass simplification validation / TEST-241
+
+8 November 2026; D075 / REQ-241. Expected: materially reduced status/state code,
+unchanged configuration/driver/qualification/claim behavior, independent snapshots
+without private resources or cached readings, migrated repo consumers, passing
+source/isolated-wheel checks and retained historical evidence.
+
+Observed: status/state definitions plus snapshot mapping 90 -> 41 lines (54%
+less), their field declarations 54 -> 30, controller dataclasses 7 -> 6, complete
+module 1165 -> 1117 lines. Policy, ControllerConfig, Identity, CycleParameters,
+KSC101 and _Claim executable ASTs match the before snapshot exactly. Metrics,
+original/current source hashes and evidence audit:
+records/dataclass-simplification-models.json.
+
+First 170 focused regressions PASS using normal temp-directory access. Sandboxed
+pytest could not access its new temporary directories; that environmental failure
+is not a software PASS. A Windows text-encoding issue was caught by lint during
+editing and corrected before final validation. An offline uv lock regeneration
+attempt changed dependency selections; restored the exact prior lock and changed
+only the local project's version. Reversing that version change reproduces the
+E216 lock hash exactly, proving dependency pins/artifacts remain unchanged.
+
+Final command: uv run --locked --offline --no-sync --group dev --extra gui python
+-B scripts/verify.py --record-prefix dataclass-simplification-
+With approved uv-cache access, 251 source + 251 installed-wheel tests PASS; zero
+failures/errors/skips. This includes the new snapshot mutation/isolation/private-
+resource/no-cached-reading regression, existing fault/cancellation/cleanup/identity/
+load limits, and migrated GUI callbacks using the frozen historical real captures.
+Only the test fixture loader translates that historical schema; runtime has no
+compatibility alias or fallback. Missing/outdated lock rejection, Ruff lint/format,
+exact source/wheel Python/CSS parity, clean install/import, CLI/WebUI help and
+passive configuration PASS. Six notebooks pass static/passive checks; no hardware
+cells executed. All six notebooks' execution counts and outputs match Git HEAD;
+source/banner changes explicitly identify saved outputs as historical.
+
+Evidence: records/dataclass-simplification-direct-validation.json contains exact
+commands/stdout and source/fixture/wheel hashes; records/dataclass-simplification-
+offline-tests.xml and dataclass-simplification-wheel-tests.xml retain JUnit results.
+All 36 verifier input hashes match at final audit. Current integration includes
+concurrent protocol/transport work; previous transient lint/encoding blockers are
+resolved on these hashes. Unrelated working changes preserved. REQ-241 COMPLETE,
+software only. External schema migration and physical/deployment acceptance
+remain open. No live device I/O, server takeover/restart, external application
+edit, commit or push. Historical raw records and manuals are unchanged.
+
+
+## D077 - Delegate GUI permission decisions to the owner / REQ-242
+
+8 November 2026: user requests "pruning the gui.py reduce guardrails. happy path
+focus." Remove duplicated route/qualification/settings policy decisions from
+button and option availability. Connected, nonfaulted controls dispatch through
+ShutterHub, which remains responsible for permissions, fresh feedback and physical
+operating limits. Buttons are not evidence of permission. Preserve session-scoped
+source/persistence confirmations, settings drafts, displayed-state conveniences,
+exact-target validation, priority OFF, Stop-before-Release and server cleanup.
+Remove unsupported display/trigger settings placeholders and their CSS, and use
+CycleParameters directly for numeric input validation. This supersedes prior GUI
+policy-disable expectations, not owner policy or device qualification.
+
+## E223 - GUI pruning validation / TEST-242
+
+8 November 2026; D077 / REQ-242. Expected: materially shorter GUI, retained supported
+controls, owner refusals despite enabled controls, unchanged dispatch and shutdown
+cleanup, and passing complete source/isolated-wheel software checks.
+
+Observed: gui.py 806 -> 682 lines, 124 fewer (15.4%). execute_action and run have
+identical executable ASTs to the pre-edit snapshot. The numeric adapter and
+unsupported settings helper/controls are removed; Settings has one cycle fieldset.
+Rendering no longer duplicates route, qualified-mode or settings permission checks.
+Enabled controls can therefore receive an explicit owner refusal; Continuous and
+EEPROM opt-ins do not grant permission. Updated docs and callback expectations.
+Three existing native-mode tests now also dispatch ON through the Dash callback:
+all report qualified_modes refusal without an ON frame or latched fault. A new
+settings callback test reports allow_device_settings refusal without device I/O.
+Existing exact-target, confirmation/draft reset, pulse availability, unknown-state,
+polling-message, active-release and cleanup-error regressions pass.
+
+Command: .venv/Scripts/python.exe -B scripts/verify.py --record-prefix gui-pruning-
+Initial sandbox run stopped at uv cache access denied; it did not reach tests.
+Rerun with approved cache/temp access: 255 source + 255 installed-wheel tests PASS,
+zero failures/errors/skips. Lock, Ruff lint/format, exact Python/CSS wheel parity,
+clean install/import, CLI/WebUI help, passive configuration and static notebook
+checks PASS. All 36 recorded input hashes match at final audit. Concurrent
+REQ-244 changed controller.py independently; the complete verification includes
+that combined source, and this task did not edit controller.py. Metrics retain
+both its hashes rather than claiming the controller was unchanged.
+
+Evidence: records/gui-pruning-metrics.json, records/gui-pruning-direct-validation.json,
+records/gui-pruning-offline-tests.xml and records/gui-pruning-wheel-tests.xml.
+REQ-242 COMPLETE, software scope. No live browser/physical test is claimed; no
+device I/O, running-server operation, external application edit, commit or push.
+Broader project physical/deployment dependencies remain open.
+
+
+## D078 - Prune repeated controller policy checks and settings poll / REQ-244
+
+8 November 2026: user says "prune" after the three-finding controller review.
+Reuse preflight's final fresh OFF reading before a settings write; validate policy
+at public operation entry and pass it explicitly to private ON/OFF; remove the
+inner preflight recheck and the already-guaranteed supported-mode membership test
+in protective OFF. pulse passes the policy already checked by validate_pulse.
+Keep private locking/readiness, identity checks, interlock/load limits, post-write
+readback, independent cleanup budgets, original/cleanup errors and public API.
+REQ-244 / TEST-244 avoids the concurrent GUI task's REQ-242 identifier.
+
+## E224 - Controller duplication pruning validation / TEST-244
+
+8 November 2026; D078 / REQ-244. All 36 E221 verifier hashes matched before this
+edit. Expected: one pre-write OFF sample with Manual/interlock qualification,
+no settings/output writes when those prerequisites fail, unchanged protective-OFF
+mode acceptance, and full source/installed-wheel regression PASS.
+
+Observed: 1117 -> 1112 controller lines. The successful settings/storage regression
+now verifies one status-bits query before the settings command and one afterward
+(previously two before and one afterward). Three new software cases refuse
+active output, non-Manual mode and disabled interlock requirement before any
+settings/storage/output command. All public owner method signatures and all
+non-owner class ASTs are unchanged. Exact old/new OFF condition comparison agrees
+in all 128 combinations of four supported modes, eight valid qualified-mode sets,
+electrical ON/OFF and persistent-mode permission. Exact source hashes and parity:
+records/controller-prune-logic.json. This is software/static evidence only.
+
+Command: uv run --locked --offline --no-sync --group dev --extra gui python -B
+scripts/verify.py --record-prefix controller-prune-
+Concurrent GUI/CSS/test edits invalidated two otherwise passing runs' input
+snapshots; a separate attempt stopped at concurrent GUI formatting. Those attempts
+are not accepted campaigns. Applied formatting only to the GUI integration file,
+preserving its concurrent semantics. Waited for the GUI code/tests to settle and
+reran the complete verifier. Failed-run diagnostics remain under tmp/verification-*.
+
+Final observed: 255 source + 255 isolated installed-wheel tests PASS; zero
+failures/errors/skips. Missing/outdated lock rejection, lint/format, exact wheel
+Python/CSS parity, clean install/import, CLI/WebUI help, passive config and six
+static/passive notebooks PASS. Commands/stdout, source/fixture/wheel hashes and
+totals: records/controller-prune-direct-validation.json; JUnit evidence:
+records/controller-prune-offline-tests.xml and controller-prune-wheel-tests.xml.
+All 36 input hashes match at final audit. Final integration includes the separate
+GUI pruning; this task changes no GUI behavior. Preserved unrelated working changes,
+records, notebook outputs, manuals, dependencies and public schema. No device I/O,
+server operation, external application edit, commit or push. REQ-244 COMPLETE,
+software scope; physical/deployment requirements remain separate and unvalidated.
+
+
+## D080 - Order controller code by responsibility and operation / REQ-246
+
+8 November 2026: user requests "reorganize the controller.py in logical order."
+Keep one controller module and order validation utilities, configuration, data
+models, APT driver, ownership and the shared owner. Within KSC101 group identity,
+mode/interlock, electrical output and cycle settings. Within ShutterHub order
+construction/shared guards, connection, status, mode/preflight, settings, output/
+pulse, then protection/recovery/shutdown. Keep operation helpers beside their
+related public operations. This replaces the earlier public-methods-first layout.
+Reorder definitions and navigation comments only; no execution or API change.
+
+## E226 - Logical controller ordering validation / TEST-246
+
+8 November 2026; D080 / REQ-246. Expected: preserved executable content, public
+API, dataclass field order, safety boundaries and source/wheel regression PASS.
+All 36 E224 verifier input hashes matched before editing. Reorganized 15 top-level
+definitions, 16 driver methods and 43 owner methods. Final formatted source AST
+matches the baseline after normalizing only definition/method order and the
+updated module navigation docstring; signatures, decorators, method/class bodies,
+imports, assignments and dataclass field order are preserved. Exact hashes and
+comparison scope: records/controller-logical-order-structure.json.
+
+Command: uv run --locked --offline --no-sync --group dev --extra gui python -B
+scripts/verify.py --record-prefix controller-logical-order-
+With existing approved uv-cache access: 255 source + 255 isolated installed-wheel
+tests PASS; zero failures/errors/skips. Current/missing/outdated lock checks,
+Ruff lint/format, exact source/wheel Python/CSS parity, clean install/import,
+CLI/WebUI help, passive config and six static/passive notebooks PASS. No new
+tests were needed for the structural move. All 36 verifier input hashes match
+at final audit. Commands/stdout, source/fixture/wheel hashes and totals:
+records/controller-logical-order-direct-validation.json; JUnit evidence:
+records/controller-logical-order-offline-tests.xml and
+records/controller-logical-order-wheel-tests.xml.
+
+REQ-246 COMPLETE, software scope. Earlier results remain revision-specific;
+E226 revalidates the combined software on these hashes. Unrelated dirty changes,
+historical artifacts, dependencies and runtime state preserved. No device I/O,
+server operation, external application edit, commit or push. Physical/deployment
+acceptance and the version-2 external consumer migration remain separate.
+
+## E225 - APT Issue42.1 coverage and happy-path review / TEST-245
+
+8 November 2026; REQ-245. Inspected the unchanged local Issue42.1 protocol,
+9 September 2025, 443 pages, SHA256
+b2a6badd7c00b3042ba383e291667e7eab10746c14c4f92cea45fc480c7304ed.
+Read the complete KSC101 applicability table and relevant detailed sections;
+rendered/visually reviewed model-table, MMI and cycle pages. Extracted 39 unique
+table IDs and compared actual KSC101 Frame/query/scalar calls, typed reply
+handling and protocol event handling. Result: 10 transmitted, 5 queried replies,
+3 inbound event handlers, 1 framing-only and 20 without a typed implementation.
+Status-bit 0x0429/042A is additionally implemented but not in the KSC101 table.
+
+Full ID/name/page/status/limitation mapping, driver AST and source hashes:
+records/apt42-command-coverage.json. Grouped matrix: docs/INTERFACE.md. Core mode/
+cycle/state operations exist. Interlock SET, channel-enable/query, automatic
+updates, hub bay, LED/button and model-ambiguous MMI/trigger/motor families are
+absent or partial. EEPROM exposes cycle storage only. HW_DISCONNECT has inbound
+handling but is not sent when closing a connection. Generic Frame encoding is
+not counted as a typed API, and GET replies are not counted as host commands.
+
+The model table lists 0x0520/0523/0526 for KSC101 while the detail sections exclude
+it, describe motor behavior and contain conflicting payload lengths. No guessed
+KSC101 implementation is justified. Issue42.1 p186's 10000-second range conflicts
+with the KSC101 RevF p31 range 100..10000 ms, which the code follows. Triggered
+priming remains the restricted count0/level subset. No interlock bypass or alias
+output API was added to improve coverage. Complete table coverage is not proved
+necessary for ordinary shutter operation or supported by this inconsistent table.
+
+The happy-path redundancy review began with all 36 E221 input hashes matching
+its saved 251-source/251-wheel results. Concurrent controller/GUI pruning then
+addressed duplicated preflight OFF/policy checks and unsupported GUI scaffolding.
+Later logical controller reordering changed the whole-file hash; command-ID sets
+were reconciled again unchanged before this audit was recorded. Remaining
+candidates are duplicate identity requests in read-only settings/Identify,
+six dynamic callback outputs for permanently Unknown Key/Ready indicators and
+repeated cycle-input markup. Preserve write-boundary identity, fresh electrical/
+mode/interlock checks, session scopes, claims, ambiguity handling and cleanup.
+These are static findings, not implemented optimizations or latency measurements.
+
+No runtime code, device I/O, server operation, external application edit, commit
+or push in this audit. No software suite or notebook hardware cell was executed
+by it; concurrent tasks own their validation evidence. REQ-245 PASS means the
+audit is complete, not that every command is implemented or physically qualified.
+
+
+## D082 - Document controller APIs and use descriptive state names / REQ-248
+
+8 November 2026: user requests improved human readability and a docstring for
+each API function/class. Document all explicit classes/functions, including
+private helpers and lifecycle hooks, with concise summaries; expand public API
+contracts where inputs, units, returned evidence or hardware effects matter.
+Describe exact targets, deadlines, policy, query/write distinctions, independent
+optical evidence, passive disconnect and explicit cleanup/recovery. Replace owner
+c/d locals and private parameters with channel/deadline; constructor/configuration
+collection locals use config. Keep public parameter names, data schema, operation
+order and executable behavior. No hardware/server operation or external edit.
+
+## E228 - Controller readability and docstring validation / TEST-248
+
+8 November 2026; D082 / REQ-248. Expected: complete explicit class/function
+coverage, accurate API contracts, readable channel/deadline names, unchanged
+public signatures and executable behavior, and full source/wheel checks PASS.
+All 36 E226 verifier input hashes matched before editing.
+
+Observed: 86/86 explicit class/function/method definitions have nonempty
+docstrings, including all public APIs and constructors/lifecycle hooks. Public
+function/constructor signatures match the baseline. Final formatted AST matches
+after excluding only docstrings and the explicit c/d-to-channel/deadline or
+c-to-config local/private parameter substitutions. Field order, guards, command
+frames/order, error messages and cleanup behavior remain unchanged. Token-aware
+renaming includes names inside f-string expressions without changing literal
+messages. Exact hashes, normalization scope and coverage:
+records/controller-readability-structure.json.
+
+Command: uv run --locked --offline --no-sync --group dev --extra gui python -B
+scripts/verify.py --record-prefix controller-readability-
+With existing approved uv-cache access: 255 source + 255 isolated installed-wheel
+tests PASS; zero failures/errors/skips. Current/missing/outdated lock checks,
+Ruff lint/format, exact source/wheel Python/CSS parity, clean install/import,
+CLI/WebUI help, passive config and six static/passive notebooks PASS. No new
+permanent tests were needed for documentation/local-name changes. Commands/stdout,
+source/fixture/wheel hashes and totals:
+records/controller-readability-direct-validation.json; JUnit evidence:
+records/controller-readability-offline-tests.xml and
+records/controller-readability-wheel-tests.xml. All 36 verifier input hashes
+match at final audit.
+
+REQ-248 COMPLETE, software scope. Documentation deliberately distinguishes
+interlock configuration from continuity, host hold from optical exposure,
+electrical readback from blade position, passive release from protective OFF,
+and protected recovery from ordinary reads. Prior software campaigns are
+historical; E228 revalidates this combined source. Unrelated work, historical
+records/notebook outputs and dependencies are preserved. No device I/O, server
+operation, external application edit, commit or push. Physical/deployment
+acceptance and version-2 external schema migration remain open.
+
+## D083 - Implement clear shutter commands without motor-layout guesses / REQ-249
+
+8 November 2026 user requests implementation of missing clearly documented
+KSC101 commands, simple/happy-path focused, without ambiguous motor layouts.
+Use Issue42.1 headers/scalars/word pairs:0x04C6 require interlock,0x0211/0212
+channel state,0x0065/0066 raw bay,0x04B3/B4/B5 LED indication mask,0x0011/0012
+updates and0x0002 explicit hardware disconnect. The driver also encodes0x0210;
+normal owner ON/OFF remains0x04CB and enable_device remains refused. No parallel
+backend, background receiver, new state schema, GUI controls or policy flags.
+
+Interlock API enables the requirement only, with existing settings permission,
+source protection, Manual/OFF and confirmed readback. Already-required state is
+idempotent. LED settings use documented mask bits1/2/8, RAM readback and the same
+entry permissions/Manual/OFF/interlock; they have no output-cleanup obligation.
+Shared settings access/confirmation keeps equivalent checks in one place and
+retains cycle-settings behavior. Firmware qualification is not expanded.
+
+Update messages are exposed as raw immutable APT frames from the bounded existing
+queue. No position/status payload is decoded; callers stop updates explicitly.
+Raw bay bytes never change KEH3 mapping. Hardware disconnect requires protected
+Manual/OFF and no active request; ordinary release remains passive. New methods
+are explicit Python APIs; no implicit initialization/configuration action.
+
+Use0x04B4 from the model table and named command heading, not the inconsistent
+0x0411 byte in p93's request diagram. Preserve raw LED-mask readbacks without
+converting motor flags into shutter state. Keep button, position, MMI, trigger-
+I/O and typed motor-status layouts excluded, plus interlock disabling. EEPROM
+stays cycle-only. This implements clear wire operations, not the contradictory
+whole model table or a new hardware-commissioning allowance.
+
+## E229 - Documented shutter-command software validation / TEST-249
+
+Issue42.1 reference and original audit are retained; current per-ID command
+coverage/source hashes are in records/shutter-commands-coverage.json. Driver
+now transmits20 distinct IDs and queries9 replies, including the existing
+status-bit extension. Direct literal vectors cover required interlock, channel
+ON/OFF alias, LED word payload, update start/stop and bus disconnect. Query
+vectors cover channel/LED/bay, fragmentation, wrong channel/enum/reserved byte/
+length, and unchanged controller-identity checks. Raw update frames interleave
+with fresh queries without guessed content. Command acknowledgements are never
+invented; faults/partial writes retain journals and are not replayed.
+
+83 targeted owner/native/new-command cases passed before the final additional
+error cases. Final command:
+uv run --locked --offline --no-sync --group dev --extra gui python -B
+scripts/verify.py --record-prefix shutter-commands-
+
+Observed293 source +293 exact isolated-wheel tests PASS, zero failures/errors/
+skips. Lock current/missing/outdated, lint/format, locked build/install, exact
+Python/CSS parity, SDK/native-free import, CLI/WebUI help and passive config
+PASS. Six notebooks pass static/passive checks; no hardware cells executed.
+All37 verifier inputs and current coverage source hashes match after the run.
+All107 explicit controller classes/functions/methods have docstrings. Detailed
+commands/stdout/source/fixture/wheel hashes: records/shutter-commands-direct-validation.json;
+source/wheel JUnit: records/shutter-commands-offline-tests.xml and
+records/shutter-commands-wheel-tests.xml. The targeted XML is retained separately.
+
+New regressions confirm permission/protection refusal before I/O, Manual/OFF
+preconditions, idempotent interlock enable, exact LED readback, no incidental OFF
+from LED-only writes, persistent uncertainty on failed readback/partial writes,
+no cleanup bytes after transmit desynchronization, raw-event consumption and
+explicit-only hardware disconnect. Existing command/cleanup/status regressions
+remain passing. These are byte fixtures and loopback software tests, not bench
+proof. No new command was sent to a physical controller.
+
+API/README/current coverage docs explain new commands and exclusions. Corrected
+the pre-existing manual-index link to the concurrently removed Issue36 PDF by
+linking immutable Git history; its deletion is preserved. Manufacturer PDFs,
+historical raw evidence/notebook outputs, live configuration, dependencies and
+runtime locks are otherwise unchanged by this implementation. No device/server/
+external application operation, commit or push. REQ-249 COMPLETE is software-only;
+new commands require separate physical validation before deployment claims.
+
+Final handoff audit: all37 verifier input hashes still match; local links in23
+Markdown documents pass. Removed only tmp/shutter-command-tests after checking
+workspace containment, no tracked files and no reparse links. No source change
+after the passing integrated run.
+
+## D085 - Serialize release guards and drain all pending chunks / REQ-251
+
+8 November 2026. The final combined review retains controller/protocol/transport
+as three core modules, per the user's clarification. Publication is authorized;
+device I/O, running-owner changes and physical qualification are excluded.
+
+Move the WebUI's Stop-before-Release check into disconnect(require_stopped=True)
+under the owner lock. Preserve ordinary passive disconnect/close semantics.
+Drain every already-arrived transport chunk before a query, checking the existing
+deadline/cancellation between chunks; reject queued replies and incomplete tails.
+Do not retry commands or claim transaction-ID freshness unavailable in APT.
+
+## E231 - Final combined review reproductions / TEST-251
+
+8 November 2026. Before interpreting the tests, expected outcomes were: a stale
+reply behind a full 4096-byte event chunk is refused before dispatch; continuous
+queued events exhaust the original deadline without dispatch; and a Release
+waiting for the owner lock refuses an ON started by another callback first.
+All three failed on the pre-fix code: two missing protocol exceptions and one
+unprotected release (records/final-review-reproductions.xml). These are software
+transport/concurrency tests, not hardware measurements.
+
+After the protocol/owner changes, 158 protocol/ownership/documented-command tests
+passed (records/final-review-core-tests.xml). GUI integration remains pending:
+the separately active GUI command-exposure task is still editing gui.py and its
+consumers. REQ-251 uses a separate ID from that task's REQ-250. Final source/wheel
+validation and publication must wait for stable inputs and include both changes.
+
+Environment: ordinary uv sync encountered the running shutter-control.exe and
+could not replace it; no process was stopped or restarted. Tests use uv run
+--no-sync and isolated wheel validation. Sandbox cache/temp ACL failures were
+resolved by executing the authorized software-only checks outside the sandbox.
+No hardware operations occurred. Final validation/publication evidence follows
+in a later record; this entry alone does not establish completion.
+
+## D084 - Expose documented commands through the shared GUI owner / REQ-250
+
+8 November 2026. Keep the main output panel unchanged. Place LED indication
+read/apply and enable-only interlock enforcement in Settings; place channel/bay,
+device-message requests, raw event collection and protected hardware disconnect
+in Diagnostics. Every device action calls the existing ShutterHub API. The GUI
+adds no wire layouts, policy duplicate or second ON/OFF enable path.
+
+Scope extra reads and LED drafts to target/connection generation. Label raw bay
+bytes, opaque event frames and unacknowledged message/disconnect requests without
+inferring optical position, hub routing or native activity. Preserve drafts and
+notices during polling; mirror settings outcomes inside the dialog. Ordinary
+Release remains passive; the hardware-disconnect request stays explicit.
+
+## E230 - GUI command exposure validation / TEST-250
+
+8 November 2026. Expected outcomes: nine new controls dispatch through shared
+owner APIs; owner protections/refusals remain effective; exact target validation
+precedes form parsing; drafts/readouts cannot cross connection scope; passive
+desktop/phone layouts remain usable without hardware access.
+
+The first targeted run found two error-ordering regressions: missing/unknown
+targets on Apply cycle settings reported a numeric field error. The concurrent
+review had removed a duplicate target guard; moving form parsing into the single
+dispatcher after its target check resolved both without restoring duplication.
+Initial evidence: records/gui-commands-targeted-tests.xml (138 passed, 2 failed).
+Final targeted run: 140 passed, zero failures/errors/skips, in
+records/gui-commands-targeted-final-tests.xml. Tests exercise actual Dash HTTP
+callbacks and ShutterHub with software transports, not browser/hardware substitutes.
+
+Final command: uv run --locked --offline --no-sync --group dev --extra gui
+python -B scripts/verify.py --record-prefix gui-commands-
+Result: 337 source and337 isolated installed-wheel tests PASS, zero failures,
+errors or skips. Lock, lint/format, exact Python/CSS wheel parity, clean locked
+installation, SDK/native-free import/help, passive configuration and six static
+notebooks PASS. No hardware notebook cells were executed. All recorded input
+hashes matched at the final audit. Evidence:
+records/gui-commands-direct-validation.json, gui-commands-offline-tests.xml and
+gui-commands-wheel-tests.xml. The run includes REQ-251's protocol/release fixes.
+
+A separate production-backend preview used localhost9872 and the tracked Ethernet
+config, without selecting Connect or any device action. Settings/Diagnostics
+were inspected at1280x720 and390x844, including scrolling and disabled controls.
+No horizontal overflow or browser warnings/errors were observed. Screenshots:
+records/gui-commands-{settings,diagnostics}-{desktop,phone}.jpg. The tab was closed,
+viewport override reset and only this preview stopped; port9872 had no listener
+afterward. Existing servers were untouched. No physical controller was contacted.
+
+records/gui-commands-coverage.json maps controls to shared APIs, captures callback/
+layout scope, screenshot hashes, current input agreement and local Markdown link
+checks. README, GUI guide, STATE and REPORT describe the result. No GUI source
+work remains pending for REQ-251's separately authorized combined publication.
+This chat made no commit/push. New hardware commands and physical/deployment
+acceptance remain untested; prior live evidence applies only to its recorded setup.
+
+## E232 - Final integrated review validation / TEST-251
+
+8 November 2026; D085/E231 and the stable D084/E230 GUI handoff. Expected: all
+software tests run without failures/skips, exact source/wheel runtime parity,
+locked dependencies, passive startup/configuration, preserved interlocks/load
+permissions/ownership/cleanup and current documentation/artifact integrity.
+
+Final command: uv run --no-sync --locked --offline --group dev --extra gui
+python -B scripts/verify.py --record-prefix final-review-. Result: 337 source +
+337 isolated installed-wheel tests PASS; zero failures/errors/skips. Lock checks,
+Ruff lint/format, exact Python/CSS wheel parity, clean locked installation,
+isolated imports/help without SDK/native extras, passive configuration and all
+six static notebook checks PASS. All 38 recorded verifier input hashes match.
+No controller or laboratory network was contacted; TCP tests use loopback.
+
+The first combined run found two error-priority regressions: invalid/missing
+target plus invalid cycle inputs reported a field error before target selection.
+records/final-review-integration-first-tests.xml retains 335 PASS / 2 FAIL.
+GUI parsing now follows its single canonical exact-target check in execute_action;
+the final suite covers every control's invalid-target refusal. No extra callback
+target guard is required. The three new E231 protection regressions also PASS
+(records/final-review-regressions.xml). Cycle-duty/count checks share one repeated
+operation branch, with existing load-boundary tests retained and passing.
+
+The separate GUI work completed its stable handoff without pending source edits;
+its preview was stopped. The final review inspected all four saved desktop/phone
+Settings/Diagnostics screenshots. No connected GUI or optical behavior is inferred.
+The user also explicitly authorized a coordination message to that chat; it was
+asked to leave the publication inputs stable. No messages were sent to others.
+
+records/final-review-audit.json: 21 Markdown files / 111 local links PASS;
+four current PDFs plus historical Issue 36 in Git 5d2adc1 match registered hashes;
+all six notebooks retain their saved outputs and execution counts; 107/107 explicit
+controller declarations have docstrings. The tracked live policy remains
+Manual-only output, 2 s OFF rest, protected persistent mode selection and no
+device-settings/EEPROM/continuous-cycle permissions. No qualification was expanded.
+
+STATE.md and outputs/REPORT.md now describe the current system concisely instead
+of repeating historical campaign summaries. Full decisions, observations, raw
+evidence and prior campaign JSON/XML remain in records; superseded review files
+and Issue 36 remain in Git history. Manufacturer-count and external DiamondGUI
+wording now distinguish current local copies from historical checks. External
+deployment, native modes/settings and physical/calibration/reboot/endurance
+acceptance remain open. Ordinary active-app sync was not retried; the existing
+shutter-control.exe and server were left running their earlier code. The final
+wheel is a software-validated deployment artifact, not a running-app upgrade.
+
+Software/doc review PASS. Publication is the remaining authorized action; record
+its observed commit/remote result separately. Evidence:
+records/final-review-{direct-validation,audit}.json and source/wheel XMLs.
+
+## D086 - Preserve verification evidence bytes in Git / REQ-251
+
+8 November 2026. Before staging, a raw-versus-filtered Git blob comparison for
+records/gui-commands-direct-validation.json differed: raw 6cdb1e3da21ed3ed8ceda7f0c6d467fd2aa98546
+versus text-filtered 541498da38cbf1c9de184fbb3ffe85a0797a3a3a. The current
+automatic LF conversion would change CRLF records and invalidate referenced
+artifact hashes. The final verifier's 38 inputs already contain no CRLF.
+
+Disable text conversion for records/*.json and records/*.xml in .gitattributes;
+preserve raw historical campaign data instead of rewriting its hashes. Confirmed
+raw/filtered blob equality after this change. Normalize only the current Markdown
+checkpoint/report/log to LF; do not rewrite the JSON/XML evidence. Staged byte
+parity is checked before publication. No runtime behavior or hardware policy changes.
+
+## E234 - Final revalidation including visible fault lockout / TEST-251
+
+8 November 2026. A concurrent new REQ-252 live-read campaign exposed a misleading
+generic success notice over a persistent owner fault. Its independently prepared
+four-case software regression and small gui.py change were reviewed and included:
+Connect, Read, Poll and Release must retain the fault in both notices; journals
+and output lockout remain unchanged. Healthy polling still preserves messages.
+The software cases reproduce and validate the UI behavior without device I/O.
+
+The final verification command is the same as E232. Result: 341 source + 341
+isolated installed-wheel tests PASS; zero failures/errors/skips. Lock, lint/format,
+Python/CSS wheel parity, clean locked installation/import/help, passive config and
+six static notebooks PASS. All 39 verifier inputs match, including the new test
+file. records/final-review-{direct-validation,audit}.json and source/wheel XMLs
+now describe this final revision; E232 is the earlier 337-case snapshot, and E230's
+separate 337-case campaign remains preserved under gui-commands-*.
+
+The document/artifact audit again passes 21 Markdown documents / 111 local links,
+five registered manual hashes (four local, Issue 36 in Git), six preserved saved
+notebook output/count sets and 107/107 controller docstrings. D086 preserves JSON/
+XML evidence bytes in Git. README/API/GUI/architecture and the compact checkpoint/
+report describe the final software and the unchanged physical boundaries.
+
+Publication excludes the concurrent, incomplete REQ-252 hardware-run artifacts
+and its new PROJECT/STATE sections. Explicit index snapshots publish only the
+reviewed REQ-251 document sections; complete working files and new live-run data
+are preserved for that task. The coordinator was informed with the user's explicit
+messaging authorization. No device/server action was performed by this review;
+the separate campaign has its own authority, observations and unfinished work.
+
+REQ-251 software/doc scope PASS. Publication evidence will identify the observed
+source commit and remote equality separately; physical acceptance remains open.

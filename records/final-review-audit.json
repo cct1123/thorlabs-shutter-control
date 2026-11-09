@@ -1,0 +1,107 @@
+{
+  "requirement_id": "REQ-251",
+  "test_id": "TEST-251",
+  "evidence_id": "E234",
+  "result": "PASS",
+  "recorded_at_utc": "2026-11-09T00:04:50.209973+00:00",
+  "scope": "Software/document/artifact integrity only; no device or existing-server operation",
+  "source_input_count": 39,
+  "changed_verifier_inputs": [],
+  "test_totals": {
+    "offline": {
+      "tests": 341,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wheel": {
+      "tests": 341,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "markdown_files": 21,
+  "local_links": 111,
+  "broken_links": [],
+  "manuals": [
+    {
+      "path": "docs/manuals/KSC101_Manual_HA0368T_Rev_D.pdf",
+      "sha256": "b51ac9ca1aa53b02b554dfd5b1c0bd4b99d73e4ba092e47170a64a3f4bab34f5",
+      "location": "working tree"
+    },
+    {
+      "path": "docs/manuals/KEH3_KEH6_Manual_DOC-103012_Rev_E.pdf",
+      "sha256": "c768e4e3f2317ae29f7bfcdf8b18f750d7adc688d324c55550cdfa9a31a0489b",
+      "location": "working tree"
+    },
+    {
+      "path": "docs/manuals/APT_Communications_Protocol_Issue_36.pdf",
+      "sha256": "96668e05c353269d59390d3e00e4e7237c881707b3a947057dd08ead13191966",
+      "location": "Git 5d2adc1"
+    },
+    {
+      "path": "docs/manuals/APT_Communications_Protocol_Issue_42.1.pdf",
+      "sha256": "b2a6badd7c00b3042ba383e291667e7eab10746c14c4f92cea45fc480c7304ed",
+      "location": "working tree"
+    },
+    {
+      "path": "docs/manuals/KSC101_Kinesis_UI_Manual_HA0368T_Rev_F.pdf",
+      "sha256": "007d604c718378b3b8b6bc6f46876f00f91c6a4e4d839c2a175681ac3c122597",
+      "location": "working tree"
+    }
+  ],
+  "notebook_outputs_and_execution_counts_preserved": [
+    "docs/examples/01_device_discovery.ipynb",
+    "docs/examples/02_connection.ipynb",
+    "docs/examples/03_status_query.ipynb",
+    "docs/examples/04_settings.ipynb",
+    "docs/examples/05_shutter_modes.ipynb",
+    "docs/examples/06_on_off.ipynb"
+  ],
+  "controller_docstring_declarations": 107,
+  "controller_docstring_coverage": "100%",
+  "passive_live_config": {
+    "qualified_modes": [
+      "manual"
+    ],
+    "min_off_s": 2.0,
+    "allow_persistent_mode_changes": true,
+    "allow_device_settings": false,
+    "allow_persistent_settings": false,
+    "allow_continuous_cycles": false
+  },
+  "screenshots_visually_reviewed": [
+    "records/gui-commands-diagnostics-desktop.jpg",
+    "records/gui-commands-diagnostics-phone.jpg",
+    "records/gui-commands-settings-desktop.jpg",
+    "records/gui-commands-settings-phone.jpg"
+  ],
+  "unpublished_concurrent_sections_excluded": [
+    "PROJECT.md REQ-252",
+    "STATE.md REQ-252"
+  ],
+  "document_sha256": {
+    "README.md": "a504b869716e49e7cf0e562c3b5c1fa065de411d2fa6323ae1755b9acfda5b47",
+    "PROJECT.md": "eeb6798a7f650dd546fcdb3da5ce60b6e22fbd68475788c27c99f6048edc248e",
+    "STATE.md": "07c665747c8dac5621a042d074f75f1d733651717232c9275753b1aff68ff873",
+    "outputs/REPORT.md": "fe6f25c70bb048568bae0ab8bf98fcb1756440ceb61125b3ec5eaea20cb925de",
+    "docs/architecture.md": "9e1a64494d266496d0e889b8c7bd7f9e104263d2f3013b9697ab5a6e8f42fefe",
+    "docs/controller-reference-review.md": "27067c6c127e1d3798dc1db3d9769cf122934fa992572497d1e0dcfdd75fc032",
+    "docs/cutover.md": "516440087b452ee94bed48332efd903b9d1c651ff166685d74f2c1b2f9a74903",
+    "docs/diamondgui.md": "8feac4adec62e1251a09ed25e85b4454849334394e8e9a52237cc5279576723e",
+    "docs/ethernet-assessment.md": "25dddfac553e20e7c31b76fc5d25257ac102ba125ef2b46c80ca07433c27554e",
+    "docs/getting-started.md": "1f73c4a99fdbed314d702e08379b3c691637fa204657d08ad4e5dd5f82d169bd",
+    "docs/gui.md": "64bfe636246ee308f9a13fe7c76ae69c9d5152d1d795a45a28e689c93d7176c5",
+    "docs/hardware.md": "c5ef4c8790761ad7bba56daabf155cd4bd5e1cbbce949e9019393a1e6aaba496",
+    "docs/HARDWARE_VALIDATION.md": "0645ce94866d28ce7d1e53305a2611c339b2008be125b50bab5efed2f2447384",
+    "docs/INTERFACE.md": "d8df1e317fe72cc1a5ec59f5b84535d24ace78e4637b83e5410a27aac75a57b7",
+    "docs/python-api.md": "e617f4f2e35b80a6a28d1715900680dc9e1ccd27721392771d6e00a600debb5d",
+    "docs/qmi-discovery-review.md": "1ab6b93a107980f7d5aec6a6cd0eb10e88b3ca417d82d64ec73bb4b4bfc9e828",
+    "docs/sources.md": "893ad2f8840400aded071fc73220c8a752e6d128aebe668de48c9e75af8cdfe3",
+    "docs/state-zero-investigation.md": "689dd206f19ed74b2de48893b151c4d454d834e276bc31b21f2982f714819a9b",
+    "docs/assets/README.md": "0a1d9f59826be16027e971a2bfb29fcdc36a656b2ef1c2d88b09d9e1da3bf9fe",
+    "docs/examples/README.md": "f9f0e85159405d8911a76b616f20497e2d24227282ae78e9535698b3b70ffe71",
+    "docs/manuals/README.md": "422f487c9fc2e7ddf7dfb9c1932b776e7288436615d2943e0a240fd977c46fcd"
+  }
+}

@@ -5,10 +5,23 @@ One shared Python owner for the library, CLI, WebUI and six
 messages directly. No Kinesis, pythonnet or Thorlabs SDK runtime is used;
 Ethernet needs only the Python standard library.
 
+The control core has three modules: controller (configuration, KSC101 commands,
+ownership and policy), protocol (APT messages/deadlines) and transport (TCP/USB
+routes and explicit inventory). Use package-level imports; the former config,
+device and discovery modules are removed. Hub serial/firmware metadata is
+optional when unknown; exact controller identity is still verified on connection.
+
+Additional documented Python operations cover channel/bay/LED queries, guarded
+LED settings, interlock enforcement, explicit update start/stop with raw events,
+and explicit hardware disconnect. They use the same owner and deadlines; ordinary
+connect/status/ON/OFF/release remains the normal path. Motor/MMI/trigger layouts
+remain excluded. See the [API contracts](docs/python-api.md).
+
 The reviewed setup is **shutter**, **SH05R**, KSC101 **68800777**, firmware
-**1.0.7**, KEH3 middle bay **192.168.1.19:40305**. Application channel0 is separate
-from APT channel1. Its tracked [configuration](config/shutter.ethernet.toml)
-remains Manual-only with cycle-setting and EEPROM writes disabled.
+**1.0.7**, KEH3 middle bay **192.168.1.19:40305**. Application channel 0 is separate
+from APT channel 1. Its tracked [configuration](config/shutter.ethernet.toml)
+allows protected selection of Manual, Single, Auto and Triggered. Output activation
+remains Manual-only; native Start/priming, cycle-setting and EEPROM writes stay disabled.
 
 ```powershell
 uv sync --locked --group dev --group notebooks --extra gui
@@ -17,9 +30,14 @@ uv run --locked shutter-control --config config/shutter.ethernet.toml gui --port
 ```
 
 Startup is passive and localhost-only. Select an exact target, then Connect.
-Use a free port explicitly; default8050 may belong to another application.
+Use a free port explicitly; default 8050 may belong to another application.
 Stop/release the previous owner before restarting an updated WebUI and reload
 the browser. There is no automatic port takeover, scan, fallback or ON replay.
+
+WebUI Release refuses pending ON/Start under the same owner lock as communication
+release. Queries reject stale replies across all queued receive chunks before
+sending a request; a busy event stream consumes the existing deadline. APT still
+cannot prove freshness for arbitrary delayed same-type replies.
 
 ## Operation
 
@@ -27,10 +45,16 @@ Connect verifies exact identity/firmware and the WebUI reads actual mode,
 interlock requirement and electrical output. Read state gets fresh replies;
 Live readback is opt-in. The modern flat panel provides mode selectors,
 Open/Close or qualified Start/Stop, timing/count readout, Settings and Identify.
-Successful polling preserves operator messages. Disconnected feedback stays Unknown.
+Healthy polling preserves operator messages. Persistent faults remain visible in
+the main and Settings notices. Disconnected feedback stays Unknown.
+
+Settings also offers LED indication reads/applies and **Require interlock**.
+Readback and diagnostics contains channel/bay queries, device-message start/stop,
+raw event collection and protected hardware disconnect. All use the shared owner;
+settings permissions still apply. See the [GUI command guide](docs/gui.md#additional-shutter-commands).
 
 Every ON attempt invalidates the previous OFF-rest interval. New rest starts
-with fresh OFF readback; it cannot be reused after an intervening ON. The1s
+with fresh OFF readback; it cannot be reused after an intervening ON. The 1 s
 timed button is a host hold after ON readback, followed by OFF. Neither host
 hold nor electrical timestamps are calibrated optical exposure.
 
@@ -51,7 +75,7 @@ from thorlabs_shutter_control import ShutterHub
 with ShutterHub("config/shutter.ethernet.toml") as hub:
     hub.connect("shutter")
     status = hub.get_status("shutter")
-    print(status.feedback.operating_mode, status.feedback.electrical_state)
+    print(status.operating_mode, status.electrical_state)
 ```
 
 Construction/configuration checks open no device; `connect()` above does.
@@ -72,7 +96,6 @@ change or Windows crash fix is implied by this package.
 
 ```powershell
 uv run --locked --offline --group dev --extra gui python -B scripts/verify.py --record-prefix review-
-uv run --locked --group notebooks python -B scripts/verify_notebooks.py
 uv run --locked python scripts/verify_webui_evidence.py records/webui-modern-hardware-live.json
 ```
 
@@ -81,7 +104,9 @@ exact Python/CSS parity and zero failed/skipped/uncollected required tests.
 Frozen real-observation fixtures participate in input hashes. `--test-path`
 selects an explicit subset; `--record-prefix` preserves previous campaigns.
 Software tests include protocol fixtures and localhost loopback; they establish
-no new bench result. Notebook checks never execute hardware cells. Successful
+no new bench result. The same suite checks notebook schema, syntax, links and
+passive setup without executing hardware cells. To run just those checks, use
+`uv run --locked --group dev pytest tests/test_tutorial_notebooks.py`. Successful
 disposable verification environments are removed; inspect failed-run diagnostics
 before pruning. Environments, manuals, actual records, backups and ownership
 state are retained.
@@ -92,8 +117,10 @@ cycles, so complete two-cycle blade motion remains unverified. E191/E192 records
 an earlier individually observed blade cycle. These are dated results on their
 exact revisions; current software review does not repeat or extend them.
 
-No SDK backend or retired probe/notebook wrapper remains. Existing DiamondGUI
-owner method/status names are intentional public contracts. The last recorded
+No SDK backend or retired probe/notebook wrapper remains. Owner method names
+remain stable; version 2 intentionally replaces nested feedback and redundant
+status fields with a flat ShutterStatus. External consumers need the
+[status migration](docs/python-api.md#status-schema-migration) before upgrading. The last recorded
 external DiamondGUI check (E185) failed its commented-out page/stale mapping;
 its restoration and live deployment are separate. Use the
 [migration guide](docs/cutover.md), [current state](STATE.md) and

@@ -7,9 +7,16 @@ from threading import Event
 import pytest
 from conftest import FakeTransport
 
-from thorlabs_shutter_control.device import KSC101
-from thorlabs_shutter_control.errors import ControllerFault, DeadlineExceeded, ProtocolError
-from thorlabs_shutter_control.protocol import Deadline, Decoder, Frame, Session
+from thorlabs_shutter_control.controller import KSC101
+from thorlabs_shutter_control.protocol import (
+    ControllerFault,
+    Deadline,
+    DeadlineExceeded,
+    Decoder,
+    Frame,
+    ProtocolError,
+    Session,
+)
 
 
 def test_status_bits_decode_actual_firmware_107_capture():
@@ -239,6 +246,28 @@ def test_pending_stale_response_cannot_satisfy_new_query(config):
     assert not transport.history
 
 
+def test_stale_reply_behind_full_transport_buffer_is_rejected_before_request(config):
+    transport = FakeTransport(config)
+    event = Frame(0x0481, destination=1, source=0x50, payload=bytes(250)).encode()
+    transport.rx.extend([event * 16, bytes.fromhex("2a0406008150010000200000")])
+    transport.read_nowait = lambda: transport.rx.popleft() if transport.rx else b""
+    transport.silent.add(0x0429)  # Only the queued stale status could satisfy this query.
+    session = Session(transport, Event())
+    with pytest.raises(ProtocolError, match="late"):
+        KSC101(session, config).output_state(Deadline(0.1))
+    assert session.poisoned and not transport.history
+
+
+def test_continuous_pending_events_expire_without_dispatch(config):
+    transport = FakeTransport(config)
+    event = Frame(0x0481, destination=1, source=0x50, payload=b"opaque").encode()
+    transport.read_nowait = lambda: event
+    session = Session(transport, Event())
+    with pytest.raises(DeadlineExceeded):
+        KSC101(session, config).output_state(Deadline(0.01))
+    assert session.poisoned and not transport.history
+
+
 def test_late_read_is_not_success(config):
     transport = FakeTransport(config)
     transport.delay = 0.03
@@ -303,7 +332,7 @@ def test_cancelled_query_does_not_touch_transport(config):
     cancel = Event()
     cancel.set()
     session = Session(transport, cancel)
-    from thorlabs_shutter_control.errors import Cancelled
+    from thorlabs_shutter_control.protocol import Cancelled
 
     with pytest.raises(Cancelled):
         KSC101(session, config).output_state(Deadline(1))

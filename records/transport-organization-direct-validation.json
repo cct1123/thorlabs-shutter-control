@@ -1,0 +1,361 @@
+{
+  "scope": "Software checks for the listed paths only; no instruments or lab network",
+  "python": "3.12.7 | packaged by Anaconda, Inc. | (main, Oct  4 2024, 13:17:27) [MSC v.1929 64 bit (AMD64)]",
+  "deadline_clock": {
+    "implementation": "QueryPerformanceCounter()",
+    "monotonic": true,
+    "adjustable": false,
+    "resolution": 1e-07
+  },
+  "tested_paths": [
+    "tests"
+  ],
+  "test_totals": {
+    "offline": {
+      "tests": 250,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wheel": {
+      "tests": 250,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "source_sha256": {
+    ".python-version": "7b55f8e67b5623c4bef3fa691288da9437d79d3aba156de48d481db32ac7d16d",
+    "config/shutter.ethernet.toml": "62fc38b1cd2978dc3df64f12af8e07dd305acd7e35d745391ccf7144a5605474",
+    "config/shutters.example.toml": "fb7a001146ad10ecc83dc37173f02ce3f24f708367b1531e6c5743bf773b12e3",
+    "docs/examples/01_device_discovery.ipynb": "e98c8ede0eb0b9c877b08f76654770008897108dc2ed4075d7869ddef728f5e4",
+    "docs/examples/02_connection.ipynb": "f54b5934e17eced3c71be015eec92b747077717e8e12c7c3b694d36ad63fdf13",
+    "docs/examples/03_status_query.ipynb": "0e40f83758b59c4a8007f25118fa581d662c6177d134683cdbf4ef74ece74e4c",
+    "docs/examples/04_settings.ipynb": "340e0c9aefe9b6300b073f9c6edc1adef79ab0f803d28dbecf3d1b8695f5f5bf",
+    "docs/examples/05_shutter_modes.ipynb": "41d06f4d88ba4e8cc736564c509ab7bdf4cfa902cbd0654f6111a6c7484c92be",
+    "docs/examples/06_on_off.ipynb": "d221adcb6da625a99585e1555ed3144dd3c1e1b2bda1b7bb6197ea6d4179d8b4",
+    "docs/examples/README.md": "f9f0e85159405d8911a76b616f20497e2d24227282ae78e9535698b3b70ffe71",
+    "docs/examples/shutter_config.py": "572284d14b1bad85ee22ccaa99ceb81dccff2b122f9df9f88e82b20a282a68d5",
+    "pyproject.toml": "fd609d443490cd1dcdc779660413784eaa48dc50a1254d90f7c70f067e751073",
+    "README.md": "711162eb5c83234f37477b5aa7f5739eec95f39c118077e6894d766459de62b2",
+    "records/webui-final-live.json": "e0f8bfdc94890b5b9d416714aca60f87566146678165557068f36d0f88bf257e",
+    "scripts/verify.py": "046ecbe5f7734700e23e608e544ec0b55774fb0ad27deaf118a36ebe774f3bc1",
+    "scripts/verify_webui_evidence.py": "b6e858359b08ee5f0198a59407f0c62d73d95adc100e34ea6313e231a5447050",
+    "src/thorlabs_shutter_control/__init__.py": "3b4431caa6f596b04a252e95f25e01351dc562b1931ed90390a97a7597ded37c",
+    "src/thorlabs_shutter_control/__main__.py": "3b4613f711ff95276f9dc0c2ed73d386dcedff1e012271bcc96e90b09c130fa6",
+    "src/thorlabs_shutter_control/assets/shutter.css": "400610b6098a6dff6bbcc1faf13dafe26534f34c3840da6d0786fbbb50612502",
+    "src/thorlabs_shutter_control/controller.py": "90472a45e5d55412db14c8547fd01cde3ca2947d288980c6d23489e7a28e8305",
+    "src/thorlabs_shutter_control/gui.py": "cb3a0e4b84a0d7f61b783d02c53ba58a0ae679bf20ae870270f55908c42273bf",
+    "src/thorlabs_shutter_control/protocol.py": "f41c898f3079015121f64a9e384e2ff3e454885468025dbefdfb5b5853db3174",
+    "src/thorlabs_shutter_control/transport.py": "4bef59787364170cb4f1f1d1f11b956ec10f5a0cfbf5e7ea8b25787bb8febe0e",
+    "tests/conftest.py": "884db151e233084cf111129d053808e4b9f399af1f49e96cb073e8756e40725d",
+    "tests/test_application.py": "0b4f31f291008ab9cd21503c11d52511fe9fbab84e743913982b948d07183866",
+    "tests/test_discovery.py": "0934580b74e78b21ec908a30548f9d66254d04b800fc264ae5302eff9be19c88",
+    "tests/test_ethernet.py": "2aa10a83bf3f40a9aab36c5ecd7dbe6c9d068b70973bfc75bb1b3fbc7b3cac44",
+    "tests/test_native_controls.py": "f810fcd76c872f64f05abcc787199e4e0c7812933620ffc27e35475f53c7fac0",
+    "tests/test_owner.py": "bce9a669e41706e73fd5c6f1a62aa14a578be4819858cb9c5c68f9a3b97c77d8",
+    "tests/test_protocol.py": "11aa8eab2f4d84d6348092bd6cb4f72eb83b646f9946364836f90d26adeab677",
+    "tests/test_review_regressions.py": "7e719816af35bc792366bf6334f72f1216ec5b7168ff3690cb8b3da14f8b4a32",
+    "tests/test_tutorial_notebooks.py": "5efdb9379120cab881137fdb4d7f87dce89ace7d94bc6de7f5afcfc695bb859e",
+    "tests/test_verification.py": "538477e7e7f85622db07cb62d55857f3cba563f4bb63d89587a2ec10f29857dc",
+    "tests/test_webui_live_regressions.py": "beaf357ef9bd9fc4ccd9f6eae75f5ffb72ecc7dc211f308bfbba797b79c50230",
+    "tests/ui_helpers.py": "47d9f7c72ffad769ca186c7b2c56ade63e3187c3f4c19991a41f4b9fad69a182",
+    "uv.lock": "a334e14b74cb92a507564cae379f4c731473673b128a2ebda99190816afc7886"
+  },
+  "wheel_sha256": "c7339a8cbc3c8ef4e34ca7eb5002f2be73efe3ace0473c4dc5da84267aa3382e",
+  "wheel_source_parity": "PASS",
+  "results": [
+    {
+      "test": "lock current",
+      "command": [
+        "C:\\Users\\HFNV\\AppData\\Local\\hermes\\bin\\uv.EXE",
+        "lock",
+        "--check",
+        "--offline"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.07822010002564639,
+      "stdout": "",
+      "stderr": "Resolved 123 packages in 2ms\n"
+    },
+    {
+      "test": "ruff check",
+      "command": [
+        "C:\\repo\\thorlabs-shutter-control\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "--no-cache",
+        "src",
+        "tests",
+        "scripts",
+        "docs/examples"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.23923290002858266,
+      "stdout": "All checks passed!\n",
+      "stderr": ""
+    },
+    {
+      "test": "ruff format --check",
+      "command": [
+        "C:\\repo\\thorlabs-shutter-control\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "--no-cache",
+        "src",
+        "tests",
+        "scripts",
+        "docs/examples"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.23322530003497377,
+      "stdout": "28 files already formatted\n",
+      "stderr": ""
+    },
+    {
+      "test": "offline tests",
+      "command": [
+        "C:\\repo\\thorlabs-shutter-control\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "-q",
+        "--tb=short",
+        "-p",
+        "no:cacheprovider",
+        "C:\\repo\\thorlabs-shutter-control\\tests",
+        "--basetemp",
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\verification-a8c2a4bdd7e041ed88c170866c581f9b\\offline",
+        "--junitxml",
+        "C:\\repo\\thorlabs-shutter-control\\records\\transport-organization-offline-tests.xml"
+      ],
+      "returncode": 0,
+      "elapsed_s": 9.144999100011773,
+      "stdout": "........................................................................ [ 28%]\n........................................................................ [ 57%]\n........................................................................ [ 86%]\n..................................                                       [100%]\n250 passed in 7.19s\n",
+      "stderr": ""
+    },
+    {
+      "test": "build locked backend",
+      "command": [
+        "C:\\repo\\thorlabs-shutter-control\\.venv\\Scripts\\python.exe",
+        "-m",
+        "hatchling",
+        "build",
+        "-t",
+        "wheel",
+        "-d",
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\verification-a8c2a4bdd7e041ed88c170866c581f9b\\build-wheel"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.3352565999957733,
+      "stdout": "",
+      "stderr": "tmp\\verification-a8c2a4bdd7e041ed88c170866c581f9b\\build-wheel\\thorlabs_shutter_control-1.0.0-py3-none-any.whl\n"
+    },
+    {
+      "test": "clean venv",
+      "command": [
+        "C:\\Users\\HFNV\\AppData\\Local\\hermes\\bin\\uv.EXE",
+        "venv",
+        "--offline",
+        "--python",
+        "3.12",
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\verification-a8c2a4bdd7e041ed88c170866c581f9b\\clean"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.08594679995439947,
+      "stdout": "",
+      "stderr": "Using CPython 3.12.7 interpreter at: C:\\ProgramData\\anaconda3\\python.exe\nCreating virtual environment at: tmp\\verification-a8c2a4bdd7e041ed88c170866c581f9b\\clean\nActivate with: tmp\\verification-a8c2a4bdd7e041ed88c170866c581f9b\\clean\\Scripts\\activate\n"
+    },
+    {
+      "test": "locked clean dependencies",
+      "command": [
+        "C:\\Users\\HFNV\\AppData\\Local\\hermes\\bin\\uv.EXE",
+        "export",
+        "--locked",
+        "--offline",
+        "--extra",
+        "gui",
+        "--group",
+        "dev",
+        "--no-emit-project",
+        "--format",
+        "requirements-txt",
+        "--output-file",
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\verification-a8c2a4bdd7e041ed88c170866c581f9b\\requirements.txt"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.07540500001050532,
+      "stdout": "# This file was autogenerated by uv via the following command:\n#    uv export --locked --offline --extra gui --group dev --no-emit-project --format requirements-txt --output-file C:\\repo\\thorlabs-shutter-control\\tmp\\verification-a8c2a4bdd7e041ed88c170866c581f9b\\requirements.txt\nannotated-types==0.8.0 \\\n    --hash=sha256:13b2beaad985e05e2d6407ee4c4f35590b11f8d693a258a561055cac8f64cab7 \\\n    --hash=sha256:f072f4d804ea359e4eaf198b1af7a8b0943881a87f31bb764f8bf219bb9419e0\n    # via pydantic\nattrs==26.1.0 \\\n    --hash=sha256:c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309 \\\n    --hash=sha256:d03ceb89cb322a8fd706d4fb91940737b6642aa36998fe130a9bc96c985eff32\n    # via\n    #   jsonschema\n    #   referencing\nblinker==1.9.0 \\\n    --hash=sha256:b4ce2265a7abece45e7cc896e98dbebe6cead56bcf805a3d23136d145f5445bf \\\n    --hash=sha256:ba0efaa9080b619ff2f3459d1d500c57bddea4a6b424b60a91141db6fd2f08bc\n    # via flask\ncertifi==2026.7.22 \\\n    --hash=sha256:62f22742b58a1a33014a2b6b706588a8d7e2a88ae7bd1a6ebe8c992928483775 \\\n    --hash=sha256:741e2c3b351ddf169a738da9f2c048608ff7f2c5cc02f1ebc6b118bb090d5d55\n    # via requests\ncharset-normalizer==3.5.1 \\\n    --hash=sha256:1d1c7a53a6c2103925cdd6d7229f8c567379f211c869793df679f2e9f738c369 \\\n    --hash=sha256:2f293479cce755c75f1697e87c409b7ae4c555c7dfecb6e988ad13abba943031 \\\n    --hash=sha256:343fb4f2821043bd87095f7b08a1a181febc8e36ac64212143bbfd0a0e1bc235 \\\n    --hash=sha256:3588e376b3ea2eea84976f67273d679f229e24c66dce7b82ae45aef04ff6e072 \\\n    --hash=sha256:36047af20e17097c3bb9476c2b7655f2f7aa51322c0ba58c07695bedf755a950 \\\n    --hash=sha256:3617ac3cfd8b9888f145ad89dd6e692285834b0201c6074a5eeaad3fd4d668c2 \\\n    --hash=sha256:41876ee62a3dddf48ff1121ad8f0798032aa03f2fd35f21f34a4cab14f18d8d2 \\\n    --hash=sha256:4582c27e8c889d64811987b5967fbd3ae0c823fe1fd933b543d55ac20bb475fa \\\n    --hash=sha256:4abdc5f9ad448c1ecbfae2974b820535d6bc6e7eef63babbab3d81cf46968c71 \\\n    --hash=sha256:4b599739b93b2cbeded49645ae3c8d1405c29ddfbceac1545c87a3f9580a9e96 \\\n    --hash=sha256:4c4fb141a727957c93edfe5c32a26ceb6b5f6461d67146e2d39f51e16170bea8 \\\n    --hash=sha256:5b6d1386bf0096d26d3a863dc0a487a5b4eb9aa93cf5ba69683d29dde6b9d60f \\\n    --hash=sha256:5d8531a6569d025f68e2321e7638fb7978f23db58e5f69f56913837aae03816e \\\n    --hash=sha256:6117b84ea48435e5356dc737f5121485c30920ba43375fa7b434fd753df0eac3 \\\n    --hash=sha256:6df0ec430f9a831772c23ca5a224cba36517a58a84bb32c32bb59a9fa67c47f6 \\\n    --hash=sha256:70055ff39b97c99e7ae40ea3e393fb62aa2e44dbd9b29f8d14f42fb0025c3959 \\\n    --hash=sha256:7235dc28fc6dd9d832ac7c7bce95367dedb85929f17368a0c2bee1e080b9acbf \\\n    --hash=sha256:7c0c10730342b0c9b35dd1d619beb8214e520bd96a1f870f452680b238aab3e0 \\\n    --hash=sha256:87e4f41d375c0b9be2fb5251aee4b8a689169e134535aed81bf085c3b647451e \\\n    --hash=sha256:88e85ab89cb822c1e635f51d6d32e488f94e002e70e2f492bdb8b945543f345a \\\n    --hash=sha256:96fef3e886d6a9874b14f27fc193fbdc69d5d8035783d86aa4e1cea594e695f9 \\\n    --hash=sha256:a2028475ba855475b8b4d3cfeb4994269c967aea8b9892dfba907f4263a863a3 \\\n    --hash=sha256:a6dac12ff6b846103483683f60c5f8fee205121adc58ffd87e90a90a3af69e99 \\\n    --hash=sha256:aae2ee51122d3ae968a3837d97dc24a0aeebb0dea23694422cd172bd30017cd6 \\\n    --hash=sha256:ae4a097991662cd4fff0ddc74e0fe7874f82e00042fa0ea00855645ed0c79598 \\\n    --hash=sha256:b39b69b347e5e47a3b5b8cfc005c68c1ba347474e3960236c4944a8ecd174962 \\\n    --hash=sha256:b9af956078716df40d985fb0dfeb2c2120c5ca92ba4ff4b388acfd01cdc14d08 \\\n    --hash=sha256:ba501e667c17d8411f98e67a022d9604ef179aff0e459b7e292c796837c13573 \\\n    --hash=sha256:cee5dd7c6fb5dd52a0fe2a740f9bc6e3593f5f8b1788bde49de02086f30182b2 \\\n    --hash=sha256:cfa1c0cc3a8f9f53f1243a5a99ac36fd003880199383b37672e86ddda9cb07e2 \\\n    --hash=sha256:dd732602a7009217f658d5863d12d79d373a4de0eebc111094bcdd3bb8e0a6cc \\\n    --hash=sha256:e199fb99720074809a7720f1c0b4d919eea8b87e88713e0f8f602f7bef543d9d \\\n    --hash=sha256:e6621fb2a4988d6e53eedc455e5903e2679f3967b8acb3d639f1b63c14a2e893 \\\n    --hash=sha256:f9f8405c2c758532c74fed975dbee57be1f31a6e865c031870c79a6ed3212ada\n    # via requests\nclick==8.5.0 \\\n    --hash=sha256:255bc9599cf7748b4b1a446ccc735421bd08a2ae529a8b88597d3de5664ee360 \\\n    --hash=sha256:ba0d2089de75ea0310e2dde03160e6ca10009947fb95a182f9b54021bb272e34\n    # via flask\ncolorama==0.4.6 ; sys_platform == 'win32' \\\n    --hash=sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44 \\\n    --hash=sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6\n    # via pytest\ncomm==0.2.3 \\\n    --hash=sha256:2dc8048c10962d55d7ad693be1e7045d891b7ce8d999c97963a5e3e99c055971 \\\n    --hash=sha256:c615d91d75f7f04f095b30d1c1711babd43bdc6419c1be9886a85f2f4e489417\n    # via dash\ndash==4.4.1 \\\n    --hash=sha256:72120a91b10ee4d73f9446efd5d6a4ec218086feed7b1b479d2259844d1f658f \\\n    --hash=sha256:9356ca7856bc496c12c5b6de5978aaf783e090d07450ee395ade1c0c2cbdf816\n    # via thorlabs-shutter-control\nfastjsonschema==2.22.3 \\\n    --hash=sha256:8330c91b027dcf941efcb7b1f0998515ff95d177ea15bbabdfe8671965620901 \\\n    --hash=sha256:f670b443830b75aca3f00b75949efa20f4b2a80302ec7a21505c28dd54cffd43\n    # via nbformat\nflask==3.1.3 \\\n    --hash=sha256:0ef0e52b8a9cd932855379197dd8f94047b359ca0a78695144304cb45f87c9eb \\\n    --hash=sha256:f4bcbefc124291925f1a26446da31a5178f9483862233b23c0c96a20701f670c\n    # via dash\nhatchling==1.33.0 \\\n    --hash=sha256:415290b84f464d2884303fca8974d38e7b85579069fab02a15db0828fbb1446d \\\n    --hash=sha256:4c422bd4d554fcff5de5b73e9596f85e41e9f97f7e553d8f7595ecb31a627bef\nidna==3.19 \\\n    --hash=sha256:5e0811a4383b21dc5838069f801c4fb62113b7447663d2530d2bd6e77b49bf15 \\\n    --hash=sha256:815e7be7a7806d54abb586dc943addc79e8b2ee16915059658cbeff4b1b43bf4\n    # via requests\nimportlib-metadata==9.0.1 \\\n    --hash=sha256:ab830580bc0ef3db61ce8fae716389e5462b67e033018bab6d8f80ef17172f99 \\\n    --hash=sha256:bba5600596a7e21f3eef53281cf28d6a5195634d2f2b78ff9501a3272c6eaab0\n    # via dash\niniconfig==2.3.0 \\\n    --hash=sha256:c76315c77db068650d49c5b56314774a7804df16fee4402c1f19d6d15d8c4730 \\\n    --hash=sha256:f631c04d2c48c52b84d0d0549c99ff3859c98df65b3101406327ecc7d53fbf12\n    # via pytest\nitsdangerous==2.2.0 \\\n    --hash=sha256:c6242fc49e35958c8b15141343aa660db5fc54d4f13a1db01a3f5891b98700ef \\\n    --hash=sha256:e0050c0b7da1eea53ffaf149c0cfbb5c6e2e2b69c4bef22c81fa6eb73e5f6173\n    # via flask\njanus==2.0.0 \\\n    --hash=sha256:0970f38e0e725400496c834a368a67ee551dc3b5ad0a257e132f5b46f2e77770 \\\n    --hash=sha256:7e6449d34eab04cd016befbd7d8c0d8acaaaab67cb59e076a69149f9031745f9\n    # via dash\njinja2==3.1.6 \\\n    --hash=sha256:0137fb05990d35f1275a587e9aee6d56da821fc83491a0fb838183be43f66d6d \\\n    --hash=sha256:85ece4451f492d0c13c5dd7c13a64681a86afae63a5f347908daf103ce6d2f67\n    # via flask\njsonschema==4.26.0 \\\n    --hash=sha256:0c26707e2efad8aa1bfc5b7ce170f3fccc2e4918ff85989ba9ffa9facb2be326 \\\n    --hash=sha256:d489f15263b8d200f8387e64b4c3a75f06629559fb73deb8fdfb525f2dab50ce\n    # via nbformat\njsonschema-specifications==2025.9.1 \\\n    --hash=sha256:98802fee3a11ee76ecaca44429fda8a41bff98b00a0f2838151b113f210cc6fe \\\n    --hash=sha256:b540987f239e745613c7a9176f3edb72b832a4ac465cf02712288397832b5e8d\n    # via jsonschema\njupyter-core==5.9.1 \\\n    --hash=sha256:4d09aaff303b9566c3ce657f580bd089ff5c91f5f89cf7d8846c3cdf465b5508 \\\n    --hash=sha256:ebf87fdc6073d142e114c72c9e29a9d7ca03fad818c5d300ce2adc1fb0743407\n    # via nbformat\nmarkupsafe==3.0.3 \\\n    --hash=sha256:1872df69a4de6aead3491198eaf13810b565bdbeec3ae2dc8780f14458ec73ce \\\n    --hash=sha256:26a5784ded40c9e318cfc2bdb30fe164bdb8665ded9cd64d500a34fb42067b1c \\\n    --hash=sha256:35add3b638a5d900e807944a078b51922212fb3dedb01633a8defc4b01a3c85f \\\n    --hash=sha256:3a7e8ae81ae39e62a41ec302f972ba6ae23a5c5396c8e60113e9066ef893da0d \\\n    --hash=sha256:722695808f4b6457b320fdc131280796bdceb04ab50fe1795cd540799ebe1698 \\\n    --hash=sha256:77f0643abe7495da77fb436f50f8dab76dbc6e5fd25d39589a0f1fe6548bfa2b \\\n    --hash=sha256:83891d0e9fb81a825d9a6d61e3f07550ca70a076484292a70fde82c4b807286f \\\n    --hash=sha256:94c6f0bb423f739146aec64595853541634bde58b2135f27f61c1ffd1cd4d16a \\\n    --hash=sha256:be8813b57049a7dc738189df53d69395eba14fb99345e0a5994914a3864c8a4b \\\n    --hash=sha256:d53197da72cc091b024dd97249dfc7794d6a56530370992a5e1a08983ad9230e \\\n    --hash=sha256:d6dd0be5b5b189d31db7cda48b91d7e0a9795f31430b7f271219ab30f1d3ac9d \\\n    --hash=sha256:d88b440e37a16e651bda4c7c2b930eb586fd15ca7406cb39e211fcff3bf3017d\n    # via\n    #   flask\n    #   jinja2\n    #   werkzeug\nnarwhals==2.26.0 \\\n    --hash=sha256:29326d74f107c347fd1009bd58e38d9f7c7c5b51e6de97bc93dbc325d9038b54 \\\n    --hash=sha256:6b9cadca82f375c7e4cf584fdc86ca25da54827307a9c58f94547ee6104b82dd\n    # via plotly\nnbformat==5.11.1 \\\n    --hash=sha256:32d4521c68c6e7d5b29c76defaeed9f42ea733142b9b19f88277ce10390b9c4d \\\n    --hash=sha256:cc6698fa75f4fab8755ead786317815f13a6fee3b53311c0abb1a8b51d52f7ec\nnest-asyncio==1.6.0 \\\n    --hash=sha256:6f172d5449aca15afd6c646851f4e31e02c598d553a667e38cafa997cfec55fe \\\n    --hash=sha256:87af6efd6b5e897c81050477ef65c62e2b2f35d51703cae01aff2905b1852e1c\n    # via dash\npackaging==26.3 \\\n    --hash=sha256:94edc256424af38762eb31306eed28beb9f0efc50a8837492c9d6fd6004aed79 \\\n    --hash=sha256:d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c\n    # via\n    #   hatchling\n    #   plotly\n    #   pytest\npathspec==1.1.1 \\\n    --hash=sha256:17db5ecd524104a120e173814c90367a96a98d07c45b2e10c2f3919fff91bf5a \\\n    --hash=sha256:a00ce642f577bf7f473932318056212bc4f8bfdf53128c78bbd5af0b9b20b189\n    # via hatchling\nplatformdirs==4.14.5 \\\n    --hash=sha256:32e9921db7385aa8169bee4fe9501923e5715ba9fb7ea3b9c69b0d8e0639f7a1 \\\n    --hash=sha256:8e778c6fa421516f4d3369449f8df3b0e1b72c0e0005fe88e3ec772d0a14e750\n    # via jupyter-core\nplotly==7.0.0 \\\n    --hash=sha256:08b21f1244a97e7a1a699833c4bb2678475aa108b3f1989886ed0b038ebfd849 \\\n    --hash=sha256:78cbf7bd06d1b05bb3b8ec1b709864695229b55151b6f7530fbf55517ead6fdd\n    # via dash\npluggy==1.6.0 \\\n    --hash=sha256:7dcc130b76258d33b90f61b658791dede3486c3e6bfb003ee5c9bfb396dd22f3 \\\n    --hash=sha256:e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746\n    # via\n    #   hatchling\n    #   pytest\npydantic==2.13.5 \\\n    --hash=sha256:346a034f080da3755d8e9cb5e00e8b07de1d39e4f6e2c87d8ab7cafa0b269a73 \\\n    --hash=sha256:51a9c5f7b2f8e636f04c6cada605d9b6a3bf1348fdf945a3d8869b19bba0ee08\n    # via dash\npydantic-core==2.46.5 \\\n    --hash=sha256:013d6f3483d81e02e7c328831808f336c8596ee33b4bd4026b9ffb1e960b8942 \\\n    --hash=sha256:0fc5be0abd4a407e200d844b404e33639a554e7bd0d448e7b9ae181be4789ac2 \\\n    --hash=sha256:10416c15b8839ecc4ef4d0885da76da6fd0f67333a0eb8aff6d93c4b8f2910fc \\\n    --hash=sha256:18a09e1e1011b462f2e32774f25859ef1223d5c2b0546a633cf56654710721e0 \\\n    --hash=sha256:2bc9419666990c06d7397831f2126a1ecc3594aaa3ff7de5bf2d066802f4e07b \\\n    --hash=sha256:347ec774390c87326a2e4929d58d3f7e8763a104d5d35f4cd595a4c952366433 \\\n    --hash=sha256:4fdc8b93a41521988916eeaa271173fcca7fa0803d62f87675aac8dcec1c8e29 \\\n    --hash=sha256:5cb482e9e84c851f4e623fe4acc1ced89168cf1fe18f7089db4548c8f5bbb65b \\\n    --hash=sha256:5e81740c09e310f5aa5cbd3e434a01c154d4bef93241c7877b39f211d2b78ba8 \\\n    --hash=sha256:816ff0a6550ffc06c098ccd2e0698600f9aa7da192a79eaa6f9af504a35db869 \\\n    --hash=sha256:8e24d8f05fa2d28513d94e877e9c75ad66175376209b3977f916e240e623193c \\\n    --hash=sha256:a39ac25a9a2fa4072efdb429833c4a4c8009a51ff9eea3eeae131713cd27991e \\\n    --hash=sha256:b98134087d9de723658d17a42c7d0da8d6e2ef08015dee7dc93889047315f5e4 \\\n    --hash=sha256:b9fe6fb92520e3fd61f2e49000b6911b188824f089b75973ea06d6267f0b476d \\\n    --hash=sha256:c7ea57fc63aa7da93a1bd2d644e6577befae10c52c4e36377635eea1056a74f5 \\\n    --hash=sha256:d925f3d9afd05a8c0fb3a1031463a8d59ebe5e2afad297e29c78be19e13b4e62 \\\n    --hash=sha256:e652ab17569c94bff5475520f907b7148b8c24036a8ebbe5cf7cf7493d28579a \\\n    --hash=sha256:e9c134bb666dd54b778b9fc0d2b50cbb7f979b9e3716f26a88c9ab3b6fc1dd0f \\\n    --hash=sha256:efd62a42486f1bda5d24cb4f63d15a3c7768375fe83d36f9417b4ad7a2fb20b3 \\\n    --hash=sha256:f7b0ec93a2893de856652154d73b7ba622f26fa97726487dcac373de5f4c6084\n    # via pydantic\npygments==2.21.0 \\\n    --hash=sha256:2363c69b61c4a97c838da3b130dcd6468f4848992b21a82f2a63ec34377137d9 \\\n    --hash=sha256:610ca751c9bc2492b38eb9a38a7fbc93edbbb2d7182edaf34e66ae493dee5c8c\n    # via pytest\npytest==9.1.1 \\\n    --hash=sha256:1088fbde8f2b49d95a549a195707afa7a76a3ce9bcadc26b6d71f0ffda5fe313 \\\n    --hash=sha256:37a86b45efb9a47a61a36449063e8e18d0cab3161329fc099eb21783169c4f0c\nreferencing==0.37.0 \\\n    --hash=sha256:381329a9f99628c9069361716891d34ad94af76e461dcb0335825aecc7692231 \\\n    --hash=sha256:44aefc3142c5b842538163acb373e24cce6632bd54bdb01b21ad5863489f50d8\n    # via\n    #   jsonschema\n    #   jsonschema-specifications\nrequests==2.34.2 \\\n    --hash=sha256:2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0 \\\n    --hash=sha256:f288924cae4e29463698d6d60bc6a4da69c89185ad1e0bcc4104f584e960b9ed\n    # via dash\nretrying==1.4.2 \\\n    --hash=sha256:bbc004aeb542a74f3569aeddf42a2516efefcdaff90df0eb38fbfbf19f179f59 \\\n    --hash=sha256:d102e75d53d8d30b88562d45361d6c6c934da06fab31bd81c0420acb97a8ba39\n    # via dash\nrpds-py==2026.9.1 \\\n    --hash=sha256:01445c8d194aa032a08e944f16567672da1c62dbdbefd8b6d0693032e290cf68 \\\n    --hash=sha256:10e208f2425d973938afcd56e28a7c4be32e27b6a60b5d381f49fb9d8acf9759 \\\n    --hash=sha256:2693b2728bbcc48d09a981a356954b0c47c53ff25b545856f28a889ea619f69a \\\n    --hash=sha256:3890a6aa36e6baa53d5258a2a25d3ef8b37ad165a6ab27a892d7c3e3a432cd69 \\\n    --hash=sha256:3b5a6f40f0a1486b4b36c888123afc67acdbd9f33235927acf5ff295429a0ba3 \\\n    --hash=sha256:46d80bc76b51a6c24f9944368c28d38b8bcbcea1da4f2f8d3ebc31a67e8c6ec6 \\\n    --hash=sha256:4793ef7f78268b124b73fa933440f01d258bbae01de9fa53e9080c9ab0425a12 \\\n    --hash=sha256:492e5e428cbe126221611f47e068f01660352feec4ad18bc0f5ea9b2ae88fb14 \\\n    --hash=sha256:501909f2e4a1e2dee528ef766fe3c469060ebc17e54a8383d404ba07a81a6f02 \\\n    --hash=sha256:50906f5aea24b5a865cbd0a589698288631d9f3a54c3a937c83aefa95a0d14af \\\n    --hash=sha256:56c6952a9b15047466d0c2347c446a761d4527f89976156341e68f0ce5cc08b0 \\\n    --hash=sha256:5ce8943f79c2210f7abcc28e86367b03b28d95027fd01c46d2472373ae70c86f \\\n    --hash=sha256:684fd492fff4fead00587544e059be2bbcb6f93454f21fa2a91b66fc7508be82 \\\n    --hash=sha256:6b5b393eda5ea42cca1c1a6665f2a4882b4fd5d1777e41ce0545a107fb008c9d \\\n    --hash=sha256:6b9bf3135b4ad5981df9a73d71a35272d650a2985ae9c2746357b24d59de2448 \\\n    --hash=sha256:6c0dbbcc19735fe5f8b0a54c07659d154a9e69f47e15d0a6ab7299215daf62cb \\\n    --hash=sha256:6cdc537c8633d7fd92a82e2e0d2ab74320a3f63d5e59fb9cf08711e08fe151c4 \\\n    --hash=sha256:815d26356930846a40c7bc1366e7b1b0320ab8a063e66c11298a208bed0fd237 \\\n    --hash=sha256:8601470267d938bcb7f3ab1a336100af51a4fd5b6ed030ef52461bb3ef5e7e07 \\\n    --hash=sha256:88b5268892fde430d5531f95bc560b6efbbd67c929662c586afd729a96e7461c \\\n    --hash=sha256:addeda51556dac7c1a2f14cda62db8b621cd12afba3091d03a96c72932387eab \\\n    --hash=sha256:b242c27c8f836305a4a72df9cdd564386ac57b807bd252a063223331c9316b37 \\\n    --hash=sha256:b5b8b0753718d258fd454283fbd57e14545d3b40583fa672e27cb4f987626bcc \\\n    --hash=sha256:befc2d6a953e563f8a7bfd87a42c22ebf8a3e980dcb7b6a4d17b70b0e914e8a3 \\\n    --hash=sha256:d1028417bb44037eb3069c1009bd7b7277212876cda22fbe565b0bca9fab6d2c \\\n    --hash=sha256:d9edf30457d74eebfd76b045535e36f1cd89062566a128a0db2145ca042d787e \\\n    --hash=sha256:e21c1429e205828ea886a2293a4a2c8e01f4c25d9893ca330e97a6cf73f52e7b \\\n    --hash=sha256:eef6a03b0b6d08d0835ccfa8ec8d1bc70525e3801387567137b50c557695e6da\n    # via\n    #   jsonschema\n    #   referencing\nruff==0.16.6 \\\n    --hash=sha256:0700580ed5303723cb3c11c2f1d2a8913ce77b7ea86646dddb887f5417a9ba70 \\\n    --hash=sha256:0b87d9d16fcb63e8018423ca1d50b7260f15cb2da33e30db4baad4183a948c25 \\\n    --hash=sha256:10d21c51c3495d8eaea7b703a16592117ea6eb1d649e36335aa965ff1173eb39 \\\n    --hash=sha256:15f1d0b6e165a6e56567befb6629f8209271311d990bae0f37e6d065035ef5f3 \\\n    --hash=sha256:31b36f1e5ad85e0737f09d2be4e512e2e283583c14015da3b9dc07359ac0fc88 \\\n    --hash=sha256:56a67065e22efa6bc4d498299d3bb06c0c90aace8fac2068b5a12f9dc4d8d51d \\\n    --hash=sha256:61029b4ab4aa723fd3064fab96b1d814492596bf0c792679fffcbde1e1679953 \\\n    --hash=sha256:61c368c26bf8e973e5ab14a2772de587bc068ea3f9a277f673380749b4898fb8 \\\n    --hash=sha256:65a006baa18f33324325814c864daef03541d51564b98c517610ea756ab7003e \\\n    --hash=sha256:7a976c79b958f94e50a022a19f0f8c87387448020935ec14fc74331bd0a7f2c5 \\\n    --hash=sha256:7fbf89013f2bb3f6835a6038ff658dc8a1b38c98dc8e724b964168ad4e881876 \\\n    --hash=sha256:99b62ea33baf130f50368798d841f0d95527b6d817bf31817b65dd058f1d314c \\\n    --hash=sha256:9ac8998457832c2061709d900856b7ad271dace0cb41f346588d540162bfa718 \\\n    --hash=sha256:cd02a7bf1a21a8735228a3e8c95a9dc5cf86bd2a52194f4aaae2a5755b4de0f4 \\\n    --hash=sha256:d72c591a96986ee4268860e2b7235082129ca5e4cb9cbba653a4b57c11893757 \\\n    --hash=sha256:dcf8a73d2ff77e99dde91244b4da16feba7f14e6beeb4015dee7c5a909e99050 \\\n    --hash=sha256:e25cc89174874b176a157e4428d66761c2c0c006654419bf384f967f361ff1b1 \\\n    --hash=sha256:ecf4f068e2e123e43a26e9db4e19524cc56563912404e83bbfca375757e45a32\nsetuptools==84.0.0 \\\n    --hash=sha256:51a52592b3b99e102b609654876bd65f19f999935166d1352678931132b0c670 \\\n    --hash=sha256:f4695c21257f0d9b537ec2692c941d02ee143b7cc1276941349a546573b2ef73\n    # via dash\ntomlkit==0.15.2 \\\n    --hash=sha256:05562412163a3037b94497385fb7f9204c637bc605af7a48199e41cf2272f437 \\\n    --hash=sha256:83e32755ba1d20d9340bd069ee97e9f6232ba2346b63ffcba425de01f7e327a6\n    # via hatchling\ntraitlets==5.16.1 \\\n    --hash=sha256:ed900c2b631aa3a112811139fa97b8d2c3bad5e989656bba4b7e52c7852c18c1 \\\n    --hash=sha256:f775618166caa0396c8e337099240f2bd3e5e917d203b2e6fbe21a58d3cb1f6b\n    # via\n    #   jupyter-core\n    #   nbformat\ntrove-classifiers==2026.9.21.13 \\\n    --hash=sha256:0a9ebc8d4e2f3e8a22848c5258033035bec17a3012ac3fea16dbaa764489eb71 \\\n    --hash=sha256:8b1ff4f9c191b1040b71c37f1e445ab99732911e3cd91de52838453a854d7a17\n    # via hatchling\ntyping-extensions==4.16.0 \\\n    --hash=sha256:481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8 \\\n    --hash=sha256:dc983d19a509c94dba722ee6abd33940f7c05a89e243c47e907eb4db6f1a43e5\n    # via\n    #   dash\n    #   pydantic\n    #   pydantic-core\n    #   referencing\n    #   typing-inspection\ntyping-inspection==0.4.4 \\\n    --hash=sha256:547274fa6b0a561ccf549cc9524b999a578e737d015d8709d021f9d0d13bea47 \\\n    --hash=sha256:65b8397ba37ccbce054456aaccddfc91e6e3083c92824df348d96ca832f3f147\n    # via pydantic\nurllib3==2.7.0 \\\n    --hash=sha256:231e0ec3b63ceb14667c67be60f2f2c40a518cb38b03af60abc813da26505f4c \\\n    --hash=sha256:9fb4c81ebbb1ce9531cce37674bbc6f1360472bc18ca9a553ede278ef7276897\n    # via requests\nwerkzeug==3.1.8 \\\n    --hash=sha256:63a77fb8892bf28ebc3178683445222aa500e48ebad5ec77b0ad80f8726b1f50 \\\n    --hash=sha256:9bad61a4268dac112f1c5cd4630a56ede601b6ed420300677a869083d70a4c44\n    # via\n    #   dash\n    #   flask\nzipp==4.1.0 \\\n    --hash=sha256:25ad4e16390cd314347dd8f1de67a2ac538ae658ed4ab9db16029c07c188e97f \\\n    --hash=sha256:4cb57381f544315db7688e976e922a2b18cdb513d21cc194eb42232ba2a3e602\n    # via importlib-metadata\n",
+      "stderr": "Resolved 123 packages in 2ms\n"
+    },
+    {
+      "test": "clean sync",
+      "command": [
+        "C:\\Users\\HFNV\\AppData\\Local\\hermes\\bin\\uv.EXE",
+        "pip",
+        "sync",
+        "--offline",
+        "--require-hashes",
+        "--python",
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\verification-a8c2a4bdd7e041ed88c170866c581f9b\\clean\\Scripts\\python.exe",
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\verification-a8c2a4bdd7e041ed88c170866c581f9b\\requirements.txt"
+      ],
+      "returncode": 0,
+      "elapsed_s": 2.5132857999997213,
+      "stdout": "",
+      "stderr": "Using Python 3.12.7 environment at: tmp\\verification-a8c2a4bdd7e041ed88c170866c581f9b\\clean\nResolved 48 packages in 40ms\nInstalled 48 packages in 2.01s\n + annotated-types==0.8.0\n + attrs==26.1.0\n + blinker==1.9.0\n + certifi==2026.7.22\n + charset-normalizer==3.5.1\n + click==8.5.0\n + colorama==0.4.6\n + comm==0.2.3\n + dash==4.4.1\n + fastjsonschema==2.22.3\n + flask==3.1.3\n + hatchling==1.33.0\n + idna==3.19\n + importlib-metadata==9.0.1\n + iniconfig==2.3.0\n + itsdangerous==2.2.0\n + janus==2.0.0\n + jinja2==3.1.6\n + jsonschema==4.26.0\n + jsonschema-specifications==2025.9.1\n + jupyter-core==5.9.1\n + markupsafe==3.0.3\n + narwhals==2.26.0\n + nbformat==5.11.1\n + nest-asyncio==1.6.0\n + packaging==26.3\n + pathspec==1.1.1\n + platformdirs==4.14.5\n + plotly==7.0.0\n + pluggy==1.6.0\n + pydantic==2.13.5\n + pydantic-core==2.46.5\n + pygments==2.21.0\n + pytest==9.1.1\n + referencing==0.37.0\n + requests==2.34.2\n + retrying==1.4.2\n + rpds-py==2026.9.1\n + ruff==0.16.6\n + setuptools==84.0.0\n + tomlkit==0.15.2\n + traitlets==5.16.1\n + trove-classifiers==2026.9.21.13\n + typing-extensions==4.16.0\n + typing-inspection==0.4.4\n + urllib3==2.7.0\n + werkzeug==3.1.8\n + zipp==4.1.0\n"
+    },
+    {
+      "test": "install exact wheel",
+      "command": [
+        "C:\\Users\\HFNV\\AppData\\Local\\hermes\\bin\\uv.EXE",
+        "pip",
+        "install",
+        "--offline",
+        "--no-deps",
+        "--python",
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\verification-a8c2a4bdd7e041ed88c170866c581f9b\\clean\\Scripts\\python.exe",
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\verification-a8c2a4bdd7e041ed88c170866c581f9b\\build-wheel\\thorlabs_shutter_control-1.0.0-py3-none-any.whl"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.23573630000464618,
+      "stdout": "",
+      "stderr": "Using Python 3.12.7 environment at: tmp\\verification-a8c2a4bdd7e041ed88c170866c581f9b\\clean\nResolved 1 package in 4ms\nPrepared 1 package in 26ms\nInstalled 1 package in 128ms\n + thorlabs-shutter-control==1.0.0 (from file:///C:/repo/thorlabs-shutter-control/tmp/verification-a8c2a4bdd7e041ed88c170866c581f9b/build-wheel/thorlabs_shutter_control-1.0.0-py3-none-any.whl)\n"
+    },
+    {
+      "test": "clean no SDK/native dependencies",
+      "command": [
+        "C:\\Users\\HFNV\\AppData\\Local\\hermes\\bin\\uv.EXE",
+        "run",
+        "--offline",
+        "--no-project",
+        "--python",
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\verification-a8c2a4bdd7e041ed88c170866c581f9b\\clean\\Scripts\\python.exe",
+        "python",
+        "-I",
+        "-B",
+        "-c",
+        "\nimport importlib.util, json, sys\nimport thorlabs_shutter_control as package\nassert 'site-packages' in package.__file__\nfor name in ('pythonnet', 'clr', 'ftd2xx', 'serial'):\n    assert importlib.util.find_spec(name) is None, name\nassert not {'ftd2xx', 'serial', 'clr', 'pythonnet'} & set(sys.modules)\nprint(json.dumps({'python': sys.version, 'package': package.__file__}))\n"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.26306010002736,
+      "stdout": "{\"python\": \"3.12.7 | packaged by Anaconda, Inc. | (main, Oct  4 2024, 13:17:27) [MSC v.1929 64 bit (AMD64)]\", \"package\": \"C:\\\\repo\\\\thorlabs-shutter-control\\\\tmp\\\\verification-a8c2a4bdd7e041ed88c170866c581f9b\\\\clean\\\\Lib\\\\site-packages\\\\thorlabs_shutter_control\\\\__init__.py\"}\n",
+      "stderr": ""
+    },
+    {
+      "test": "clean CLI help",
+      "command": [
+        "C:\\Users\\HFNV\\AppData\\Local\\hermes\\bin\\uv.EXE",
+        "run",
+        "--offline",
+        "--no-project",
+        "--python",
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\verification-a8c2a4bdd7e041ed88c170866c581f9b\\clean\\Scripts\\python.exe",
+        "python",
+        "-I",
+        "-B",
+        "-m",
+        "thorlabs_shutter_control",
+        "--help"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.21805680001853034,
+      "stdout": "usage: __main__.py [-h] [--config CONFIG] [--target TARGET]\n                   {check-config,identify,status,safe-off,gui,discover,manual,pulse}\n                   ...\n\nDirect KSC101 owner; optical state is independent\n\npositional arguments:\n  {check-config,identify,status,safe-off,gui,discover,manual,pulse}\n    gui                 Open the localhost WebUI without connecting\n    discover            Explicit informational inventory; never opens or\n                        selects a controller\n    manual              Select Manual; stays selected at power-up\n    pulse               Bounded hold on a continuous-duty qualified load\n\noptions:\n  -h, --help            show this help message and exit\n  --config CONFIG\n  --target TARGET       Exact configured logical name\n",
+      "stderr": ""
+    },
+    {
+      "test": "clean WebUI help",
+      "command": [
+        "C:\\Users\\HFNV\\AppData\\Local\\hermes\\bin\\uv.EXE",
+        "run",
+        "--offline",
+        "--no-project",
+        "--python",
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\verification-a8c2a4bdd7e041ed88c170866c581f9b\\clean\\Scripts\\python.exe",
+        "python",
+        "-I",
+        "-B",
+        "-m",
+        "thorlabs_shutter_control",
+        "gui",
+        "--help"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.22915149998152629,
+      "stdout": "usage: __main__.py gui [-h] [--port PORT]\n\noptions:\n  -h, --help   show this help message and exit\n  --port PORT  Localhost HTTP port (default: 8050)\n",
+      "stderr": ""
+    },
+    {
+      "test": "wheel tests",
+      "command": [
+        "C:\\Users\\HFNV\\AppData\\Local\\hermes\\bin\\uv.EXE",
+        "run",
+        "--offline",
+        "--no-project",
+        "--python",
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\verification-a8c2a4bdd7e041ed88c170866c581f9b\\clean\\Scripts\\python.exe",
+        "python",
+        "-I",
+        "-B",
+        "-m",
+        "pytest",
+        "-q",
+        "--tb=short",
+        "-p",
+        "no:cacheprovider",
+        "C:\\repo\\thorlabs-shutter-control\\tests",
+        "--basetemp",
+        "C:\\repo\\thorlabs-shutter-control\\tmp\\verification-a8c2a4bdd7e041ed88c170866c581f9b\\wheel",
+        "--junitxml",
+        "C:\\repo\\thorlabs-shutter-control\\records\\transport-organization-wheel-tests.xml"
+      ],
+      "returncode": 0,
+      "elapsed_s": 6.34343920001993,
+      "stdout": "........................................................................ [ 28%]\n........................................................................ [ 57%]\n........................................................................ [ 86%]\n..................................                                       [100%]\n250 passed in 3.81s\n",
+      "stderr": ""
+    },
+    {
+      "test": "missing lock rejected",
+      "command": [
+        "C:\\Users\\HFNV\\AppData\\Local\\hermes\\bin\\uv.EXE",
+        "lock",
+        "--check",
+        "--offline"
+      ],
+      "returncode": 2,
+      "elapsed_s": 0.06757800001651049,
+      "stdout": "",
+      "stderr": "Using CPython 3.12.7 interpreter at: C:\\ProgramData\\anaconda3\\python.exe\nerror: Unable to find lockfile at `uv.lock`, but `--check` was provided. To create a lockfile, run `uv lock` or `uv sync` without the flag.\n"
+    },
+    {
+      "test": "outdated lock rejected",
+      "command": [
+        "C:\\Users\\HFNV\\AppData\\Local\\hermes\\bin\\uv.EXE",
+        "lock",
+        "--check",
+        "--offline"
+      ],
+      "returncode": 1,
+      "elapsed_s": 0.26954660000046715,
+      "stdout": "",
+      "stderr": "Using CPython 3.12.7 interpreter at: C:\\ProgramData\\anaconda3\\python.exe\nWARN ruff==0.16.6 needs to be downloaded from a registry\nWARN ruff needs to be downloaded from a registry\nWARN pywin32==312 needs to be downloaded from a registry\nWARN pywin32 needs to be downloaded from a registry\nWARN pydantic==2.13.5 needs to be downloaded from a registry\nWARN plotly==7.0.0 needs to be downloaded from a registry\nWARN ruff needs to be downloaded from a registry\nWARN plotly needs to be downloaded from a registry\nWARN pydantic needs to be downloaded from a registry\nWARN zipp==4.1.0 needs to be downloaded from a registry\nWARN narwhals==2.26.0 needs to be downloaded from a registry\nWARN zipp needs to be downloaded from a registry\nWARN narwhals needs to be downloaded from a registry\nWARN idna==3.19 needs to be downloaded from a registry\nWARN urllib3==2.7.0 needs to be downloaded from a registry\nWARN charset-normalizer==3.5.1 needs to be downloaded from a registry\nWARN charset-normalizer needs to be downloaded from a registry\nWARN idna needs to be downloaded from a registry\nWARN urllib3 needs to be downloaded from a registry\nResolved 123 packages in 188ms\nerror: The lockfile at `uv.lock` needs to be updated, but `--check` was provided.\n\nhint: To update the lockfile, run `uv lock`.\n"
+    },
+    {
+      "test": "passive config validation",
+      "command": [
+        "C:\\repo\\thorlabs-shutter-control\\.venv\\Scripts\\python.exe",
+        "-m",
+        "thorlabs_shutter_control",
+        "--config",
+        "C:\\repo\\thorlabs-shutter-control\\config\\shutters.example.toml",
+        "check-config"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.24896789999911562,
+      "stdout": "[\n  {\n    \"name\": \"shutter\",\n    \"channel\": 0,\n    \"role\": \"operator must establish physical beam role\",\n    \"serial_number\": \"68000001\",\n    \"firmware\": [\n      \"1.0.7\"\n    ],\n    \"route\": {\n      \"kind\": \"d2xx\",\n      \"port\": null,\n      \"hub_serial\": null,\n      \"host\": null,\n      \"bay\": null,\n      \"hub_firmware\": null\n    },\n    \"policy\": null\n  }\n]\n",
+      "stderr": ""
+    }
+  ]
+}

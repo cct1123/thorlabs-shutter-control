@@ -1,0 +1,50 @@
+{
+  "requirement": "REQ-241",
+  "test": "TEST-241",
+  "before": {
+    "controller_lines": 1165,
+    "dataclasses": 7,
+    "status_state_field_declarations": 54,
+    "status_state_snapshot_lines": 90
+  },
+  "after": {
+    "controller_lines": 1117,
+    "dataclasses": 6,
+    "status_state_field_declarations": 30,
+    "status_state_snapshot_lines": 41
+  },
+  "unchanged_class_asts": [
+    "Policy",
+    "ControllerConfig",
+    "Identity",
+    "CycleParameters",
+    "KSC101",
+    "_Claim"
+  ],
+  "dependency_pins": "unchanged; only local project 1.0.0 -> 2.0.0",
+  "input_hashes_match": 36,
+  "test_totals": {
+    "offline": {
+      "tests": 251,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wheel": {
+      "tests": 251,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "historical_notebook_outputs_unchanged": [
+    "docs/examples/01_device_discovery.ipynb",
+    "docs/examples/02_connection.ipynb",
+    "docs/examples/03_status_query.ipynb",
+    "docs/examples/04_settings.ipynb",
+    "docs/examples/05_shutter_modes.ipynb",
+    "docs/examples/06_on_off.ipynb"
+  ],
+  "source_before_sha256": "7974431fc61df47d15c4497344a9f8af4d0e4db0aecc34c858650a95269e7690",
+  "source_after_sha256": "466fb1a57f9a475f0c38b0797ea8ed1955d302a9c9e1e192217bd4db249fb13e"
+}

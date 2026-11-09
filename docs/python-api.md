@@ -1,5 +1,14 @@
 # Python API
 
+Import configuration and owner classes from `thorlabs_shutter_control`:
+`ControllerConfig`, `Policy`, `Route`, `CycleParameters`, `ShutterHub`,
+`ShutterStatus` and `load_config` remain available there.
+The internal config/device/discovery modules were consolidated into controller
+and transport; their old import paths have no compatibility wrappers. Existing
+TOML keys remain supported. KEH3 requires host/bay; hub_serial/hub_firmware may
+be omitted when unknown and do not establish verified hub identity. Supplied
+known metadata must agree across routes to the same host.
+
 ```python
 from thorlabs_shutter_control import ShutterHub
 
@@ -7,12 +16,45 @@ with ShutterHub("shutters.local.toml") as hub:  # construction is passive
     connection = hub.connect("shutter")     # exact identity only, no enable
     print(connection.identity)              # model/serial/firmware/hardware/channels
     sample = hub.get_status("shutter")      # fresh electrical feedback
-    print(sample.feedback.electrical_state)
+    print(sample.electrical_state)
 ```
 
 The context closes communication on success or error. It preserves the original
 exception and adds any cleanup failure; retain the owner if release fails. Closing
 does not actuate OFF. Explicit connect/get_status/release is also supported.
+
+The additional documented Issue42.1 operations use the same owner:
+
+| Method | Result and effect |
+| --- | --- |
+| get_channel_enabled(target) | Boolean from 0x0211/0212; not blade position |
+| get_hub_bay_reply(target) | Raw legacy bay byte, including unknown values; never changes configured KEH3 mapping |
+| get_led_modes(target) | Raw LED indication-mode word; not display brightness |
+| set_led_modes(target, modes, source_inhibited=False) | Write/read back documented LED bits 1=Identify, 2=limit switch, 8=moving; does not infer their shutter meaning |
+| require_interlock(target, source_inhibited=False) | Ensure interlock is required, verify Manual/OFF; already-required readback sends no write. No disable API |
+| start_updates(target), stop_updates(target) | Explicit 0x0011/0012 requests; no ACK confirms streaming started/stopped |
+| get_events(target) | Fresh identity query collects arrivals, then returns/consumes buffered raw Frame objects; no motor payload decoded |
+| disconnect_hardware(target, source_inhibited=False) | Explicit 0x0002 followed by release; requires protected Manual/OFF and no active request |
+
+LED/interlock settings use the existing allow_device_settings permission and
+source-protection assertion; the tracked live profile keeps settings disabled.
+LED writes require Manual/OFF/interlock and exact RAM readback, send no EEPROM
+command and create no output-cleanup obligation. Interlock repair may start with
+the requirement disabled, but cannot disable it; failures retain uncertainty and
+use the existing bounded output cleanup. No new firmware qualification is implied.
+
+Stop updates explicitly before releasing. Events are held in the existing bounded
+64-frame queue and collected during queries, without a receiver thread or a
+lossless-acquisition claim. Status-update payloads remain bytes, because Issue42.1
+does not establish a KSC101-specific motor-status layout. Use get_status for the
+usual fresh electrical readback. A raw bay value is not verified KEH3 topology.
+The LED request uses the consistent 0x04B4 model-table/section identifier; p93's
+request diagram prints an inconsistent 0x0411. No such motor query is sent.
+
+The low-level KSC101.set_channel_enabled encoder implements the documented
+0x0210 output alias. Application ON/OFF stays on the canonical 0x04CB owner path;
+enable_device still refuses incidental activation. Ordinary disconnect()/close()
+send neither hardware-disconnect nor automatic-update commands.
 
 | Method | Effect |
 | --- | --- |
@@ -23,7 +65,7 @@ does not actuate OFF. Explicit connect/get_status/release is also supported.
 | get_cycle_parameters(target) | Explicit APT cycle read; returns dated cycle_parameters in ShutterStatus |
 | get_solenoid_state_reply(target) | Explicit raw 0x04CD byte, without output/operating-state interpretation |
 | connection_snapshot(target) | Host metadata only; no hardware polling |
-| disconnect(target=None), close() | Release communication; no output command |
+| disconnect(target=None, require_stopped=False), close() | Release communication; no output command. The WebUI passes require_stopped=True to refuse pending ON/Start under the same lock as release |
 
 Names or configured integer application channels are accepted. APT channel is
 always1. KEH3 and VCP connections support queries. Docked KEH3 and D2XX writes
@@ -115,20 +157,44 @@ explicit Stop/OFF replaces an older native Start request.
 `settings_persistence` reports an EEPROM request, never confirmed persistence;
 that requires separately authorized restart/readback verification. Optional policy
 fields and native Start/Stop semantics are in the [WebUI guide](gui.md#manufacturer-reference-and-implemented-functions).
-The live SH05R profile remains Manual-only with settings writes disabled. A native
-Start remains pending until Stop even if output reads OFF; operating_state and
-transition_confirmed never become inferred success. Existing Manual methods retain
+The live SH05R profile permits protected selection of all four modes through
+`allow_persistent_mode_changes`; `qualified_modes` gates output activation and
+remains Manual-only, with settings writes disabled. Stop/OFF is supported in the
+selectable modes even when native Start is unqualified. A native
+Start remains pending until Stop even if output reads OFF; no native inactivity
+or physical completion is inferred. Existing Manual methods retain
 their contracts; native control does not route through set_solenoid(True).
 
-`ShutterStatus` retains the DiamondGUI owner schema. Requested state,
-`feedback.electrical_state`, and timestamped human optical observations are
-separate. `feedback.shutter_state` stays unknown without a live independent
-sensor. `transition_confirmed` is false. Interlock mode is the controller's
-configuration, not proof of contact continuity. status_bits is the fresh raw
-32-bit field; electrical_state uses the exact KSC101 output mask0x1.
-operating_state remains unknown: an OFF output does not establish Inactive or
-an unprimed trigger. key_enabled/channel_enabled remain unknown in the normalized
-application schema; no readiness or output permission is inferred from them.
+## Status schema migration
+
+Version 2 uses one flat `ShutterStatus`; `ShutterFeedback` is removed without an
+alias. Owner operation names and configuration constructors remain supported.
+Update external consumers before deploying this version; the external DiamondGUI
+checkout is not migrated by this repository change.
+
+| Previous access | Current access |
+| --- | --- |
+| `sample.feedback.electrical_state`, `.operating_mode`, `.status_bits`, `.electrical_observed_at` | `sample.electrical_state`, `.operating_mode`, `.status_bits`, `.electrical_observed_at` |
+| `sample.feedback.interlock_enabled` | `sample.interlock_required`: configuration, not contact continuity |
+| `sample.identity_verified` | `sample.identity is not None` |
+| `sample.observed_serial_number`, `.description` | Read serial/model/firmware from `sample.identity` when present |
+| `sample.connection` | Use `sample.error`, `sample.has_device` and `sample.identity` for distinct fault/handle/verification conditions |
+| `sample.optical_observed_state`, `.optical_observed_at`, `.optical_provenance` | `sample.optical_closed_at` and `.optical_evidence`; absent means no independent closed observation |
+
+Removed: nested `feedback`, redundant `observed_at`/`feedback_freshness`, and
+unsupported `shutter_state`, `operating_state`, `key_enabled`, `channel_enabled`
+and `transition_confirmed` placeholders. Native activity, key position and blade
+motion remain unavailable; field removal supplies no new physical evidence.
+Freshness remains response-after-request without APT transaction identifiers.
+
+Status snapshots are independent mutable copies; editing one cannot change the
+owner. No locks, transports or other private resources are serialized. A
+`connection_snapshot()` contains host metadata with unknown electrical readings;
+`get_status()` explicitly queries current readings. Requested output, electrical
+readback and timestamped human closure evidence remain separate. Output attempts,
+release and ambiguity clear the human observation. A closure timestamp records an
+observation, not proof of continuing closure or calibrated optical timing.
+
 The .NET Closed0/Open1 feedback enum differs from the legacy C/APT1/2 representation;
 the optional raw scalar never controls normal feedback or output confirmation.
 

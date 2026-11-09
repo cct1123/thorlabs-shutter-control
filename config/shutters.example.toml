@@ -11,5 +11,6 @@ firmware = ["1.0.7"]
 [shutters.route]
 kind = "d2xx"
 
-# KEH3 routes require kind, hub_serial, host, bay, hub_firmware. They are currently
+# KEH3 routes require kind, host and bay; known hub_serial/hub_firmware are optional.
+# They are currently
 # available for docked Manual control with a reviewed load policy; external USB is read-only.

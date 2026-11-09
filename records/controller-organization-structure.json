@@ -1,0 +1,11 @@
+{
+  "requirement": "REQ-234",
+  "test": "TEST-234",
+  "scope": "Definition/method reordering, section comments and module navigation only; no device I/O",
+  "before_sha256": "06a769b67b841549be6149e468efcf6a8e115d7271625b544f98b8c1ca2c1852",
+  "after_sha256": "90472a45e5d55412db14c8547fd01cde3ca2947d288980c6d23489e7a28e8305",
+  "normalized_ast_comparison": "PASS; only module docstring and definition/method order excluded",
+  "top_level_definitions": 16,
+  "owner_methods": 44,
+  "baseline_verifier_hash_mismatches": []
+}

@@ -1,6 +1,8 @@
 """TEST-228 software-only regressions; no hardware or bench qualification."""
 
+from contextlib import contextmanager
 from dataclasses import replace
+from threading import Event, Thread, current_thread
 from types import SimpleNamespace
 
 import pytest
@@ -61,7 +63,7 @@ def test_protected_recovery_clears_active_request_without_incidental_off(bench):
         "beam", source_inhibited=True, optical_closed=True, evidence="software fixture observation"
     )
     assert recovered.requested_state is None
-    assert recovered.feedback.electrical_state == "off"
+    assert recovered.electrical_state == "off"
     hub.shutdown_outputs()
     assert not devices[-1].output_frames
 
@@ -164,7 +166,7 @@ def test_mode_stop_clears_native_start_request(config, tmp_path):
         device.state = 2  # Native cycle's OFF interval, not proof of Inactive.
         result = hub.set_manual_mode("beam", source_inhibited=True)
         assert result.requested_state == "off"  # Mode transition explicitly sent Stop/OFF.
-        assert result.feedback.operating_mode == "manual"
+        assert result.operating_mode == "manual"
 
 
 @pytest.mark.parametrize("connected,generation", [(False, 1), (True, 2)])
@@ -245,3 +247,44 @@ def test_protection_assertions_end_at_actual_disconnect(config, connected, conte
         assert rendered["source-inhibited"]["value"] == []
         assert rendered["persist"]["value"] == []
         assert rendered["live-readback"]["value"] == []
+
+
+def test_webui_release_checks_active_request_under_owner_lock(bench, monkeypatch):
+    from thorlabs_shutter_control.gui import execute_action
+
+    hub, devices, _, _ = bench
+    hub.connect("beam")
+    channel = hub._channel("beam")
+    waiting = Event()
+    errors = []
+    original_locked = hub._locked
+    main_thread = current_thread()
+
+    @contextmanager
+    def observed_lock(channel, deadline):
+        if current_thread() is not main_thread:
+            waiting.set()
+        with original_locked(channel, deadline):
+            yield
+
+    monkeypatch.setattr(hub, "_locked", observed_lock)
+
+    def release():
+        try:
+            execute_action(hub, "release", "beam")
+        except BaseException as exc:
+            errors.append(exc)
+
+    worker = Thread(target=release)
+    try:
+        with channel.lock:
+            worker.start()
+            assert waiting.wait(1), "Release did not reach the owner lock"
+            hub.open_shutter("beam")  # Simulate another callback winning the lock first.
+    finally:
+        worker.join(2)
+    assert not worker.is_alive()
+    assert errors and isinstance(errors[0], ShutterError)
+    assert "Stop / OFF" in str(errors[0])
+    assert not devices[0].closed and hub.connection_snapshot("beam").has_device
+    hub.safe_state("beam")

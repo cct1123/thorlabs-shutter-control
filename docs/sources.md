@@ -1,9 +1,14 @@
 # Source register and contract gaps
 
+Current reference note, 8 November 2026: Issue42.1 is the local APT reference;
+Issue36 was removed from the working tree and remains in Git history. The dated
+retrieval/verification records below retain their original revisions and hashes.
+
 Initial retrieval 2026-11-04; later sources are dated below. Manufacturer documents
-are reference data, not operating authorization. Unchanged controller/hub manuals
-and both inspected APT protocol revisions are now included under
-[docs/manuals](manuals/README.md) for offline reference (verified 2026-11-06).
+are reference data, not operating authorization. The controller/hub manuals and
+both inspected APT protocol revisions were verified on 2026-11-06; the
+[manual index](manuals/README.md) identifies the current local copies and the
+earlier protocol retained in Git history.
 Original downloads/extracted text remain in ignored inputs/reference; their exact
 SHA-256 values below identify the inspected documents. See the
 [verification manifest](../records/manuals-verification.json) for local paths,
@@ -52,7 +57,7 @@ SHA-256 b2a6badd7c00b3042ba383e291667e7eab10746c14c4f92cea45fc480c7304ed.
 The full text provides no KEH3/40303-specific contract. Official example repository
 tree snapshots (Motion_Control_Examples and Light_Control_and_Manipulation_Examples)
 were also inspected; exact tree IDs/hashes are recorded in records/keh3-validation.json.
-See docs/keh3-offline-validation.md for the bounded findings and remaining questions.
+See [Ethernet assessment](ethernet-assessment.md) for current findings and remaining questions.
 
 The generic protocol describes triggered cycling while the KSC101 manual
 describes logic-level operation with priming. TTL, cycle starts and EEPROM

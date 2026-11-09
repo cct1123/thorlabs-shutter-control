@@ -1,9 +1,15 @@
 """Direct KSC101 control. Imports and construction never access hardware."""
 
-from .config import ControllerConfig, Policy, Route, load_config
-from .controller import ShutterFeedback, ShutterHub, ShutterStatus
-from .device import CycleParameters
-from .errors import ShutterError, UnsupportedRoute
+from .controller import (
+    ControllerConfig,
+    CycleParameters,
+    Policy,
+    ShutterHub,
+    ShutterStatus,
+    load_config,
+)
+from .protocol import ShutterError
+from .transport import Route, UnsupportedRoute
 
 __all__ = [
     "ControllerConfig",
@@ -12,7 +18,6 @@ __all__ = [
     "Route",
     "load_config",
     "ShutterHub",
-    "ShutterFeedback",
     "ShutterStatus",
     "ShutterError",
     "UnsupportedRoute",

@@ -3,3 +3,8 @@
 *.jpg binary
 *.webp binary
 *.pdf binary
+
+# Preserve verification records exactly; referenced hashes include their bytes.
+records/*.json -text whitespace=trailing-space,space-before-tab,cr-at-eol
+# Captured pytest tracebacks can contain intentional whitespace-only lines.
+records/*.xml -text -whitespace

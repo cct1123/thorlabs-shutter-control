@@ -1,0 +1,22 @@
+{
+  "requirement": "REQ-244",
+  "test": "TEST-244",
+  "safe_mode_predicate_equivalent_cases": 128,
+  "unchanged_class_asts": [
+    "Policy",
+    "ControllerConfig",
+    "IdentityMismatch",
+    "Identity",
+    "CycleParameters",
+    "KSC101",
+    "ShutterStatus",
+    "_Claim",
+    "_Channel"
+  ],
+  "before_sha256": "466fb1a57f9a475f0c38b0797ea8ed1955d302a9c9e1e192217bd4db249fb13e",
+  "after_sha256": "904c35cd7aa8e974b3ae32ce6c2d46e2fab28b2d9c6707f57bf98a6a12e3dda4",
+  "controller_lines_before": 1117,
+  "controller_lines_after": 1112,
+  "scope": "Software/static only; no device I/O",
+  "public_owner_signatures": "unchanged"
+}
