@@ -4521,3 +4521,15 @@ artifacts. The final documentation commit is identified by Git history; verify
 remote main equals local HEAD and the worktree is clean after push. No hardware,
 SDK, lab-network, existing-server or external-checkout operation is authorized
 or performed by publication. Physical acceptance remains BLOCKED separately.
+
+## E258 - Push blocked by automatic approval review / TEST-274 publication
+
+Documentation committed as f45f77b. git push origin main was rejected before
+execution by automatic approval review: sensitive external egress to default
+branch; brief user instruction did not explicitly approve this payload,
+destination and inclusion of prior commits. No push ran and no workaround was
+attempted. Exact destination: git@github.com:cct1123/thorlabs-shutter-control.git,
+main. Required approval covers f45f77b, prior ddda81d/7c2f4d4/5a6ae37 and this
+blocked-handoff checkpoint. After explicit approval, retry ordinary push and
+verify remote main equals HEAD. Documentation/software acceptance remains PASS;
+publication is BLOCKED pending that approval. No hardware operation occurred.

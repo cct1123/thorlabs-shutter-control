@@ -9,6 +9,10 @@ describes a removed source-confirmation flag. No runtime/configuration/notebook
 cell change. User follow-up "commit push" authorizes publication to origin/main,
 including the three prior local review commits. Git history identifies the final
 documentation commit; equality with the remote main ref is the publication check.
+Documentation commit: f45f77b. Publication is BLOCKED: automatic approval review
+rejected git push origin main as sensitive external egress to the default branch,
+requiring explicit approval of the payload/destination and prior commits (E258).
+No push ran. This local handoff checkpoint is an additional publication commit.
 Prior REQ-273 review is complete: runtime ddda81d, docs/evidence 7c2f4d4,
 checkpoint 5a6ae37 (D094/E254/E255).
 The broader engineering project remains BLOCKED on the independent physical,
@@ -214,7 +218,8 @@ check remains historical. Software permissions do not establish physical qualifi
 
 No further documentation/test action is required for the completed REQ-274
 refresh. Commit/push to origin/main is authorized by the user's follow-up;
-verify the final remote ref and clean worktree after publication. No
+obtain the explicit payload/destination approval in Human action required, then
+push and verify the final remote ref and clean worktree. No
 hardware operation is pending. Keep previous captures and consumed cycle
 allowances historical. A running owner may have older source/configuration.
 Deployment requires normal Stop/Release followed by deliberate restart/reload,
@@ -223,6 +228,15 @@ must verify OFF/interlock to clear a live fault. Never delete ownership journals
 to imitate verification. Broader physical acceptance remains BLOCKED separately.
 
 ## Human action required
+
+Publication: f45f77b contains the validated documentation refresh; ddda81d,
+7c2f4d4 and 5a6ae37 contain the earlier runtime/configuration/tests/tutorial,
+documentation/evidence and review checkpoint. Automatic approval review rejected
+pushing these to git@github.com:cct1123/thorlabs-shutter-control.git main as
+sensitive external egress without explicit payload/destination approval (E258).
+Approve publication of those four commits plus this blocked-handoff checkpoint
+to that exact origin/main. No hardware authority is requested. After approval,
+retry the normal push and compare remote main with HEAD; no force push.
 
 For the active REQ-271 status gap, one precise dependency remains:
 1. Known: documented status flags are implemented/tested; vendor Key/Ready/actual
