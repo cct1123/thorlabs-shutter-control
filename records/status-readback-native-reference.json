@@ -1,0 +1,28 @@
+{
+  "scope": "static file extraction and reflection-only metadata inspection; no vendor code execution",
+  "installer_sha256_verified": "298c4cc03a6c3b4d5c174964ae9193d13baca63dab10c1595b4e9ad5d914ff05",
+  "provenance": "same installer as SRC-008; prior signature record valid Thorlabs Inc.; MSI Data1.cab extraction only",
+  "files": {
+    "tmp\\status-reference\\thorlabs.motioncontrol.kcube25": {
+      "bytes": 370016,
+      "sha256": "980e27a7e21037d3af116d5387958a4317fd3e9dcaac7c03e102dd201fdff048"
+    },
+    "tmp\\status-reference\\thorlabs.motioncontrol.kcube26": {
+      "bytes": 247648,
+      "sha256": "e02948f1b8442c6f250c6f1188789b52462c2cc3f57c4e89616378e1db924dc7"
+    },
+    "tmp\\status-reference\\thorlabs.motioncontrol.kcube27": {
+      "bytes": 1078112,
+      "sha256": "146fbcb61c7801456fff57be5e11fbe497baad42c92d269e8d18d198b76757cf"
+    }
+  },
+  "findings": [
+    "SolenoidStatus.get_KeyEnabled reads managed _keyEnabled field",
+    "native-pointer constructor invokes native SolenoidStatusStruct.KeyEnabled accessor (method token0x0600012A)",
+    "native-pointer constructor invokes native OperatingState accessor (method token0x06000127)",
+    "public getter metadata does not establish which protocol bytes populate these native fields"
+  ],
+  "sdk_installed": false,
+  "vendor_code_executed": false,
+  "cached_analysis_package_attempt": "dnfile unavailable offline; no packages installed"
+}

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="11" time="0.467" timestamp="2026-11-08T18:23:29.303617-06:00" hostname="HighFieldSetup"><testcase classname="tests.test_gui_fault_notice" name="test_persistent_fault_remains_in_both_notices_without_actuation[connect]" file="tests\test_gui_fault_notice.py" line="10" time="0.094" /><testcase classname="tests.test_gui_fault_notice" name="test_persistent_fault_remains_in_both_notices_without_actuation[read]" file="tests\test_gui_fault_notice.py" line="10" time="0.024" /><testcase classname="tests.test_gui_fault_notice" name="test_persistent_fault_remains_in_both_notices_without_actuation[poll]" file="tests\test_gui_fault_notice.py" line="10" time="0.021" /><testcase classname="tests.test_gui_fault_notice" name="test_persistent_fault_remains_in_both_notices_without_actuation[release]" file="tests\test_gui_fault_notice.py" line="10" time="0.022" /><testcase classname="tests.test_gui_fault_notice" name="test_confirmed_stop_is_visible_without_clearing_fault_or_enabling_on[off]" file="tests\test_gui_fault_notice.py" line="29" time="0.024"><failure message="AssertionError: assert 'Stop / OFF sent; fresh electrical OFF readback received.' in 'Controller fault remains: Persistent uncertainty: Previous cleanup unconfirmed (software fixture). Output activation is blocked; protected recovery is required.'">bench = (&lt;thorlabs_shutter_control.controller.ShutterHub object at 0x000002A9D89A7B60&gt;, [&lt;conftest.FakeTransport object at 0x0...D89CB920&gt;, WindowsPath('C:/repo/thorlabs-shutter-control/tmp/gui-off-feedback-before/test_confirmed_stop_is_visible0'))
+action = 'off'
+
+    @pytest.mark.parametrize("action", ["off", "settings-stop"])
+    def test_confirmed_stop_is_visible_without_clearing_fault_or_enabling_on(bench, action):
+        hub, devices, _, path = bench
+        journal = path / "uncertain-68000001"
+        journal.write_text("Previous cleanup unconfirmed (software fixture)", encoding="utf-8")
+        hub.connect("beam")
+        app = create_app(hub)
+        key = next(key for key in app.callback_map if "notice.children" in key)
+        response = post_callback(app, key, {"target": "beam", action: 1}, f"{action}.n_clicks")
+        sample = response["sample"]["data"]
+        message = response["notice"]["children"]
+&gt;       assert "Stop / OFF sent; fresh electrical OFF readback received." in message
+E       AssertionError: assert 'Stop / OFF sent; fresh electrical OFF readback received.' in 'Controller fault remains: Persistent uncertainty: Previous cleanup unconfirmed (software fixture). Output activation is blocked; protected recovery is required.'
+
+tests\test_gui_fault_notice.py:41: AssertionError</failure></testcase><testcase classname="tests.test_gui_fault_notice" name="test_confirmed_stop_is_visible_without_clearing_fault_or_enabling_on[settings-stop]" file="tests\test_gui_fault_notice.py" line="29" time="0.023"><failure message="AssertionError: assert 'Stop / OFF sent; fresh electrical OFF readback received.' in 'Controller fault remains: Persistent uncertainty: Previous cleanup unconfirmed (software fixture). Output activation is blocked; protected recovery is required.'">bench = (&lt;thorlabs_shutter_control.controller.ShutterHub object at 0x000002A9D8A6A000&gt;, [&lt;conftest.FakeTransport object at 0x0...D8A62020&gt;, WindowsPath('C:/repo/thorlabs-shutter-control/tmp/gui-off-feedback-before/test_confirmed_stop_is_visible1'))
+action = 'settings-stop'
+
+    @pytest.mark.parametrize("action", ["off", "settings-stop"])
+    def test_confirmed_stop_is_visible_without_clearing_fault_or_enabling_on(bench, action):
+        hub, devices, _, path = bench
+        journal = path / "uncertain-68000001"
+        journal.write_text("Previous cleanup unconfirmed (software fixture)", encoding="utf-8")
+        hub.connect("beam")
+        app = create_app(hub)
+        key = next(key for key in app.callback_map if "notice.children" in key)
+        response = post_callback(app, key, {"target": "beam", action: 1}, f"{action}.n_clicks")
+        sample = response["sample"]["data"]
+        message = response["notice"]["children"]
+&gt;       assert "Stop / OFF sent; fresh electrical OFF readback received." in message
+E       AssertionError: assert 'Stop / OFF sent; fresh electrical OFF readback received.' in 'Controller fault remains: Persistent uncertainty: Previous cleanup unconfirmed (software fixture). Output activation is blocked; protected recovery is required.'
+
+tests\test_gui_fault_notice.py:41: AssertionError</failure></testcase><testcase classname="tests.test_gui_fault_notice" name="test_fault_display_keeps_only_connected_dated_electrical_feedback[off-True-True-Off]" file="tests\test_gui_fault_notice.py" line="54" time="0.021"><failure message="AssertionError: assert 'Unknown' == 'Off'&#10;  &#10;  - Off&#10;  + Unknown">bench = (&lt;thorlabs_shutter_control.controller.ShutterHub object at 0x000002A9D8AFE990&gt;, [&lt;conftest.FakeTransport object at 0x0...D8AF42C0&gt;, WindowsPath('C:/repo/thorlabs-shutter-control/tmp/gui-off-feedback-before/test_fault_display_keeps_only_0'))
+state = 'off', connected = True, dated = True, expected = 'Off'
+
+    @pytest.mark.parametrize(
+        "state,connected,dated,expected",
+        [
+            ("off", True, True, "Off"),
+            ("on", True, True, "On"),
+            ("off", True, False, "Unknown"),
+            ("off", False, True, "Unknown"),
+            ("unknown", True, True, "Unknown"),
+        ],
+    )
+    def test_fault_display_keeps_only_connected_dated_electrical_feedback(
+        bench, state, connected, dated, expected
+    ):
+        hub, _, _, path = bench
+        (path / "uncertain-68000001").write_text(
+            "Retained fault (software fixture)", encoding="utf-8"
+        )
+        hub.connect("beam")
+        sample = asdict(hub.get_status("beam"))
+        assert sample["error"]
+        sample["electrical_state"], sample["has_device"] = state, connected
+        if not dated:
+            sample["electrical_observed_at"] = None
+        app = create_app(hub)
+        key = next(key for key in app.callback_map if "serial-label.children" in key)
+        shown = post_callback(app, key, {"target": "beam", "sample": sample}, "sample.data")
+&gt;       assert shown["output-lamp-value"]["children"] == expected
+E       AssertionError: assert 'Unknown' == 'Off'
+E         
+E         - Off
+E         + Unknown
+
+tests\test_gui_fault_notice.py:81: AssertionError</failure></testcase><testcase classname="tests.test_gui_fault_notice" name="test_fault_display_keeps_only_connected_dated_electrical_feedback[on-True-True-On]" file="tests\test_gui_fault_notice.py" line="54" time="0.020"><failure message="AssertionError: assert 'Unknown' == 'On'&#10;  &#10;  - On&#10;  + Unknown">bench = (&lt;thorlabs_shutter_control.controller.ShutterHub object at 0x000002A9D89D3470&gt;, [&lt;conftest.FakeTransport object at 0x0...D89CAA20&gt;, WindowsPath('C:/repo/thorlabs-shutter-control/tmp/gui-off-feedback-before/test_fault_display_keeps_only_1'))
+state = 'on', connected = True, dated = True, expected = 'On'
+
+    @pytest.mark.parametrize(
+        "state,connected,dated,expected",
+        [
+            ("off", True, True, "Off"),
+            ("on", True, True, "On"),
+            ("off", True, False, "Unknown"),
+            ("off", False, True, "Unknown"),
+            ("unknown", True, True, "Unknown"),
+        ],
+    )
+    def test_fault_display_keeps_only_connected_dated_electrical_feedback(
+        bench, state, connected, dated, expected
+    ):
+        hub, _, _, path = bench
+        (path / "uncertain-68000001").write_text(
+            "Retained fault (software fixture)", encoding="utf-8"
+        )
+        hub.connect("beam")
+        sample = asdict(hub.get_status("beam"))
+        assert sample["error"]
+        sample["electrical_state"], sample["has_device"] = state, connected
+        if not dated:
+            sample["electrical_observed_at"] = None
+        app = create_app(hub)
+        key = next(key for key in app.callback_map if "serial-label.children" in key)
+        shown = post_callback(app, key, {"target": "beam", "sample": sample}, "sample.data")
+&gt;       assert shown["output-lamp-value"]["children"] == expected
+E       AssertionError: assert 'Unknown' == 'On'
+E         
+E         - On
+E         + Unknown
+
+tests\test_gui_fault_notice.py:81: AssertionError</failure></testcase><testcase classname="tests.test_gui_fault_notice" name="test_fault_display_keeps_only_connected_dated_electrical_feedback[off-True-False-Unknown]" file="tests\test_gui_fault_notice.py" line="54" time="0.019" /><testcase classname="tests.test_gui_fault_notice" name="test_fault_display_keeps_only_connected_dated_electrical_feedback[off-False-True-Unknown]" file="tests\test_gui_fault_notice.py" line="54" time="0.021" /><testcase classname="tests.test_gui_fault_notice" name="test_fault_display_keeps_only_connected_dated_electrical_feedback[unknown-True-True-Unknown]" file="tests\test_gui_fault_notice.py" line="54" time="0.037" /></testsuite></testsuites>

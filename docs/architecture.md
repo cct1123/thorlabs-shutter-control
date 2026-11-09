@@ -68,8 +68,8 @@ Protected recovery verifies Manual/OFF/interlock before clearing stale requests
 without sending output. Native Stop during an explicit mode change is reflected
 in requested state, independent of the unknown native-activity feedback.
 
-The WebUI scopes settings drafts and operator assertions to target plus owner
-connection generation. New connections clear stale edits/permissions; polling
+The WebUI scopes settings drafts, persistence opt-in and polling to target plus owner
+connection generation. New connections clear stale edits/selections; polling
 within a connection preserves drafts. A shared software callback-test helper
 keeps HTTP test dispatch consistent without another runtime backend.
 
@@ -79,6 +79,8 @@ This does not solve APT's lack of transaction IDs for arbitrary delayed replies.
 End-to-end deadlines use perf_counter, including lock time. No retries, fallback,
 reconnect or ON replay occur. Framing/freshness failures quarantine the session;
 partial/unknown writes also lose transmit alignment and block protective frames.
-Recovery requires independent source protection, observed optical closure and
+Explicit Stop/OFF clears faults only after fresh OFF/interlock verification;
+automatic cleanup and shutdown retain faults, and shutdown reports them even
+when its OFF succeeds. Passive protected recovery requires independent source protection, observed optical closure and
 fresh OFF/Manual/interlock checks. Neither a command nor electrical feedback
 establishes optical state, exposure timing or driver/native dispatch guarantees.

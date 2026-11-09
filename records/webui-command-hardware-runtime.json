@@ -1,0 +1,14 @@
+{
+  "started_at_utc": "2026-11-09T00:02:17.515980+00:00",
+  "scope": "Current production runtime about to launch for actual visible-WebUI checks",
+  "source_sha256": {
+    "config/shutter.ethernet.toml": "62fc38b1cd2978dc3df64f12af8e07dd305acd7e35d745391ccf7144a5605474",
+    "src/thorlabs_shutter_control/__init__.py": "df8f1a80bd7892400fef2f66a061bcee2776125a61977091b7402cf44025248f",
+    "src/thorlabs_shutter_control/__main__.py": "3b4613f711ff95276f9dc0c2ed73d386dcedff1e012271bcc96e90b09c130fa6",
+    "src/thorlabs_shutter_control/assets/shutter.css": "d7c6e24fb0c0d30688eb96dc7673c5df230c4751189585f36252a7f869a5fb12",
+    "src/thorlabs_shutter_control/controller.py": "3d94b1ac3a482325ebcd019c6a4cd442dbfd1d5d592946bc4e55819c46ee76d8",
+    "src/thorlabs_shutter_control/gui.py": "3da9ed2c6e98f3040ed4ab3edb390077cca0be1ea15f60e7bc28a6fe298a3757",
+    "src/thorlabs_shutter_control/protocol.py": "73884542c7e7fc0cdefa45efe2d4ef3232f288649e08143705e39e1a6f17754c",
+    "src/thorlabs_shutter_control/transport.py": "850583f672bc8566529b1845e84e5dd3bdb5d865cf361366c2c84e9612722da3"
+  }
+}

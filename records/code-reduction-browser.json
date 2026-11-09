@@ -1,0 +1,40 @@
+{
+  "desktopWidth": 1280,
+  "desktopHorizontalOverflow": false,
+  "mobile": {
+    "dialog": {
+      "bottom": 801.8000373840332,
+      "height": 759.6000366210938,
+      "left": 12,
+      "right": 363.2000122070313,
+      "top": 42.20000076293945,
+      "width": 351.20001220703125,
+      "x": 12,
+      "y": 42.20000076293945
+    },
+    "fields": [
+      {
+        "id": "cycle-on",
+        "max": "10000",
+        "min": "100",
+        "value": "1000"
+      },
+      {
+        "id": "cycle-off",
+        "max": "10000",
+        "min": "100",
+        "value": "2000"
+      },
+      {
+        "id": "cycles",
+        "max": "1000000",
+        "min": "1",
+        "value": "1"
+      }
+    ],
+    "horizontalOverflow": false,
+    "width": 390
+  },
+  "consoleErrors": [],
+  "scope": "Passive disconnected UI; transport opens forbidden"
+}

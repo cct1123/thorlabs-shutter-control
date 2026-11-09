@@ -1,0 +1,196 @@
+{
+  "requirement": "REQ-252",
+  "test": "TEST-252",
+  "record": "E233",
+  "captured_at_utc": "2026-11-09T00:11:25.885403+00:00",
+  "scope": "Actual visible-browser workflow and separate explicitly authorized passive API recovery; final software fixes validated offline",
+  "hardware": {
+    "serial": "68800777",
+    "model": "KSC101",
+    "firmware": "1.0.7",
+    "load": "SH05R",
+    "endpoint": "192.168.1.19:40305",
+    "initial_human_conditions": "Independent beam block, isolated triggers, intact key/interlock, initially closed blade confirmed"
+  },
+  "cycle": {
+    "approved": 1,
+    "requested": 1,
+    "remaining": 0,
+    "host_hold_s": 1.0,
+    "seconds_from_first_healthy_off_sample_to_click": 39.551058,
+    "completion_notice": "One 1-second host hold completed; electrical OFF read back.",
+    "final_sample": {
+      "name": "shutter",
+      "channel": 0,
+      "serial_number": "68800777",
+      "endpoint": "192.168.1.19:40305",
+      "has_device": true,
+      "identity": {
+        "serial_number": "68800777",
+        "model": "KSC101",
+        "firmware": "1.0.7",
+        "hardware_version": 3,
+        "channels": 1
+      },
+      "generation": 1,
+      "operating_mode": "manual",
+      "interlock_required": true,
+      "status_bits": 8192,
+      "electrical_state": "off",
+      "electrical_observed_at": "2026-11-09T00:04:38.858385+00:00",
+      "requested_state": "off",
+      "error": null,
+      "cleanup": "Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown",
+      "optical_closed_at": null,
+      "optical_evidence": null,
+      "cycle_parameters": null,
+      "settings_observed_at": null,
+      "settings_persistence": null
+    },
+    "evidence_limit": "The runtime checks electrical ON before the hold and OFF afterward; only the completed OFF sample is saved by the visible callback. No optical timing or blade-position measurement."
+  },
+  "actual_reads": {
+    "cycle_parameters": {
+      "on_ms": 2000,
+      "off_ms": 2000,
+      "cycles": 5
+    },
+    "led_modes": "LED modes: 0x0001",
+    "channel_enable": "Channel enable: Disabled",
+    "raw_bay": "FAIL: request timed out and latched uncertainty; not retried"
+  },
+  "findings": [
+    {
+      "issue": "Generic success notice obscures persistent owner fault",
+      "fix": "Returned faults are shown in both notices, including polling/release",
+      "validation": "Four pre-fix failures,36 affected tests PASS after fix; actual fixed fault warning observed; included in published2bc53e2"
+    },
+    {
+      "issue": "Read LED modes does not update checkboxes when status/details arrive together",
+      "observed": "Actual0x0001 readout with all three checkboxes unchecked",
+      "fix": "Use changed-property membership rather than only first trigger",
+      "validation": "Combined-update regression reproduced then passed; no post-fix live LED read while fault remains"
+    },
+    {
+      "issue": "Legacy raw-bay request has no qualified KEH3 reply",
+      "observed": "Actual end-to-end deadline expired",
+      "fix": "ShutterHub rejects KEH3 legacy-bay request before any I/O; retain configured routing",
+      "validation": "Connected/disconnected software cases prove no I/O or latched fault; no further actual query"
+    }
+  ],
+  "software": {
+    "artifact": "records/webui-command-direct-validation.json",
+    "test_totals": {
+      "offline": {
+        "tests": 344,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "wheel": {
+        "tests": 344,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "input_count": 39,
+    "current_input_hashes_match": true,
+    "targeted_followup_tests": 135
+  },
+  "physical_observation": {
+    "human_reply": "I don't observe. verify it yourself",
+    "result": "Unobserved; controller electrical readback does not independently establish blade motion",
+    "additional_cycles_requested": 0
+  },
+  "final": {
+    "off_sample": {
+      "name": "shutter",
+      "channel": 0,
+      "serial_number": "68800777",
+      "endpoint": "192.168.1.19:40305",
+      "has_device": true,
+      "identity": {
+        "serial_number": "68800777",
+        "model": "KSC101",
+        "firmware": "1.0.7",
+        "hardware_version": 3,
+        "channels": 1
+      },
+      "generation": 2,
+      "operating_mode": "manual",
+      "interlock_required": true,
+      "status_bits": 8192,
+      "electrical_state": "off",
+      "electrical_observed_at": "2026-11-09T00:07:18.604417+00:00",
+      "requested_state": "off",
+      "error": "Persistent uncertainty: 2026-11-09T00:06:11.380229+00:00 original=End-to-end deadline expired; result is unconfirmed; latest=End-to-end deadline expired; result is unconfirmed; cleanup=Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown",
+      "cleanup": "Electrical OFF readback; dispatch monotonic=309283.930783; optical unknown",
+      "optical_closed_at": null,
+      "optical_evidence": null,
+      "cycle_parameters": null,
+      "settings_observed_at": null,
+      "settings_persistence": null
+    },
+    "released_sample": {
+      "name": "shutter",
+      "channel": 0,
+      "serial_number": "68800777",
+      "endpoint": "192.168.1.19:40305",
+      "has_device": false,
+      "identity": null,
+      "generation": 2,
+      "operating_mode": "unknown",
+      "interlock_required": null,
+      "status_bits": null,
+      "electrical_state": "unknown",
+      "electrical_observed_at": null,
+      "requested_state": "off",
+      "error": "Persistent uncertainty: 2026-11-09T00:06:11.380229+00:00 original=End-to-end deadline expired; result is unconfirmed; latest=End-to-end deadline expired; result is unconfirmed; cleanup=Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown",
+      "cleanup": "Electrical OFF readback; dispatch monotonic=309283.930783; optical unknown",
+      "optical_closed_at": null,
+      "optical_evidence": null,
+      "cycle_parameters": null,
+      "settings_observed_at": null,
+      "settings_persistence": null
+    },
+    "test_server_stopped": true,
+    "netstat_matching_lines": [],
+    "no_active_device_socket_or9860_listener": true,
+    "journal_path": "C:\\Users\\HFNV\\AppData\\Local\\KSC101Control\\ownership-v1\\uncertain-68800777",
+    "journal_sha256": "8e3e6175adfe4cf642552888efe6c43f433de48da35f5f921c3b9c9a3daf636c",
+    "journal_text": "Protective OFF pending; original=Persistent uncertainty: 2026-11-09T00:06:11.380229+00:00 original=End-to-end deadline expired; result is unconfirmed; latest=End-to-end deadline expired; result is unconfirmed; cleanup=Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown; optical state unknown",
+    "lockout_retained": true
+  },
+  "revision_boundary": {
+    "hardware_runtime_hashes": "records/webui-command-hardware-runtime.json",
+    "final_fixes_not_live_retested": [
+      "src/thorlabs_shutter_control/controller.py",
+      "src/thorlabs_shutter_control/gui.py"
+    ],
+    "final_software_hashes": "records/webui-command-direct-validation.json"
+  },
+  "not_exercised": [
+    "Device-message start/stop",
+    "Raw-event collection",
+    "Hardware-disconnect request",
+    "Mode/settings/EEPROM writes",
+    "Native cycles",
+    "Additional ON",
+    "Post-pulse optical observation"
+  ],
+  "resumption": "Provide independent current blade-closed evidence under protected conditions, then documented passive recover. No further ON is authorized.",
+  "artifact_sha256": {
+    "records/webui-command-hardware-live.json": "b2b323cd71c17f0273625544f714f35b800272cbc115f95f72b866f36203839a",
+    "records/webui-command-hardware-recovery-authorization.json": "8204135e8349d81e58a6935255fd73f50196a20b4c7c83489b1184a41a2b6355",
+    "records/webui-command-hardware-recovery.json": "27168893e388d5e51070328d72f7716fb259e6fe41a00d81e52f1b1b9fd66c32",
+    "records/webui-command-hardware-runtime.json": "96aecf4fb7ef2f55941cfb1f22f2e321ecd24afd8fb45493a04e88c06f3489fa",
+    "records/webui-command-hardware-fault-fixed.jpg": "af70347916af610b5f271cff5893ea69f10c3631d3f0e537fac734ffae56b80d",
+    "records/webui-command-hardware-fault.jpg": "58be0c1c19dd75b1d8ac2a4c9d29b516ed5407a9f01f856a17d6356461ca9f69",
+    "records/webui-command-hardware-final-released.jpg": "1da0312b142b4e212260480045b6ec02fbb856bcdd8fb6c8c72fa5e42adcf5d9"
+  },
+  "local_markdown_links": {
+    "documents_checked": 21,
+    "missing": []
+  }
+}

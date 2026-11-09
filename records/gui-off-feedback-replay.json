@@ -1,0 +1,42 @@
+{
+  "requirement": "REQ-254",
+  "test": "TEST-254",
+  "record": "E237",
+  "scope": "Offline replay of saved actual final OFF through Dash callbacks; no device/server operation",
+  "notice": "Stop / OFF sent; fresh electrical OFF readback received. Controller fault remains: Persistent uncertainty: 2026-11-09T00:06:11.380229+00:00 original=End-to-end deadline expired; result is unconfirmed; latest=End-to-end deadline expired; result is unconfirmed; cleanup=Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown. Output activation is blocked; protected recovery is required.",
+  "settings_notice": "Stop / OFF sent; fresh electrical OFF readback received. Controller fault remains: Persistent uncertainty: 2026-11-09T00:06:11.380229+00:00 original=End-to-end deadline expired; result is unconfirmed; latest=End-to-end deadline expired; result is unconfirmed; cleanup=Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown. Output activation is blocked; protected recovery is required.",
+  "electrical_readback_at": "2026-11-09T00:07:18.604417+00:00",
+  "display": {
+    "output": "Off",
+    "fault": "Reported",
+    "on_disabled": true,
+    "pulse_disabled": true
+  },
+  "controller_source_unchanged_from_review": true,
+  "separate_P1_controller_defect": "Still open; not part of this GUI-only fix",
+  "saved_actual_input_sha256": "b2b323cd71c17f0273625544f714f35b800272cbc115f95f72b866f36203839a",
+  "current_gui_sha256": "47dadb6ea652b8b9e3e2b825ee84f0272160fc51923415acbe739483b134791a",
+  "final_software": {
+    "artifact": "records/gui-off-feedback-direct-validation.json",
+    "input_count": 39,
+    "input_hashes_match": true,
+    "test_totals": {
+      "offline": {
+        "tests": 351,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "wheel": {
+        "tests": 351,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "local_link_check": {
+    "documents": 21,
+    "missing": []
+  }
+}

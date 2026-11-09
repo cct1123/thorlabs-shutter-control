@@ -63,7 +63,8 @@ The generic protocol describes triggered cycling while the KSC101 manual
 describes logic-level operation with priming. TTL, cycle starts and EEPROM
 configuration require the separate qualification gates described in SRC-010 below;
 trigger-I/O configuration remains unavailable. SRC-002 p20 says mode changes are automatically
-remembered at power-up; they now require separate policy permission. APT has no
+remembered at power-up; current mode selection has no separate permission flag,
+while OFF/interlock/readback checks remain. APT has no
 transaction IDs; even a post-request
 reply cannot distinguish an arbitrarily delayed same-type unsolicited reply
 from the current one. Quarantine prevents known timed-out requests from being
@@ -123,7 +124,8 @@ operation at20 C within its electrical limits. Timing depends on the driver;
 SC10 measurements are not KSC101 calibration. The connector's position-feedback
 signal is distinct from output enable. This supports the native-driver load
 policy's design assumptions, not present wiring, optical closure or performance.
-The configured2 s OFF pause is a commissioning choice, not a manufacturer minimum.
+The earlier 2 s OFF pause was a commissioning choice, not a manufacturer minimum;
+the current tracked profile uses zero extra software OFF pause.
 
 The direct mirror download timed out; the web PDF extraction supplied the inspected
 manufacturer text. No local SH05R PDF hash is claimed. Existing downloaded
@@ -136,7 +138,8 @@ and [one ON/OFF cycle](../records/ethernet-control-live.json) are separate from 
 source facts. APT/SRC-007 section2.1 gives transport independence, pp190-191
 command0x04CB ON1/OFF2; KEH3/SRC-003 section4.3 gives per-bay routing. The exact
 192.168.1.19:40305/68800777/1.0.7 path now has real command/readback evidence.
-The configured2s OFF pause is a commissioning choice, not a rated minimum.
+That recorded run used a 2 s commissioning pause, not a rated minimum; the
+current tracked profile uses zero extra software OFF pause.
 No custom voltage, EEPROM, trigger configuration or interlock bypass was used.
 
 ## SRC-010 - KSC101 Kinesis UI manual, 6 November 2026
@@ -161,14 +164,17 @@ storage, mode/cycle query/set and ON/OFF frames. Cycle commands use channel1
 and integer milliseconds. The application's conservative100..10000 ms bound
 follows the KSC101 manual rather than the inconsistent generic timing upper
 bound prose. NoEEPROM ACK exists; success is only a storage request, with later
-restart/readback verification required. Current hardware qualification remains
-Manual-only; software contracts do not qualify native timing, priming or storage.
+restart/readback verification required. Physical command/readback evidence covers
+Manual only. The current software profile permits all four activation modes;
+software contracts do not qualify native timing, priming or storage.
 
 Unresolved: the protocol's model table lists KSC101 for MMI0x0520 and trigger
 0x0523, but detailed sections name motor KST/KDC/KBD families and contain motor
 positions/velocities and conflicting lengths. That is insufficient to implement
 KSC101 display/trigger configuration. No confirmed Key/Ready mapping was found.
-Those controls stay disabled/Unknown; no motor-layout guess or SDK fallback.
+Those controls remain unavailable. The UI labels the implemented status bits
+literally; it does not substitute them for Key/Ready or actual native activity.
+No motor-layout guess or SDK fallback is used.
 A newer official APT URL attempt returned1313-byte HTML, not a PDF; it is not
 used as protocol evidence. The [WebUI matrix](gui.md#manufacturer-reference-and-implemented-functions)
 and records/webui-apt-validation.json distinguish implemented software paths,

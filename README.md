@@ -21,16 +21,22 @@ The reviewed setup is **shutter**, **SH05R**, KSC101 **68800777**, firmware
 **1.0.7**, KEH3 middle bay **192.168.1.19:40305**. Application channel 0 is separate
 from APT channel 1. Its tracked [configuration](config/shutter.ethernet.toml)
 allows protected selection of Manual, Single, Auto and Triggered. Output activation
-remains Manual-only; native Start/priming, cycle-setting and EEPROM writes stay disabled.
+permits all four modes through `qualified_modes`. Native Start retains OFF/interlock
+readback and cycle/load limits; continuous Triggered priming, cycle-setting
+and EEPROM writes retain their separate restrictions.
+
+From the repository root, install the GUI once with `uv sync --locked --extra gui`,
+then run:
 
 ```powershell
-uv sync --locked --group dev --group notebooks --extra gui
-uv run --locked shutter-control --config config/shutter.ethernet.toml check-config
-uv run --locked shutter-control --config config/shutter.ethernet.toml gui --port 9860
+uv run shutter-control gui
 ```
 
+Open http://127.0.0.1:9860. The GUI defaults to
+[config/shutter.ethernet.toml](config/shutter.ethernet.toml) and port 9860.
+Use `--config PATH` before `gui`, or `gui --port PORT`, to override them.
+Other CLI commands retain `shutters.local.toml` as their default configuration.
 Startup is passive and localhost-only. Select an exact target, then Connect.
-Use a free port explicitly; default 8050 may belong to another application.
 Stop/release the previous owner before restarting an updated WebUI and reload
 the browser. There is no automatic port takeover, scan, fallback or ON replay.
 
@@ -39,6 +45,11 @@ release. Queries reject stale replies across all queued receive chunks before
 sending a request; a busy event stream consumes the existing deadline. APT still
 cannot prove freshness for arbitrary delayed same-type replies.
 
+Standalone launches show **Shutdown GUI server** in the heading. It exits through
+normal output cleanup and communication release after accepted requests finish;
+imported `create_app()` instances do not expose this button. Use Stop / OFF for
+immediate output control. Restart the launcher to serve the GUI again.
+
 ## Operation
 
 Connect verifies exact identity/firmware and the WebUI reads actual mode,
@@ -46,28 +57,45 @@ interlock requirement and electrical output. Read state gets fresh replies;
 Live readback is opt-in. The modern flat panel provides mode selectors,
 Open/Close or qualified Start/Stop, timing/count readout, Settings and Identify.
 Healthy polling preserves operator messages. Persistent faults remain visible in
-the main and Settings notices. Disconnected feedback stays Unknown.
+the main and Settings notices. Confirmed Stop/OFF and dated electrical feedback
+stay visible alongside a retained fault. An explicit verified Stop/OFF now clears
+the fault; reads and automatic failure cleanup do not.
+Disconnected or undated feedback stays Unknown; electrical OFF does not prove
+physical blade closure or clear a fault. A healthy refused command preserves the
+last same-connection dated feedback with its original timestamp and an explicit
+historical-reading notice; a fault, disconnect or different connection clears it.
 
 Settings also offers LED indication reads/applies and **Require interlock**.
 Readback and diagnostics contains channel/bay queries, device-message start/stop,
-raw event collection and protected hardware disconnect. All use the shared owner;
+raw event collection. Protected hardware disconnect remains API-only. All use the shared owner;
 settings permissions still apply. See the [GUI command guide](docs/gui.md#additional-shutter-commands).
+The legacy bay query is refused on KEH3 before I/O; the actual route timed out
+on that request. Use the explicitly configured bay and endpoint.
 
+The tracked SH05R Ethernet profile sets `min_off_s = 0.0`, removing the extra
+software OFF pause. Fresh OFF and enabled-interlock readback remain required.
+Profiles with a positive `min_off_s` retain their configured interval.
 Every ON attempt invalidates the previous OFF-rest interval. New rest starts
 with fresh OFF readback; it cannot be reused after an intervening ON. The 1 s
 timed button is a host hold after ON readback, followed by OFF. Neither host
 hold nor electrical timestamps are calibrated optical exposure.
 
-Mode changes persist at power-up and need explicit qualification and source
-protection. Native modes/settings have separate default-off permissions. Display
-and trigger-I/O settings remain disabled pending a verified KSC101 wire layout;
-Key/Ready and native activity are not inferred from the output bit. See the
+Mode changes persist at power-up; selection has no separate permission flag or
+source-confirmation requirement. OFF/interlock/readback checks remain.
+The source-confirmation checkbox is removed for native activation and settings;
+their separate policy, OFF/interlock and readback checks remain. Display
+and trigger-I/O configuration remains unavailable pending a verified KSC101 wire layout.
+The status panel reads the documented interlock/channel flags as Set/Clear;
+these are not verified key position or readiness. Native request shows host
+Start tracking, not measured activity. See the
 [function and qualification matrix](docs/gui.md#manufacturer-reference-and-implemented-functions).
 
-Settings drafts, protection assertions, persistence opt-in and polling are
+Settings drafts, persistence opt-in and polling are
 scoped to a target/connection generation. Disconnect or reconnect clears old
 state; ordinary polling preserves active edits. Settings writes check timing,
 count/duty limits, exact readback and retained interlock configuration.
+Read LED modes fills the indication checkboxes; other reads preserve local edits.
+Editing a draft writes nothing until Apply is explicitly requested and permitted.
 
 ```python
 from thorlabs_shutter_control import ShutterHub
@@ -84,7 +112,10 @@ Explicit OFF is separate. Shutdown cleanup follows unresolved/current output
 work, while a successfully closed output session cannot authorize an OFF in a
 later read-only connection. Uncertain output retains its journal across release;
 protected recovery checks Manual/OFF/interlock and clears stale requests without
-replaying commands. See the [API/recovery contract](docs/python-api.md).
+replaying commands. Recovery requires independent source protection and a closed
+blade observation. Empty-text exceptions retain their exception name and lockout
+until verified explicit Stop/OFF or protected recovery. Neither reset establishes
+optical closure. See the [API/recovery contract](docs/python-api.md).
 
 An omitted load policy permits reads only. Qualified output is supported on
 D2XX and docked KEH3 routes; VCP and KEH3 external USB OUT output control remain
@@ -111,14 +142,19 @@ disposable verification environments are removed; inspect failed-run diagnostics
 before pruning. Environments, manuals, actual records, backups and ownership
 state are retained.
 
-E200 records two real WebUI/controller cycles, active-release refusal and final
-Manual/OFF followed by release. E202 reports that the user did not observe both
-cycles, so complete two-cycle blade motion remains unverified. E191/E192 records
-an earlier individually observed blade cycle. These are dated results on their
-exact revisions; current software review does not repeat or extend them.
+Latest software results: [source and isolated-wheel verification](records/repo-review-final-direct-validation.json).
+The [8 November bounded actual WebUI redo](records/webui-redo-bounded-validation.json)
+completed one approved 1 s host-held pulse, LED/cycle/channel reads, draft checks
+and safe KEH3 bay-query refusal. Final readback was Manual/OFF, interlock required,
+no fault; communication was released and the server stopped with no journal left.
+Its [browser record](records/webui-redo-bounded-live.json) and
+[final OFF screenshot](records/webui-redo-bounded-final-off.jpg) apply to that exact
+recorded runtime. Independent blade motion was unobserved, and optical timing,
+extinction, native modes/settings and wider deployment remain unqualified.
+That one-cycle allowance is consumed; the record does not authorize another run.
 
 No SDK backend or retired probe/notebook wrapper remains. Owner method names
-remain stable; version 2 intentionally replaces nested feedback and redundant
+have been narrowed; version 2 intentionally replaces nested feedback and redundant
 status fields with a flat ShutterStatus. External consumers need the
 [status migration](docs/python-api.md#status-schema-migration) before upgrading. The last recorded
 external DiamondGUI check (E185) failed its commented-out page/stale mapping;

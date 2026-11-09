@@ -1,0 +1,44 @@
+{
+  "requirement": "REQ-256",
+  "test": "TEST-256",
+  "record": "E240",
+  "checked_at_utc": "2026-11-09T03:47:03.495233+00:00",
+  "command": "uv run shutter-control gui",
+  "url": "http://127.0.0.1:9860/",
+  "http_status": 200,
+  "loaded_config": "config/shutter.ethernet.toml",
+  "selected_target": null,
+  "initial_sample": null,
+  "active_device_socket": false,
+  "device_connection_or_actuation_requested": false,
+  "scope": "Passive real localhost launcher and HTTP layout only; no browser Connect or hardware operation",
+  "test_server_stopped": true,
+  "server_stop": {
+    "method": "Ctrl+C to test-only exec session",
+    "exec_exit_code": 1,
+    "listener_absent": true
+  },
+  "software": {
+    "artifact": "records/simple-launch-direct-validation.json",
+    "input_count": 39,
+    "current_hashes_match": true,
+    "test_totals": {
+      "offline": {
+        "tests": 355,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "wheel": {
+        "tests": 355,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "local_link_check": {
+    "documents": 21,
+    "missing": []
+  }
+}

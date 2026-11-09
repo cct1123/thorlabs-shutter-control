@@ -1,0 +1,46 @@
+{
+  "scope": "static source audit and passive configuration load; no hardware/network I/O",
+  "effective_config": {
+    "name": "shutter",
+    "channel": 0,
+    "role": "SH05R on KSC10168800777, KEH3 middle bay",
+    "serial_number": "68800777",
+    "firmware": [
+      "1.0.7"
+    ],
+    "route": {
+      "kind": "keh3",
+      "port": null,
+      "hub_serial": null,
+      "host": "192.168.1.19",
+      "bay": "middle",
+      "hub_firmware": null
+    },
+    "policy": {
+      "evidence": "PROJECT.md exact Ethernet ON/OFF request and user SH05R/safe confirmation 2026-11-06; SRC-009 SH05R manual. Source protection/trigger isolation required for physical use; optical state remains unmeasured.",
+      "shutter_model": "SH05R",
+      "off_optical_state": "closed",
+      "min_off_s": 0.0,
+      "continuous_on_allowed": true,
+      "max_on_s": null,
+      "max_duty_fraction": 1.0,
+      "allow_persistent_mode_changes": true,
+      "qualified_modes": [
+        "manual"
+      ],
+      "allow_device_settings": false,
+      "allow_persistent_settings": false,
+      "allow_continuous_cycles": false,
+      "max_cycle_count": 1
+    }
+  },
+  "owner_signature": "(configs, *, connect_timeout=5.0, query_timeout=3.0, cleanup_timeout=5.0, transport_factory=None, lock_directory=None)",
+  "source_sha256": {
+    "src\\thorlabs_shutter_control\\controller.py": "c343cd31200094c0e29c36919131768da877228415b4e3ffee9a69c25b9cd502",
+    "src\\thorlabs_shutter_control\\gui.py": "b38b9298527c3c80b743cdb567d004961b98a97731ecb6ee2dfea32baf63f19a",
+    "src\\thorlabs_shutter_control\\protocol.py": "73884542c7e7fc0cdefa45efe2d4ef3232f288649e08143705e39e1a6f17754c",
+    "src\\thorlabs_shutter_control\\transport.py": "850583f672bc8566529b1845e84e5dd3bdb5d865cf361366c2c84e9612722da3",
+    "src\\thorlabs_shutter_control\\__init__.py": "df8f1a80bd7892400fef2f66a061bcee2776125a61977091b7402cf44025248f",
+    "src\\thorlabs_shutter_control\\__main__.py": "5fd1c09d0b63e71867991f1f3410a541c7b0708063346a4a5637664ba5cfbd4a"
+  }
+}

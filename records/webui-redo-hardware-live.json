@@ -1,0 +1,106 @@
+{
+  "requirement": "REQ-255",
+  "test": "TEST-255",
+  "scope": "Actual browser / production controller / TCP; no simulated hardware",
+  "events": [
+    {
+      "action": "initial-connect-read-only",
+      "captured_at_utc": "2026-11-09T00:30:27.197Z",
+      "notice": "Controller fault remains: Persistent uncertainty: Protective OFF pending; original=Persistent uncertainty: 2026-11-09T00:06:11.380229+00:00 original=End-to-end deadline expired; result is unconfirmed; latest=End-to-end deadline expired; result is unconfirmed; cleanup=Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown; optical state unknown. Output activation is blocked; protected recovery is required.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": true,
+        "identity": {
+          "serial_number": "68800777",
+          "model": "KSC101",
+          "firmware": "1.0.7",
+          "hardware_version": 3,
+          "channels": 1
+        },
+        "generation": 1,
+        "operating_mode": "manual",
+        "interlock_required": true,
+        "status_bits": 8192,
+        "electrical_state": "off",
+        "electrical_observed_at": "2026-11-09T00:30:26.928688+00:00",
+        "requested_state": null,
+        "error": "Persistent uncertainty: Protective OFF pending; original=Persistent uncertainty: 2026-11-09T00:06:11.380229+00:00 original=End-to-end deadline expired; result is unconfirmed; latest=End-to-end deadline expired; result is unconfirmed; cleanup=Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown; optical state unknown",
+        "cleanup": null,
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": null,
+        "settings_observed_at": null,
+        "settings_persistence": null
+      }
+    },
+    {
+      "action": "live-readback-then-disabled",
+      "captured_at_utc": "2026-11-09T00:31:16.045Z",
+      "notice": "Controller fault remains: Persistent uncertainty: Protective OFF pending; original=Persistent uncertainty: 2026-11-09T00:06:11.380229+00:00 original=End-to-end deadline expired; result is unconfirmed; latest=End-to-end deadline expired; result is unconfirmed; cleanup=Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown; optical state unknown. Output activation is blocked; protected recovery is required.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": true,
+        "identity": {
+          "serial_number": "68800777",
+          "model": "KSC101",
+          "firmware": "1.0.7",
+          "hardware_version": 3,
+          "channels": 1
+        },
+        "generation": 1,
+        "operating_mode": "manual",
+        "interlock_required": true,
+        "status_bits": 8192,
+        "electrical_state": "off",
+        "electrical_observed_at": "2026-11-09T00:31:15.461067+00:00",
+        "requested_state": null,
+        "error": "Persistent uncertainty: Protective OFF pending; original=Persistent uncertainty: 2026-11-09T00:06:11.380229+00:00 original=End-to-end deadline expired; result is unconfirmed; latest=End-to-end deadline expired; result is unconfirmed; cleanup=Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown; optical state unknown",
+        "cleanup": null,
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": null,
+        "settings_observed_at": null,
+        "settings_persistence": null
+      },
+      "output_lamp": "Off",
+      "activation_disabled": true
+    },
+    {
+      "action": "release-read-only-pending-confirmation",
+      "captured_at_utc": "2026-11-09T00:33:04.270Z",
+      "notice": "Communication released. Optical state is not measured. Controller fault remains: Persistent uncertainty: Protective OFF pending; original=Persistent uncertainty: 2026-11-09T00:06:11.380229+00:00 original=End-to-end deadline expired; result is unconfirmed; latest=End-to-end deadline expired; result is unconfirmed; cleanup=Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown; optical state unknown. Output activation is blocked; protected recovery is required.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": false,
+        "identity": null,
+        "generation": 1,
+        "operating_mode": "unknown",
+        "interlock_required": null,
+        "status_bits": null,
+        "electrical_state": "unknown",
+        "electrical_observed_at": null,
+        "requested_state": null,
+        "error": "Persistent uncertainty: Protective OFF pending; original=Persistent uncertainty: 2026-11-09T00:06:11.380229+00:00 original=End-to-end deadline expired; result is unconfirmed; latest=End-to-end deadline expired; result is unconfirmed; cleanup=Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown; optical state unknown",
+        "cleanup": null,
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": null,
+        "settings_observed_at": null,
+        "settings_persistence": null
+      },
+      "output_lamp": "Unknown"
+    }
+  ],
+  "motion_requested": 0,
+  "recovery_performed": false,
+  "pending": "Current protected setup and independent blade-closed confirmation; camera view unconfirmed"
+}

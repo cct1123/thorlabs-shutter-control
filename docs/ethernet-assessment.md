@@ -23,11 +23,13 @@ polls fresh0x042A replies within the original deadline to allow a physical trans
 it never retries a failed query or resends the output command. The exact KSC101
 API defines output mask0x1. Optical blade position is not inferred from it.
 
-Manual is selected explicitly. A protected Trigger->Manual transition needs
-source_inhibited=True plus policy permission for remembered mode changes. It sends
+Manual is selected explicitly. A Trigger->Manual transition needs no separate
+mode permission or software source confirmation, but still requires OFF/interlock readback. It sends
 OFF/deactivate, confirms output clear, selects Manual and verifies Manual/OFF.
-Ordinary ON/OFF never changes mode implicitly or primes a trigger. Interlock bypass,
-EEPROM, trigger/cycle parameters and network settings are not exposed.
+Ordinary ON/OFF never changes mode implicitly or primes a trigger. Interlock bypass
+and trigger-I/O/network configuration remain unavailable. Cycle settings and
+cycle-only EEPROM requests have separately permitted Python/GUI APIs; neither
+was exercised in this historical run.
 
 [The real notebook6 result](../records/ethernet-control-live.json) records one ON,
 one1s added hold, priority OFF and release. Readback0x2000->0x2001->0x2000;
@@ -38,5 +40,5 @@ in [the configuration](../config/shutter.ethernet.toml) and [manual register](so
 Other occupied/empty/swapped bay/firmware combinations, shared-hub loss, hub
 identity/recovery/persistence, independent optics and endurance remain separate
 acceptance work. The implementation permits documented docked bays with exact
-controller config and load policy; only this middle-bay setup has current physical
+controller config and load policy; only this middle-bay setup has recorded physical
 command evidence. VCP and external USB OUT control remain unavailable.

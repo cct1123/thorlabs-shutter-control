@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="3" time="0.353" timestamp="2026-11-08T22:50:44.887323-06:00" hostname="HighFieldSetup"><testcase classname="tests.test_gui_commands" name="test_protected_hardware_disconnect_is_api_only" file="tests\test_gui_commands.py" line="181" time="0.097"><failure message="assert b'hardware-disconnect' not in b'{&quot;props&quot;:{&quot;children&quot;:[{&quot;props&quot;:{&quot;children&quot;:[{&quot;props&quot;:{&quot;children&quot;:[{&quot;props&quot;:{&quot;children&quot;:&quot;DIRECT APT CONTROL&quot;,&quot;classNa...val&quot;,&quot;namespace&quot;:&quot;dash_core_components&quot;}],&quot;className&quot;:&quot;shutter-app&quot;},&quot;type&quot;:&quot;Main&quot;,&quot;namespace&quot;:&quot;dash_html_components&quot;}'&#10; +  where b'{&quot;props&quot;:{&quot;children&quot;:[{&quot;props&quot;:{&quot;children&quot;:[{&quot;props&quot;:{&quot;children&quot;:[{&quot;props&quot;:{&quot;children&quot;:&quot;DIRECT APT CONTROL&quot;,&quot;classNa...val&quot;,&quot;namespace&quot;:&quot;dash_core_components&quot;}],&quot;className&quot;:&quot;shutter-app&quot;},&quot;type&quot;:&quot;Main&quot;,&quot;namespace&quot;:&quot;dash_html_components&quot;}' = &lt;WrapperTestResponse 18146 bytes [200 OK]&gt;.data&#10; +    where &lt;WrapperTestResponse 18146 bytes [200 OK]&gt; = get('/_dash-layout')&#10; +      where get = &lt;FlaskClient &lt;Flask 'thorlabs_shutter_control.gui'&gt;&gt;.get">bench = (&lt;thorlabs_shutter_control.controller.ShutterHub object at 0x00000231E682C5F0&gt;, [&lt;conftest.FakeTransport object at 0x0...1E68ADB20&gt;, WindowsPath('C:/Users/HFNV/AppData/Local/Temp/pytest-of-HFNV/pytest-1092/test_protected_hardware_discon0'))
+
+    def test_protected_hardware_disconnect_is_api_only(bench):
+        hub, devices, _, _ = bench
+        hub.connect("beam")
+        app = create_app(hub)
+        client = app.server.test_client()
+&gt;       assert b"hardware-disconnect" not in client.get("/_dash-layout").data
+E       assert b'hardware-disconnect' not in b'{"props":{"children":[{"props":{"children":[{"props":{"children":[{"props":{"children":"DIRECT APT CONTROL","classNa...val","namespace":"dash_core_components"}],"className":"shutter-app"},"type":"Main","namespace":"dash_html_components"}'
+E        +  where b'{"props":{"children":[{"props":{"children":[{"props":{"children":[{"props":{"children":"DIRECT APT CONTROL","classNa...val","namespace":"dash_core_components"}],"className":"shutter-app"},"type":"Main","namespace":"dash_html_components"}' = &lt;WrapperTestResponse 18146 bytes [200 OK]&gt;.data
+E        +    where &lt;WrapperTestResponse 18146 bytes [200 OK]&gt; = get('/_dash-layout')
+E        +      where get = &lt;FlaskClient &lt;Flask 'thorlabs_shutter_control.gui'&gt;&gt;.get
+
+tests\test_gui_commands.py:187: AssertionError</failure></testcase><testcase classname="tests.test_owner" name="test_shutdown_reports_retained_fault_after_off_and_still_cleans_other_targets" file="tests\test_owner.py" line="552" time="0.016"><failure message="Failed: DID NOT RAISE ShutterError">config = ControllerConfig(name='beam', channel=0, role='fictional beam role', serial_number='68000001', firmware=('1.0.7',), ro...al',), allow_device_settings=False, allow_persistent_settings=False, allow_continuous_cycles=False, max_cycle_count=1))
+second = ControllerConfig(name='second', channel=1, role='fictional beam role', serial_number='68000002', firmware=('1.0.7',), ...al',), allow_device_settings=False, allow_persistent_settings=False, allow_continuous_cycles=False, max_cycle_count=1))
+tmp_path = WindowsPath('C:/Users/HFNV/AppData/Local/Temp/pytest-of-HFNV/pytest-1092/test_shutdown_reports_retained0')
+
+    def test_shutdown_reports_retained_fault_after_off_and_still_cleans_other_targets(
+        config, second, tmp_path
+    ):
+        devices = {c.name: FakeTransport(c) for c in (config, second)}
+        with ShutterHub(
+            [config, second], transport_factory=lambda c, d: devices[c.name], lock_directory=tmp_path
+        ) as hub:
+            for name in devices:
+                hub.connect(name)
+                hub.set_solenoid(name, True)
+            channel = hub._channel("beam")
+            hub._fault(channel, ShutterError("Original output uncertainty"))
+&gt;           with pytest.raises(ShutterError, match="Original output uncertainty"):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE ShutterError
+
+tests\test_owner.py:565: Failed</failure></testcase><testcase classname="tests.test_application" name="test_cli_empty_text_interruption_reports_exception_name" file="tests\test_application.py" line="69" time="0.002"><failure message="AssertionError: assert 'Unconfirmed: KeyboardInterrupt' in 'Unconfirmed: \n'&#10; +  where 'Unconfirmed: \n' = CaptureResult(out='', err='Unconfirmed: \n').err&#10; +    where CaptureResult(out='', err='Unconfirmed: \n') = readouterr()&#10; +      where readouterr = &lt;_pytest.capture.CaptureFixture object at 0x00000231E6A8AB40&gt;.readouterr">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000231E6A8A9C0&gt;
+capsys = &lt;_pytest.capture.CaptureFixture object at 0x00000231E6A8AB40&gt;
+
+    def test_cli_empty_text_interruption_reports_exception_name(monkeypatch, capsys):
+        from thorlabs_shutter_control import __main__ as cli
+    
+        def interrupted_config(_path):
+            raise KeyboardInterrupt()
+    
+        monkeypatch.setattr(cli, "load_config", interrupted_config)
+        assert cli.main(["status"]) == 1
+&gt;       assert "Unconfirmed: KeyboardInterrupt" in capsys.readouterr().err
+E       AssertionError: assert 'Unconfirmed: KeyboardInterrupt' in 'Unconfirmed: \n'
+E        +  where 'Unconfirmed: \n' = CaptureResult(out='', err='Unconfirmed: \n').err
+E        +    where CaptureResult(out='', err='Unconfirmed: \n') = readouterr()
+E        +      where readouterr = &lt;_pytest.capture.CaptureFixture object at 0x00000231E6A8AB40&gt;.readouterr
+
+tests\test_application.py:78: AssertionError</failure></testcase></testsuite></testsuites>

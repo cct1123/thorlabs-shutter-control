@@ -1,0 +1,637 @@
+{
+  "requirement": "REQ-255",
+  "test": "TEST-255",
+  "record": "E239",
+  "scope": "Actual visible WebUI with current production ShutterHub/APT/TCP",
+  "approved_pulses": 1,
+  "requested_pulses": 1,
+  "camera_used": false,
+  "physical_motion_observed": false,
+  "events": [
+    {
+      "action": "connect-after-protected-recovery",
+      "captured_at_utc": "2026-11-09T03:32:31.994Z",
+      "notice": "Connected to the exact controller; fresh feedback received.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": true,
+        "identity": {
+          "serial_number": "68800777",
+          "model": "KSC101",
+          "firmware": "1.0.7",
+          "hardware_version": 3,
+          "channels": 1
+        },
+        "generation": 1,
+        "operating_mode": "manual",
+        "interlock_required": true,
+        "status_bits": 8192,
+        "electrical_state": "off",
+        "electrical_observed_at": "2026-11-09T03:32:31.679053+00:00",
+        "requested_state": null,
+        "error": null,
+        "cleanup": null,
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": null,
+        "settings_observed_at": null,
+        "settings_persistence": null
+      }
+    },
+    {
+      "action": "read-cycle-settings",
+      "captured_at_utc": "2026-11-09T03:32:45.848Z",
+      "notice": "Device cycle settings read. No defaults were written.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": true,
+        "identity": {
+          "serial_number": "68800777",
+          "model": "KSC101",
+          "firmware": "1.0.7",
+          "hardware_version": 3,
+          "channels": 1
+        },
+        "generation": 1,
+        "operating_mode": "manual",
+        "interlock_required": true,
+        "status_bits": 8192,
+        "electrical_state": "off",
+        "electrical_observed_at": "2026-11-09T03:32:45.674667+00:00",
+        "requested_state": null,
+        "error": null,
+        "cleanup": null,
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": {
+          "on_ms": 2000,
+          "off_ms": 2000,
+          "cycles": 5
+        },
+        "settings_observed_at": "2026-11-09T03:32:45.603991+00:00",
+        "settings_persistence": null
+      }
+    },
+    {
+      "action": "read-led-modes",
+      "captured_at_utc": "2026-11-09T03:32:46.193Z",
+      "notice": "LED indication modes read. No settings were written.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": true,
+        "identity": {
+          "serial_number": "68800777",
+          "model": "KSC101",
+          "firmware": "1.0.7",
+          "hardware_version": 3,
+          "channels": 1
+        },
+        "generation": 1,
+        "operating_mode": "manual",
+        "interlock_required": true,
+        "status_bits": 8192,
+        "electrical_state": "off",
+        "electrical_observed_at": "2026-11-09T03:32:46.026236+00:00",
+        "requested_state": null,
+        "error": null,
+        "cleanup": null,
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": {
+          "on_ms": 2000,
+          "off_ms": 2000,
+          "cycles": 5
+        },
+        "settings_observed_at": "2026-11-09T03:32:45.603991+00:00",
+        "settings_persistence": null
+      },
+      "led_readout": "LED modes: 0x0001",
+      "led_checkboxes": [
+        {
+          "checked": true,
+          "value": "1"
+        },
+        {
+          "checked": false,
+          "value": "2"
+        },
+        {
+          "checked": false,
+          "value": "8"
+        }
+      ]
+    },
+    {
+      "action": "local-led-draft-preserved-by-unrelated-read",
+      "captured_at_utc": "2026-11-09T03:33:00.709Z",
+      "notice": "Device cycle settings read. No defaults were written.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": true,
+        "identity": {
+          "serial_number": "68800777",
+          "model": "KSC101",
+          "firmware": "1.0.7",
+          "hardware_version": 3,
+          "channels": 1
+        },
+        "generation": 1,
+        "operating_mode": "manual",
+        "interlock_required": true,
+        "status_bits": 8192,
+        "electrical_state": "off",
+        "electrical_observed_at": "2026-11-09T03:33:00.555067+00:00",
+        "requested_state": null,
+        "error": null,
+        "cleanup": null,
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": {
+          "on_ms": 2000,
+          "off_ms": 2000,
+          "cycles": 5
+        },
+        "settings_observed_at": "2026-11-09T03:33:00.484252+00:00",
+        "settings_persistence": null
+      },
+      "draft_only": true,
+      "led_checkboxes": [
+        {
+          "checked": true,
+          "value": "1"
+        },
+        {
+          "checked": false,
+          "value": "2"
+        },
+        {
+          "checked": true,
+          "value": "8"
+        }
+      ]
+    },
+    {
+      "action": "explicit-led-read-restores-device-flags",
+      "captured_at_utc": "2026-11-09T03:33:01.082Z",
+      "notice": "LED indication modes read. No settings were written.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": true,
+        "identity": {
+          "serial_number": "68800777",
+          "model": "KSC101",
+          "firmware": "1.0.7",
+          "hardware_version": 3,
+          "channels": 1
+        },
+        "generation": 1,
+        "operating_mode": "manual",
+        "interlock_required": true,
+        "status_bits": 8192,
+        "electrical_state": "off",
+        "electrical_observed_at": "2026-11-09T03:33:00.902718+00:00",
+        "requested_state": null,
+        "error": null,
+        "cleanup": null,
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": {
+          "on_ms": 2000,
+          "off_ms": 2000,
+          "cycles": 5
+        },
+        "settings_observed_at": "2026-11-09T03:33:00.484252+00:00",
+        "settings_persistence": null
+      },
+      "led_checkboxes": [
+        {
+          "checked": true,
+          "value": "1"
+        },
+        {
+          "checked": false,
+          "value": "2"
+        },
+        {
+          "checked": false,
+          "value": "8"
+        }
+      ]
+    },
+    {
+      "action": "read-channel-enable",
+      "captured_at_utc": "2026-11-09T03:33:21.414Z",
+      "notice": "Channel enable read; this does not measure blade position.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": true,
+        "identity": {
+          "serial_number": "68800777",
+          "model": "KSC101",
+          "firmware": "1.0.7",
+          "hardware_version": 3,
+          "channels": 1
+        },
+        "generation": 1,
+        "operating_mode": "manual",
+        "interlock_required": true,
+        "status_bits": 8192,
+        "electrical_state": "off",
+        "electrical_observed_at": "2026-11-09T03:33:21.255239+00:00",
+        "requested_state": null,
+        "error": null,
+        "cleanup": null,
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": {
+          "on_ms": 2000,
+          "off_ms": 2000,
+          "cycles": 5
+        },
+        "settings_observed_at": "2026-11-09T03:33:00.484252+00:00",
+        "settings_persistence": null
+      },
+      "channel_readout": "Channel enable: Disabled"
+    },
+    {
+      "action": "legacy-bay-refused-without-fault",
+      "captured_at_utc": "2026-11-09T03:33:21.788Z",
+      "notice": "Refused or unconfirmed: Legacy hub-bay query is unqualified on KEH3; use the configured route ",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": true,
+        "identity": {
+          "serial_number": "68800777",
+          "model": "KSC101",
+          "firmware": "1.0.7",
+          "hardware_version": 3,
+          "channels": 1
+        },
+        "generation": 1,
+        "operating_mode": "unknown",
+        "interlock_required": null,
+        "status_bits": null,
+        "electrical_state": "unknown",
+        "electrical_observed_at": null,
+        "requested_state": null,
+        "error": null,
+        "cleanup": null,
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": {
+          "on_ms": 2000,
+          "off_ms": 2000,
+          "cycles": 5
+        },
+        "settings_observed_at": "2026-11-09T03:33:00.484252+00:00",
+        "settings_persistence": null
+      }
+    },
+    {
+      "action": "read-state-after-bay-refusal",
+      "captured_at_utc": "2026-11-09T03:33:22.124Z",
+      "notice": "Readback updated.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": true,
+        "identity": {
+          "serial_number": "68800777",
+          "model": "KSC101",
+          "firmware": "1.0.7",
+          "hardware_version": 3,
+          "channels": 1
+        },
+        "generation": 1,
+        "operating_mode": "manual",
+        "interlock_required": true,
+        "status_bits": 8192,
+        "electrical_state": "off",
+        "electrical_observed_at": "2026-11-09T03:33:21.934267+00:00",
+        "requested_state": null,
+        "error": null,
+        "cleanup": null,
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": {
+          "on_ms": 2000,
+          "off_ms": 2000,
+          "cycles": 5
+        },
+        "settings_observed_at": "2026-11-09T03:33:00.484252+00:00",
+        "settings_persistence": null
+      }
+    },
+    {
+      "action": "collect-raw-events",
+      "captured_at_utc": "2026-11-09T03:33:40.477Z",
+      "notice": "Collected 0 raw events; payloads are not interpreted.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": true,
+        "identity": {
+          "serial_number": "68800777",
+          "model": "KSC101",
+          "firmware": "1.0.7",
+          "hardware_version": 3,
+          "channels": 1
+        },
+        "generation": 1,
+        "operating_mode": "manual",
+        "interlock_required": true,
+        "status_bits": 8192,
+        "electrical_state": "off",
+        "electrical_observed_at": "2026-11-09T03:33:40.304624+00:00",
+        "requested_state": null,
+        "error": null,
+        "cleanup": null,
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": {
+          "on_ms": 2000,
+          "off_ms": 2000,
+          "cycles": 5
+        },
+        "settings_observed_at": "2026-11-09T03:33:00.484252+00:00",
+        "settings_persistence": null
+      },
+      "raw_events": "[]"
+    },
+    {
+      "action": "protected-off-before-pulse",
+      "captured_at_utc": "2026-11-09T03:33:40.816Z",
+      "notice": "Collected 0 raw events; payloads are not interpreted.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": true,
+        "identity": {
+          "serial_number": "68800777",
+          "model": "KSC101",
+          "firmware": "1.0.7",
+          "hardware_version": 3,
+          "channels": 1
+        },
+        "generation": 1,
+        "operating_mode": "manual",
+        "interlock_required": true,
+        "status_bits": 8192,
+        "electrical_state": "off",
+        "electrical_observed_at": "2026-11-09T03:33:40.304624+00:00",
+        "requested_state": null,
+        "error": null,
+        "cleanup": null,
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": {
+          "on_ms": 2000,
+          "off_ms": 2000,
+          "cycles": 5
+        },
+        "settings_observed_at": "2026-11-09T03:33:00.484252+00:00",
+        "settings_persistence": null
+      }
+    },
+    {
+      "action": "single-pulse-attempt-recorded",
+      "captured_at_utc": "2026-11-09T03:33:56.624Z",
+      "conservative_budget_consumed": true
+    },
+    {
+      "action": "one-approved-1s-pulse-completed",
+      "captured_at_utc": "2026-11-09T03:33:58.074Z",
+      "notice": "One 1-second host hold completed; electrical OFF read back.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": true,
+        "identity": {
+          "serial_number": "68800777",
+          "model": "KSC101",
+          "firmware": "1.0.7",
+          "hardware_version": 3,
+          "channels": 1
+        },
+        "generation": 1,
+        "operating_mode": "manual",
+        "interlock_required": true,
+        "status_bits": 8192,
+        "electrical_state": "off",
+        "electrical_observed_at": "2026-11-09T03:33:57.983518+00:00",
+        "requested_state": "off",
+        "error": null,
+        "cleanup": "Electrical OFF readback; dispatch monotonic=321683.281743; optical unknown",
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": {
+          "on_ms": 2000,
+          "off_ms": 2000,
+          "cycles": 5
+        },
+        "settings_observed_at": "2026-11-09T03:33:00.484252+00:00",
+        "settings_persistence": null
+      }
+    },
+    {
+      "action": "final-close-off-confirmed",
+      "captured_at_utc": "2026-11-09T03:34:29.380Z",
+      "notice": "Stop / OFF sent; fresh electrical OFF readback received.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": true,
+        "identity": {
+          "serial_number": "68800777",
+          "model": "KSC101",
+          "firmware": "1.0.7",
+          "hardware_version": 3,
+          "channels": 1
+        },
+        "generation": 1,
+        "operating_mode": "manual",
+        "interlock_required": true,
+        "status_bits": 8192,
+        "electrical_state": "off",
+        "electrical_observed_at": "2026-11-09T03:34:29.231395+00:00",
+        "requested_state": "off",
+        "error": null,
+        "cleanup": "Electrical OFF readback; dispatch monotonic=321714.561860; optical unknown",
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": {
+          "on_ms": 2000,
+          "off_ms": 2000,
+          "cycles": 5
+        },
+        "settings_observed_at": "2026-11-09T03:33:00.484252+00:00",
+        "settings_persistence": null
+      }
+    },
+    {
+      "action": "live-readback-preserves-off-notice",
+      "captured_at_utc": "2026-11-09T03:34:39.732Z",
+      "notice": "Stop / OFF sent; fresh electrical OFF readback received.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": true,
+        "identity": {
+          "serial_number": "68800777",
+          "model": "KSC101",
+          "firmware": "1.0.7",
+          "hardware_version": 3,
+          "channels": 1
+        },
+        "generation": 1,
+        "operating_mode": "manual",
+        "interlock_required": true,
+        "status_bits": 8192,
+        "electrical_state": "off",
+        "electrical_observed_at": "2026-11-09T03:34:39.533966+00:00",
+        "requested_state": "off",
+        "error": null,
+        "cleanup": "Electrical OFF readback; dispatch monotonic=321714.561860; optical unknown",
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": {
+          "on_ms": 2000,
+          "off_ms": 2000,
+          "cycles": 5
+        },
+        "settings_observed_at": "2026-11-09T03:33:00.484252+00:00",
+        "settings_persistence": null
+      }
+    },
+    {
+      "action": "final-explicit-read-state",
+      "captured_at_utc": "2026-11-09T03:34:40.083Z",
+      "notice": "Readback updated.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": true,
+        "identity": {
+          "serial_number": "68800777",
+          "model": "KSC101",
+          "firmware": "1.0.7",
+          "hardware_version": 3,
+          "channels": 1
+        },
+        "generation": 1,
+        "operating_mode": "manual",
+        "interlock_required": true,
+        "status_bits": 8192,
+        "electrical_state": "off",
+        "electrical_observed_at": "2026-11-09T03:34:39.878424+00:00",
+        "requested_state": "off",
+        "error": null,
+        "cleanup": "Electrical OFF readback; dispatch monotonic=321714.561860; optical unknown",
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": {
+          "on_ms": 2000,
+          "off_ms": 2000,
+          "cycles": 5
+        },
+        "settings_observed_at": "2026-11-09T03:33:00.484252+00:00",
+        "settings_persistence": null
+      }
+    },
+    {
+      "action": "released-after-approved-pulse",
+      "captured_at_utc": "2026-11-09T03:34:52.704Z",
+      "notice": "Communication released. Optical state is not measured.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": false,
+        "identity": null,
+        "generation": 1,
+        "operating_mode": "unknown",
+        "interlock_required": null,
+        "status_bits": null,
+        "electrical_state": "unknown",
+        "electrical_observed_at": null,
+        "requested_state": "off",
+        "error": null,
+        "cleanup": "Electrical OFF readback; dispatch monotonic=321714.561860; optical unknown",
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": null,
+        "settings_observed_at": null,
+        "settings_persistence": null
+      },
+      "source_confirmation_cleared": true,
+      "output_lamp": "Unknown"
+    },
+    {
+      "action": "read-state-after-release-passive",
+      "captured_at_utc": "2026-11-09T03:35:13.220Z",
+      "notice": "Disconnected; no device feedback was requested.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": false,
+        "identity": null,
+        "generation": 1,
+        "operating_mode": "unknown",
+        "interlock_required": null,
+        "status_bits": null,
+        "electrical_state": "unknown",
+        "electrical_observed_at": null,
+        "requested_state": "off",
+        "error": null,
+        "cleanup": "Electrical OFF readback; dispatch monotonic=321714.561860; optical unknown",
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": null,
+        "settings_observed_at": null,
+        "settings_persistence": null
+      },
+      "led_drafts_cleared": true,
+      "live_readback_disabled": true
+    }
+  ],
+  "pulse_requested_at_utc": "2026-11-09T03:33:56.624Z",
+  "browser_warnings_or_errors": []
+}

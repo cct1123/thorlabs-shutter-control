@@ -1,0 +1,36 @@
+{
+  "requirement": "REQ-255",
+  "test": "TEST-255",
+  "scope": "Actual explicitly authorized passive protected recovery through shared API; no output/settings command",
+  "started_at_utc": "2026-11-09T03:31:19.589490+00:00",
+  "status": {
+    "name": "shutter",
+    "channel": 0,
+    "serial_number": "68800777",
+    "endpoint": "192.168.1.19:40305",
+    "has_device": true,
+    "identity": {
+      "serial_number": "68800777",
+      "model": "KSC101",
+      "firmware": "1.0.7",
+      "hardware_version": 3,
+      "channels": 1
+    },
+    "generation": 1,
+    "operating_mode": "manual",
+    "interlock_required": true,
+    "status_bits": 8192,
+    "electrical_state": "off",
+    "electrical_observed_at": "2026-11-09T03:31:19.707084+00:00",
+    "requested_state": null,
+    "error": null,
+    "cleanup": "Protected recovery verified Manual/OFF; no output command sent",
+    "optical_closed_at": "2026-11-09T03:31:19.707084+00:00",
+    "optical_evidence": "User explicitly confirmed independent beam block, isolated triggers, intact key/interlock and visibly closed blade for this bounded redo; records/webui-redo-bounded-authorization.json. Human report, not a sensor measurement.",
+    "cycle_parameters": null,
+    "settings_observed_at": null,
+    "settings_persistence": null
+  },
+  "result": "PASS: protected passive recovery and release completed",
+  "finished_at_utc": "2026-11-09T03:31:19.707084+00:00"
+}

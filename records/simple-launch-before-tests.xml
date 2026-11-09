@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="4" time="0.290" timestamp="2026-11-08T21:44:03.989831-06:00" hostname="HighFieldSetup"><testcase classname="tests.test_application" name="test_cli_reads_share_owner_schema_and_release[identify]" file="tests\test_application.py" line="69" time="0.008" /><testcase classname="tests.test_application" name="test_cli_reads_share_owner_schema_and_release[status]" file="tests\test_application.py" line="69" time="0.008" /><testcase classname="tests.test_application" name="test_cli_gui_transfers_cleanup_ownership_once[argv0-config/shutter.ethernet.toml-9860]" file="tests\test_application.py" line="253" time="0.003"><failure message="AssertionError: assert (['shutters.local.toml'] == ['config/shut...thernet.toml']&#10;  &#10;  At index 0 diff: 'shutters.local.toml' != 'config/shutter.ethernet.toml'&#10;  Use -v to get more diff)">bench = (&lt;thorlabs_shutter_control.controller.ShutterHub object at 0x000001E5872040B0&gt;, [], &lt;function bench.&lt;locals&gt;.factory a...1E587209800&gt;, WindowsPath('C:/repo/thorlabs-shutter-control/tmp/simple-launch-before/test_cli_gui_transfers_cleanup0'))
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001E587204440&gt;
+argv = ['gui'], config_path = 'config/shutter.ethernet.toml', port = 9860
+
+    @pytest.mark.parametrize(
+        "argv,config_path,port",
+        [
+            (["gui"], "config/shutter.ethernet.toml", 9860),
+            (["--config", "custom.toml", "gui", "--port", "9874"], "custom.toml", 9874),
+        ],
+    )
+    def test_cli_gui_transfers_cleanup_ownership_once(bench, monkeypatch, argv, config_path, port):
+        from thorlabs_shutter_control import __main__ as cli
+        from thorlabs_shutter_control import gui
+    
+        hub, devices, _, _ = bench
+        releases = []
+        paths, served = [], []
+    
+        def configured(path):
+            paths.append(path)
+            return hub.configs
+    
+        monkeypatch.setattr(cli, "load_config", configured)
+        monkeypatch.setattr(cli, "ShutterHub", lambda configs: hub)
+        monkeypatch.setattr(
+            gui, "create_app", lambda owner: SimpleNamespace(run=lambda **kw: served.append(kw))
+        )
+        monkeypatch.setattr(hub, "close", lambda: releases.append("release"))
+        assert cli.main(argv) == 0
+&gt;       assert paths == [config_path] and served[0]["port"] == port
+E       AssertionError: assert (['shutters.local.toml'] == ['config/shut...thernet.toml']
+E         
+E         At index 0 diff: 'shutters.local.toml' != 'config/shutter.ethernet.toml'
+E         Use -v to get more diff)
+
+tests\test_application.py:280: AssertionError</failure></testcase><testcase classname="tests.test_application" name="test_cli_gui_transfers_cleanup_ownership_once[argv1-custom.toml-9874]" file="tests\test_application.py" line="253" time="0.004" /></testsuite></testsuites>

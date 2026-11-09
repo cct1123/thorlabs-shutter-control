@@ -1,0 +1,35 @@
+{
+  "scope": "software only; no device or network I/O",
+  "policy": {
+    "evidence": "PROJECT.md exact Ethernet ON/OFF request and user SH05R/safe confirmation 2026-11-06; SRC-009 SH05R manual. Source protection/trigger isolation required for physical use; optical state remains unmeasured.",
+    "shutter_model": "SH05R",
+    "off_optical_state": "closed",
+    "min_off_s": 0.0,
+    "continuous_on_allowed": true,
+    "max_on_s": null,
+    "max_duty_fraction": 1.0,
+    "allow_persistent_mode_changes": false,
+    "qualified_modes": [
+      "manual",
+      "single",
+      "auto",
+      "triggered"
+    ],
+    "allow_device_settings": false,
+    "allow_persistent_settings": false,
+    "allow_continuous_cycles": false,
+    "max_cycle_count": 1
+  },
+  "tests": {
+    "passed": 362,
+    "xml": "records/native-policy-removal-tests.xml"
+  },
+  "annotation_3": "declined; interlock and fresh OFF checks retained",
+  "sha256": {
+    "src/thorlabs_shutter_control/controller.py": "8e0c1f84149c6545a5d09a64d40d3403cf00dd5a878ef91300d54198e6e2af44",
+    "config/shutter.ethernet.toml": "74edde22307353c8bfb949494683256aec6acf2e9b7befd152e51cfe9db0e386",
+    "tests/test_native_controls.py": "cf1c3f20cde24534320b8f131582532e2b67ab547bce03d4755a22a3b9ea604c",
+    "tests/test_owner.py": "d475329ef90df5b84b2d4bbb18d8f3b62130b0d805c95b06d19d62f1312b4c95",
+    "tests/test_webui_live_regressions.py": "31fcd4e5144e0916daf7eadbf1f4507c2570fe255dac74f9ee84f84c5cc1d1a6"
+  }
+}

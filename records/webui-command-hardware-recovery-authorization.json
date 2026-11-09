@@ -1,0 +1,14 @@
+{
+  "scope": "Read-only copy of actual persisted fault; original retained",
+  "path": "C:\\Users\\HFNV\\AppData\\Local\\KSC101Control\\ownership-v1\\uncertain-68800777",
+  "sha256": "5721b37ea9ec762800a8d308d7ea877bd0ab2a10ab49ee0b55b5a355bedd76e2",
+  "text": "2026-11-08T23:58:00.357925+00:00 original=; latest=; cleanup=Safe state unconfirmed: ",
+  "human_report": "Conditions confirmed; recover and run one pulse",
+  "conditions_confirmed": [
+    "beam independently blocked",
+    "external triggers isolated",
+    "key/interlock intact",
+    "blade visibly closed"
+  ],
+  "allowed": "documented passive protected recovery, exactly one1s Manual GUI pulse after >=2s OFF rest, final OFF/readback/release; no settings changes"
+}

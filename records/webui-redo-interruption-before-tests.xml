@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="3" time="0.236" timestamp="2026-11-08T18:28:44.591849-06:00" hostname="HighFieldSetup"><testcase classname="tests.test_owner" name="test_empty_text_pulse_failure_blocks_on_until_protected_recovery[KeyboardInterrupt]" file="tests\test_owner.py" line="500" time="0.013"><failure message="Failed: DID NOT RAISE ShutterError">bench = (&lt;thorlabs_shutter_control.controller.ShutterHub object at 0x000002EAC38D4230&gt;, [&lt;conftest.FakeTransport object at 0x0...0&gt;, WindowsPath('C:/repo/thorlabs-shutter-control/tmp/webui-redo-interruption-before/test_empty_text_pulse_failure_0'))
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000002EAC38A4770&gt;
+error_type = &lt;class 'KeyboardInterrupt'&gt;
+
+    @pytest.mark.parametrize("error_type", [KeyboardInterrupt, ShutterError])
+    def test_empty_text_pulse_failure_blocks_on_until_protected_recovery(
+        bench, monkeypatch, error_type
+    ):
+        hub, devices, _, path = bench
+        hub.connect("beam")
+    
+        def interrupted_hold(timeout):
+            raise error_type()
+    
+        with monkeypatch.context() as patch:
+            patch.setattr(hub._channel("beam").cancel, "wait", interrupted_hold)
+            with pytest.raises(error_type):
+                hub.pulse("beam", 0.001)
+        status = hub.get_status("beam")
+        before = len(devices[0].output_frames)
+&gt;       with pytest.raises(ShutterError, match="lockout"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ShutterError
+
+tests\test_owner.py:517: Failed</failure></testcase><testcase classname="tests.test_owner" name="test_empty_text_pulse_failure_blocks_on_until_protected_recovery[ShutterError]" file="tests\test_owner.py" line="500" time="0.012"><failure message="Failed: DID NOT RAISE ShutterError">bench = (&lt;thorlabs_shutter_control.controller.ShutterHub object at 0x000002EAC38A4CB0&gt;, [&lt;conftest.FakeTransport object at 0x0...0&gt;, WindowsPath('C:/repo/thorlabs-shutter-control/tmp/webui-redo-interruption-before/test_empty_text_pulse_failure_1'))
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000002EAC38A6900&gt;
+error_type = &lt;class 'thorlabs_shutter_control.protocol.ShutterError'&gt;
+
+    @pytest.mark.parametrize("error_type", [KeyboardInterrupt, ShutterError])
+    def test_empty_text_pulse_failure_blocks_on_until_protected_recovery(
+        bench, monkeypatch, error_type
+    ):
+        hub, devices, _, path = bench
+        hub.connect("beam")
+    
+        def interrupted_hold(timeout):
+            raise error_type()
+    
+        with monkeypatch.context() as patch:
+            patch.setattr(hub._channel("beam").cancel, "wait", interrupted_hold)
+            with pytest.raises(error_type):
+                hub.pulse("beam", 0.001)
+        status = hub.get_status("beam")
+        before = len(devices[0].output_frames)
+&gt;       with pytest.raises(ShutterError, match="lockout"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ShutterError
+
+tests\test_owner.py:517: Failed</failure></testcase><testcase classname="tests.test_owner" name="test_empty_text_connection_failure_keeps_a_visible_error" file="tests\test_owner.py" line="536" time="0.003"><failure message="AssertionError: assert ('' == 'KeyboardInterrupt'&#10;  &#10;  - KeyboardInterrupt)">config = ControllerConfig(name='beam', channel=0, role='fictional beam role', serial_number='68000001', firmware=('1.0.7',), ro...al',), allow_device_settings=False, allow_persistent_settings=False, allow_continuous_cycles=False, max_cycle_count=1))
+tmp_path = WindowsPath('C:/repo/thorlabs-shutter-control/tmp/webui-redo-interruption-before/test_empty_text_connection_fai0')
+
+    def test_empty_text_connection_failure_keeps_a_visible_error(config, tmp_path):
+        def interrupted_open(config, deadline):
+            raise KeyboardInterrupt()
+    
+        with ShutterHub(
+            [config], transport_factory=interrupted_open, lock_directory=tmp_path
+        ) as hub:
+            with pytest.raises(KeyboardInterrupt):
+                hub.connect("beam")
+            snapshot = hub.connection_snapshot("beam")
+&gt;           assert snapshot.error == "KeyboardInterrupt" and not snapshot.has_device
+E           AssertionError: assert ('' == 'KeyboardInterrupt'
+E             
+E             - KeyboardInterrupt)
+
+tests\test_owner.py:547: AssertionError</failure></testcase></testsuite></testsuites>

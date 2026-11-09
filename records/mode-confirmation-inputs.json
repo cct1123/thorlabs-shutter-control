@@ -1,0 +1,7 @@
+{
+  "src/thorlabs_shutter_control/controller.py": "c343cd31200094c0e29c36919131768da877228415b4e3ffee9a69c25b9cd502",
+  "src/thorlabs_shutter_control/gui.py": "b38b9298527c3c80b743cdb567d004961b98a97731ecb6ee2dfea32baf63f19a",
+  "src/thorlabs_shutter_control/__main__.py": "5fd1c09d0b63e71867991f1f3410a541c7b0708063346a4a5637664ba5cfbd4a",
+  "tests/test_owner.py": "828e7b23f3af3af5e58e665740c31f6cc5a026c15dd21da7459f779bc88fa90f",
+  "tests/test_native_controls.py": "2a12d2308d10d22be6d0c3865e9fa7026110dde3de5651c4199db9670ca9da7f"
+}

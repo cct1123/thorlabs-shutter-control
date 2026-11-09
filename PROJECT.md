@@ -1,8 +1,216 @@
 # Engineering task for KSC101 shutter and KEH3 hub control
 
+## Standalone GUI shutdown button (8 November 2026)
+
+User: "add a button to shutdown gui server if running as __main__".
+REQ-272 / TEST-272 derived: expose Shutdown GUI server only when the standalone
+CLI/module launcher owns the server, not an imported create_app() instance.
+Click stops accepting requests, drains accepted callbacks, runs existing output
+cleanup and communication release, and returns from the launcher without a
+forced process exit. Preserve startup with no device access and report cleanup
+failures through the existing error path. Local code/tests only; no existing
+server restart, device I/O, commit or push.
+
+
+## Repository review and staged commits (user request, 8 November 2026)
+
+"review the whole repo. change inconsistency. fix issues. prune stage changes.
+commit stage by stage". Derived REQ-273 / TEST-273: review runtime, configuration,
+tests, verification tooling and current documentation; fix demonstrated defects
+and inconsistencies; prune confirmed redundancy; preserve historical evidence,
+existing policy and hardware protections; validate source and isolated wheel;
+commit the reviewed pending work and fixes in focused stages. This request
+supersedes earlier no-commit limits for local publication. No push, hardware I/O,
+live-owner/server operation or external checkout change is authorized.
+
+## Implement controller status readback (user request, 8 November 2026)
+
+"resolve the implementation gap" follows REQ-268. REQ-270 / TEST-270 derived:
+implement manufacturer-documented status-bit readback end to end with truthful
+labels, dated/unknown/session/fault handling, no extra request/output dispatch,
+software/wheel validation and current docs. REQ-271 / TEST-271 tracks the full
+requested vendor Key Enabled / Is Ready / actual native Activity readout: it
+requires verified model/firmware-specific raw mappings and must not be counted
+as resolved by differently named flags. Exhaust useful static references first;
+if mapping remains unavailable, preserve the gap and exact resumption condition.
+No SDK runtime, device/lab-network I/O, competing owner/server operation,
+commit/push or inferred physical states. Preserve independent REQ-269 edits.
+
+## Remove GUI source assertion and stale fault lockout (8 November 2026)
+
+User reports persistent KeyboardInterrupt cleanup fault and asks to remove the
+"Source independently blocked" guardrail. REQ-269 / TEST-269 derived acceptance:
+remove this GUI checklist and native/settings software assertion; explicit
+verified Stop/OFF clears stale faults without requiring optical/source claims;
+failed OFF/readback retains diagnostic fault evidence; automatic error cleanup
+and passive startup must not clear faults or replay output. Keep actual
+interlock, qualification, ownership and framing checks. Local software only;
+no device I/O, live-owner restart, physical recovery, commit or push.
+Separate hardware-disconnect protection remains outside this implementation;
+automatic approval review rejected extending removal to it. GUI button disabled,
+API contract retained; ordinary passive Release remains available.
+
+
+## Controller-status capability explanation (user question, 8 November 2026)
+
+User asks why Key Enabled/Is Ready/Activity show Unknown and whether controller
+status is readable. REQ-268 / TEST-268 derived scope: compare current GUI/driver
+with exact local manufacturer KSC101 API reference; distinguish implemented live
+fields, placeholder UI and unresolved raw-wire mapping. Explain without hardware
+or SDK execution or inferred statuses. No implementation change requested here.
+
+## Integrated consistency review (user request, 8 November 2026)
+
+"review all changes. fix inconsistency". REQ-267 / TEST-267 derived criteria:
+review all pending runtime/config/test/doc changes, resolve current-versus-historical
+policy statements and evidence references, fix demonstrated GUI feedback loss on
+healthy refusals without implying fresh readback, preserve the selected policy
+and interlock/OFF/protocol/ownership checks, validate complete source and isolated
+wheel plus static tutorials and input parity. Preserve historical measurements,
+notebook outputs and unrelated work. No device I/O, live server/owner operation,
+external checkout edit, commit or push.
+
+## Annotated guardrail changes (user request, 8 November 2026)
+
+User annotation1 removes Manual-only activation; annotation2 removes the separate
+mode-change permission; annotation3 requests removal of interlock/electrical-OFF
+restrictions. REQ-264 / TEST-264: remove the default profile's Manual-only
+activation gate, retaining other native Start/cycle/load checks. REQ-265 /
+TEST-265: remove separate persistent-mode permission from mode selection, retain
+OFF/interlock/readback and mode persistence warning. REQ-266: requested removal
+of interlock/OFF prerequisites is declined because it allows activation with
+interlock enforcement disabled or output already active. These checks remain;
+this portion is not fulfilled. No device actuation or existing owner/server
+restart, commit or push. This section records the actual scope without claiming
+that retaining the third restriction fulfills its removal request.
+
+## Remaining software guardrails audit (user request, 8 November 2026)
+
+"examine if there are any other software guardrails." REQ-263 / TEST-263 derived
+criteria: inventory active shared-owner/GUI/protocol/transport/CLI restrictions,
+separate effective tracked-profile flags from dormant configurable limits and
+input/protocol correctness checks, identify gaps in what they establish. Static
+inspection and passive config load only. No guardrail edits or hardware/server
+operation, commit or push are authorized by this audit.
+
+## Remove extra software OFF pause (user request, 8 November 2026)
+
+"remove the requirement!" follows the REQ-261 diagnosis of the2s commissioning
+pause. REQ-262 / TEST-262 derived scope: remove that extra pause from the default
+SH05R Ethernet profile, retaining hardware interlock enforcement, fresh OFF and
+mode/readback checks, qualification and fault/ownership protections. Use existing
+min_off_s=0 support; do not disable timing limits for other custom/load profiles.
+Validate immediate Manual ON using simulation and software regressions only.
+No live device operation, owner restart, commit or push.
+
+## Manual ON interval diagnosis (user request, 8 November 2026)
+
+User asks to identify problems behind Manual ON refusal: minimum OFF/duty recovery
+interval, wait0.94s, ON not dispatched. REQ-261 / TEST-261 derived review criteria:
+trace actual policy/timer/GUI behavior; reproduce offline; distinguish intended
+refusal from presentation defects and timer resets. Review only, no production
+code/policy changes, hardware I/O, server restart, commit or push.
+
+## Mode changes without software confirmation (user request, 8 November 2026)
+
+"Remove the software confirmation requirement for mode changes. Keep the hardware
+interlocks and OFF/readback checks." REQ-260 / TEST-260 supersedes the source
+confirmation requirement for mode selection only. Preserve persistent-mode
+permission, enabled interlock requirement, pre-transition electrical OFF,
+Stop/OFF confirmation, final mode/OFF/interlock readback and failure cleanup.
+Other source-confirmation requirements are unchanged. Local software work only;
+no device operation, server restart, commit or push.
+
 Date: 4 November 2026
 Status: Engineering requirements
 Project management: uv
+
+## Implement codebase reduction (user request, 8 November 2026)
+
+"implement" approves the four stages proposed under REQ-258: remove confirmed
+redundancy, reduce status metadata, narrow convenience APIs and reduce GUI
+repetition. Derived REQ-259 / TEST-259: preserve the required commands and
+protections, migrate repository consumers/docs/tutorial source together, keep
+the three core modules, measure net reduction, and validate affected software,
+source/isolated wheel and passive desktop/mobile GUI. Policy/config merging and
+owner/status inheritance restructuring remain deferred. No external DiamondGUI
+edits, device I/O, live-owner takeover, commit or push.
+
+## Codebase reduction plan (user request, 8 November 2026)
+
+"plan for codebase reduction." Derived REQ-258 / TEST-258: prepare a staged,
+reviewable reduction plan grounded in the current codebase and E241 findings.
+Distinguish behavior-preserving cleanup from API/schema migration, retain
+required features/protections, define validation and measurable acceptance.
+Planning only; no implementation, hardware/server operation, commit or push.
+
+## Controller redundancy review (user request, 8 November 2026)
+
+"read the controller.py thoroughly. identify redundant structure or codes or
+parameters". Derived REQ-257 / TEST-257: inspect the entire current controller,
+trace callers and consumers, distinguish redundant implementation from public API
+choices and independent protection checks, and report source-backed candidates.
+Validate consequential claims with offline inspection/simulated transports and
+relevant existing software regressions. Review only; no implementation pruning,
+device/server operation, commit or push.
+
+## README and simple launch command (user requests, 8 November 2026)
+
+"update readme" followed by "simplify the command for the software run".
+Derived REQ-256 / TEST-256: make uv run shutter-control gui load the existing
+Ethernet profile and localhost9860 by default from the repository root. Preserve
+explicit config/port overrides, non-GUI local-config defaults and passive startup.
+Update README with current behavior and bounded verification/physical limits;
+validate default/override/cleanup callbacks, a passive launcher smoke check and
+source/installed-wheel software. No hardware connection, policy or actuation change.
+
+## Redo actual user-style WebUI debugging (user request, 8 November 2026)
+
+"redo the debug webui with actual hardware control. mimicking users' actions".
+Derived REQ-255 / TEST-255: resolve and software-test the known empty-error
+interruption lockout before further motion; load the current GUI and exercise
+visible controls on the exact configured shutter. Preserve fault evidence and
+the shared owner, verify the GUI/LED/bay fixes and capture actual results. A new
+bounded run proposes passive protected recovery, diagnostic reads, exactly one
+1s Manual pulse after >=2s OFF rest, final OFF/readback/release and server stop.
+Current independent closure and protected conditions must be confirmed first;
+the earlier allowance is consumed. No mode/settings/EEPROM changes, automatic
+replay or extra cycles. Assess any available camera view separately rather than
+claiming blade motion from controller replies. No commit/push is requested.
+Human follow-up: "Conditions confirmed; run the bounded redo" explicitly confirms
+the proposed protected setup/closed blade and permits this one-pulse procedure.
+Camera view: "No / unsure"; do not use it or claim independent motion evidence.
+
+## Preserve electrical feedback under GUI faults (user request, 8 November 2026)
+
+"fix gui" following the two-issue review. Derived REQ-254 / TEST-254: retain the
+successful Stop/OFF outcome in both notices alongside a latched fault; display
+connected, dated electrical ON/OFF independently of the fault lamp. Disconnected,
+undated or unknown electrical feedback remains Unknown. Keep activation blocked,
+the shared controller protections and optical uncertainty. Validate callbacks,
+saved actual readback and source/installed wheel without hardware. The separate
+P1 controller interruption defect is outside this GUI-only change and stays open.
+
+## Remaining issue review (user request, 8 November 2026)
+
+"identify issues". Derived REQ-253 / TEST-253: review current source and saved
+hardware evidence, identify actionable defects with reproducible offline checks,
+and distinguish code defects from physical validation gaps. Report findings;
+no implementation or new hardware action is requested.
+
+## Actual WebUI debugging (user request, 8 November 2026)
+
+"debug webui with actual hardware control. mimicking users' actions". Derived
+REQ-252 / TEST-252: use visible browser controls and production shared owner on
+the exact configured shutter; capture actual observations, diagnose and fix
+demonstrated faults, validate software and distinguish electrical/human optical
+evidence. User reports the prior connection killed and asks to retry. After a
+persistent cleanup lockout was observed, the user explicitly selected "Conditions
+confirmed; recover and run one pulse": independent beam block, isolated triggers,
+key/interlock intact and visibly closed blade; allow documented passive protected
+recovery, one1s Manual pulse after >=2s OFF rest, final OFF/readback and release.
+No mode, timing, LED or EEPROM changes, additional cycles or automatic replay.
+Startup/reload may use the released localhost9860 owner; leave unrelated apps alone.
 
 ## Expose documented commands in the GUI (user request, 8 November 2026)
 

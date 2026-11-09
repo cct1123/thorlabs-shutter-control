@@ -1,0 +1,36 @@
+{
+  "scope": "Actual hardware preparation using documented shared API; separate from visible GUI actions",
+  "started_at_utc": "2026-11-09T00:03:12.375704+00:00",
+  "human_authorization": "Conditions confirmed; recover and run one pulse",
+  "output_commands_requested": false,
+  "status": {
+    "name": "shutter",
+    "channel": 0,
+    "serial_number": "68800777",
+    "endpoint": "192.168.1.19:40305",
+    "has_device": true,
+    "identity": {
+      "serial_number": "68800777",
+      "model": "KSC101",
+      "firmware": "1.0.7",
+      "hardware_version": 3,
+      "channels": 1
+    },
+    "generation": 1,
+    "operating_mode": "manual",
+    "interlock_required": true,
+    "status_bits": 8192,
+    "electrical_state": "off",
+    "electrical_observed_at": "2026-11-09T00:03:12.481870+00:00",
+    "requested_state": null,
+    "error": null,
+    "cleanup": "Protected recovery verified Manual/OFF; no output command sent",
+    "optical_closed_at": "2026-11-09T00:03:12.481870+00:00",
+    "optical_evidence": "User confirmed independent beam block, isolated triggers, intact key/interlock and visibly closed blade in this chat on 2026-11-08; see webui-command-hardware-recovery-authorization.json. Human report, not an optical measurement.",
+    "cycle_parameters": null,
+    "settings_observed_at": null,
+    "settings_persistence": null
+  },
+  "result": "PASS: protected passive verification and release completed",
+  "finished_at_utc": "2026-11-09T00:03:12.481870+00:00"
+}

@@ -1,0 +1,41 @@
+{
+  "python_lines_before": 3180,
+  "status_field_count": 17,
+  "layout_and_callback_parity": "PASS after accounting only for REQ-260 profile-note text change; reduction alone matched exactly.",
+  "verification_inputs_still_match": true,
+  "tests": {
+    "offline": {
+      "tests": 359,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wheel": {
+      "tests": 359,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "first_verified_reduction_lines_after": 3142,
+  "reduction_task_lines_removed": 38,
+  "first_verified_counts": {
+    "src\\thorlabs_shutter_control\\controller.py": 1502,
+    "src\\thorlabs_shutter_control\\gui.py": 972,
+    "src\\thorlabs_shutter_control\\protocol.py": 283,
+    "src\\thorlabs_shutter_control\\transport.py": 250,
+    "src\\thorlabs_shutter_control\\__init__.py": 24,
+    "src\\thorlabs_shutter_control\\__main__.py": 111
+  },
+  "combined_counts_after": {
+    "src\\thorlabs_shutter_control\\controller.py": 1497,
+    "src\\thorlabs_shutter_control\\gui.py": 973,
+    "src\\thorlabs_shutter_control\\protocol.py": 283,
+    "src\\thorlabs_shutter_control\\transport.py": 250,
+    "src\\thorlabs_shutter_control\\__init__.py": 24,
+    "src\\thorlabs_shutter_control\\__main__.py": 109
+  },
+  "combined_python_lines_after": 3136,
+  "combined_tree_note": "Concurrent REQ-260 mode-confirmation edits are preserved and excluded from reduction-task savings.",
+  "final_evidence": "records/code-reduction-final-direct-validation.json"
+}

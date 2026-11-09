@@ -1,0 +1,1622 @@
+{
+  "layout": {
+    "props": {
+      "children": [
+        {
+          "props": {
+            "children": [
+              {
+                "props": {
+                  "children": [
+                    {
+                      "props": {
+                        "children": "DIRECT APT CONTROL",
+                        "className": "eyebrow"
+                      },
+                      "type": "P",
+                      "namespace": "dash_html_components"
+                    },
+                    {
+                      "props": {
+                        "children": "Shutter controller"
+                      },
+                      "type": "H1",
+                      "namespace": "dash_html_components"
+                    }
+                  ]
+                },
+                "type": "Div",
+                "namespace": "dash_html_components"
+              },
+              {
+                "props": {
+                  "children": "LOCALHOST",
+                  "className": "local-badge"
+                },
+                "type": "Span",
+                "namespace": "dash_html_components"
+              }
+            ],
+            "className": "page-heading"
+          },
+          "type": "Div",
+          "namespace": "dash_html_components"
+        },
+        {
+          "props": {
+            "children": [
+              {
+                "props": {
+                  "children": "Configured controller",
+                  "htmlFor": "target"
+                },
+                "type": "Label",
+                "namespace": "dash_html_components"
+              },
+              {
+                "props": {
+                  "options": [
+                    "shutter"
+                  ],
+                  "clearable": false,
+                  "placeholder": "Select an exact controller",
+                  "id": "target"
+                },
+                "type": "Dropdown",
+                "namespace": "dash_core_components"
+              },
+              {
+                "props": {
+                  "children": "Connect",
+                  "id": "connect",
+                  "className": "utility"
+                },
+                "type": "Button",
+                "namespace": "dash_html_components"
+              },
+              {
+                "props": {
+                  "children": "Read state",
+                  "id": "read",
+                  "className": "utility"
+                },
+                "type": "Button",
+                "namespace": "dash_html_components"
+              },
+              {
+                "props": {
+                  "children": "Release",
+                  "id": "release",
+                  "className": "utility"
+                },
+                "type": "Button",
+                "namespace": "dash_html_components"
+              }
+            ],
+            "className": "connection-bar"
+          },
+          "type": "Div",
+          "namespace": "dash_html_components"
+        },
+        {
+          "props": {
+            "children": [
+              {
+                "props": {
+                  "children": [
+                    {
+                      "props": {
+                        "children": "K-Cube Solenoid Controller"
+                      },
+                      "type": "Span",
+                      "namespace": "dash_html_components"
+                    },
+                    {
+                      "props": {
+                        "children": "S/N \u2014",
+                        "id": "serial-label"
+                      },
+                      "type": "Span",
+                      "namespace": "dash_html_components"
+                    }
+                  ],
+                  "className": "instrument-title"
+                },
+                "type": "Header",
+                "namespace": "dash_html_components"
+              },
+              {
+                "props": {
+                  "children": [
+                    {
+                      "props": {
+                        "children": [
+                          {
+                            "props": {
+                              "children": "Operating mode",
+                              "className": "panel-heading"
+                            },
+                            "type": "H2",
+                            "namespace": "dash_html_components"
+                          },
+                          {
+                            "props": {
+                              "children": [
+                                {
+                                  "props": {
+                                    "children": [
+                                      {
+                                        "props": {
+                                          "children": "M",
+                                          "className": "mode-icon"
+                                        },
+                                        "type": "Span",
+                                        "namespace": "dash_html_components"
+                                      },
+                                      {
+                                        "props": {
+                                          "children": "Manual"
+                                        },
+                                        "type": "Span",
+                                        "namespace": "dash_html_components"
+                                      },
+                                      {
+                                        "props": {
+                                          "children": null,
+                                          "className": "mode-dot"
+                                        },
+                                        "type": "Span",
+                                        "namespace": "dash_html_components"
+                                      }
+                                    ],
+                                    "id": "manual",
+                                    "className": "mode-button",
+                                    "title": "Direct Open / Close; no implicit mode change"
+                                  },
+                                  "type": "Button",
+                                  "namespace": "dash_html_components"
+                                },
+                                {
+                                  "props": {
+                                    "children": [
+                                      {
+                                        "props": {
+                                          "children": "1",
+                                          "className": "mode-icon"
+                                        },
+                                        "type": "Span",
+                                        "namespace": "dash_html_components"
+                                      },
+                                      {
+                                        "props": {
+                                          "children": "Single"
+                                        },
+                                        "type": "Span",
+                                        "namespace": "dash_html_components"
+                                      },
+                                      {
+                                        "props": {
+                                          "children": null,
+                                          "className": "mode-dot"
+                                        },
+                                        "type": "Span",
+                                        "namespace": "dash_html_components"
+                                      }
+                                    ],
+                                    "id": "single",
+                                    "className": "mode-button",
+                                    "title": "One controller-timed ON interval"
+                                  },
+                                  "type": "Button",
+                                  "namespace": "dash_html_components"
+                                },
+                                {
+                                  "props": {
+                                    "children": [
+                                      {
+                                        "props": {
+                                          "children": "\u21bb",
+                                          "className": "mode-icon"
+                                        },
+                                        "type": "Span",
+                                        "namespace": "dash_html_components"
+                                      },
+                                      {
+                                        "props": {
+                                          "children": "Auto"
+                                        },
+                                        "type": "Span",
+                                        "namespace": "dash_html_components"
+                                      },
+                                      {
+                                        "props": {
+                                          "children": null,
+                                          "className": "mode-dot"
+                                        },
+                                        "type": "Span",
+                                        "namespace": "dash_html_components"
+                                      }
+                                    ],
+                                    "id": "auto",
+                                    "className": "mode-button",
+                                    "title": "Native cycles with device timing and count"
+                                  },
+                                  "type": "Button",
+                                  "namespace": "dash_html_components"
+                                },
+                                {
+                                  "props": {
+                                    "children": [
+                                      {
+                                        "props": {
+                                          "children": "\u2197",
+                                          "className": "mode-icon"
+                                        },
+                                        "type": "Span",
+                                        "namespace": "dash_html_components"
+                                      },
+                                      {
+                                        "props": {
+                                          "children": "Triggered"
+                                        },
+                                        "type": "Span",
+                                        "namespace": "dash_html_components"
+                                      },
+                                      {
+                                        "props": {
+                                          "children": null,
+                                          "className": "mode-dot"
+                                        },
+                                        "type": "Span",
+                                        "namespace": "dash_html_components"
+                                      }
+                                    ],
+                                    "id": "triggered",
+                                    "className": "mode-button",
+                                    "title": "External-trigger mode; priming is separate"
+                                  },
+                                  "type": "Button",
+                                  "namespace": "dash_html_components"
+                                }
+                              ],
+                              "className": "mode-grid"
+                            },
+                            "type": "Div",
+                            "namespace": "dash_html_components"
+                          },
+                          {
+                            "props": {
+                              "children": [
+                                {
+                                  "props": {
+                                    "children": "On duration"
+                                  },
+                                  "type": "Span",
+                                  "namespace": "dash_html_components"
+                                },
+                                {
+                                  "props": {
+                                    "children": "Not read",
+                                    "id": "on-duration"
+                                  },
+                                  "type": "Strong",
+                                  "namespace": "dash_html_components"
+                                },
+                                {
+                                  "props": {
+                                    "children": "Off duration"
+                                  },
+                                  "type": "Span",
+                                  "namespace": "dash_html_components"
+                                },
+                                {
+                                  "props": {
+                                    "children": "Not read",
+                                    "id": "off-duration"
+                                  },
+                                  "type": "Strong",
+                                  "namespace": "dash_html_components"
+                                },
+                                {
+                                  "props": {
+                                    "children": "Cycles"
+                                  },
+                                  "type": "Span",
+                                  "namespace": "dash_html_components"
+                                },
+                                {
+                                  "props": {
+                                    "children": "Not read",
+                                    "id": "cycle-count"
+                                  },
+                                  "type": "Strong",
+                                  "namespace": "dash_html_components"
+                                }
+                              ],
+                              "className": "timing-readout"
+                            },
+                            "type": "Div",
+                            "namespace": "dash_html_components"
+                          }
+                        ],
+                        "className": "mode-column"
+                      },
+                      "type": "Div",
+                      "namespace": "dash_html_components"
+                    },
+                    {
+                      "props": {
+                        "children": [
+                          {
+                            "props": {
+                              "children": "Output control",
+                              "className": "panel-heading"
+                            },
+                            "type": "H2",
+                            "namespace": "dash_html_components"
+                          },
+                          {
+                            "props": {
+                              "children": [
+                                {
+                                  "props": {
+                                    "children": [
+                                      {
+                                        "props": {
+                                          "children": "\u25cb",
+                                          "className": "action-symbol"
+                                        },
+                                        "type": "Span",
+                                        "namespace": "dash_html_components"
+                                      },
+                                      {
+                                        "props": {
+                                          "children": "Open / ON",
+                                          "id": "on-label"
+                                        },
+                                        "type": "Span",
+                                        "namespace": "dash_html_components"
+                                      }
+                                    ],
+                                    "id": "on",
+                                    "className": "output-action open-action",
+                                    "title": "Open / Start in the current mode"
+                                  },
+                                  "type": "Button",
+                                  "namespace": "dash_html_components"
+                                },
+                                {
+                                  "props": {
+                                    "children": [
+                                      {
+                                        "props": {
+                                          "children": "\u25a0",
+                                          "className": "action-symbol"
+                                        },
+                                        "type": "Span",
+                                        "namespace": "dash_html_components"
+                                      },
+                                      {
+                                        "props": {
+                                          "children": "Close / OFF",
+                                          "id": "off-label"
+                                        },
+                                        "type": "Span",
+                                        "namespace": "dash_html_components"
+                                      }
+                                    ],
+                                    "id": "off",
+                                    "className": "output-action close-action",
+                                    "title": "Priority OFF; mode unchanged"
+                                  },
+                                  "type": "Button",
+                                  "namespace": "dash_html_components"
+                                }
+                              ],
+                              "className": "primary-actions"
+                            },
+                            "type": "Div",
+                            "namespace": "dash_html_components"
+                          },
+                          {
+                            "props": {
+                              "children": [
+                                {
+                                  "props": {
+                                    "children": "\u2699  Settings",
+                                    "id": "settings",
+                                    "className": "settings-button"
+                                  },
+                                  "type": "Button",
+                                  "namespace": "dash_html_components"
+                                },
+                                {
+                                  "props": {
+                                    "children": "1-second ON, then OFF",
+                                    "id": "pulse",
+                                    "className": "pulse-button",
+                                    "title": "One Manual host hold, then OFF"
+                                  },
+                                  "type": "Button",
+                                  "namespace": "dash_html_components"
+                                }
+                              ],
+                              "className": "secondary-actions"
+                            },
+                            "type": "Div",
+                            "namespace": "dash_html_components"
+                          },
+                          {
+                            "props": {
+                              "children": "Electrical output is not an optical position sensor.",
+                              "className": "output-note"
+                            },
+                            "type": "P",
+                            "namespace": "dash_html_components"
+                          }
+                        ],
+                        "className": "action-column"
+                      },
+                      "type": "Div",
+                      "namespace": "dash_html_components"
+                    },
+                    {
+                      "props": {
+                        "children": [
+                          {
+                            "props": {
+                              "children": "Controller status",
+                              "className": "panel-heading"
+                            },
+                            "type": "H2",
+                            "namespace": "dash_html_components"
+                          },
+                          {
+                            "props": {
+                              "children": [
+                                {
+                                  "props": {
+                                    "children": "Key Enabled"
+                                  },
+                                  "type": "Span",
+                                  "namespace": "dash_html_components"
+                                },
+                                {
+                                  "props": {
+                                    "children": "Unknown",
+                                    "id": "key-lamp-value",
+                                    "className": "lamp-value"
+                                  },
+                                  "type": "Span",
+                                  "namespace": "dash_html_components"
+                                },
+                                {
+                                  "props": {
+                                    "children": null,
+                                    "id": "key-lamp",
+                                    "className": "lamp unknown",
+                                    "role": "img",
+                                    "aria-label": "Key Enabled: Unknown"
+                                  },
+                                  "type": "Span",
+                                  "namespace": "dash_html_components"
+                                }
+                              ],
+                              "className": "indicator",
+                              "title": "Key position unavailable from verified APT feedback."
+                            },
+                            "type": "Div",
+                            "namespace": "dash_html_components"
+                          },
+                          {
+                            "props": {
+                              "children": [
+                                {
+                                  "props": {
+                                    "children": "Is Ready"
+                                  },
+                                  "type": "Span",
+                                  "namespace": "dash_html_components"
+                                },
+                                {
+                                  "props": {
+                                    "children": "Unknown",
+                                    "id": "ready-lamp-value",
+                                    "className": "lamp-value"
+                                  },
+                                  "type": "Span",
+                                  "namespace": "dash_html_components"
+                                },
+                                {
+                                  "props": {
+                                    "children": null,
+                                    "id": "ready-lamp",
+                                    "className": "lamp unknown",
+                                    "role": "img",
+                                    "aria-label": "Is Ready: Unknown"
+                                  },
+                                  "type": "Span",
+                                  "namespace": "dash_html_components"
+                                }
+                              ],
+                              "className": "indicator",
+                              "title": "Readiness is not inferred from output or policy."
+                            },
+                            "type": "Div",
+                            "namespace": "dash_html_components"
+                          },
+                          {
+                            "props": {
+                              "children": [
+                                {
+                                  "props": {
+                                    "children": "Error"
+                                  },
+                                  "type": "Span",
+                                  "namespace": "dash_html_components"
+                                },
+                                {
+                                  "props": {
+                                    "children": "Unknown",
+                                    "id": "error-lamp-value",
+                                    "className": "lamp-value"
+                                  },
+                                  "type": "Span",
+                                  "namespace": "dash_html_components"
+                                },
+                                {
+                                  "props": {
+                                    "children": null,
+                                    "id": "error-lamp",
+                                    "className": "lamp unknown",
+                                    "role": "img",
+                                    "aria-label": "Error: Unknown"
+                                  },
+                                  "type": "Span",
+                                  "namespace": "dash_html_components"
+                                }
+                              ],
+                              "className": "indicator",
+                              "title": "Reported fault; not all hardware faults are observable."
+                            },
+                            "type": "Div",
+                            "namespace": "dash_html_components"
+                          },
+                          {
+                            "props": {
+                              "children": null
+                            },
+                            "type": "Hr",
+                            "namespace": "dash_html_components"
+                          },
+                          {
+                            "props": {
+                              "children": [
+                                {
+                                  "props": {
+                                    "children": "Output ON"
+                                  },
+                                  "type": "Span",
+                                  "namespace": "dash_html_components"
+                                },
+                                {
+                                  "props": {
+                                    "children": "Unknown",
+                                    "id": "output-lamp-value",
+                                    "className": "lamp-value"
+                                  },
+                                  "type": "Span",
+                                  "namespace": "dash_html_components"
+                                },
+                                {
+                                  "props": {
+                                    "children": null,
+                                    "id": "output-lamp",
+                                    "className": "lamp unknown",
+                                    "role": "img",
+                                    "aria-label": "Output ON: Unknown"
+                                  },
+                                  "type": "Span",
+                                  "namespace": "dash_html_components"
+                                }
+                              ],
+                              "className": "indicator",
+                              "title": "Electrical output; not independent blade position."
+                            },
+                            "type": "Div",
+                            "namespace": "dash_html_components"
+                          },
+                          {
+                            "props": {
+                              "children": [
+                                {
+                                  "props": {
+                                    "children": "Activity"
+                                  },
+                                  "type": "Span",
+                                  "namespace": "dash_html_components"
+                                },
+                                {
+                                  "props": {
+                                    "children": "Unknown",
+                                    "id": "active-lamp-value",
+                                    "className": "lamp-value"
+                                  },
+                                  "type": "Span",
+                                  "namespace": "dash_html_components"
+                                },
+                                {
+                                  "props": {
+                                    "children": null,
+                                    "id": "active-lamp",
+                                    "className": "lamp unknown",
+                                    "role": "img",
+                                    "aria-label": "Activity: Unknown"
+                                  },
+                                  "type": "Span",
+                                  "namespace": "dash_html_components"
+                                }
+                              ],
+                              "className": "indicator",
+                              "title": "Start requested is not confirmed Active."
+                            },
+                            "type": "Div",
+                            "namespace": "dash_html_components"
+                          },
+                          {
+                            "props": {
+                              "children": [
+                                {
+                                  "props": {
+                                    "children": null,
+                                    "className": "identify-dot"
+                                  },
+                                  "type": "Span",
+                                  "namespace": "dash_html_components"
+                                },
+                                "Identify"
+                              ],
+                              "id": "identify",
+                              "className": "identify-button",
+                              "title": "Flash this controller's LEDs only"
+                            },
+                            "type": "Button",
+                            "namespace": "dash_html_components"
+                          }
+                        ],
+                        "className": "status-column"
+                      },
+                      "type": "Div",
+                      "namespace": "dash_html_components"
+                    }
+                  ],
+                  "className": "instrument-body"
+                },
+                "type": "Div",
+                "namespace": "dash_html_components"
+              },
+              {
+                "props": {
+                  "children": [
+                    {
+                      "props": {
+                        "children": "Disconnected",
+                        "id": "connection-label"
+                      },
+                      "type": "Span",
+                      "namespace": "dash_html_components"
+                    },
+                    {
+                      "props": {
+                        "children": "No controller selected",
+                        "id": "route-label"
+                      },
+                      "type": "Span",
+                      "namespace": "dash_html_components"
+                    }
+                  ],
+                  "className": "instrument-footer"
+                },
+                "type": "Footer",
+                "namespace": "dash_html_components"
+              }
+            ],
+            "className": "instrument"
+          },
+          "type": "Section",
+          "namespace": "dash_html_components"
+        },
+        {
+          "props": {
+            "children": [
+              {
+                "props": {
+                  "children": "No live feedback",
+                  "id": "readback-time"
+                },
+                "type": "Span",
+                "namespace": "dash_html_components"
+              },
+              {
+                "props": {
+                  "options": [
+                    {
+                      "label": "Live readback",
+                      "value": "live"
+                    }
+                  ],
+                  "value": [],
+                  "id": "live-readback"
+                },
+                "type": "Checklist",
+                "namespace": "dash_core_components"
+              }
+            ],
+            "className": "readback-bar"
+          },
+          "type": "Div",
+          "namespace": "dash_html_components"
+        },
+        {
+          "props": {
+            "children": "Select a controller, then Connect. Startup never opens a device.",
+            "id": "notice",
+            "className": "notice",
+            "role": "status"
+          },
+          "type": "Div",
+          "namespace": "dash_html_components"
+        },
+        {
+          "props": {
+            "options": [
+              {
+                "label": "Source independently blocked; external triggers isolated",
+                "value": "protected"
+              }
+            ],
+            "value": [],
+            "className": "source-confirmation",
+            "id": "source-inhibited"
+          },
+          "type": "Checklist",
+          "namespace": "dash_core_components"
+        },
+        {
+          "props": {
+            "children": "Mode changes persist. Source protection is an operator condition.",
+            "id": "profile-note",
+            "className": "profile-note"
+          },
+          "type": "P",
+          "namespace": "dash_html_components"
+        },
+        {
+          "props": {
+            "children": [
+              {
+                "props": {
+                  "children": [
+                    {
+                      "props": {
+                        "children": "Controller settings"
+                      },
+                      "type": "H2",
+                      "namespace": "dash_html_components"
+                    },
+                    {
+                      "props": {
+                        "children": "Stop / OFF",
+                        "id": "settings-stop",
+                        "className": "emergency"
+                      },
+                      "type": "Button",
+                      "namespace": "dash_html_components"
+                    },
+                    {
+                      "props": {
+                        "children": "Close settings",
+                        "id": "settings-close",
+                        "className": "utility"
+                      },
+                      "type": "Button",
+                      "namespace": "dash_html_components"
+                    }
+                  ],
+                  "className": "dialog-heading"
+                },
+                "type": "Header",
+                "namespace": "dash_html_components"
+              },
+              {
+                "props": {
+                  "children": [
+                    {
+                      "props": {
+                        "children": [
+                          {
+                            "props": {
+                              "children": [
+                                {
+                                  "props": {
+                                    "children": "Cycle settings"
+                                  },
+                                  "type": "Legend",
+                                  "namespace": "dash_html_components"
+                                },
+                                {
+                                  "props": {
+                                    "children": "On duration (ms)",
+                                    "htmlFor": "cycle-on"
+                                  },
+                                  "type": "Label",
+                                  "namespace": "dash_html_components"
+                                },
+                                {
+                                  "props": {
+                                    "type": "number",
+                                    "placeholder": "100\u201310000",
+                                    "min": 100,
+                                    "max": 10000,
+                                    "step": 1,
+                                    "id": "cycle-on"
+                                  },
+                                  "type": "Input",
+                                  "namespace": "dash_core_components"
+                                },
+                                {
+                                  "props": {
+                                    "children": "Off duration (ms)",
+                                    "htmlFor": "cycle-off"
+                                  },
+                                  "type": "Label",
+                                  "namespace": "dash_html_components"
+                                },
+                                {
+                                  "props": {
+                                    "type": "number",
+                                    "placeholder": "100\u201310000",
+                                    "min": 100,
+                                    "max": 10000,
+                                    "step": 1,
+                                    "id": "cycle-off"
+                                  },
+                                  "type": "Input",
+                                  "namespace": "dash_core_components"
+                                },
+                                {
+                                  "props": {
+                                    "children": "Cycle count",
+                                    "htmlFor": "cycles"
+                                  },
+                                  "type": "Label",
+                                  "namespace": "dash_html_components"
+                                },
+                                {
+                                  "props": {
+                                    "type": "number",
+                                    "placeholder": "1\u20131000000",
+                                    "min": 1,
+                                    "max": 1000000,
+                                    "step": 1,
+                                    "id": "cycles"
+                                  },
+                                  "type": "Input",
+                                  "namespace": "dash_core_components"
+                                },
+                                {
+                                  "props": {
+                                    "options": [
+                                      {
+                                        "label": "Continuous (count 0)",
+                                        "value": "continuous"
+                                      }
+                                    ],
+                                    "value": [],
+                                    "id": "continuous"
+                                  },
+                                  "type": "Checklist",
+                                  "namespace": "dash_core_components"
+                                },
+                                {
+                                  "props": {
+                                    "children": "Milliseconds. Opening this panel writes nothing.",
+                                    "className": "field-note"
+                                  },
+                                  "type": "P",
+                                  "namespace": "dash_html_components"
+                                },
+                                {
+                                  "props": {
+                                    "children": "Read device settings",
+                                    "id": "read-settings",
+                                    "className": "utility"
+                                  },
+                                  "type": "Button",
+                                  "namespace": "dash_html_components"
+                                }
+                              ],
+                              "className": "settings-group"
+                            },
+                            "type": "Fieldset",
+                            "namespace": "dash_html_components"
+                          },
+                          {
+                            "props": {
+                              "options": [
+                                {
+                                  "label": "Persist cycle settings to device EEPROM",
+                                  "value": "persist"
+                                }
+                              ],
+                              "value": [],
+                              "id": "persist"
+                            },
+                            "type": "Checklist",
+                            "namespace": "dash_core_components"
+                          },
+                          {
+                            "props": {
+                              "children": "EEPROM needs separate permission and restart verification.",
+                              "className": "field-note"
+                            },
+                            "type": "P",
+                            "namespace": "dash_html_components"
+                          },
+                          {
+                            "props": {
+                              "children": "Apply cycle settings",
+                              "id": "apply-settings",
+                              "className": "apply-button"
+                            },
+                            "type": "Button",
+                            "namespace": "dash_html_components"
+                          }
+                        ]
+                      },
+                      "type": "Div",
+                      "namespace": "dash_html_components"
+                    },
+                    {
+                      "props": {
+                        "children": [
+                          {
+                            "props": {
+                              "children": "Controller options"
+                            },
+                            "type": "Legend",
+                            "namespace": "dash_html_components"
+                          },
+                          {
+                            "props": {
+                              "children": "LED indications"
+                            },
+                            "type": "Label",
+                            "namespace": "dash_html_components"
+                          },
+                          {
+                            "props": {
+                              "options": [
+                                {
+                                  "label": "Identify",
+                                  "value": 1
+                                },
+                                {
+                                  "label": "Limit indication",
+                                  "value": 2
+                                },
+                                {
+                                  "label": "Activity indication",
+                                  "value": 8
+                                }
+                              ],
+                              "value": [],
+                              "id": "led-modes"
+                            },
+                            "type": "Checklist",
+                            "namespace": "dash_core_components"
+                          },
+                          {
+                            "props": {
+                              "children": "Not read",
+                              "id": "led-reading",
+                              "className": "field-note"
+                            },
+                            "type": "P",
+                            "namespace": "dash_html_components"
+                          },
+                          {
+                            "props": {
+                              "children": [
+                                {
+                                  "props": {
+                                    "children": "Read LED modes",
+                                    "id": "read-led",
+                                    "className": "utility"
+                                  },
+                                  "type": "Button",
+                                  "namespace": "dash_html_components"
+                                },
+                                {
+                                  "props": {
+                                    "children": "Apply LED modes",
+                                    "id": "apply-led",
+                                    "className": "utility"
+                                  },
+                                  "type": "Button",
+                                  "namespace": "dash_html_components"
+                                }
+                              ],
+                              "className": "diagnostic-tools"
+                            },
+                            "type": "Div",
+                            "namespace": "dash_html_components"
+                          },
+                          {
+                            "props": {
+                              "children": "Interlock requirement: Unknown",
+                              "id": "interlock-reading"
+                            },
+                            "type": "P",
+                            "namespace": "dash_html_components"
+                          },
+                          {
+                            "props": {
+                              "children": "Require interlock",
+                              "id": "require-interlock",
+                              "className": "utility"
+                            },
+                            "type": "Button",
+                            "namespace": "dash_html_components"
+                          },
+                          {
+                            "props": {
+                              "children": "Confirm source protection on the main panel before settings writes. The interlock setting does not measure contact continuity.",
+                              "className": "field-note"
+                            },
+                            "type": "P",
+                            "namespace": "dash_html_components"
+                          }
+                        ],
+                        "className": "settings-group controller-options"
+                      },
+                      "type": "Fieldset",
+                      "namespace": "dash_html_components"
+                    }
+                  ],
+                  "className": "settings-layout"
+                },
+                "type": "Div",
+                "namespace": "dash_html_components"
+              },
+              {
+                "props": {
+                  "children": "Settings results appear here.",
+                  "id": "settings-notice",
+                  "className": "notice",
+                  "role": "status"
+                },
+                "type": "Div",
+                "namespace": "dash_html_components"
+              }
+            ],
+            "id": "settings-dialog",
+            "open": false
+          },
+          "type": "Dialog",
+          "namespace": "dash_html_components"
+        },
+        {
+          "props": {
+            "children": [
+              {
+                "props": {
+                  "children": "Readback and diagnostics"
+                },
+                "type": "Summary",
+                "namespace": "dash_html_components"
+              },
+              {
+                "props": {
+                  "children": [
+                    {
+                      "props": {
+                        "children": "Read channel enable",
+                        "id": "read-channel",
+                        "className": "utility"
+                      },
+                      "type": "Button",
+                      "namespace": "dash_html_components"
+                    },
+                    {
+                      "props": {
+                        "children": "Read raw bay",
+                        "id": "read-bay",
+                        "className": "utility"
+                      },
+                      "type": "Button",
+                      "namespace": "dash_html_components"
+                    },
+                    {
+                      "props": {
+                        "children": "Start device messages",
+                        "id": "start-updates",
+                        "className": "utility"
+                      },
+                      "type": "Button",
+                      "namespace": "dash_html_components"
+                    },
+                    {
+                      "props": {
+                        "children": "Stop device messages",
+                        "id": "stop-updates",
+                        "className": "utility"
+                      },
+                      "type": "Button",
+                      "namespace": "dash_html_components"
+                    },
+                    {
+                      "props": {
+                        "children": "Collect raw events",
+                        "id": "read-events",
+                        "className": "utility"
+                      },
+                      "type": "Button",
+                      "namespace": "dash_html_components"
+                    }
+                  ],
+                  "className": "diagnostic-tools"
+                },
+                "type": "Div",
+                "namespace": "dash_html_components"
+              },
+              {
+                "props": {
+                  "children": [
+                    {
+                      "props": {
+                        "children": "Channel enable: Not read",
+                        "id": "channel-reading"
+                      },
+                      "type": "Span",
+                      "namespace": "dash_html_components"
+                    },
+                    {
+                      "props": {
+                        "children": "Raw bay: Not read",
+                        "id": "bay-reading"
+                      },
+                      "type": "Span",
+                      "namespace": "dash_html_components"
+                    },
+                    {
+                      "props": {
+                        "children": "Device messages: No request",
+                        "id": "update-request"
+                      },
+                      "type": "Span",
+                      "namespace": "dash_html_components"
+                    }
+                  ],
+                  "className": "diagnostic-readings"
+                },
+                "type": "Div",
+                "namespace": "dash_html_components"
+              },
+              {
+                "props": {
+                  "children": "These are last explicit reads, not optical feedback. Device messages are separate from Live readback; stop them before Release.",
+                  "className": "field-note"
+                },
+                "type": "P",
+                "namespace": "dash_html_components"
+              },
+              {
+                "props": {
+                  "children": "No events collected",
+                  "id": "event-data"
+                },
+                "type": "Pre",
+                "namespace": "dash_html_components"
+              },
+              {
+                "props": {
+                  "children": [
+                    {
+                      "props": {
+                        "children": "Disconnect hardware",
+                        "id": "hardware-disconnect",
+                        "className": "utility"
+                      },
+                      "type": "Button",
+                      "namespace": "dash_html_components"
+                    },
+                    {
+                      "props": {
+                        "children": "Requires source protection and Manual/OFF. Release only closes communication.",
+                        "className": "field-note"
+                      },
+                      "type": "Span",
+                      "namespace": "dash_html_components"
+                    }
+                  ],
+                  "className": "diagnostic-tools"
+                },
+                "type": "Div",
+                "namespace": "dash_html_components"
+              },
+              {
+                "props": {
+                  "children": [
+                    {
+                      "props": {
+                        "children": "Full controller readback"
+                      },
+                      "type": "Summary",
+                      "namespace": "dash_html_components"
+                    },
+                    {
+                      "props": {
+                        "children": "No sample",
+                        "id": "result"
+                      },
+                      "type": "Pre",
+                      "namespace": "dash_html_components"
+                    }
+                  ]
+                },
+                "type": "Details",
+                "namespace": "dash_html_components"
+              }
+            ],
+            "className": "diagnostics"
+          },
+          "type": "Details",
+          "namespace": "dash_html_components"
+        },
+        {
+          "props": {
+            "id": "sample"
+          },
+          "type": "Store",
+          "namespace": "dash_core_components"
+        },
+        {
+          "props": {
+            "id": "details"
+          },
+          "type": "Store",
+          "namespace": "dash_core_components"
+        },
+        {
+          "props": {
+            "id": "settings-context"
+          },
+          "type": "Store",
+          "namespace": "dash_core_components"
+        },
+        {
+          "props": {
+            "id": "confirmation-context"
+          },
+          "type": "Store",
+          "namespace": "dash_core_components"
+        },
+        {
+          "props": {
+            "id": "poll",
+            "disabled": true,
+            "interval": 1000
+          },
+          "type": "Interval",
+          "namespace": "dash_core_components"
+        }
+      ],
+      "className": "shutter-app"
+    },
+    "type": "Main",
+    "namespace": "dash_html_components"
+  },
+  "dependencies": [
+    {
+      "output": "settings-dialog.open",
+      "inputs": [
+        {
+          "id": "settings",
+          "property": "n_clicks"
+        },
+        {
+          "id": "settings-close",
+          "property": "n_clicks"
+        }
+      ],
+      "state": [],
+      "clientside_function": null,
+      "prevent_initial_call": true,
+      "background": null,
+      "dynamic_creator": null,
+      "no_output": false,
+      "optional": false,
+      "hidden": false,
+      "websocket": false,
+      "persistent": false
+    },
+    {
+      "output": "..source-inhibited.value...persist.value...live-readback.value...confirmation-context.data..",
+      "inputs": [
+        {
+          "id": "target",
+          "property": "value"
+        },
+        {
+          "id": "sample",
+          "property": "data"
+        }
+      ],
+      "state": [
+        {
+          "id": "confirmation-context",
+          "property": "data"
+        }
+      ],
+      "clientside_function": null,
+      "prevent_initial_call": false,
+      "background": null,
+      "dynamic_creator": null,
+      "no_output": false,
+      "optional": false,
+      "hidden": false,
+      "websocket": false,
+      "persistent": false
+    },
+    {
+      "output": "poll.disabled",
+      "inputs": [
+        {
+          "id": "live-readback",
+          "property": "value"
+        },
+        {
+          "id": "sample",
+          "property": "data"
+        }
+      ],
+      "state": [],
+      "clientside_function": null,
+      "prevent_initial_call": false,
+      "background": null,
+      "dynamic_creator": null,
+      "no_output": false,
+      "optional": false,
+      "hidden": false,
+      "websocket": false,
+      "persistent": false
+    },
+    {
+      "output": "..sample.data...notice.children...settings-notice.children...details.data..",
+      "inputs": [
+        {
+          "id": "connect",
+          "property": "n_clicks"
+        },
+        {
+          "id": "read",
+          "property": "n_clicks"
+        },
+        {
+          "id": "release",
+          "property": "n_clicks"
+        },
+        {
+          "id": "manual",
+          "property": "n_clicks"
+        },
+        {
+          "id": "single",
+          "property": "n_clicks"
+        },
+        {
+          "id": "auto",
+          "property": "n_clicks"
+        },
+        {
+          "id": "triggered",
+          "property": "n_clicks"
+        },
+        {
+          "id": "on",
+          "property": "n_clicks"
+        },
+        {
+          "id": "off",
+          "property": "n_clicks"
+        },
+        {
+          "id": "settings-stop",
+          "property": "n_clicks"
+        },
+        {
+          "id": "pulse",
+          "property": "n_clicks"
+        },
+        {
+          "id": "identify",
+          "property": "n_clicks"
+        },
+        {
+          "id": "read-settings",
+          "property": "n_clicks"
+        },
+        {
+          "id": "apply-settings",
+          "property": "n_clicks"
+        },
+        {
+          "id": "read-channel",
+          "property": "n_clicks"
+        },
+        {
+          "id": "read-bay",
+          "property": "n_clicks"
+        },
+        {
+          "id": "read-led",
+          "property": "n_clicks"
+        },
+        {
+          "id": "apply-led",
+          "property": "n_clicks"
+        },
+        {
+          "id": "require-interlock",
+          "property": "n_clicks"
+        },
+        {
+          "id": "start-updates",
+          "property": "n_clicks"
+        },
+        {
+          "id": "stop-updates",
+          "property": "n_clicks"
+        },
+        {
+          "id": "read-events",
+          "property": "n_clicks"
+        },
+        {
+          "id": "hardware-disconnect",
+          "property": "n_clicks"
+        },
+        {
+          "id": "poll",
+          "property": "n_intervals"
+        }
+      ],
+      "state": [
+        {
+          "id": "target",
+          "property": "value"
+        },
+        {
+          "id": "source-inhibited",
+          "property": "value"
+        },
+        {
+          "id": "cycle-on",
+          "property": "value"
+        },
+        {
+          "id": "cycle-off",
+          "property": "value"
+        },
+        {
+          "id": "cycles",
+          "property": "value"
+        },
+        {
+          "id": "continuous",
+          "property": "value"
+        },
+        {
+          "id": "persist",
+          "property": "value"
+        },
+        {
+          "id": "led-modes",
+          "property": "value"
+        },
+        {
+          "id": "details",
+          "property": "data"
+        }
+      ],
+      "clientside_function": null,
+      "prevent_initial_call": true,
+      "background": null,
+      "dynamic_creator": null,
+      "no_output": false,
+      "optional": false,
+      "hidden": false,
+      "websocket": false,
+      "persistent": false
+    },
+    {
+      "output": "..channel-reading.children...bay-reading.children...update-request.children...event-data.children...led-reading.children...interlock-reading.children...led-modes.value..",
+      "inputs": [
+        {
+          "id": "details",
+          "property": "data"
+        },
+        {
+          "id": "sample",
+          "property": "data"
+        },
+        {
+          "id": "target",
+          "property": "value"
+        }
+      ],
+      "state": [],
+      "clientside_function": null,
+      "prevent_initial_call": false,
+      "background": null,
+      "dynamic_creator": null,
+      "no_output": false,
+      "optional": false,
+      "hidden": false,
+      "websocket": false,
+      "persistent": false
+    },
+    {
+      "output": "..cycle-on.value...cycle-off.value...cycles.value...continuous.value...settings-context.data..",
+      "inputs": [
+        {
+          "id": "sample",
+          "property": "data"
+        },
+        {
+          "id": "target",
+          "property": "value"
+        }
+      ],
+      "state": [
+        {
+          "id": "settings-context",
+          "property": "data"
+        }
+      ],
+      "clientside_function": null,
+      "prevent_initial_call": true,
+      "background": null,
+      "dynamic_creator": null,
+      "no_output": false,
+      "optional": false,
+      "hidden": false,
+      "websocket": false,
+      "persistent": false
+    },
+    {
+      "output": "..serial-label.children...connection-label.children...route-label.children...on-label.children...off-label.children...on-duration.children...off-duration.children...cycle-count.children...readback-time.children...result.children...manual.className...manual.disabled...single.className...single.disabled...auto.className...auto.disabled...triggered.className...triggered.disabled...on.disabled...off.disabled...settings-stop.disabled...pulse.disabled...identify.disabled...read-settings.disabled...apply-settings.disabled...read-channel.disabled...read-bay.disabled...read-led.disabled...apply-led.disabled...require-interlock.disabled...start-updates.disabled...stop-updates.disabled...read-events.disabled...hardware-disconnect.disabled...key-lamp.className...key-lamp.aria-label...ready-lamp.className...ready-lamp.aria-label...error-lamp.className...error-lamp.aria-label...output-lamp.className...output-lamp.aria-label...active-lamp.className...active-lamp.aria-label...key-lamp-value.children...ready-lamp-value.children...error-lamp-value.children...output-lamp-value.children...active-lamp-value.children..",
+      "inputs": [
+        {
+          "id": "sample",
+          "property": "data"
+        },
+        {
+          "id": "target",
+          "property": "value"
+        }
+      ],
+      "state": [],
+      "clientside_function": null,
+      "prevent_initial_call": false,
+      "background": null,
+      "dynamic_creator": null,
+      "no_output": false,
+      "optional": false,
+      "hidden": false,
+      "websocket": false,
+      "persistent": false
+    }
+  ]
+}

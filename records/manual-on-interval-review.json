@@ -1,0 +1,11 @@
+{
+  "gui_on_enabled_during_recovery": true,
+  "refusal": "Refused or unconfirmed: Minimum OFF/duty recovery interval has not elapsed; wait 0.94 s. ON was not dispatched. ",
+  "refusal_snapshot_electrical_state": "unknown",
+  "refusal_fault": null,
+  "output_frames_after_refusal": 0,
+  "deadline_after_poll": 102.0,
+  "on_after_interval": "on",
+  "deadline_after_redundant_off": 112,
+  "deadline_after_return_to_manual": 132
+}

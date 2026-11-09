@@ -3628,3 +3628,829 @@ physical/deployment acceptance remains BLOCKED. Concurrent REQ-252 live records
 and PROJECT/STATE sections remain uncommitted and unchanged by this publication.
 The final documentation checkpoint is committed/pushed separately, then remote
 HEAD equality is checked again. No hardware operation was performed here.
+
+## D086 - Fix observed GUI faults and refuse unqualified KEH3 bay queries / REQ-252
+
+8 November 2026. The user requests actual-hardware debugging through visible
+WebUI actions. Keep electrical evidence separate from physical blade observation.
+Do not clear uncertainty from a successful status read, retry a timed-out bay
+query or replay ON. Use documented passive recovery only with independent closed
+blade evidence and source protection. One explicitly approved1s pulse is the
+entire new motion allowance; settings and mode changes remain excluded.
+
+Show latched owner faults instead of generic success, even on polling; keep
+Release's communication outcome explicit. Use all changed Dash property IDs for
+LED prefill: status and diagnostic store outputs can arrive together. Refuse
+legacy0x0065 hub-bay requests on KEH3 in ShutterHub before I/O. Issue42.1 p52's
+detailed contract describes T-Cube bay identities, not a qualified KEH3 route;
+the actual query timed out. Keep lower-level encoding and configured routing;
+do not guess another destination/layout or relax protocol fault handling.
+
+## E233 - Actual WebUI debugging, one electrical pulse and final fixes / TEST-252
+
+8 November 2026 local /9 November UTC. Expected results before execution:
+exact production identity and protected Manual/OFF, documented passive recovery,
+one1s GUI pulse with >=2s OFF rest, final OFF/readback/release; diagnose observed
+UI/communication faults with software regressions. Physical motion requires an
+independent observation, not an output-bit inference.
+
+The prior running WebUI on9860 was stale;8050 was a different rotation app and
+was left alone. User reported the other connection killed. Its listener/socket
+closed before the current production GUI was started on9860. Initial Connect
+verified68800777 /KSC101 /firmware1.0.7 /hardware3 /channel1, Manual/OFF,
+interlock required, but retained the prior journal dated23:58:00.357925 UTC with
+empty original/latest error text and unconfirmed cleanup. That journal is copied
+with its hash in webui-command-hardware-recovery-authorization.json; its cause
+cannot be reconstructed from the empty text alone.
+
+Generic Connect/Read/Release notices hid that fault and healthy-style polling
+suppressed the notice. Four software cases failed before correction;36 affected
+cases passed after. The actual corrected Connect/Release warnings were observed
+before recovery. The same fix/tests were included by the separate REQ-251 review
+in published2bc53e2, validated there by E234. Repository publication does not grant additional hardware authority.
+
+The user explicitly confirmed independently blocked beam, isolated triggers,
+intact key/interlock and visibly closed blade, selecting "Conditions confirmed;
+recover and run one pulse". The GUI owner released first. Documented shared-API
+recover then verified exact Manual/OFF/interlock and cleared the journal at
+2026-11-09T00:03:12.481870 UTC without an output command. The released old GUI's
+in-memory fault was not silently cleared; it was restarted as a fresh owner.
+Recovery evidence: records/webui-command-hardware-recovery.json.
+
+Visible GUI Connect/read then showed healthy Manual/OFF. Exactly one1s pulse was
+clicked39.551058s after the first healthy OFF sample, returning electrical OFF
+at00:04:38.858385 UTC with no error. The source routine checks electrical ON
+before its1s host hold and OFF afterward; the visible callback saves only the
+completed OFF sample. There is no calibrated exposure/timing or recorded optical
+trace. The user replied "I don't observe. verify it yourself". No independent
+blade-position signal is exposed by the owner; no physical-motion PASS is claimed
+and no extra pulse was sent to obtain missing observations.
+
+Actual read-only controls returned cycle parameters2000/2000ms/count5, LED
+mask0x0001 and channel enable Disabled. LED Identify stayed unchecked: the
+status/detail outputs changed together while the callback considered only the
+first trigger. A combined-update regression reproduced it. The raw bay request
+then timed out at the normal end-to-end deadline, poisoning that receive session
+and latching uncertainty. It was not repeated or decoded speculatively. No mode,
+timing, LED or EEPROM settings were changed. Update start/stop, raw-event
+collection and hardware-disconnect were not exercised in this bounded run.
+
+The GUI released the timed-out session, reconnected while retaining lockout,
+and sent final protective OFF. Fresh Manual/OFF/interlock/status0x2000 was read
+at2026-11-09T00:07:18.604417 UTC; final release completed at00:07:56.830 UTC.
+The server was stopped; no active device socket or9860 listener remained.
+Shutdown reported retained fault/unavailable controller without automatically
+reconnecting or sending another output command. The uncertainty journal remains.
+
+The final fixes use ctx.triggered_prop_ids membership and reject KEH3 legacy
+bay queries before the read context. Follow-up reproduction:3 failures/1 pass;
+after fixes135 affected tests PASS. Final command:
+uv run --locked --offline --no-sync --group dev --extra gui python -B
+scripts/verify.py --record-prefix webui-command-
+Result:344 source +344 isolated installed-wheel tests PASS, zero failures/errors/
+skips; lock/lint/format/exact Python+CSS parity, clean install/import/help/passive
+config and six static notebooks PASS. All39 input hashes match. Evidence:
+records/webui-command-{followup-reproduction-tests,followup-fixed-tests,offline-tests,
+wheel-tests}.xml and webui-command-direct-validation.json.
+
+records/webui-command-hardware-{live,validation,runtime}.json preserve browser
+observations, actual identity/final state, source/artifact hashes and the revision
+boundary. Hardware ran before the final LED/bay fixes; these last fixes were not
+live re-tested after lockout, and their validation is software-only. Screenshots
+capture the initial/corrected fault and final released state. README, GUI/API/
+interface docs, PROJECT, STATE and REPORT are reconciled. No commit or push was
+made by this campaign; subsequent LED/bay fixes and campaign evidence remain local.
+Resumption requires independent current closed-blade evidence under protected
+conditions, then documented passive recovery. No further ON is authorized.
+
+## E236 - Remaining-issue review / TEST-253
+
+8 November 2026. User asks "identify issues". Review only: no production edits,
+hardware connection/command, fault clearing or new cycle. Compare source with
+STATE and saved TEST-252 evidence; retain existing dirty work.
+
+Expected interruption behavior: KeyboardInterrupt during a pulse may be followed
+by electrical OFF cleanup, but further ON remains blocked until recovery. An
+in-memory FakeTransport reproduction interrupted cancel.wait after ON readback.
+Observed: error="", electrical OFF, journal present with "Protective OFF pending;
+original=; optical state unknown", then another open_shutter succeeded on the
+same owner, yielding two ON frames. _fault stores empty str(exc), and _ready
+checks its truthiness. This is a P1 current REQ-207 FAIL; the journal still blocks
+a later process. The reproduction does not establish the cause of the prior
+actual cleanup failure whose exception text was empty.
+
+Expected display behavior: successful dated protective OFF remains visible
+alongside retained fault and blocked activation. Offline Dash rendering of the
+saved actual final-protective-off-result confirmed electrical OFF at
+2026-11-09T00:07:18.604417 UTC, but the main Output lamp becomes Unknown and the
+notice drops the successful OFF message. gui.py716 and935-936 cause this P2
+visibility defect. Preserve fault/optical Unknown while showing electrical data.
+
+No GUI recover action exists; documented manual API recovery remains an
+operational gap, with independent closure evidence still required. Blade motion
+was not independently observed. These gaps are separate from the two defects.
+
+Evidence: records/webui-remaining-issues-review.json records methods, observed
+outputs and source hashes. All39 prior verifier input hashes still match; the
+existing344 source +344 wheel results pass in their scope but omit the new
+interruption case. PROJECT/STATE/REPORT record the review. Fixes are pending;
+current REQ-207 acceptance is invalidated for the reproduced case.
+
+## E237 - Preserve GUI electrical feedback under retained faults / TEST-254
+
+8 November 2026. User asks "fix gui" after E236. Scope: resolve its P2 display
+finding; keep the independent P1 controller interruption issue open. No device,
+server, recovery or output operation is authorized or executed by this fix.
+
+Expected behavior: completed Stop/OFF remains explicit in both notices; a
+connected dated electrical sample shows On/Off alongside Fault Reported. ON and
+timed activation remain disabled under fault, and undated/disconnected/unknown
+feedback remains Unknown. Optical state and controller journal remain unchanged.
+
+Added seven software regressions to test_gui_fault_notice.py: main/dialog Stop
+outcomes through the shared owner and five dated/connected/unknown lamp cases.
+Before the source change,4 cases failed and7 passed including existing cases
+(records/gui-off-feedback-before-tests.xml). The fix preserves successful Stop
+messages before the fault notice and derives the Output lamp from a connected,
+dated electrical sample. Existing fault/permission/activation logic remains.
+Afterward102 affected callbacks passed (gui-off-feedback-fixed-tests.xml).
+
+Offline replay of TEST-252's saved final-protective-off-result through local Dash
+callbacks shows current Stop/OFF confirmation plus retained fault in both notices,
+Output Off, Error Reported and ON/pulse disabled. This is a saved-data UI check,
+not a new hardware command. Evidence: records/gui-off-feedback-replay.json.
+
+Final command: uv run --locked --offline --no-sync --group dev --extra gui
+python -B scripts/verify.py --record-prefix gui-off-feedback-
+351 source +351 isolated-wheel tests PASS, zero failures/errors/skips; lock,
+lint/format, exact Python/CSS package parity, clean install/import/help, passive
+config and six static notebooks PASS. All39 input hashes match. A first verifier
+attempt stopped at a single test-format difference, corrected before this final
+run. Evidence: gui-off-feedback-direct-validation.json and source/wheel XMLs.
+
+PROJECT/STATE/GUI guide/REPORT reflect the display behavior and remaining limit.
+controller.py matches E236's reviewed hash; its P1 empty-error interruption
+defect remains open and untested by the existing351-case suite. Real uncertainty
+state and consumed motion allowance are untouched. No commit/push was made.
+
+## D087 - Close empty-error lockout before another physical run / REQ-255
+
+8 November 2026. A real WebUI redo must not proceed to motion with the known
+E236 interruption bypass. Keep nonempty exception descriptions (fallback to the
+exception type) in both connection errors and _fault; treat every non-None error
+as lockout. Preserve the latest error description in the uncertainty journal.
+Do not clear the actual journal or infer optical closure from OFF to enable a test.
+
+## E238 - Redo prerequisite fix and actual read-only verification / TEST-255
+
+8 November 2026 local. User requests another actual user-style WebUI run. Proposed
+bounded procedure: current protected setup/independent closure confirmation,
+documented passive recovery, diagnostic reads, exactly one1s Manual pulse after
+>=2s OFF rest, final OFF/readback/release and server stop, without settings changes.
+The setup question and a separate camera-view question received no answer during
+this turn. Elapsed time is not confirmation; no recovery or pulse was performed.
+
+Before correction, three new software cases failed: KeyboardInterrupt and empty
+ShutterError during a pulse allowed another ON through the retained owner, and
+an empty connection failure had no visible error. After the small controller
+change,115 affected owner/GUI cases passed. Regressions also verify fault retention
+across reconnect, no new ON before protected recovery, and that simulated passive
+recovery restores operation without output replay. All use fictional identities
+and in-memory transports; no actual interrupted hardware test occurred.
+
+Final command: uv run --locked --offline --no-sync --group dev --extra gui
+python -B scripts/verify.py --record-prefix webui-redo-
+354 source +354 isolated-wheel tests PASS, zero failures/errors/skips; lock,
+lint/format, exact Python/CSS wheel parity, clean install/import/help/passive
+config and six static notebooks PASS. All39 inputs match. Evidence:
+records/webui-redo-{interruption-before-tests,interruption-fixed-tests,offline-tests,
+wheel-tests}.xml and webui-redo-direct-validation.json. REQ-207's new interruption
+case is now revalidated in software; physical safety qualification remains open.
+
+No9860/9872 listener or active shutter socket was present at resume. The current
+production GUI was started on9860 without automatic connection. Visible browser
+selection/Connect verified KSC10168800777 /firmware1.0.7 /hardware3 /channel1,
+Manual/OFF /interlock required /status0x2000 with the previous fault retained.
+The corrected GUI showed Output Off and Error Reported concurrently, with ON
+disabled. Live readback was enabled then disabled; its timestamp advanced to
+2026-11-09T00:31:15.461067 UTC while the fault notice stayed visible.
+
+Browser Release completed at00:33:04.270 UTC, clearing old electrical feedback to
+Unknown and retaining the fault. The tab closed and test server stopped. Shutdown
+reported the retained read-only fault without opening a device or sending OFF.
+No active device socket or9860 listener remained. The journal's final hash equals
+its pre-test hash. No device output, settings command or protected recovery was
+sent by this redo. Browser warnings/errors: none. No motion evidence is claimed.
+
+Read-only camera inventory found Logi Webcam C920e. Its aim/view is unconfirmed;
+no camera application was opened or frame captured. Camera presence cannot prove
+closed blade or movement. Independent current closed-blade/protected setup facts
+remain the exact dependency for the proposed motion test.
+
+Evidence: records/webui-redo-{hardware-live,runtime,validation}.json and
+webui-redo-fault-readback.jpg capture actual results, unchanged runtime/journal
+hashes, software scope and the blocked condition. PROJECT/STATE/REPORT reconcile
+E236/E237 findings: both code issues are fixed in software; physical continuation
+is BLOCKED, not validated completion. No commit or push was made.
+
+## E239 - Confirmed bounded actual WebUI redo / TEST-255
+
+8 November 2026 local /9 November UTC. The user answered the pending question
+"Conditions confirmed; run the bounded redo" and camera view "No / unsure".
+This confirms independent beam block, isolated external triggers, intact
+key/interlock and initially visibly closed SH05R on68800777 /192.168.1.19:40305.
+Allow passive recovery, diagnostic reads, exactly one1s Manual pulse after >=2s
+OFF rest, final OFF/readback/release; no settings changes or additional cycles.
+No camera was opened or used. This resolves E238's blocked setup dependency.
+
+The expected results were defined before action: verified exact identity and
+Manual/OFF/interlock, working LED prefill/drafts and safe bay refusal, one pulse
+completion with electrical OFF, healthy final readback, passive release/reset,
+unchanged cycle parameters, stopped server/no residual owner. Independent
+physical movement/timing would remain unobserved without a usable camera/sensor.
+
+Saved the original journal and authority in webui-redo-bounded-authorization.json.
+Documented shared-API recovery verified68800777 /KSC101 /firmware1.0.7 /hardware3 /
+channel1, Manual/OFF/interlock at2026-11-09T03:31:19.707084 UTC, cleared the
+journal and released without output or settings commands. A fresh current GUI
+was then started on localhost9860. Its runtime/config hashes match E238's354
+source +354 isolated-wheel tests, all39 inputs, zero failures/errors/skips.
+
+All later device operations used visible browser buttons and the production
+ShutterHub/APT/TCP owner, with no injected transport or direct callback substitute.
+Connect read healthy Manual/OFF. Cycle reads returned2000/2000ms/count5. LED
+mask0x0001 selected Identify. An unapplied local Activity checkbox draft survived
+an unrelated cycle read; explicit LED read restored the actual flags. Channel
+read Disabled. Legacy Read raw bay was refused locally without latching a fault;
+subsequent Read state returned healthy Manual/OFF. Collect raw events returned0.
+No LED/cycle Apply, mode change, EEPROM or hardware-disconnect command was used.
+
+The sole pulse attempt was recorded before clicking, consuming its budget even
+if the result became ambiguous. Exactly one1s GUI pulse then completed, after
+84.944947s since the first healthy GUI OFF sample. Its routine checks electrical
+ON before the1s host hold and OFF afterward; the visible callback saves the final
+OFF sample at2026-11-09T03:33:57.983518 UTC. No independent motion or calibrated
+exposure is inferred. No second ON was requested.
+
+Final Close/OFF read back OFF. Live readback advanced timestamps while preserving
+the OFF notice, then was disabled. Explicit Read state at03:34:39.878424 UTC
+confirmed Manual/OFF/interlock required/status0x2000/errorNone, cycle parameters
+unchanged. Release completed03:34:52.704 UTC, clearing old electrical feedback,
+LED drafts and source assertion. Post-release Read at03:35:13.220 UTC reported
+disconnected/no device feedback requested. Browser warnings/errors: none.
+
+The tab closed and only this test server was stopped via Ctrl+C. No active
+shutter socket or9860 listener remained, and the journal was absent after the
+verified recovery/healthy OFF lifecycle. No further cleanup actuation was needed
+after passive release. Terminal stop status is recorded separately from the
+successful device/WebUI procedure. No source change or new test run was needed:
+all existing verified input/runtime hashes still match.
+
+Evidence: records/webui-redo-bounded-{authorization,recovery,runtime,live,
+validation}.json and {settings,final-off,released}.jpg. STATE/REPORT/GUI guide
+mark the bounded electrical/WebUI run complete. Full independent optical,
+calibration/native/settings/deployment criteria remain open. One-pulse allowance
+consumed; no new motion is authorized by it. No commit or push was made.
+
+## D088 - Short GUI launch without changing other CLI defaults / REQ-256
+
+8 November 2026. User asks to update README and simplify the software run command.
+Use the existing entry point: uv run shutter-control gui. GUI defaults select
+the existing config/shutter.ethernet.toml and localhost9860 from repository root.
+Explicit --config before gui and gui --port overrides remain available; missing
+files and occupied ports fail rather than falling back. Other commands retain
+shutters.local.toml. Keep startup passive/exact-target and add no launcher wrapper.
+
+## E240 - README and short-launch validation / TEST-256
+
+8 November 2026. Expected results: the short GUI command uses the tracked profile
+and9860, explicit config/port overrides work, other CLI defaults remain unchanged,
+construction/cleanup never opens hardware, and README reflects the latest bounded
+results without implying optical motion or a fresh cycle allowance.
+
+Before correction, the selected CLI tests produced1 failure/3 passes: gui without
+flags still selected shutters.local.toml. Added default/override assertions and
+verified the direct GUI runner's default port. After the small CLI/default change,
+all59 application tests passed. No controller/protocol/transport or policy change.
+
+The exact uv run shutter-control gui command was executed from repository root.
+It started on127.0.0.1:9860; GET / and /_dash-layout returned valid HTTP200/layout.
+Selected target and initial sample were null; no active shutter socket existed.
+No browser Connect or device command was sent. Only this passive test server was
+stopped afterward. Evidence: records/simple-launch-smoke.json. Startup selected
+no hardware automatically. First-time GUI setup remains uv sync --locked --extra gui.
+
+Final command: uv run --locked --offline --no-sync --group dev --extra gui
+python -B scripts/verify.py --record-prefix simple-launch-
+355 source +355 isolated-wheel tests PASS, zero failures/errors/skips; lock,
+lint/format, exact Python/CSS wheel parity, clean install/import/help, passive
+configuration and six static notebooks PASS. All39 input hashes match.
+Evidence: records/simple-launch-{before-tests,fixed-tests,offline-tests,wheel-tests}.xml
+and simple-launch-direct-validation.json. Before-tests intentionally preserves
+the initial failure; fixed-tests has59 passing application cases.
+
+README now leads with the short run command, explains overrides/passive startup,
+retained-fault electrical feedback, LED drafts and interruption lockout. It links
+the dated E239 actual run and its recorded source limits, keeping independent
+blade/optical qualification open. GUI/setup guides and PROJECT/STATE/REPORT are
+consistent. E239's hardware record is historical relative to these launch-only
+source defaults; this change performs no new physical test or authorizes motion.
+No commit/push. Existing dirty work and all actual-hardware evidence preserved.
+
+## E241 - Full controller redundancy review / TEST-257
+
+8 November 2026. User requested full controller inspection and identification,
+without implementation. Expected: source-backed pruning candidates, explicit
+API/protection distinctions, preserved runtime source and software-only evidence.
+Reviewed all1536 lines and callers/protocol/transport/tests. Controller SHA256:
+213A3BF62C5D409126C5469F9227A0D52B04955793F69A4C47B60CB0AF35348A.
+
+Confirmed by injected FakeTransport: LED-write request sequence
+0005,0005,04C1,04C7,0429,04B3,04B4 and hardware disconnect sequence
+0005,0005,04C1,04C7,0429,0002. Each starts with consecutive identity queries;
+neither sends an output frame. records/controller-redundancy-observations.json
+captures them and confirms BlockingIOError subclasses OSError. Static inspection
+proves validate_pulse's max_on_s comparison cannot constrain an accepted pulse:
+continuous policies forbid max_on_s, and finite policies are refused regardless.
+Remaining structural/API candidates and necessary protections: outputs/REPORT.md.
+No freely removable unused method parameters found; context-manager arguments
+are required by the interface.
+
+Initial sandbox execution could not access newly created temporary directories:
+99 tests passed and114 setup errors; fake experiment likewise failed before any
+fake device operation. These are environment errors, not controller failures.
+Reran outside sandbox with software-only scope: .venv/Scripts/python.exe -B -m
+pytest -q --tb=short -p no:cacheprovider tests/test_owner.py
+tests/test_additional_commands.py tests/test_native_controls.py
+tests/test_protocol.py tests/test_review_regressions.py --junitxml
+records/controller-redundancy-tests.xml:213 passed, zero failures/errors/skips.
+The separate fake experiment then passed. Removed only its exact empty leftover
+directory records/review-fake-kyvfa_cq. Review requirement PASS; no production
+source/config edits, device/network I/O, installed-wheel rerun, commit or push.
+
+## E242 - Codebase reduction plan / TEST-258
+
+8 November 2026. User requested a plan, not implementation. Expected: current
+baseline, ordered bounded stages, API/protection distinctions and validation
+gates. Read the E241 checkpoint/report and inspected current source inventory,
+CLI dispatch, GUI dispatch/layout/callback boundaries and cleanup. Python AST
+parse/line inventory succeeded: controller1536, GUI978, protocol283,
+transport250, CLI109, exports24 =3180 lines; controller+GUI2514 (~79%).
+outputs/REPORT.md contains the proposed four stages and optional model merge.
+No guaranteed percentage reduction: acceptance is measured net reduction with
+clearer ownership and preserved required behavior. No feature cuts or external
+consumer edits are assumed. Plan review PASS; implementation unstarted. No new
+tests/device/server operation or runtime source/configuration changes. E241's
+213-test source result and E240's complete source/wheel evidence retain their
+original scope. Project-wide physical/deployment gaps remain open.
+
+
+## E243 - Mode selection without software confirmation / TEST-260
+
+8 November 2026. Direct user authorization removes software confirmation only
+for mode changes and explicitly retains hardware interlocks and OFF/readback.
+Expected: select modes without checkbox; refuse non-OFF/interlock-disabled
+preconditions; preserve policy, wrong-mode/output/interlock failure handling and
+native Start qualification. Removed only the shared owner's source-confirmation
+refusal; compatibility boolean validation remains. GUI and Manual CLI no longer
+pass source confirmation to selection. Other source assertions are unchanged.
+Updated active API/interface/GUI/tutorial documentation, not historical captures.
+
+Software test command: .venv/Scripts/python.exe -B -m pytest -q
+-p no:cacheprovider --basetemp tmp/mode-confirmation-final
+--junitxml records/mode-confirmation-final-tests.xml
+Observed:359 passed, zero failures/errors/skips. TEST-260 PASS (software only).
+Tests exercise unchecked GUI Single/Auto/Triggered selection, Trigger-to-Manual
+with false/true flags, OFF/interlock precondition refusals without output writes,
+persistent-mode permission, final mode/OFF/interlock mismatches and cleanup.
+Initial sandbox run hit WinError5 on pytest temporary directories, also reproduced
+in a single-test probe; software tests reran outside sandbox. First unrestricted
+run:356 passed,3 failed because a modified test expected live feedback in a passive
+connection snapshot. Corrected test to request get_status; final run above passed.
+Ruff check src tests and Ruff format --check src tests PASS; notebook schema and
+code-cell syntax checks PASS. No hardware, network, running-server restart,
+installed-wheel validation, commit or push. Changed mode behavior remains
+physically untested; saved earlier physical evidence is historical only.
+
+## D089 - Implement the selected reduction without compatibility aliases / REQ-259
+
+8 November 2026. User said "implement" after the four-stage reduction plan.
+Remove the six listed convenience methods and duplicate status configuration
+fields, migrate repository consumers together and document the breaking change.
+Keep Manual-only set_solenoid separate from mode-aware start; protective
+safe_state remains canonical. Retain the three core modules and defer model
+merging/inheritance restructuring. Preserve separately authorized concurrent
+REQ-260 mode-confirmation edits and all other pending work. No hardware authority
+or publication is inferred from this implementation instruction.
+
+## E244 - Codebase reduction and integrated final validation / TEST-259
+
+8 November 2026. Expected: net source reduction with required behavior preserved,
+updated consumers/schema/docs, one identity query per affected full preflight,
+wrong identity refused before writes, identical GUI fields/dependencies and
+complete source/installed-wheel software checks. Evidence and outcomes:
+
+- records/code-reduction-baseline.json captures original source counts/hashes.
+  Reduction-only source3180 ->3142 lines (38 removed); six methods removed and
+  status20 ->17 fields. Concurrent REQ-260 accounts for the final3136-line tree;
+  its savings and behavioral change are separately attributed in summary JSON.
+- records/code-reduction-before-tests.xml: two expected command-order failures
+  show duplicate0005 queries. stage1-tests.xml:215 PASS, including two new
+  wrong-identity-before-write cases. api-tests.xml:292 PASS after consumer/schema
+  migration. Existing protocol regressions now exercise status_bits directly.
+- First full source/wheel verification:357 +357 PASS, recorded under
+  code-reduction-direct-validation.json and corresponding XMLs. Subsequent
+  concurrent mode-confirmation edits invalidated those hashes for the final tree.
+- Final command: uv run --locked --offline --no-sync --group dev --extra gui
+  python -B scripts/verify.py --record-prefix code-reduction-final-
+  Final359 source +359 isolated-wheel tests PASS, zero failures/errors/skips;
+  lock/lint/format/byte-exact source-wheel Python/CSS/clean install/import/help/
+  config/static notebook checks PASS. Final hashes still match. This adds
+  installed-wheel coverage of E243's changed source. Evidence: final direct JSON
+  and offline/wheel XMLs. Initial notebook format failure was corrected before PASS.
+- Passive Flask layout/dependency capture is byte-for-byte equivalent as JSON
+  for reduction alone. Current tree differs only at profile-note children for
+  REQ-260; all callback definitions and other layout content still match.
+  records/code-reduction-gui-baseline.json and summary.json record scope.
+- Background browser checks: desktop1280px and mobile390x844; settings modal,
+  labels/bounds/placeholders/empty defaults and local numeric drafts verified.
+  No horizontal overflow or console errors. Screenshots and browser.json saved.
+  Preview factory rejected all opens before device access; preview.json records
+  zero attempts and released owner. Browser override reset, tab closed and own
+  server9872 stopped. No existing server/owner was taken over or restarted.
+
+REQ-259 PASS for software reduction. docs/python-api.md lists all replacements
+and schema migration. Policy/configuration constructors and owner inheritance
+are unchanged. Readiness/identity/route qualification, interlocks, timing,
+ownership, cancellation, uncertainty and cleanup remain; mode selection follows
+the separately superseding REQ-260. No new hardware/network-to-device operation,
+external application edit, commit or push. Optical/deployment acceptance remains
+open, and historical physical captures are not proof for this changed revision.
+
+
+## E244 - Manual ON OFF-interval diagnosis / TEST-261
+
+8 November 2026. Review-only request. Expected: identify actual origin/semantics
+of wait0.94s and GUI behavior; no live operation. Inspected policy, read-status,
+mode transition, Manual ON, protective OFF, GUI dispatch/renderer and existing
+interval regressions. Reproducible software command:
+.venv/Scripts/python.exe -B records/manual-on-interval-review.py
+Ran outside sandbox for the previously confirmed Windows temp-directory access
+problem; transport is FakeTransport only. Result JSON saved alongside script.
+TEST-261 PASS: min_off_s2s, first OFF at fake100s; ON at101.06s gives exact0.94s
+refusal, zero output frames, null fault; GUI ON was enabled. Refusal sample has
+Unknown electrical state because generic catch serializes connection_snapshot.
+Polling leaves deadline102s; ON at102.01s succeeds. Repeated OFF at110s resets
+deadline112s; actual return to Manual at130s resets deadline132s. Mode-change
+and OFF behavior are conservative resets, not evidence of faulty clock/polling.
+Review establishes software behavior only, not this user's precise runtime
+sequence/configuration or physical recovery requirement. Current profile labels
+2s a commissioning pause, not a calibrated/rated minimum. Production source,
+policy and live owner unchanged. No hardware/network I/O, commit or push.
+
+
+## E245 - Remove tracked SH05R software OFF pause / TEST-262
+
+8 November 2026. User explicitly requests removal after diagnosis of the2s
+commissioning pause. Changed only config/shutter.ethernet.toml min_off_s2.0->0.0
+and corresponding current docs. Expected: no elapsed-time prerequisite for
+Manual ON in this profile; retain OFF/readback/interlock and all other policy.
+Software validation command:
+.venv/Scripts/python.exe -B records/zero-off-pause-validation.py
+FakeTransport with frozen clock100s and actual tracked config: immediate ON after
+GUI Connect, repeated OFF, Single->Manual all returned electrical ON. Disabled
+interlock was refused with no new output frame. Final simulated state OFF.
+Output: records/zero-off-pause-validation.json. TEST-262 PASS, software only.
+Regression command: .venv/Scripts/python.exe -B -m pytest -q
+-p no:cacheprovider --basetemp tmp/zero-off-pause-tests
+--junitxml records/zero-off-pause-tests.xml
+359 passed, zero failures/errors/skips. Commands ran outside sandbox for known
+Windows temporary-directory access restriction. No real device/network I/O.
+No driver/controller logic changed; other custom profiles retain positive rest
+limits when configured. New setting requires normal GUI-owner restart/reload;
+no live owner was stopped or modified. No new hardware/wheel validation,
+commit or push. Historical2s measurements/authorizations are not reused as proof
+of physical performance for the zero-pause profile.
+
+
+## E246 - Remaining software guardrails inventory / TEST-263
+
+8 November 2026. User requests examination only. Expected: source-backed inventory
+of remaining effective restrictions without removing them or device operation.
+Read PROJECT/STATE, current controller Policy/configuration/owner/driver,
+GUI/CLI dispatch/rendering, protocol and transport checks. Passive load_config
+and inspect.signature(ShutterHub) captured effective tracked policy and5/3/5s
+budgets; all six source SHA256 captured in records/software-guardrails-audit.json.
+Full restriction/scope inventory saved at top of outputs/REPORT.md.
+TEST-263 PASS for static/passive audit only. No new regression or physical test
+run; existing359-test evidence retains its original scope. No production code,
+profile or live owner change, network/device I/O, commit or push. No relevant
+prior-project memory was used; unrelated WAGO search hits were not applied.
+
+
+## E247 - Annotated native activation and mode permission changes / TEST-264/265
+
+8 November 2026. Annotation1 requests removal of Manual-only activation,
+annotation2 removal of separate mode permission. Tracked qualified_modes changed
+from manual only to all four; custom-profile activation gates retained. Removed
+mode selection's qualification/allow_persistent_mode_changes gates and protective
+OFF's dependency on that flag; legacy boolean accepted/validated. Preserved all
+mode/OFF/interlock pre/post readback and driver supported-mode validation.
+Source assertion, cycle limits, pending native Start, continuous permission,
+settings/EEPROM flags, fault/ownership/protocol checks unchanged. Annotation3
+requests OFF/interlock bypass and is explicitly declined, not implemented.
+
+Command .venv/Scripts/python.exe -B -m pytest -q -p no:cacheprovider
+--basetemp tmp/native-policy-removal-tests
+--junitxml records/native-policy-removal-tests.xml
+Observed362 passed, zero failures/errors/skips; software-only outside sandbox
+for the previously confirmed temp-directory access restriction. REQ-264/265
+software PASS. Native profile Single/Auto Start passes with fake one-cycle
+parameters; Triggered remains refused without its independent priming conditions.
+Legacy mode permission false/true both select modes; custom-profile native
+activation restrictions and interlock/OFF/mismatch cleanup regressions pass.
+Ruff check src tests, Ruff format --check src tests, notebook schema/code syntax
+and git diff --check PASS. No real device/network I/O, server restart, wheel
+verification, commit or push. Request partially fulfilled: REQ-266 declined.
+
+
+## E248 - Evidence-ID correction for Manual ON diagnosis
+
+8 November 2026. Two existing headings use E244: codebase reduction TEST-259 and
+Manual ON interval diagnosis TEST-261. Historical entries are left intact.
+Canonical reference E244 now means "Codebase reduction and integrated final
+validation / TEST-259". E248 is the unambiguous alias for the existing "Manual ON
+OFF-interval diagnosis / TEST-261" entry and records/manual-on-interval-review
+.{py,json}; it adds no test or physical observation. Use E248/TEST-261 in current
+checkpoint/report references. E243/E245/E246/E247 retain their original meanings.
+
+## D090 - Consistent current checkpoint and dated GUI feedback / REQ-267
+
+8 November 2026. Keep the user-selected zero-pause/all-mode activation profile,
+removed mode-confirmation/permission gates, retained interlock/OFF checks and
+other native/settings/fault policies. Preserve legacy configuration/CLI inputs as
+explicitly documented compatibility values rather than adding aliases or removing
+accepted inputs incidentally. Replace accumulated checkpoint/report histories
+with current summaries and historical requirement references; evidence remains
+append-only. Historical notebook outputs stay intact. A refused healthy action
+may retain only same-connection dated feedback with its original timestamp,
+labelled historical; authoritative host metadata/fault/request fields remain
+current, and no extra device read is made by refusal handling.
+
+## E249 - Integrated consistency review and fixes / TEST-267
+
+8 November 2026. Reviewed full pending diffs across runtime/controller/GUI/CLI,
+profile, tests, docs/tutorial source and checkpoint/evidence. Fixed stale current
+mode-permission and2s-pause prose (including notebook5's missed multiline text),
+distinguished the tracked all-mode profile from default custom Manual-only
+policy and historical Manual-only physical evidence, and removed a stale Python
+example comment about a confirmation value. Configuration evidence now explicitly
+labels native activation as human-approved software policy, physically untested.
+D090/E248 resolve current/history and duplicate-ID ambiguity without rewriting
+old evidence or saved notebook outputs.
+
+Reproduced GUI feedback inconsistency before correction:
+.venv/Scripts/python.exe -B -m pytest -q -p no:cacheprovider
+--basetemp tmp/consistency-review-before tests/test_gui_fault_notice.py -k refusal
+--junitxml records/consistency-review-before-tests.xml
+Observed1 failure (same healthy session discarded dated OFF),4 passes.
+Fix: callback consumes prior displayed sample as State; retains only dated,
+healthy same-name/generation/connection feedback on refusal, preserving original
+timestamp and adding "Last dated feedback retained; no fresh readback is implied."
+Owner metadata remains current. New tests cover target/generation/fault/disconnect/
+undated/prior-fault boundaries and exact0.94s custom-policy ON refusal with zero
+output frames. No additional device query or hidden replay is introduced.
+
+Final software command:
+.venv/Scripts/python.exe -B scripts/verify.py --record-prefix consistency-review-final-
+Observed370 source +370 isolated installed-wheel tests, zero failures/errors/skips;
+locked/offline dependencies, lint/format, exact wheel Python/CSS parity, passive
+imports/config/help, stale/missing lock rejection and tutorial schema/syntax/
+passive setup PASS. All39 verifier input hashes match final files. Earlier
+consistency-review verification also passed370/370; final rerun includes updated
+README evidence link. Commands ran outside sandbox for known Windows temporary
+access restriction; tests use fake transports or localhost only.
+
+Historical notebook outputs/execution metadata were compared to HEAD and are
+unchanged. REQ-267 PASS for software review; software/interface docs and canonical
+STATE/REPORT updated. No device/lab-network I/O, live owner/server restart,
+external checkout change, commit or push. Physical native/optical/driver and
+external deployment acceptance remain separate and open. REQ-266 stays declined;
+this review does not silently remove interlock or electrical-OFF prerequisites.
+
+
+## E250 - Controller status capability explanation / TEST-268
+
+8 November 2026. User asks whether Unknown GUI fields should be readable.
+Reviewed GUI layout/renderer and canonical get_status/driver against exact local
+Thorlabs Kinesis1.14.60 reference extracted previously without installation.
+Recomputed hashes for KSC101 header, SolenoidStatus, GetStatusBits and
+GetOperatingState pages; all match SRC-008/ksc101-api-reference-findings.json.
+SolenoidStatus exposes KeyEnabled, OperatingMode, OperatingState, SolenoidState
+and ToggleCount. Header/GetStatusBits document output0x1, interlock0x1000 and
+channel-enabled0x80000000; generic unused0x2000 is not Key/Ready. These extra
+bits are evidence of available status capability, not a qualified mapping to
+GUI Key/Ready or current physical interlock continuity. GUI hardcodes Key/Ready
+Unknown, shows Start requested/Unknown for activity, owner error/None reported
+for fault and dated bit0 for output. Identify is a button with plain text; the
+pasted HTML-space entity does not appear in GUI source. No browser reproduction
+was made, so its appearance cannot be diagnosed beyond a possible copy/render issue.
+
+TEST-268 PASS static comparison only; no source edit/new regression, SDK
+execution, device/lab-network I/O, server restart, commit or push. Official web
+searches for matching KSC101 header/UI wording returned no results; conclusions
+rely on locally verified manufacturer reference and current code. Artifact:
+records/controller-status-capability-review.json. Prior broad descriptions of
+unavailable statuses should be read as missing raw-protocol implementation/
+verified mapping, not lack of manufacturer API support. Native physical behavior
+and actual key/readiness/operating-state telemetry remain unvalidated here.
+
+
+## D091 - Explicit Stop reset and source checklist removal / REQ-269
+
+8 November 2026. User requests removal of GUI source guard and stale interruption
+fault barrier. Removed checklist/callback dependency and native/settings source
+assertion; compatibility booleans remain typed. Explicit safe_state resets faults
+only after fresh OFF/interlock confirmation. Private _protect(reset_fault=False)
+keeps automatic error cleanup and shutdown from silently clearing faults. Recovery
+API remains passive and evidence-based. Clear no optical evidence on reset.
+Automatic approval review rejected expanding this removal to hardware disconnect
+as outside requested GUI/fault scope; restored/retained that API protection and
+disabled its GUI button with an API-only explanation. No hardware command,
+server restart, journal deletion, commit or push.
+
+## E251 - GUI reset software regressions / TEST-269
+
+389 source tests PASS, zero skips/failures/errors. Command:
+.venv\Scripts\python.exe -m pytest -q --tb=short
+--junitxml=records/gui-fault-reset-tests.xml. Expected/observed: explicit Stop with
+verified OFF/interlock clears journal/error and enables output controls without
+sending ON; failed OFF write or disabled interlock retains fault/journal; passive
+poll/connect preserves fault; automatic failure cleanup retains original exception;
+native Start succeeds without source assertion when remaining checks pass; GUI
+layout/dependencies contain no source checklist and startup opens no device.
+Artifact: records/gui-fault-reset-tests.xml. Sandbox fixture creation failed with
+Windows Access Denied; approved offline pytest run outside sandbox succeeded.
+Final Ruff lint and formatting PASS. Earlier intermediate lint noted status
+tooltip lines; these are resolved in the current working tree.
+No wheel, browser screenshot, live-owner/device recovery or physical evidence
+claimed. Prior E249 wheel and all earlier physical results remain historical.
+
+
+## D092 - Decode documented flags without claiming vendor Key/Ready equivalence
+
+8 November 2026. User asks to resolve status implementation gap. REQ-270 implements
+the supported additional0x042A flags as literal named bits; REQ-271 explicitly
+retains the full requested vendor Key/Ready/actual native Activity mapping gap.
+The public getter names do not supply raw encoding. No Key=interlock-bit or
+Ready=channel-enabled-bit association is assumed. New fields are readback-only,
+not command-permission inputs. Existing source/explicit-reset edits under REQ-269
+were observed concurrently and preserved; this task adds no command authorization.
+
+## E252 - Documented status readback implementation and remaining mapping gap
+
+8 November 2026. REQ-270/TEST-270 PASS software; REQ-271/TEST-271 PARTIAL/BLOCKED.
+Rechecked exact SRC-008 reference hashes and original signed-installer SHA256.
+Inspected RevF PDF p29 using bundled pypdf (PDF skill); Key/Ready described without
+raw fields. Public KeyEnabled/OperatingState and masks0x1000/0x80000000 documented.
+Extracted three inert vendor Solenoid DLL files from existing MSI/CAB into
+ tmp/status-reference. ReflectionOnlyLoad metadata/getter/constructor bytecode
+inspection shows native struct accessors, not verified receive-frame layouts.
+No vendor constructor/function, installer, native driver or SDK runtime executed.
+Cached dnfile/capstone installation attempt failed offline because dnfile absent;
+no package dependency was added. File/provenance artifact:
+records/status-readback-native-reference.json. Official web search supplied no
+usable primary raw mapping; local verified manufacturer material is the basis.
+
+Implemented interlock_status_bit/channel_enabled_bit in shared ShutterStatus;
+central _snapshot decoding covers get_status, ON wait/readback and OFF results,
+using current raw bits/date. Host-only/disconnected fields are None; existing
+healthy-refusal GUI retention copies flags only with the same dated context.
+GUI uses Interlock flag/Channel flag Set/Clear, Software fault and Native request
+labels; actual Key/Ready/native activity limitation is explicit. No extra status
+query, output frame, receiver, hidden initialization or policy gate was added.
+Updated current docs/API/README and new docs/status-readback.md. Unknown mask bits
+remain raw; firmware0x2000 is not repurposed as readiness/key.
+
+Initial status software suite:386 passed before concurrent REQ-269 final changes.
+Final command .venv/Scripts/python.exe -B scripts/verify.py
+--record-prefix status-readback-final-
+Observed389 source +389 isolated-wheel tests PASS, zero failures/errors/skips;
+lock/lint/format, exact Python/CSS parity, passive imports/help/config, negative
+lock checks and static tutorials PASS. All40 final verifier inputs match.
+First status-readback verifier also passed389+389, but later concurrent README
+edit invalidated one doc hash; final rerun above validates the combined final inputs.
+Software-only execution used outside sandbox for known Windows tmp permissions;
+fake transports/localhost only. No device/lab-network operations, live owner/
+server changes, external checkout edits, commit or push. No new browser screenshot
+or physical interpretation is claimed. Source-reset/confirmation behavior from
+REQ-269 was preserved; new readback logic does not alter command controls.
+
+Historical replay: records/state-zero-statusbits-investigation.json raw
+2a0406008150010000200000 decodes0x2000, both new flags Clear, output OFF.
+Artifact records/status-readback-reference-replay.json; this is not a new read.
+Full request remains blocked pending manufacturer-confirmed firmware1.0.7
+Key/Ready/OperatingState/ToggleCount raw request/reply definitions or an existing
+passive capture paired with those states. STATE.md and docs/status-readback.md
+record exact required provenance/bytes and next fixture/implementation step.
+
+
+## D093 - Standalone-owned GUI server shutdown / REQ-272
+
+8 November 2026. Add optional shutdown callback to create_app; standalone run()
+supplies Event.set and embeds a heading button/callback. Imported create_app()
+gets neither control nor shutdown endpoint. Use a localhost threaded Werkzeug
+server with a 0.2s idle loop timeout, no reloader. Non-daemon request threads are
+drained by server_close before hub.shutdown_outputs and hub.close, so accepted
+callbacks cannot dispatch after final cleanup. Exit preserves original and
+cleanup errors; no process kill, browser close or arbitrary server takeover.
+Shutdown may wait for a pending bounded request. Use Stop/OFF for output control.
+
+## E253 - Standalone shutdown regression evidence / TEST-272
+
+Command: .venv\Scripts\python.exe -m pytest -q --tb=short
+--junitxml=records/gui-shutdown-tests.xml.391 tests PASS, zero errors/failures/skips.
+Expected/observed: embedded layout/dependencies lack shutdown; standalone real
+localhost listener accepts a Dash shutdown POST, sends the acknowledgement and
+disables the button, returns from run(), closes the listening socket, then calls
+output cleanup and communication release once in order. Tests use no device,
+SDK or lab-network access; listener test uses an OS-assigned localhost port.
+Existing CLI default/override tests and server-error cleanup preservation pass.
+Final Ruff lint/format and git diff --check PASS. Hardware cleanup behavior is
+covered by existing simulations only; no live server/device was stopped here.
+Source tests use approved unsandboxed temporary fixtures/loopback. No new wheel
+validation. Artifact: records/gui-shutdown-tests.xml.
+
+## D094 - Integrated repository review and local staged publication / REQ-273
+
+8 November 2026. User requests whole-repository review, inconsistency fixes,
+pruning and stage-by-stage commits. This authorizes local commits of reviewed
+pending work and fixes, superseding earlier no-commit constraints; no push,
+hardware/lab-network I/O, live-owner/server action or external checkout edit.
+Concurrent completed REQ-272 shutdown work was preserved and included in the
+integrated validation. REQ-273 avoids collision with that existing requirement.
+
+Keep dependent runtime/API/schema and repository consumers together in one
+runtime commit, then commit reconciled documentation/evidence, then the final
+checkpoint. Retain historical captures, manifests, prior failed-test evidence,
+notebook outputs/metadata, manuals, environments and ownership state.
+The control core remains controller/protocol/transport. Existing interlock,
+OFF/readback, identity, qualification, framing and ownership checks remain.
+
+Remove the unusable GUI hardware-disconnect widget/action/dispatch rather than
+leave a disabled control that rendering re-enables. Preserve the protected Python
+API and ordinary passive Release. Automatic shutdown must report retained faults
+after successful OFF while still attempting other targets; it must never clear
+the fault. Only explicit verified Stop/OFF or protected recovery resets it.
+
+## E254 - Repository review validation / TEST-273
+
+8 November 2026. REQ-273 software validation PASS; physical/deployment acceptance
+remains BLOCKED separately. Reviewed all six runtime modules, both verification
+scripts, configuration, test coverage, tutorials, current docs and pending diffs;
+historical records were inspected selectively for current references.
+
+Baseline:391 source tests PASS. Three new regressions then failed as expected:
+1. GUI layout/dependencies still exposed hardware-disconnect, contrary to the
+   API-only contract; render() also overwrote its initial disabled=True.
+2. shutdown_outputs() returned success after confirmed OFF while retaining a
+   prior output fault, contrary to its aggregate-failure contract.
+3. CLI KeyboardInterrupt with empty text printed only "Unconfirmed:".
+Artifact: records/repo-review-reproduction-tests.xml (three failures, expected).
+After fixes165 owner/GUI/CLI tests PASS; full391-source suite PASS. Shutdown
+regression uses two simulated targets: both receive OFF, original fault/journal
+remain, aggregate raises, and subsequent explicit verified Stop clears it.
+Artifacts: repo-review-fixed-tests.xml, repo-review-source-tests.xml.
+
+Final command: uv run --locked --offline --group dev --extra gui python -B
+scripts/verify.py --record-prefix repo-review-final-
+Observed391 source +391 isolated installed-wheel tests PASS; zero failures,
+errors or skips. Lock, Ruff lint/format, exact wheel Python/CSS parity, passive
+imports/help/config, missing/outdated lock rejection and static tutorials PASS.
+All41 input hashes match records/repo-review-final-direct-validation.json.
+Both suites include the real localhost-only shutdown response/listener-close
+check. No instrument, SDK runtime, lab network or existing server was accessed.
+
+Initial sandbox runs could not use uv cache/pytest temporary directories; the
+approved software-only run outside that sandbox passed. These filesystem errors
+were not classified as source regressions. Final verification removed its own
+successful disposable environment. Historical failed environments and evidence
+were not deleted. Only the inspected empty .tmp-source-reset-tests directory and
+this review's empty failed-test scratch directory were selected for cleanup.
+
+Reconciled stale source-confirmation/mode-permission and historical/current
+claims across README/config/API/GUI/interface/architecture/cutover/setup/physical
+guides. Notebook4 now describes all-mode software permission; saved outputs,
+metadata and cell identities in all six notebooks match review base174d23b.
+records/repo-review-audit.json records local-link checks, all four unchanged
+manufacturer PDF hashes and current verifier-input parity. Current checkpoint/
+report are consolidated; old E252/E253 and physical results retain dated scope.
+Fourteen historical screenshots have .png names but JPEG bytes. Their names and
+original bytes are preserved for existing capture/hash references; the audit
+lists them explicitly. This archival naming limitation does not affect runtime
+assets, decoder behavior or package validation.
+
+REQ-271 Key/Ready/actual native-state mapping remains PARTIAL/BLOCKED; no mask
+was guessed. No live hardware qualification or new cycle authority is implied.
+Runtime stage committed as ddda81d. Later stages are recorded in Git history and
+the final STATE.md checkpoint; this record does not claim a push.

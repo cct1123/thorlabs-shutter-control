@@ -1,0 +1,21 @@
+{
+  "scope": "Simulated transports only; no device/network I/O",
+  "led": [
+    "0x0005",
+    "0x0005",
+    "0x04C1",
+    "0x04C7",
+    "0x0429",
+    "0x04B3",
+    "0x04B4"
+  ],
+  "disconnect": [
+    "0x0005",
+    "0x0005",
+    "0x04C1",
+    "0x04C7",
+    "0x0429",
+    "0x0002"
+  ],
+  "BlockingIOError_is_OSError": true
+}

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="0.244" timestamp="2026-11-08T22:05:18.864676-06:00" hostname="HighFieldSetup"><testcase classname="tests.test_additional_commands" name="test_led_write_has_exact_readback_without_incidental_off" file="tests\test_additional_commands.py" line="150" time="0.011"><failure message="assert [5, 5, 1217, ...65, 1203, ...] == [5, 1217, 122...5, 1203, 1204]&#10;  &#10;  At index 1 diff: 5 != 1217&#10;  Left contains one more item: 1204&#10;  Use -v to get more diff">tests\test_additional_commands.py:160: in test_led_write_has_exact_readback_without_incidental_off
+    assert [f.message_id for _, f in device.history[before:]] == [
+E   assert [5, 5, 1217, ...65, 1203, ...] == [5, 1217, 122...5, 1203, 1204]
+E     
+E     At index 1 diff: 5 != 1217
+E     Left contains one more item: 1204
+E     Use -v to get more diff</failure></testcase><testcase classname="tests.test_additional_commands" name="test_hardware_disconnect_is_explicit_and_ordinary_close_stays_passive" file="tests\test_additional_commands.py" line="227" time="0.005"><failure message="assert [5, 5, 1217, 1223, 1065, 2] == [5, 1217, 1223, 1065, 2]&#10;  &#10;  At index 1 diff: 5 != 1217&#10;  Left contains one more item: 2&#10;  Use -v to get more diff">tests\test_additional_commands.py:236: in test_hardware_disconnect_is_explicit_and_ordinary_close_stays_passive
+    assert [f.message_id for _, f in devices[0].history[before:]] == [
+E   assert [5, 5, 1217, 1223, 1065, 2] == [5, 1217, 1223, 1065, 2]
+E     
+E     At index 1 diff: 5 != 1217
+E     Left contains one more item: 2
+E     Use -v to get more diff</failure></testcase></testsuite></testsuites>

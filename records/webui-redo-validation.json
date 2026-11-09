@@ -1,0 +1,122 @@
+{
+  "requirement": "REQ-255",
+  "test": "TEST-255",
+  "record": "E238",
+  "captured_at_utc": "2026-11-09T00:33:26.077484+00:00",
+  "scope": "Actual read-only browser flow and software prerequisite correction; no motion or protected recovery",
+  "software": {
+    "test_totals": {
+      "offline": {
+        "tests": 354,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "wheel": {
+        "tests": 354,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "affected_tests": 115,
+    "inputs_match": 39
+  },
+  "checks": {
+    "exact_identity": true,
+    "manual_off_interlock": true,
+    "fault_and_fresh_off_both_visible": true,
+    "activation_disabled": true,
+    "live_readback_updated": true,
+    "release_clears_old_electrical_display": true,
+    "released": true,
+    "test_server_stopped": true,
+    "journal_unchanged": true,
+    "runtime_hashes_unchanged": true,
+    "browser_warnings_or_errors": []
+  },
+  "motion_requested": 0,
+  "recovery_performed": false,
+  "last_electrical_observation": {
+    "name": "shutter",
+    "channel": 0,
+    "serial_number": "68800777",
+    "endpoint": "192.168.1.19:40305",
+    "has_device": true,
+    "identity": {
+      "serial_number": "68800777",
+      "model": "KSC101",
+      "firmware": "1.0.7",
+      "hardware_version": 3,
+      "channels": 1
+    },
+    "generation": 1,
+    "operating_mode": "manual",
+    "interlock_required": true,
+    "status_bits": 8192,
+    "electrical_state": "off",
+    "electrical_observed_at": "2026-11-09T00:31:15.461067+00:00",
+    "requested_state": null,
+    "error": "Persistent uncertainty: Protective OFF pending; original=Persistent uncertainty: 2026-11-09T00:06:11.380229+00:00 original=End-to-end deadline expired; result is unconfirmed; latest=End-to-end deadline expired; result is unconfirmed; cleanup=Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown; optical state unknown",
+    "cleanup": null,
+    "optical_closed_at": null,
+    "optical_evidence": null,
+    "cycle_parameters": null,
+    "settings_observed_at": null,
+    "settings_persistence": null
+  },
+  "post_release_status": {
+    "name": "shutter",
+    "channel": 0,
+    "serial_number": "68800777",
+    "endpoint": "192.168.1.19:40305",
+    "has_device": false,
+    "identity": null,
+    "generation": 1,
+    "operating_mode": "unknown",
+    "interlock_required": null,
+    "status_bits": null,
+    "electrical_state": "unknown",
+    "electrical_observed_at": null,
+    "requested_state": null,
+    "error": "Persistent uncertainty: Protective OFF pending; original=Persistent uncertainty: 2026-11-09T00:06:11.380229+00:00 original=End-to-end deadline expired; result is unconfirmed; latest=End-to-end deadline expired; result is unconfirmed; cleanup=Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown; optical state unknown",
+    "cleanup": null,
+    "optical_closed_at": null,
+    "optical_evidence": null,
+    "cycle_parameters": null,
+    "settings_observed_at": null,
+    "settings_persistence": null
+  },
+  "netstat_matching_lines": [
+    "TCP    127.0.0.1:30130        127.0.0.1:9860         TIME_WAIT       0",
+    "TCP    127.0.0.1:32718        127.0.0.1:9860         TIME_WAIT       0",
+    "TCP    127.0.0.1:32820        127.0.0.1:9860         TIME_WAIT       0",
+    "TCP    127.0.0.1:39331        127.0.0.1:9860         TIME_WAIT       0",
+    "TCP    127.0.0.1:43335        127.0.0.1:9860         TIME_WAIT       0",
+    "TCP    127.0.0.1:48616        127.0.0.1:9860         TIME_WAIT       0",
+    "TCP    192.168.1.201:36648    192.168.1.19:40305     TIME_WAIT       0"
+  ],
+  "physical_test": "BLOCKED: current protected setup and independent blade-closed confirmation not received",
+  "camera": "Logi Webcam C920e present, orientation unanswered; no camera image captured",
+  "remaining_actions": [
+    "Confirm current protected setup and independent closed blade evidence",
+    "Perform documented passive recovery under that confirmation",
+    "Run the proposed one1s Manual pulse after >=2s OFF rest, final OFF/readback/release; no settings changes"
+  ],
+  "artifacts": [
+    "records/webui-redo-hardware-live.json",
+    "records/webui-redo-runtime.json",
+    "records/webui-redo-fault-readback.jpg",
+    "records/webui-redo-direct-validation.json"
+  ],
+  "local_markdown_links": {
+    "documents": 21,
+    "missing": []
+  },
+  "artifact_sha256": {
+    "records/webui-redo-hardware-live.json": "22f88de5e9dafa6b205ff1ddba5a3de2826aaa2b37d99bb474c72df9971d5cd9",
+    "records/webui-redo-runtime.json": "fc1b227dd1ed0a2fb472c5b2dc05cf46ca7307ad2313693612ffd3b594ff12f1",
+    "records/webui-redo-fault-readback.jpg": "59edfc765f087c17c482c22145b016833806775343d06964268a4772ddfe4fe0",
+    "records/webui-redo-direct-validation.json": "4f17ae211ef1b0b061bdb1a369ac46ccfa72b789f8fd414bd9bbdb92c19f4106"
+  }
+}

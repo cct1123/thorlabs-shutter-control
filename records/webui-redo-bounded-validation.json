@@ -1,0 +1,175 @@
+{
+  "requirement": "REQ-255",
+  "test": "TEST-255",
+  "record": "E239",
+  "captured_at_utc": "2026-11-09T03:35:53.934278+00:00",
+  "result": "PASS for the bounded electrical/WebUI procedure; independent motion remains unobserved",
+  "scope": "Actual visible user actions with current production owner; passive API recovery is recorded separately; no simulated hardware or direct callback substitutes",
+  "checks": {
+    "passive_protected_recovery": true,
+    "exact_identity": true,
+    "single_approved_pulse_completed": true,
+    "led_read_prefill": true,
+    "local_led_draft_preserved": true,
+    "explicit_read_restores_led_flags": true,
+    "channel_read": "Channel enable: Disabled",
+    "legacy_bay_refusal_without_fault": true,
+    "raw_events_collected": 0,
+    "polling_preserves_off_notice": true,
+    "final_manual_off_interlock_no_fault": true,
+    "cycle_parameters_unchanged": true,
+    "release_and_drafts_cleared": true,
+    "passive_read_after_release": true,
+    "browser_warnings_or_errors": [],
+    "runtime_matches_verified_source": true,
+    "no_journal_remains": true,
+    "test_server_stopped": true,
+    "no_active_socket_or_listener": true
+  },
+  "pulse_budget": {
+    "approved": 1,
+    "requested": 1,
+    "remaining": 0,
+    "host_hold_s": 1.0,
+    "seconds_since_first_healthy_off_sample": 84.944947
+  },
+  "pulse_completion": {
+    "name": "shutter",
+    "channel": 0,
+    "serial_number": "68800777",
+    "endpoint": "192.168.1.19:40305",
+    "has_device": true,
+    "identity": {
+      "serial_number": "68800777",
+      "model": "KSC101",
+      "firmware": "1.0.7",
+      "hardware_version": 3,
+      "channels": 1
+    },
+    "generation": 1,
+    "operating_mode": "manual",
+    "interlock_required": true,
+    "status_bits": 8192,
+    "electrical_state": "off",
+    "electrical_observed_at": "2026-11-09T03:33:57.983518+00:00",
+    "requested_state": "off",
+    "error": null,
+    "cleanup": "Electrical OFF readback; dispatch monotonic=321683.281743; optical unknown",
+    "optical_closed_at": null,
+    "optical_evidence": null,
+    "cycle_parameters": {
+      "on_ms": 2000,
+      "off_ms": 2000,
+      "cycles": 5
+    },
+    "settings_observed_at": "2026-11-09T03:33:00.484252+00:00",
+    "settings_persistence": null
+  },
+  "final_readback": {
+    "name": "shutter",
+    "channel": 0,
+    "serial_number": "68800777",
+    "endpoint": "192.168.1.19:40305",
+    "has_device": true,
+    "identity": {
+      "serial_number": "68800777",
+      "model": "KSC101",
+      "firmware": "1.0.7",
+      "hardware_version": 3,
+      "channels": 1
+    },
+    "generation": 1,
+    "operating_mode": "manual",
+    "interlock_required": true,
+    "status_bits": 8192,
+    "electrical_state": "off",
+    "electrical_observed_at": "2026-11-09T03:34:39.878424+00:00",
+    "requested_state": "off",
+    "error": null,
+    "cleanup": "Electrical OFF readback; dispatch monotonic=321714.561860; optical unknown",
+    "optical_closed_at": null,
+    "optical_evidence": null,
+    "cycle_parameters": {
+      "on_ms": 2000,
+      "off_ms": 2000,
+      "cycles": 5
+    },
+    "settings_observed_at": "2026-11-09T03:33:00.484252+00:00",
+    "settings_persistence": null
+  },
+  "released_status": {
+    "name": "shutter",
+    "channel": 0,
+    "serial_number": "68800777",
+    "endpoint": "192.168.1.19:40305",
+    "has_device": false,
+    "identity": null,
+    "generation": 1,
+    "operating_mode": "unknown",
+    "interlock_required": null,
+    "status_bits": null,
+    "electrical_state": "unknown",
+    "electrical_observed_at": null,
+    "requested_state": "off",
+    "error": null,
+    "cleanup": "Electrical OFF readback; dispatch monotonic=321714.561860; optical unknown",
+    "optical_closed_at": null,
+    "optical_evidence": null,
+    "cycle_parameters": null,
+    "settings_observed_at": null,
+    "settings_persistence": null
+  },
+  "physical_observation": {
+    "camera_reply": "No / unsure",
+    "camera_used": false,
+    "motion_observed": false,
+    "limit": "Pulse routine checks electrical ON before hold and OFF afterward; only completed OFF is saved by the GUI callback. No independent blade, optical timing or extinction measurement."
+  },
+  "software": {
+    "artifact": "records/webui-redo-direct-validation.json",
+    "test_totals": {
+      "offline": {
+        "tests": 354,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "wheel": {
+        "tests": 354,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "verified_input_count": 39
+  },
+  "not_exercised": [
+    "Mode changes",
+    "LED/timing/EEPROM writes",
+    "Native cycling",
+    "Automatic message start/stop",
+    "Hardware-disconnect request",
+    "Physical interruption/recovery under an active beam"
+  ],
+  "netstat_matching_lines": [],
+  "artifact_sha256": {
+    "records/webui-redo-bounded-authorization.json": "a4eed149dbea1e2f76f496807d1dab0b8a8882afc031a4e9a21cb6c58ed47079",
+    "records/webui-redo-bounded-final-off.jpg": "4f7c5d3ed6a30979294cf88075c0bc3bd9c2dc9bdb831879e93fbca5e57be050",
+    "records/webui-redo-bounded-live.json": "920c6a90dad821227d00653758e6fc671309b78f7c94e34bb6901a2ca48ef5f5",
+    "records/webui-redo-bounded-recovery.json": "d80ab1d8dd4a2c4d9db9443ad844ffed786074ebda02f8f0e71eb3078c5bd8e6",
+    "records/webui-redo-bounded-released.jpg": "62b14b8d0f0c1a0c51a0fd0d6bab1829c16d4ace78d61a66c9c4f0ace7a16b67",
+    "records/webui-redo-bounded-runtime.json": "521bb7a295a9ccc45f0eeb16980484a80d1738dc21146aaf9fef4ec7e5d2fb6a",
+    "records/webui-redo-bounded-settings.jpg": "4d6d75223d9b3a3e48fd564798d4a74cb133d85ef90fad06a0804dee0114b3b8"
+  },
+  "local_markdown_links": {
+    "documents": 21,
+    "missing": []
+  },
+  "server_stop": {
+    "method": "Ctrl+C to test-only exec session",
+    "exec_exit_code": 1,
+    "cleanup_failure_reported": false,
+    "listener_absent": true,
+    "note": "Intentional terminal stop status is separate from the successful device/WebUI procedure; no cleanup error was printed and the listener was independently confirmed absent."
+  }
+}

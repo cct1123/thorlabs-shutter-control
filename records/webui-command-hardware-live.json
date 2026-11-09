@@ -1,0 +1,551 @@
+{
+  "requirement": "REQ-252",
+  "test": "TEST-252",
+  "scope": "Visible WebUI / production ShutterHub / actual KEH3 TCP controller",
+  "events": [
+    {
+      "action": "connect",
+      "captured_at_utc": "2026-11-08T23:59:29.195Z",
+      "notice": "Connected to the exact controller; fresh feedback received.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": true,
+        "identity": {
+          "serial_number": "68800777",
+          "model": "KSC101",
+          "firmware": "1.0.7",
+          "hardware_version": 3,
+          "channels": 1
+        },
+        "generation": 1,
+        "operating_mode": "manual",
+        "interlock_required": true,
+        "status_bits": 8192,
+        "electrical_state": "off",
+        "electrical_observed_at": "2026-11-08T23:58:59.943912+00:00",
+        "requested_state": null,
+        "error": "Persistent uncertainty: 2026-11-08T23:58:00.357925+00:00 original=; latest=; cleanup=Safe state unconfirmed: ",
+        "cleanup": null,
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": null,
+        "settings_observed_at": null,
+        "settings_persistence": null
+      }
+    },
+    {
+      "action": "release-before-reload",
+      "captured_at_utc": "2026-11-09T00:01:48.863Z",
+      "notice": "Communication released. Optical state is not measured.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": false,
+        "identity": null,
+        "generation": 1,
+        "operating_mode": "unknown",
+        "interlock_required": null,
+        "status_bits": null,
+        "electrical_state": "unknown",
+        "electrical_observed_at": null,
+        "requested_state": null,
+        "error": "Persistent uncertainty: 2026-11-08T23:58:00.357925+00:00 original=; latest=; cleanup=Safe state unconfirmed: ",
+        "cleanup": null,
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": null,
+        "settings_observed_at": null,
+        "settings_persistence": null
+      },
+      "observation": "Captured while callback was updating; not completion evidence"
+    },
+    {
+      "action": "release-before-reload-completed",
+      "captured_at_utc": "2026-11-09T00:01:57.805Z",
+      "notice": "Communication released. Optical state is not measured.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": false,
+        "identity": null,
+        "generation": 1,
+        "operating_mode": "unknown",
+        "interlock_required": null,
+        "status_bits": null,
+        "electrical_state": "unknown",
+        "electrical_observed_at": null,
+        "requested_state": null,
+        "error": "Persistent uncertainty: 2026-11-08T23:58:00.357925+00:00 original=; latest=; cleanup=Safe state unconfirmed: ",
+        "cleanup": null,
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": null,
+        "settings_observed_at": null,
+        "settings_persistence": null
+      }
+    },
+    {
+      "action": "connect-fault-notice-fixed",
+      "captured_at_utc": "2026-11-09T00:02:45.797Z",
+      "notice": "Controller fault remains: Persistent uncertainty: 2026-11-08T23:58:00.357925+00:00 original=; latest=; cleanup=Safe state unconfirmed: . Output activation is blocked; protected recovery is required.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": true,
+        "identity": {
+          "serial_number": "68800777",
+          "model": "KSC101",
+          "firmware": "1.0.7",
+          "hardware_version": 3,
+          "channels": 1
+        },
+        "generation": 1,
+        "operating_mode": "manual",
+        "interlock_required": true,
+        "status_bits": 8192,
+        "electrical_state": "off",
+        "electrical_observed_at": "2026-11-09T00:02:45.475985+00:00",
+        "requested_state": null,
+        "error": "Persistent uncertainty: 2026-11-08T23:58:00.357925+00:00 original=; latest=; cleanup=Safe state unconfirmed: ",
+        "cleanup": null,
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": null,
+        "settings_observed_at": null,
+        "settings_persistence": null
+      }
+    },
+    {
+      "action": "release-fixed-before-recovery",
+      "captured_at_utc": "2026-11-09T00:03:00.408Z",
+      "notice": "Communication released. Optical state is not measured. Controller fault remains: Persistent uncertainty: 2026-11-08T23:58:00.357925+00:00 original=; latest=; cleanup=Safe state unconfirmed: . Output activation is blocked; protected recovery is required.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": false,
+        "identity": null,
+        "generation": 1,
+        "operating_mode": "unknown",
+        "interlock_required": null,
+        "status_bits": null,
+        "electrical_state": "unknown",
+        "electrical_observed_at": null,
+        "requested_state": null,
+        "error": "Persistent uncertainty: 2026-11-08T23:58:00.357925+00:00 original=; latest=; cleanup=Safe state unconfirmed: ",
+        "cleanup": null,
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": null,
+        "settings_observed_at": null,
+        "settings_persistence": null
+      }
+    },
+    {
+      "action": "connect-after-protected-recovery",
+      "captured_at_utc": "2026-11-09T00:03:57.791Z",
+      "notice": "Connected to the exact controller; fresh feedback received.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": true,
+        "identity": {
+          "serial_number": "68800777",
+          "model": "KSC101",
+          "firmware": "1.0.7",
+          "hardware_version": 3,
+          "channels": 1
+        },
+        "generation": 1,
+        "operating_mode": "manual",
+        "interlock_required": true,
+        "status_bits": 8192,
+        "electrical_state": "off",
+        "electrical_observed_at": "2026-11-09T00:03:57.516942+00:00",
+        "requested_state": null,
+        "error": null,
+        "cleanup": null,
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": null,
+        "settings_observed_at": null,
+        "settings_persistence": null
+      }
+    },
+    {
+      "action": "read-before-approved-pulse",
+      "captured_at_utc": "2026-11-09T00:04:25.025Z",
+      "notice": "Readback updated.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": true,
+        "identity": {
+          "serial_number": "68800777",
+          "model": "KSC101",
+          "firmware": "1.0.7",
+          "hardware_version": 3,
+          "channels": 1
+        },
+        "generation": 1,
+        "operating_mode": "manual",
+        "interlock_required": true,
+        "status_bits": 8192,
+        "electrical_state": "off",
+        "electrical_observed_at": "2026-11-09T00:04:24.390152+00:00",
+        "requested_state": null,
+        "error": null,
+        "cleanup": null,
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": null,
+        "settings_observed_at": null,
+        "settings_persistence": null
+      }
+    },
+    {
+      "action": "one-approved-1s-pulse",
+      "captured_at_utc": "2026-11-09T00:04:38.928Z",
+      "notice": "One 1-second host hold completed; electrical OFF read back.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": true,
+        "identity": {
+          "serial_number": "68800777",
+          "model": "KSC101",
+          "firmware": "1.0.7",
+          "hardware_version": 3,
+          "channels": 1
+        },
+        "generation": 1,
+        "operating_mode": "manual",
+        "interlock_required": true,
+        "status_bits": 8192,
+        "electrical_state": "off",
+        "electrical_observed_at": "2026-11-09T00:04:38.858385+00:00",
+        "requested_state": "off",
+        "error": null,
+        "cleanup": "Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown",
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": null,
+        "settings_observed_at": null,
+        "settings_persistence": null
+      },
+      "requested_at_utc": "2026-11-09T00:04:37.068Z",
+      "operator_cycle_budget": {
+        "approved": 1,
+        "requested": 1,
+        "remaining": 0
+      }
+    },
+    {
+      "action": "read-cycle-settings",
+      "captured_at_utc": "2026-11-09T00:05:26.198Z",
+      "notice": "Device cycle settings read. No defaults were written.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": true,
+        "identity": {
+          "serial_number": "68800777",
+          "model": "KSC101",
+          "firmware": "1.0.7",
+          "hardware_version": 3,
+          "channels": 1
+        },
+        "generation": 1,
+        "operating_mode": "manual",
+        "interlock_required": true,
+        "status_bits": 8192,
+        "electrical_state": "off",
+        "electrical_observed_at": "2026-11-09T00:05:25.878411+00:00",
+        "requested_state": "off",
+        "error": null,
+        "cleanup": "Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown",
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": {
+          "on_ms": 2000,
+          "off_ms": 2000,
+          "cycles": 5
+        },
+        "settings_observed_at": "2026-11-09T00:05:25.807852+00:00",
+        "settings_persistence": null
+      }
+    },
+    {
+      "action": "read-led-modes",
+      "captured_at_utc": "2026-11-09T00:05:31.049Z",
+      "notice": "LED indication modes read. No settings were written.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": true,
+        "identity": {
+          "serial_number": "68800777",
+          "model": "KSC101",
+          "firmware": "1.0.7",
+          "hardware_version": 3,
+          "channels": 1
+        },
+        "generation": 1,
+        "operating_mode": "manual",
+        "interlock_required": true,
+        "status_bits": 8192,
+        "electrical_state": "off",
+        "electrical_observed_at": "2026-11-09T00:05:30.734259+00:00",
+        "requested_state": "off",
+        "error": null,
+        "cleanup": "Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown",
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": {
+          "on_ms": 2000,
+          "off_ms": 2000,
+          "cycles": 5
+        },
+        "settings_observed_at": "2026-11-09T00:05:25.807852+00:00",
+        "settings_persistence": null
+      },
+      "led_readout": "LED modes: 0x0001",
+      "led_checkboxes": [
+        {
+          "checked": false,
+          "value": "1"
+        },
+        {
+          "checked": false,
+          "value": "2"
+        },
+        {
+          "checked": false,
+          "value": "8"
+        }
+      ]
+    },
+    {
+      "action": "read-channel-enable",
+      "captured_at_utc": "2026-11-09T00:06:04.472Z",
+      "notice": "Channel enable read; this does not measure blade position.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": true,
+        "identity": {
+          "serial_number": "68800777",
+          "model": "KSC101",
+          "firmware": "1.0.7",
+          "hardware_version": 3,
+          "channels": 1
+        },
+        "generation": 1,
+        "operating_mode": "manual",
+        "interlock_required": true,
+        "status_bits": 8192,
+        "electrical_state": "off",
+        "electrical_observed_at": "2026-11-09T00:06:04.177863+00:00",
+        "requested_state": "off",
+        "error": null,
+        "cleanup": "Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown",
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": {
+          "on_ms": 2000,
+          "off_ms": 2000,
+          "cycles": 5
+        },
+        "settings_observed_at": "2026-11-09T00:05:25.807852+00:00",
+        "settings_persistence": null
+      },
+      "channel_readout": "Channel enable: Disabled"
+    },
+    {
+      "action": "read-raw-bay-result",
+      "captured_at_utc": "2026-11-09T00:06:14.837Z",
+      "notice": "Refused or unconfirmed: End-to-end deadline expired; result is unconfirmed ",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": true,
+        "identity": {
+          "serial_number": "68800777",
+          "model": "KSC101",
+          "firmware": "1.0.7",
+          "hardware_version": 3,
+          "channels": 1
+        },
+        "generation": 1,
+        "operating_mode": "unknown",
+        "interlock_required": null,
+        "status_bits": null,
+        "electrical_state": "unknown",
+        "electrical_observed_at": null,
+        "requested_state": "off",
+        "error": "End-to-end deadline expired; result is unconfirmed",
+        "cleanup": "Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown",
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": {
+          "on_ms": 2000,
+          "off_ms": 2000,
+          "cycles": 5
+        },
+        "settings_observed_at": "2026-11-09T00:05:25.807852+00:00",
+        "settings_persistence": null
+      },
+      "bay_readout": "Raw bay: Not read"
+    },
+    {
+      "action": "release-after-bay-timeout",
+      "captured_at_utc": "2026-11-09T00:07:01.968Z",
+      "notice": "Communication released. Optical state is not measured. Controller fault remains: End-to-end deadline expired; result is unconfirmed. Output activation is blocked; protected recovery is required.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": false,
+        "identity": null,
+        "generation": 1,
+        "operating_mode": "unknown",
+        "interlock_required": null,
+        "status_bits": null,
+        "electrical_state": "unknown",
+        "electrical_observed_at": null,
+        "requested_state": "off",
+        "error": "End-to-end deadline expired; result is unconfirmed",
+        "cleanup": "Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown",
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": null,
+        "settings_observed_at": null,
+        "settings_persistence": null
+      }
+    },
+    {
+      "action": "reconnect-retaining-bay-fault",
+      "captured_at_utc": "2026-11-09T00:07:05.907Z",
+      "notice": "Controller fault remains: Persistent uncertainty: 2026-11-09T00:06:11.380229+00:00 original=End-to-end deadline expired; result is unconfirmed; latest=End-to-end deadline expired; result is unconfirmed; cleanup=Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown. Output activation is blocked; protected recovery is required.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": true,
+        "identity": {
+          "serial_number": "68800777",
+          "model": "KSC101",
+          "firmware": "1.0.7",
+          "hardware_version": 3,
+          "channels": 1
+        },
+        "generation": 2,
+        "operating_mode": "manual",
+        "interlock_required": true,
+        "status_bits": 8192,
+        "electrical_state": "off",
+        "electrical_observed_at": "2026-11-09T00:07:05.813377+00:00",
+        "requested_state": "off",
+        "error": "Persistent uncertainty: 2026-11-09T00:06:11.380229+00:00 original=End-to-end deadline expired; result is unconfirmed; latest=End-to-end deadline expired; result is unconfirmed; cleanup=Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown",
+        "cleanup": "Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown",
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": null,
+        "settings_observed_at": null,
+        "settings_persistence": null
+      }
+    },
+    {
+      "action": "final-protective-off-result",
+      "captured_at_utc": "2026-11-09T00:07:25.789Z",
+      "notice": "Controller fault remains: Persistent uncertainty: 2026-11-09T00:06:11.380229+00:00 original=End-to-end deadline expired; result is unconfirmed; latest=End-to-end deadline expired; result is unconfirmed; cleanup=Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown. Output activation is blocked; protected recovery is required.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": true,
+        "identity": {
+          "serial_number": "68800777",
+          "model": "KSC101",
+          "firmware": "1.0.7",
+          "hardware_version": 3,
+          "channels": 1
+        },
+        "generation": 2,
+        "operating_mode": "manual",
+        "interlock_required": true,
+        "status_bits": 8192,
+        "electrical_state": "off",
+        "electrical_observed_at": "2026-11-09T00:07:18.604417+00:00",
+        "requested_state": "off",
+        "error": "Persistent uncertainty: 2026-11-09T00:06:11.380229+00:00 original=End-to-end deadline expired; result is unconfirmed; latest=End-to-end deadline expired; result is unconfirmed; cleanup=Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown",
+        "cleanup": "Electrical OFF readback; dispatch monotonic=309283.930783; optical unknown",
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": null,
+        "settings_observed_at": null,
+        "settings_persistence": null
+      }
+    },
+    {
+      "action": "final-release-fault-retained",
+      "captured_at_utc": "2026-11-09T00:07:56.830Z",
+      "notice": "Communication released. Optical state is not measured. Controller fault remains: Persistent uncertainty: 2026-11-09T00:06:11.380229+00:00 original=End-to-end deadline expired; result is unconfirmed; latest=End-to-end deadline expired; result is unconfirmed; cleanup=Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown. Output activation is blocked; protected recovery is required.",
+      "sample": {
+        "name": "shutter",
+        "channel": 0,
+        "serial_number": "68800777",
+        "endpoint": "192.168.1.19:40305",
+        "has_device": false,
+        "identity": null,
+        "generation": 2,
+        "operating_mode": "unknown",
+        "interlock_required": null,
+        "status_bits": null,
+        "electrical_state": "unknown",
+        "electrical_observed_at": null,
+        "requested_state": "off",
+        "error": "Persistent uncertainty: 2026-11-09T00:06:11.380229+00:00 original=End-to-end deadline expired; result is unconfirmed; latest=End-to-end deadline expired; result is unconfirmed; cleanup=Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown",
+        "cleanup": "Electrical OFF readback; dispatch monotonic=309283.930783; optical unknown",
+        "optical_closed_at": null,
+        "optical_evidence": null,
+        "cycle_parameters": null,
+        "settings_observed_at": null,
+        "settings_persistence": null
+      }
+    }
+  ],
+  "physical_observation": {
+    "human_reply": "I don't observe. verify it yourself",
+    "result": "Unobserved; controller electrical readback does not independently establish blade motion",
+    "additional_cycles_requested": 0
+  },
+  "remaining_cycle_allowance": 0
+}

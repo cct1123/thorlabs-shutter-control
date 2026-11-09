@@ -1,0 +1,74 @@
+{
+  "requirement": "REQ-253",
+  "test": "TEST-253",
+  "record": "E236",
+  "scope": "Read-only source review, in-memory transport reproduction, and offline rendering of saved actual observations; no hardware",
+  "reviewed_at_utc": "2026-11-09T00:17:53.591671+00:00",
+  "findings": [
+    {
+      "priority": "P1",
+      "file": "src/thorlabs_shutter_control/controller.py",
+      "line": 1515,
+      "title": "Empty-text exceptions bypass the retained-owner lockout",
+      "method": "Use tests/conftest.py fictional config and FakeTransport; interrupt pulse hold with unittest.mock.patch.object(channel.cancel, wait, side_effect=KeyboardInterrupt()); catch it, then request ON again on the same owner. No instrument transport is constructed.",
+      "observed": {
+        "interrupted": true,
+        "retained_error": "",
+        "electrical_after_cleanup": "off",
+        "journal_exists_after_cleanup": true,
+        "journal_after_interrupt": "Protective OFF pending; original=; optical state unknown",
+        "subsequent_on_accepted": true,
+        "on_frames": 2
+      },
+      "cause": "_fault stores str(exc), empty for KeyboardInterrupt; _ready at724 treats an empty error as no fault. The disk journal still blocks a later process, but the retained owner can send another ON.",
+      "proposed_correction": "Store a nonempty exception description and make fault-state checking consistent; add an interruption regression asserting no subsequent ON before protected recovery."
+    },
+    {
+      "priority": "P2",
+      "file": "src/thorlabs_shutter_control/gui.py",
+      "line": 716,
+      "title": "Retained fault hides successful protective OFF feedback",
+      "method": "Render final-protective-off-result from records/webui-command-hardware-live.json through the current Dash HTTP callback, offline.",
+      "observed": {
+        "recorded_electrical": "off",
+        "recorded_timestamp": "2026-11-09T00:07:18.604417+00:00",
+        "recorded_cleanup": "Electrical OFF readback; dispatch monotonic=309283.930783; optical unknown",
+        "ui_output_lamp": "Unknown",
+        "ui_output_aria": "Output ON: Unknown",
+        "ui_error": "Reported",
+        "notice_excludes_successful_off": true
+      },
+      "cause": "The fault-notice branch discards the successful action message while connected, and render at935-936 forces electrical Output to Unknown for every fault, even with a fresh sample.",
+      "proposed_correction": "Keep fault/activation lockout while also reporting the confirmed OFF action and dated electrical result; retain optical state Unknown."
+    }
+  ],
+  "operational_gaps": [
+    "No protected recovery action in GUI ACTIONS; manual documented API procedure remains necessary",
+    "No independent blade/optical observation was available for the recorded real pulse"
+  ],
+  "production_code_changed": false,
+  "hardware_contacted": false,
+  "reviewed_source_sha256": {
+    "src/thorlabs_shutter_control/controller.py": "9172a9efdbde5125af19a298e82d6e12b0edc0eaea12ac372bc1a49077e3859b",
+    "src/thorlabs_shutter_control/gui.py": "6b5cd87d1fa16855c00533e12f56fb2cafae7e109141fcfff777c929945045b8"
+  },
+  "prior_suite": {
+    "artifact": "records/webui-command-direct-validation.json",
+    "input_hashes_match": true,
+    "test_totals": {
+      "offline": {
+        "tests": 344,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "wheel": {
+        "tests": 344,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "limitation": "344 passing existing tests per environment do not cover the newly reproduced empty-error interruption."
+  }
+}

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="4" time="0.355" timestamp="2026-11-08T18:09:07.844092-06:00" hostname="HighFieldSetup"><testcase classname="tests.test_gui_commands" name="test_explicit_led_read_updates_draft_but_other_reads_preserve_it[details.data]" file="tests\test_gui_commands.py" line="109" time="0.099" /><testcase classname="tests.test_gui_commands" name="test_explicit_led_read_updates_draft_but_other_reads_preserve_it[changed1]" file="tests\test_gui_commands.py" line="109" time="0.021"><failure message="KeyError: 'led-modes'">bench = (&lt;thorlabs_shutter_control.controller.ShutterHub object at 0x000001F456621BB0&gt;, [&lt;conftest.FakeTransport object at 0x0...699E40&gt;, WindowsPath('C:/repo/thorlabs-shutter-control/tmp/gui-followup-reproduction/test_explicit_led_read_updates1'))
+changed = ['sample.data', 'details.data']
+
+    @pytest.mark.parametrize("changed", ["details.data", ["sample.data", "details.data"]])
+    def test_explicit_led_read_updates_draft_but_other_reads_preserve_it(bench, changed):
+        hub, devices, _, _ = bench
+        hub.connect("beam")
+        devices[0].led_modes = 0x8009
+        app = create_app(hub)
+        response = action(app, "read-led")
+        data, sample = response["details"]["data"], response["sample"]["data"]
+        shown = details(app, data, sample, changed)
+&gt;       assert shown["led-modes"]["value"] == [1, 8]
+               ^^^^^^^^^^^^^^^^^^
+E       KeyError: 'led-modes'
+
+tests\test_gui_commands.py:119: KeyError</failure></testcase><testcase classname="tests.test_additional_commands" name="test_keh3_legacy_bay_query_is_refused_without_io_or_fault[False]" file="tests\test_additional_commands.py" line="71" time="0.002"><failure message="thorlabs_shutter_control.protocol.ShutterError: No identity-verified handle; connect explicitly">config = ControllerConfig(name='beam', channel=0, role='fictional beam role', serial_number='68000001', firmware=('1.0.7',), ro...al',), allow_device_settings=False, allow_persistent_settings=False, allow_continuous_cycles=False, max_cycle_count=1))
+tmp_path = WindowsPath('C:/repo/thorlabs-shutter-control/tmp/gui-followup-reproduction/test_keh3_legacy_bay_query_is_0')
+connected = False
+
+    @pytest.mark.parametrize("connected", [False, True])
+    def test_keh3_legacy_bay_query_is_refused_without_io_or_fault(config, tmp_path, connected):
+        config = replace(config, route=Route("keh3", host="192.168.1.19", bay="middle"))
+        devices = []
+    
+        def factory(c, d):
+            device = FakeTransport(c)
+            devices.append(device)
+            return device
+    
+        with ShutterHub([config], transport_factory=factory, lock_directory=tmp_path) as hub:
+            if connected:
+                hub.connect("beam")
+            before = [len(device.history) for device in devices]
+            with pytest.raises(UnsupportedRoute, match="KEH3"):
+&gt;               hub.get_hub_bay_reply("beam")
+
+tests\test_additional_commands.py:87: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\thorlabs_shutter_control\controller.py:922: in get_hub_bay_reply
+    with self._read_operation(target) as (channel, deadline):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\ProgramData\anaconda3\Lib\contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+src\thorlabs_shutter_control\controller.py:897: in _read_operation
+    self._ready(channel)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;thorlabs_shutter_control.controller.ShutterHub object at 0x000001F456AF7620&gt;
+channel = _Channel(name='beam', channel=0, serial_number='68000001', endpoint='192.168.1.19:40305', has_device=False, identity=N... object at 0x000001F456840740&gt;, protectors=0, transport=None, claim=None, driver=None, next_on=None, output_attempts=0)
+allow_fault = False
+
+    def _ready(self, channel, *, allow_fault=False):
+        """Require a verified handle and, unless allowed for cleanup/reads, no latched fault."""
+        if channel.driver is None or channel.identity is None:
+&gt;           raise ShutterError("No identity-verified handle; connect explicitly")
+E           thorlabs_shutter_control.protocol.ShutterError: No identity-verified handle; connect explicitly
+
+src\thorlabs_shutter_control\controller.py:723: ShutterError</failure></testcase><testcase classname="tests.test_additional_commands" name="test_keh3_legacy_bay_query_is_refused_without_io_or_fault[True]" file="tests\test_additional_commands.py" line="71" time="0.004"><failure message="Failed: DID NOT RAISE UnsupportedRoute">config = ControllerConfig(name='beam', channel=0, role='fictional beam role', serial_number='68000001', firmware=('1.0.7',), ro...al',), allow_device_settings=False, allow_persistent_settings=False, allow_continuous_cycles=False, max_cycle_count=1))
+tmp_path = WindowsPath('C:/repo/thorlabs-shutter-control/tmp/gui-followup-reproduction/test_keh3_legacy_bay_query_is_1')
+connected = True
+
+    @pytest.mark.parametrize("connected", [False, True])
+    def test_keh3_legacy_bay_query_is_refused_without_io_or_fault(config, tmp_path, connected):
+        config = replace(config, route=Route("keh3", host="192.168.1.19", bay="middle"))
+        devices = []
+    
+        def factory(c, d):
+            device = FakeTransport(c)
+            devices.append(device)
+            return device
+    
+        with ShutterHub([config], transport_factory=factory, lock_directory=tmp_path) as hub:
+            if connected:
+                hub.connect("beam")
+            before = [len(device.history) for device in devices]
+&gt;           with pytest.raises(UnsupportedRoute, match="KEH3"):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE UnsupportedRoute
+
+tests\test_additional_commands.py:86: Failed</failure></testcase></testsuite></testsuites>

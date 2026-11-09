@@ -34,8 +34,8 @@ Restart kernels after source changes.
 | [2. Connection](02_connection.ipynb) | Connect, verify identity, release |
 | [3. Status](03_status_query.ipynb) | Read the canonical structured status |
 | [4. Settings](04_settings.ipynb) | Inspect host configuration and actual feedback |
-| [5. Modes](05_shutter_modes.ipynb) | Explicit persistent Manual selection; Trigger exit requires source-protection confirmation |
-| [6. ON/OFF](06_on_off.ipynb) | Physical OFF preparation, 2 s OFF pause, one 1 s host ON hold, OFF/readback |
+| [5. Modes](05_shutter_modes.ipynb) | Explicit persistent Manual selection with OFF/interlock readback; no source confirmation |
+| [6. ON/OFF](06_on_off.ipynb) | Physical OFF preparation, configured OFF pause (currently zero), one 1 s host ON hold, OFF/readback |
 
 Every hardware cell uses the same ShutterHub as Python/CLI/GUI. Its context
 releases communication on success or error, preserving a cleanup error alongside
@@ -49,7 +49,7 @@ an explicit diagnostic and is not needed for normal status. See
 [manual/API findings](../state-zero-investigation.md) and [the Python API](../python-api.md).
 
 Notebooks 1-4 query only. Notebook 5 can change the remembered operating mode;
-its False source-protection flag refuses Trigger exit. Notebook 6 actuates the
+it requires OFF/interlock readback, without separate mode permission or a source-confirmation flag. Notebook 6 actuates the
 connected shutter and requires prior Manual selection and the exact approved
 source-blocked setup. Run All on notebooks 5/6 is a device operation, separate
 from static verification. Review their instructions and

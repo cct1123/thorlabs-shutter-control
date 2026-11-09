@@ -27,17 +27,17 @@ There is no USB fallback. This repository supplies config/shutter.ethernet.toml
 for the selected controller, with hub identity/firmware explicitly unknown.
 Migrate deployment metadata deliberately; do not rename physical roles by inference.
 
-Public owner methods remain stable. Version 2 deliberately replaces the nested
-status schema: update the external adapter/page using the
+Convenience owner aliases and duplicated status configuration fields have been
+removed. Version 2 also replaces the nested status schema: update the external adapter/page using the
 [status migration](python-api.md#status-schema-migration) before upgrading. The
 external checkout has not been migrated or revalidated for version 2 here.
-Enable rejects because it
-aliases output; partial/unknown-count writes refuse every subsequent frame,
+No owner-level enable setup alias exists because channel enable actuates output;
+partial/unknown-count writes refuse every subsequent frame,
 including OFF, until protected recovery. Native activity remains unavailable
 and is never inferred from electrical ON/OFF. Docked KEH3 and D2XX use the same
-reviewed Manual/load/interlock/ownership boundary; VCP/external USB writes remain
-restricted. Changed modes require separate persistent-mode permission, and
-Trigger exit additionally requires established source protection.
+reviewed mode/load/interlock/ownership boundary; VCP/external USB writes remain
+restricted. Changed modes require verified OFF/interlock readback; mode selection
+has no separate permission or software source-confirmation requirement.
 
 ## Page restoration and validation
 

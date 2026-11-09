@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="5" time="0.455" timestamp="2026-11-08T22:28:49.625906-06:00" hostname="HighFieldSetup"><testcase classname="tests.test_gui_fault_notice" name="test_refusal_preserves_only_same_session_dated_feedback[same]" file="tests\test_gui_fault_notice.py" line="83" time="0.128"><failure message="AssertionError: assert 'unknown' == 'off'&#10;  &#10;  - off&#10;  + unknown">bench = (&lt;thorlabs_shutter_control.controller.ShutterHub object at 0x000002A10DFD5760&gt;, [&lt;conftest.FakeTransport object at 0x0...FF4EA0&gt;, WindowsPath('C:/repo/thorlabs-shutter-control/tmp/consistency-review-before/test_refusal_preserves_only_sa0'))
+context = 'same'
+
+    @pytest.mark.parametrize("context", ["same", "target", "generation", "fault", "undated"])
+    def test_refusal_preserves_only_same_session_dated_feedback(bench, context):
+        hub, devices, _, _ = bench
+        hub.connect("beam")
+        previous = asdict(hub.get_status("beam"))
+        if context == "target":
+            previous["name"] = "other"
+        elif context == "generation":
+            previous["generation"] -= 1
+        elif context == "undated":
+            previous["electrical_observed_at"] = None
+        elif context == "fault":
+            hub._channel("beam").error = "Retained fault"
+        # A denied settings request performs no I/O, so retain an old dated reading
+        # only for the unchanged healthy connection, never infer a fresh reading.
+        app = create_app(hub)
+        key = next(key for key in app.callback_map if "notice.children" in key)
+        before = len(devices[0].history)
+        response = post_callback(
+            app, key,
+            {"target": "beam", "sample": previous, "apply-led": 1, "led-modes": [1]},
+            "apply-led.n_clicks",
+        )
+        sample = response["sample"]["data"]
+        assert len(devices[0].history) == before
+        if context == "same":
+&gt;           assert sample["electrical_state"] == "off"
+E           AssertionError: assert 'unknown' == 'off'
+E             
+E             - off
+E             + unknown
+
+tests\test_gui_fault_notice.py:110: AssertionError</failure></testcase><testcase classname="tests.test_gui_fault_notice" name="test_refusal_preserves_only_same_session_dated_feedback[target]" file="tests\test_gui_fault_notice.py" line="83" time="0.038" /><testcase classname="tests.test_gui_fault_notice" name="test_refusal_preserves_only_same_session_dated_feedback[generation]" file="tests\test_gui_fault_notice.py" line="83" time="0.037" /><testcase classname="tests.test_gui_fault_notice" name="test_refusal_preserves_only_same_session_dated_feedback[fault]" file="tests\test_gui_fault_notice.py" line="83" time="0.038" /><testcase classname="tests.test_gui_fault_notice" name="test_refusal_preserves_only_same_session_dated_feedback[undated]" file="tests\test_gui_fault_notice.py" line="83" time="0.040" /></testsuite></testsuites>

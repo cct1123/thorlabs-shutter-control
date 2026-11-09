@@ -1,0 +1,34 @@
+{
+  "scope": "historical saved raw reply replay, not hardware I/O",
+  "capture": "records\\state-zero-statusbits-investigation.json",
+  "capture_sha256": "f772a5652d36e6beb2f118282be343cf303ff74ca98e06e90fc002fee0f9ac44",
+  "reply_hex": "2a0406008150010000200000",
+  "status_bits": 8192,
+  "interlock_status_bit": false,
+  "channel_enabled_bit": false,
+  "electrical_state": "off",
+  "verified_manufacturer_sources": {
+    "ksc101_header": {
+      "path": "inputs/reference/state-zero/Thorlabs.MotionControl.KCube.Solenoid.h",
+      "sha256": "528c5e92604710c258e5e67326ddeb7a8c9add2b297bd1d903e60ff02ef60445"
+    },
+    "ksc101_get_status_bits": {
+      "path": "inputs/reference/state-zero/kinesis-1.14.60/dotnet-api/a08488_a33fd41ba3b79a5078c4609d804c51376.html",
+      "sha256": "cf20d5625aaae5eab3b2081e461b394b2ca213658183a47859c76afd545da72b"
+    },
+    "solenoid_status_class": {
+      "path": "inputs/reference/state-zero/kinesis-1.14.60/dotnet-api/a08484.html",
+      "sha256": "add82aed2829c80b0047923d62d6e66ac6bb133a7093d0429d10b4fc7ab4300c"
+    },
+    "ksc101_get_operating_state": {
+      "path": "inputs/reference/state-zero/kinesis-1.14.60/dotnet-api/a08488_a17ec982fd4d4ce12229bb09fe9671aa2.html",
+      "sha256": "f0913138657d2f73bd30bb986de9a8fe1db2a2490a50b0771ae32cc58a271259"
+    }
+  },
+  "unresolved": [
+    "KeyEnabled raw mapping",
+    "Is Ready raw mapping",
+    "actual native OperatingState/ToggleCount"
+  ],
+  "vendor_code_executed": false
+}

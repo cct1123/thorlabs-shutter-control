@@ -1,0 +1,21 @@
+{
+  "input_count": 40,
+  "all_inputs_match": true,
+  "test_totals": {
+    "offline": {
+      "tests": 389,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wheel": {
+      "tests": 389,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "REQ-270": "PASS software",
+  "REQ-271": "PARTIAL/BLOCKED; manufacturer/raw mapping required",
+  "no_hardware_or_sdk_execution": true
+}

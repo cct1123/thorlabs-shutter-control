@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="4" time="0.332" timestamp="2026-11-08T18:00:37.922721-06:00" hostname="HighFieldSetup"><testcase classname="tests.test_gui_fault_notice" name="test_persistent_fault_remains_in_both_notices_without_actuation[connect]" file="tests\test_gui_fault_notice.py" line="8" time="0.109"><failure message="AssertionError: assert ('fault' in 'connected to the exact controller; fresh feedback received.')&#10; +  where 'connected to the exact controller; fresh feedback received.' = &lt;built-in method lower of str object at 0x000001F7883EE6B0&gt;()&#10; +    where &lt;built-in method lower of str object at 0x000001F7883EE6B0&gt; = 'Connected to the exact controller; fresh feedback received.'.lower">bench = (&lt;thorlabs_shutter_control.controller.ShutterHub object at 0x000001F787FF9B20&gt;, [&lt;conftest.FakeTransport object at 0x0...7880949A0&gt;, WindowsPath('C:/repo/thorlabs-shutter-control/tmp/gui-fault-reproduction/test_persistent_fault_remains_0'))
+action = 'connect'
+
+    @pytest.mark.parametrize("action", ["connect", "read", "poll", "release"])
+    def test_persistent_fault_remains_in_both_notices_without_actuation(bench, action):
+        hub, devices, _, path = bench
+        journal = path / "uncertain-68000001"
+        journal.write_text("Previous owner cleanup unconfirmed (software fixture)", encoding="utf-8")
+        hub.connect("beam")
+        app = create_app(hub)
+        key = next(key for key in app.callback_map if "notice.children" in key)
+        prop = "n_intervals" if action == "poll" else "n_clicks"
+        response = post_callback(app, key, {"target": "beam", action: 1}, f"{action}.{prop}")
+        assert response["sample"]["data"]["error"].startswith("Persistent uncertainty:")
+        assert "notice" in response  # Faults must also surface during background polling.
+        message = response["notice"]["children"]
+&gt;       assert "fault" in message.lower() and "recovery" in message.lower()
+E       AssertionError: assert ('fault' in 'connected to the exact controller; fresh feedback received.')
+E        +  where 'connected to the exact controller; fresh feedback received.' = &lt;built-in method lower of str object at 0x000001F7883EE6B0&gt;()
+E        +    where &lt;built-in method lower of str object at 0x000001F7883EE6B0&gt; = 'Connected to the exact controller; fresh feedback received.'.lower
+
+tests\test_gui_fault_notice.py:22: AssertionError</failure></testcase><testcase classname="tests.test_gui_fault_notice" name="test_persistent_fault_remains_in_both_notices_without_actuation[read]" file="tests\test_gui_fault_notice.py" line="8" time="0.028"><failure message="AssertionError: assert ('fault' in 'readback updated.')&#10; +  where 'readback updated.' = &lt;built-in method lower of str object at 0x000001F7884F7170&gt;()&#10; +    where &lt;built-in method lower of str object at 0x000001F7884F7170&gt; = 'Readback updated.'.lower">bench = (&lt;thorlabs_shutter_control.controller.ShutterHub object at 0x000001F78842E7B0&gt;, [&lt;conftest.FakeTransport object at 0x0...7884537E0&gt;, WindowsPath('C:/repo/thorlabs-shutter-control/tmp/gui-fault-reproduction/test_persistent_fault_remains_1'))
+action = 'read'
+
+    @pytest.mark.parametrize("action", ["connect", "read", "poll", "release"])
+    def test_persistent_fault_remains_in_both_notices_without_actuation(bench, action):
+        hub, devices, _, path = bench
+        journal = path / "uncertain-68000001"
+        journal.write_text("Previous owner cleanup unconfirmed (software fixture)", encoding="utf-8")
+        hub.connect("beam")
+        app = create_app(hub)
+        key = next(key for key in app.callback_map if "notice.children" in key)
+        prop = "n_intervals" if action == "poll" else "n_clicks"
+        response = post_callback(app, key, {"target": "beam", action: 1}, f"{action}.{prop}")
+        assert response["sample"]["data"]["error"].startswith("Persistent uncertainty:")
+        assert "notice" in response  # Faults must also surface during background polling.
+        message = response["notice"]["children"]
+&gt;       assert "fault" in message.lower() and "recovery" in message.lower()
+E       AssertionError: assert ('fault' in 'readback updated.')
+E        +  where 'readback updated.' = &lt;built-in method lower of str object at 0x000001F7884F7170&gt;()
+E        +    where &lt;built-in method lower of str object at 0x000001F7884F7170&gt; = 'Readback updated.'.lower
+
+tests\test_gui_fault_notice.py:22: AssertionError</failure></testcase><testcase classname="tests.test_gui_fault_notice" name="test_persistent_fault_remains_in_both_notices_without_actuation[poll]" file="tests\test_gui_fault_notice.py" line="8" time="0.022"><failure message="AssertionError: assert 'notice' in {'sample': {'data': {'name': 'beam', 'channel': 0, 'serial_number': '68000001', 'endpoint': None, ...}}, 'details': {'data': {'target': 'beam', 'generation': 1, 'values': {}, 'action': 'reset', ...}}}">bench = (&lt;thorlabs_shutter_control.controller.ShutterHub object at 0x000001F78850D820&gt;, [&lt;conftest.FakeTransport object at 0x0...7884F1440&gt;, WindowsPath('C:/repo/thorlabs-shutter-control/tmp/gui-fault-reproduction/test_persistent_fault_remains_2'))
+action = 'poll'
+
+    @pytest.mark.parametrize("action", ["connect", "read", "poll", "release"])
+    def test_persistent_fault_remains_in_both_notices_without_actuation(bench, action):
+        hub, devices, _, path = bench
+        journal = path / "uncertain-68000001"
+        journal.write_text("Previous owner cleanup unconfirmed (software fixture)", encoding="utf-8")
+        hub.connect("beam")
+        app = create_app(hub)
+        key = next(key for key in app.callback_map if "notice.children" in key)
+        prop = "n_intervals" if action == "poll" else "n_clicks"
+        response = post_callback(app, key, {"target": "beam", action: 1}, f"{action}.{prop}")
+        assert response["sample"]["data"]["error"].startswith("Persistent uncertainty:")
+&gt;       assert "notice" in response  # Faults must also surface during background polling.
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 'notice' in {'sample': {'data': {'name': 'beam', 'channel': 0, 'serial_number': '68000001', 'endpoint': None, ...}}, 'details': {'data': {'target': 'beam', 'generation': 1, 'values': {}, 'action': 'reset', ...}}}
+
+tests\test_gui_fault_notice.py:20: AssertionError</failure></testcase><testcase classname="tests.test_gui_fault_notice" name="test_persistent_fault_remains_in_both_notices_without_actuation[release]" file="tests\test_gui_fault_notice.py" line="8" time="0.024"><failure message="AssertionError: assert ('fault' in 'communication released. optical state is not measured.')&#10; +  where 'communication released. optical state is not measured.' = &lt;built-in method lower of str object at 0x000001F7884AEEB0&gt;()&#10; +    where &lt;built-in method lower of str object at 0x000001F7884AEEB0&gt; = 'Communication released. Optical state is not measured.'.lower">bench = (&lt;thorlabs_shutter_control.controller.ShutterHub object at 0x000001F7885517F0&gt;, [&lt;conftest.FakeTransport object at 0x0...788537EC0&gt;, WindowsPath('C:/repo/thorlabs-shutter-control/tmp/gui-fault-reproduction/test_persistent_fault_remains_3'))
+action = 'release'
+
+    @pytest.mark.parametrize("action", ["connect", "read", "poll", "release"])
+    def test_persistent_fault_remains_in_both_notices_without_actuation(bench, action):
+        hub, devices, _, path = bench
+        journal = path / "uncertain-68000001"
+        journal.write_text("Previous owner cleanup unconfirmed (software fixture)", encoding="utf-8")
+        hub.connect("beam")
+        app = create_app(hub)
+        key = next(key for key in app.callback_map if "notice.children" in key)
+        prop = "n_intervals" if action == "poll" else "n_clicks"
+        response = post_callback(app, key, {"target": "beam", action: 1}, f"{action}.{prop}")
+        assert response["sample"]["data"]["error"].startswith("Persistent uncertainty:")
+        assert "notice" in response  # Faults must also surface during background polling.
+        message = response["notice"]["children"]
+&gt;       assert "fault" in message.lower() and "recovery" in message.lower()
+E       AssertionError: assert ('fault' in 'communication released. optical state is not measured.')
+E        +  where 'communication released. optical state is not measured.' = &lt;built-in method lower of str object at 0x000001F7884AEEB0&gt;()
+E        +    where &lt;built-in method lower of str object at 0x000001F7884AEEB0&gt; = 'Communication released. Optical state is not measured.'.lower
+
+tests\test_gui_fault_notice.py:22: AssertionError</failure></testcase></testsuite></testsuites>

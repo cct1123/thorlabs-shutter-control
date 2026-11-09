@@ -8,6 +8,17 @@ uv sync --locked --extra gui --group dev
 uv run --locked python scripts/verify.py
 ```
 
+Launch the GUI from the repository root:
+
+```powershell
+uv run shutter-control gui
+```
+
+The GUI defaults to the tracked Ethernet profile
+and http://127.0.0.1:9860; it opens no device until you select an exact target and
+click Connect. Override with `--config PATH` before `gui` or `gui --port PORT`.
+Other CLI commands continue to default to `shutters.local.toml`.
+
 The default package has no Python runtime dependencies. Optional `d2xx` uses
 ftd2xx 1.3.8 and the installed FTDI D2XX native library; it never uses a Thorlabs
 DLL. Optional `vcp` uses pyserial 3.5 and an exact configured port. The VCP bridge
@@ -42,11 +53,11 @@ the hub. Optional known metadata is checked for consistency across its routes.
 `policy` is omitted by default. Writes require an operator-reviewed qualification
 record covering shutter model, wiring, OFF -> optical closed mapping, interlocks,
 continuous-duty permission and minimum OFF interval. The current implementation
-only permits continuous-duty manual loads: finite exposure/duty policies fail
+only activates continuous-duty loads in permitted modes: finite exposure/duty policies fail
 closed until an independent cutoff and applicable limits are qualified.
 Changing a policy requires revalidation; setting a boolean is not qualification.
-`allow_persistent_mode_changes` defaults to false. Set it to true only when the
-approved setup permits changing the remembered startup mode. KSC101 mode changes
+`allow_persistent_mode_changes` is a legacy compatibility field and does not gate
+mode selection; electrical OFF and interlock/readback checks remain. KSC101 mode changes
 persist automatically (SRC-002 p20) even without an explicit EEPROM command.
 
 | Symptom | Meaning / response |
@@ -54,9 +65,9 @@ persist automatically (SRC-002 p20) even without an explicit EEPROM command.
 | Missing ftd2xx/native DLL | Install optional Python extra and matching official FTDI native package; no Thorlabs application required |
 | Already owned | Release the active owner; a failed release retains claims; do not delete lock files to bypass ownership |
 | Identity mismatch | Check exact controller/route with source protected; no fallback or output cleanup to a mismatched device |
-| Fault lockout | Keep independent optical protection; use documented protected recovery, never repeat ON |
-| Control route unavailable | VCP and KEH3 external USB OUT writes are refused; docked KEH3 writes require the reviewed load policy and Manual/interlock checks |
-| Trigger->Manual refused | Establish independent source protection and trigger isolation, then use Python source_inhibited=True or CLI manual --source-inhibited |
+| Fault lockout | Keep independent optical protection; explicit Stop/OFF resets after verified OFF/interlock. A poisoned session needs Release/Connect first; passive protected recovery is another option. Never repeat ON |
+| Control route unavailable | VCP and KEH3 external USB OUT writes are refused; docked KEH3 writes require the reviewed load policy and mode/interlock checks |
+| Trigger->Manual refused | Check electrical OFF and enabled interlock requirement; no source confirmation is required for mode selection |
 | OFF unconfirmed | Physical state remains unknown; use independent source protection and inspect the shutter |
 | Write framing unknown | No more frames, including OFF, are sent on that connection; independently inhibit the source and perform protected recovery |
 

@@ -1,0 +1,29 @@
+{
+  "requirement": "REQ-255",
+  "test": "TEST-255",
+  "record": "E239",
+  "recorded_at_utc": "2026-11-09T03:31:14.915071+00:00",
+  "human_reply": "Conditions confirmed; run the bounded redo",
+  "conditions": [
+    "Independent beam block",
+    "Isolated external triggers",
+    "Intact key/interlock",
+    "Visibly closed blade"
+  ],
+  "target": {
+    "load": "SH05R",
+    "serial": "68800777",
+    "endpoint": "192.168.1.19:40305"
+  },
+  "approved_actions": "Protected passive recovery; diagnostic reads; exactly one1s Manual pulse after >=2s OFF rest; final OFF/readback/release; no settings changes",
+  "approved_pulses": 1,
+  "requested_pulses": 0,
+  "camera_reply": "No / unsure",
+  "camera_used": false,
+  "journal_before": {
+    "path": "C:\\Users\\HFNV\\AppData\\Local\\KSC101Control\\ownership-v1\\uncertain-68800777",
+    "exists": true,
+    "sha256": "8e3e6175adfe4cf642552888efe6c43f433de48da35f5f921c3b9c9a3daf636c",
+    "text": "Protective OFF pending; original=Persistent uncertainty: 2026-11-09T00:06:11.380229+00:00 original=End-to-end deadline expired; result is unconfirmed; latest=End-to-end deadline expired; result is unconfirmed; cleanup=Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown; optical state unknown"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "requirement": "REQ-255",
+  "test": "TEST-255",
+  "captured_at_utc": "2026-11-09T00:30:45.711941+00:00",
+  "scope": "Before any recovery or actuation; exact journal retained",
+  "runtime_sha256": {
+    "src/thorlabs_shutter_control/__init__.py": "df8f1a80bd7892400fef2f66a061bcee2776125a61977091b7402cf44025248f",
+    "src/thorlabs_shutter_control/__main__.py": "3b4613f711ff95276f9dc0c2ed73d386dcedff1e012271bcc96e90b09c130fa6",
+    "src/thorlabs_shutter_control/assets/shutter.css": "d7c6e24fb0c0d30688eb96dc7673c5df230c4751189585f36252a7f869a5fb12",
+    "src/thorlabs_shutter_control/controller.py": "213a3bf62c5d409126c5469f9227a0d52b04955793f69a4c47b60cb0af35348a",
+    "src/thorlabs_shutter_control/gui.py": "47dadb6ea652b8b9e3e2b825ee84f0272160fc51923415acbe739483b134791a",
+    "src/thorlabs_shutter_control/protocol.py": "73884542c7e7fc0cdefa45efe2d4ef3232f288649e08143705e39e1a6f17754c",
+    "src/thorlabs_shutter_control/transport.py": "850583f672bc8566529b1845e84e5dd3bdb5d865cf361366c2c84e9612722da3"
+  },
+  "software_totals": {
+    "offline": {
+      "tests": 354,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wheel": {
+      "tests": 354,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "verifier_input_count": 39,
+  "journal": {
+    "path": "C:\\Users\\HFNV\\AppData\\Local\\KSC101Control\\ownership-v1\\uncertain-68800777",
+    "sha256": "8e3e6175adfe4cf642552888efe6c43f433de48da35f5f921c3b9c9a3daf636c",
+    "text": "Protective OFF pending; original=Persistent uncertainty: 2026-11-09T00:06:11.380229+00:00 original=End-to-end deadline expired; result is unconfirmed; latest=End-to-end deadline expired; result is unconfirmed; cleanup=Electrical OFF readback; dispatch monotonic=309124.150821; optical unknown; optical state unknown"
+  },
+  "physical_confirmation": "Pending",
+  "camera_inventory": "Logi Webcam C920e present; view/orientation not confirmed; no image captured"
+}

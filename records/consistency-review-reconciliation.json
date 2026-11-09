@@ -1,0 +1,28 @@
+{
+  "verifier_inputs_match": true,
+  "input_count": 39,
+  "test_totals": {
+    "offline": {
+      "tests": 370,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "wheel": {
+      "tests": 370,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "unchanged_notebook_observations": [
+    "docs/examples/01_device_discovery.ipynb",
+    "docs/examples/02_connection.ipynb",
+    "docs/examples/03_status_query.ipynb",
+    "docs/examples/04_settings.ipynb",
+    "docs/examples/05_shutter_modes.ipynb",
+    "docs/examples/06_on_off.ipynb"
+  ],
+  "evidence_id_correction": "E248 aliases earlier duplicate-E244 TEST-261; E244 canonical code reduction",
+  "scope": "software-only; no hardware/live server operation"
+}
